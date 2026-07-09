@@ -161,9 +161,46 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_freeContext(
     whisper_free(context);
 }
 
+struct fgt_segment_ctx {
+    JNIEnv *env;
+    jobject callback;
+    jmethodID mid;
+};
+
+static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *state, int n_new, void *user_data) {
+    UNUSED(state);
+    UNUSED(n_new);
+    struct fgt_segment_ctx *cb = (struct fgt_segment_ctx *) user_data;
+    if (cb == NULL || cb->callback == NULL || cb->mid == NULL) {
+        return;
+    }
+    int n = whisper_full_n_segments(ctx);
+    size_t cap = 1;
+    for (int i = 0; i < n; i++) {
+        const char *t = whisper_full_get_segment_text(ctx, i);
+        if (t != NULL) cap += strlen(t);
+    }
+    char *buf = (char *) malloc(cap);
+    if (buf == NULL) {
+        return;
+    }
+    buf[0] = '\0';
+    for (int i = 0; i < n; i++) {
+        const char *t = whisper_full_get_segment_text(ctx, i);
+        if (t != NULL) strcat(buf, t);
+    }
+    jstring js = (*cb->env)->NewStringUTF(cb->env, buf);
+    free(buf);
+    (*cb->env)->CallVoidMethod(cb->env, cb->callback, cb->mid, js);
+    if ((*cb->env)->ExceptionCheck(cb->env)) {
+        (*cb->env)->ExceptionClear(cb->env);
+    }
+    (*cb->env)->DeleteLocalRef(cb->env, js);
+}
+
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language) {
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback) {
     UNUSED(thiz);
     struct whisper_context *context = (struct whisper_context *) context_ptr;
     jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
@@ -191,6 +228,19 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
         params.language = "auto";
     }
     params.detect_language = false;
+
+    struct fgt_segment_ctx seg_ctx;
+    seg_ctx.env = env;
+    seg_ctx.callback = segment_callback;
+    seg_ctx.mid = NULL;
+    if (segment_callback != NULL) {
+        jclass cb_class = (*env)->GetObjectClass(env, segment_callback);
+        seg_ctx.mid = (*env)->GetMethodID(env, cb_class, "onSegment", "(Ljava/lang/String;)V");
+        if (seg_ctx.mid != NULL) {
+            params.new_segment_callback = fgt_new_segment;
+            params.new_segment_callback_user_data = &seg_ctx;
+        }
+    }
 
     whisper_reset_timings(context);
 

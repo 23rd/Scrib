@@ -22,7 +22,12 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 return
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val text = whisperContext().transcribeData(pcm, language).trim()
+            val text = whisperContext().transcribeData(pcm, language) { partial ->
+                try {
+                    callback.onTranscriptionProgress(partial.trim())
+                } catch (ignore: Exception) {
+                }
+            }.trim()
             callback.onTranscriptionResult(text)
         } catch (e: Throwable) {
             callback.onTranscriptionError(makeError(ErrorType.UNEXPECTED, e.message))
