@@ -74,6 +74,7 @@ class MainActivity : Activity() {
                     "Model not found:\n${model.absolutePath}"
                 } else {
                     val context = WhisperContext.createContextFromFile(model.absolutePath)
+                    val decodeStart = System.currentTimeMillis()
                     val audio = if (opus) {
                         val file = opusFile()
                         if (!file.exists()) throw RuntimeException("jfk.ogg not found: ${file.absolutePath}")
@@ -82,9 +83,11 @@ class MainActivity : Activity() {
                     } else {
                         assets.open("jfk.wav").use { WavDecoder.decode(it) }
                     }
+                    val decodeMs = System.currentTimeMillis() - decodeStart
                     val started = System.currentTimeMillis()
                     val text = context.transcribeData(audio, if (opus) null else "en")
                     val elapsed = System.currentTimeMillis() - started
+                    android.util.Log.i("FGTPERF", "decode=${decodeMs}ms whisper=${elapsed}ms samples=${audio.size}")
                     context.release()
                     "OK · ${if (opus) "Opus" else "WAV"} · ${audio.size} samples · ${elapsed}ms\n\n$text"
                 }

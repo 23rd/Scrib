@@ -3,6 +3,7 @@ package com.whispercpp.whisper
 import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
+import java.io.File
 
 private const val LOG_TAG = "LibWhisper"
 
@@ -73,7 +74,27 @@ private class WhisperLib {
     companion object {
         init {
             Log.d(LOG_TAG, "Primary ABI: ${Build.SUPPORTED_ABIS[0]}")
-            System.loadLibrary("whisper")
+            var loadVfpv4 = false
+            var loadV8fp16 = false
+            if (Build.SUPPORTED_ABIS[0].equals("armeabi-v7a")) {
+                cpuInfo()?.let { if (it.contains("vfpv4")) loadVfpv4 = true }
+            } else if (Build.SUPPORTED_ABIS[0].equals("arm64-v8a")) {
+                cpuInfo()?.let { if (it.contains("fphp")) loadV8fp16 = true }
+            }
+            when {
+                loadVfpv4 -> {
+                    Log.d(LOG_TAG, "Loading libwhisper_vfpv4.so")
+                    System.loadLibrary("whisper_vfpv4")
+                }
+                loadV8fp16 -> {
+                    Log.d(LOG_TAG, "Loading libwhisper_v8fp16_va.so")
+                    System.loadLibrary("whisper_v8fp16_va")
+                }
+                else -> {
+                    Log.d(LOG_TAG, "Loading libwhisper.so")
+                    System.loadLibrary("whisper")
+                }
+            }
         }
 
         external fun initContextFromAsset(assetManager: AssetManager, assetPath: String): Long
@@ -85,5 +106,14 @@ private class WhisperLib {
         external fun getTextSegmentT0(contextPtr: Long, index: Int): Long
         external fun getTextSegmentT1(contextPtr: Long, index: Int): Long
         external fun getSystemInfo(): String
+    }
+}
+
+private fun cpuInfo(): String? {
+    return try {
+        File("/proc/cpuinfo").inputStream().bufferedReader().use { it.readText() }
+    } catch (e: Exception) {
+        Log.w(LOG_TAG, "Couldn't read /proc/cpuinfo", e)
+        null
     }
 }
