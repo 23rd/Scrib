@@ -18,7 +18,7 @@ interface TranscriptionEngine {
 
         fun get(context: Context): TranscriptionEngine {
             return instance ?: synchronized(this) {
-                instance ?: StubTranscriptionEngine().also { instance = it }
+                instance ?: WhisperTranscriptionEngine(context.applicationContext).also { instance = it }
             }
         }
     }
