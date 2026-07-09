@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Forkgram Transcriber</string>
+    <string name="main_status">Forkgram Transcriber\n\nOffline speech-to-text service.\n\nThis app runs on-device Whisper transcription for Forkgram. Keep it installed; you don\'t need to open it.\n\n(stub build — engine not yet wired)</string>
+</resources>
