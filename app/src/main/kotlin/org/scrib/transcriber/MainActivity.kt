@@ -24,6 +24,10 @@ class MainActivity : Activity() {
         val info = TextView(this).apply {
             text = getString(R.string.main_status)
         }
+        val downloadButton = Button(this).apply {
+            text = "Download model"
+            setOnClickListener { downloadModel() }
+        }
         val wavButton = Button(this).apply {
             text = "Self-test: jfk.wav (WAV)"
             setOnClickListener { runSelfTest(opus = false) }
@@ -37,10 +41,24 @@ class MainActivity : Activity() {
             text = "Model exists=${modelFile().exists()}"
         }
         root.addView(info)
+        root.addView(downloadButton)
         root.addView(wavButton)
         root.addView(opusButton)
         root.addView(status)
         setContentView(ScrollView(this).apply { addView(root) })
+    }
+
+    private fun downloadModel() {
+        status.text = "Downloading model…"
+        thread {
+            val message = try {
+                val file = ModelManager.ensureModel(this)
+                "Model ready · ${file.length() / 1_000_000} MB"
+            } catch (e: Throwable) {
+                "Download failed: ${e.message}"
+            }
+            runOnUiThread { status.text = message }
+        }
     }
 
     private fun modelFile(): File = File(getExternalFilesDir(null), "ggml-tiny-q5_1.bin")
