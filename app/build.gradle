@@ -5,6 +5,7 @@ android {
     namespace 'org.scrib.transcriber'
     compileSdk 35
     buildToolsVersion '35.0.0'
+    ndkVersion '27.2.12479018'
 
     defaultConfig {
         applicationId 'org.scrib.transcriber'
@@ -12,10 +13,26 @@ android {
         targetSdk 35
         versionCode 1
         versionName '0.1'
+
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+        externalNativeBuild {
+            cmake {
+                cppFlags '-O3'
+                cFlags '-O3'
+            }
+        }
     }
 
     buildFeatures {
         aidl true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'src/main/jni/whisper/CMakeLists.txt'
+        }
     }
 
     compileOptions {
