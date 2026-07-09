@@ -83,7 +83,7 @@ class MainActivity : Activity() {
                         assets.open("jfk.wav").use { WavDecoder.decode(it) }
                     }
                     val started = System.currentTimeMillis()
-                    val text = context.transcribeData(audio, "en")
+                    val text = context.transcribeData(audio, if (opus) null else "en")
                     val elapsed = System.currentTimeMillis() - started
                     context.release()
                     "OK · ${if (opus) "Opus" else "WAV"} · ${audio.size} samples · ${elapsed}ms\n\n$text"

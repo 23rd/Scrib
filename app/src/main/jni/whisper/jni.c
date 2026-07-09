@@ -187,11 +187,10 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     }
     if (lang_chars != NULL && strlen(lang_chars) > 0) {
         params.language = lang_chars;
-        params.detect_language = false;
     } else {
-        params.language = NULL;
-        params.detect_language = true;
+        params.language = "auto";
     }
+    params.detect_language = false;
 
     whisper_reset_timings(context);
 
