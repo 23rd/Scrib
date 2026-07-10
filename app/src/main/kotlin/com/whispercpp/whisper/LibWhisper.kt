@@ -11,12 +11,40 @@ interface WhisperSegmentCallback {
     fun onSegment(text: String)
 }
 
+class WhisperAbortFlag {
+
+    private var ptr: Long = WhisperLib.newAbortFlag()
+
+    @Synchronized
+    fun nativePtr(): Long = ptr
+
+    @Synchronized
+    fun cancel() {
+        if (ptr != 0L) {
+            WhisperLib.setAbortFlag(ptr)
+        }
+    }
+
+    @Synchronized
+    fun close() {
+        if (ptr != 0L) {
+            WhisperLib.freeAbortFlag(ptr)
+            ptr = 0
+        }
+    }
+}
+
 class WhisperContext private constructor(private var ptr: Long) {
 
     // Whisper C++ requires that a context is not accessed from more than one thread
     // at a time; the callers here are already serialized, and this enforces it too.
     @Synchronized
-    fun transcribeData(data: FloatArray, language: String?, onSegment: ((String) -> Unit)? = null): String {
+    fun transcribeData(
+        data: FloatArray,
+        language: String?,
+        abortFlag: WhisperAbortFlag? = null,
+        onSegment: ((String) -> Unit)? = null
+    ): String {
         require(ptr != 0L)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
@@ -28,7 +56,7 @@ class WhisperContext private constructor(private var ptr: Long) {
                 }
             }
         } else null
-        WhisperLib.fullTranscribe(ptr, numThreads, data, language ?: "", callback)
+        WhisperLib.fullTranscribe(ptr, numThreads, data, language ?: "", callback, abortFlag?.nativePtr() ?: 0L)
         val textCount = WhisperLib.getTextSegmentCount(ptr)
         return buildString {
             for (i in 0 until textCount) {
@@ -67,6 +95,15 @@ class WhisperContext private constructor(private var ptr: Long) {
         }
 
         fun getSystemInfo(): String = WhisperLib.getSystemInfo()
+
+        fun supportedLanguages(): List<String> {
+            val count = WhisperLib.languageCount()
+            val languages = ArrayList<String>(count)
+            for (i in 0 until count) {
+                WhisperLib.languageId(i)?.let { languages.add(it) }
+            }
+            return languages
+        }
     }
 }
 
@@ -100,7 +137,12 @@ private class WhisperLib {
         external fun initContextFromAsset(assetManager: AssetManager, assetPath: String): Long
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
-        external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?)
+        external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
+        external fun newAbortFlag(): Long
+        external fun setAbortFlag(flagPtr: Long)
+        external fun freeAbortFlag(flagPtr: Long)
+        external fun languageCount(): Int
+        external fun languageId(index: Int): String?
         external fun getTextSegmentCount(contextPtr: Long): Int
         external fun getTextSegment(contextPtr: Long, index: Int): String
         external fun getTextSegmentT0(contextPtr: Long, index: Int): Long

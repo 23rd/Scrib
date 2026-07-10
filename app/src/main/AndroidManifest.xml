@@ -21,7 +21,7 @@
             android:name=".TranscriptionService"
             android:exported="true">
             <intent-filter>
-                <action android:name="org.scrib.transcriber.ITranscriptionService"/>
+                <action android:name="org.opentranscribe.api.ITranscriptionService"/>
             </intent-filter>
         </service>
     </application>

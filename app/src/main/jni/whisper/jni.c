@@ -2,6 +2,7 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 #include <android/log.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <sys/sysinfo.h>
 #include <string.h>
@@ -200,9 +201,66 @@ static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *s
     (*cb->env)->DeleteLocalRef(cb->env, js);
 }
 
+struct fgt_abort_flag {
+    volatile int cancelled;
+};
+
+static bool fgt_should_abort(void *user_data) {
+    struct fgt_abort_flag *flag = (struct fgt_abort_flag *) user_data;
+    return flag != NULL && flag->cancelled != 0;
+}
+
+static bool fgt_encoder_begin(struct whisper_context *ctx, struct whisper_state *state, void *user_data) {
+    UNUSED(ctx);
+    UNUSED(state);
+    return !fgt_should_abort(user_data);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_newAbortFlag(JNIEnv *env, jobject thiz) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct fgt_abort_flag *flag = (struct fgt_abort_flag *) calloc(1, sizeof(struct fgt_abort_flag));
+    return (jlong) flag;
+}
+
+JNIEXPORT void JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_setAbortFlag(JNIEnv *env, jobject thiz, jlong flag_ptr) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct fgt_abort_flag *flag = (struct fgt_abort_flag *) flag_ptr;
+    if (flag != NULL) {
+        flag->cancelled = 1;
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_freeAbortFlag(JNIEnv *env, jobject thiz, jlong flag_ptr) {
+    UNUSED(env);
+    UNUSED(thiz);
+    free((void *) flag_ptr);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageCount(JNIEnv *env, jobject thiz) {
+    UNUSED(env);
+    UNUSED(thiz);
+    return whisper_lang_max_id() + 1;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jobject thiz, jint index) {
+    UNUSED(thiz);
+    const char *code = whisper_lang_str(index);
+    if (code == NULL) {
+        return NULL;
+    }
+    return (*env)->NewStringUTF(env, code);
+}
+
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback) {
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
     UNUSED(thiz);
     struct whisper_context *context = (struct whisper_context *) context_ptr;
     jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
@@ -242,6 +300,14 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
             params.new_segment_callback = fgt_new_segment;
             params.new_segment_callback_user_data = &seg_ctx;
         }
+    }
+
+    struct fgt_abort_flag *abort_flag = (struct fgt_abort_flag *) abort_flag_ptr;
+    if (abort_flag != NULL) {
+        params.abort_callback = fgt_should_abort;
+        params.abort_callback_user_data = abort_flag;
+        params.encoder_begin_callback = fgt_encoder_begin;
+        params.encoder_begin_callback_user_data = abort_flag;
     }
 
     whisper_reset_timings(context);

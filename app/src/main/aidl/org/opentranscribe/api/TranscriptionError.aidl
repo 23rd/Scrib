@@ -1,6 +1,6 @@
-package org.scrib.transcriber;
+package org.opentranscribe.api;
 
-import org.scrib.transcriber.ErrorType;
+import org.opentranscribe.api.ErrorType;
 
 parcelable TranscriptionError {
     ErrorType type;

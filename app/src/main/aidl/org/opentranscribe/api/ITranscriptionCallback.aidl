@@ -1,6 +1,6 @@
-package org.scrib.transcriber;
+package org.opentranscribe.api;
 
-import org.scrib.transcriber.TranscriptionError;
+import org.opentranscribe.api.TranscriptionError;
 
 oneway interface ITranscriptionCallback {
     void onTranscriptionProgress(String text);

@@ -19,7 +19,7 @@ object AudioDecoder {
     // Decodes whatever the platform supports (Opus/OGG voice notes, AAC/MP4 round videos) from the
     // file descriptor into 16 kHz mono float32 PCM. Uses async MediaCodec so decoding runs at the
     // codec's full speed instead of polling with per-packet timeouts.
-    fun decodeToPcm16kMono(pfd: ParcelFileDescriptor): FloatArray {
+    fun decodeToPcm16kMono(pfd: ParcelFileDescriptor, cancellation: CancellationToken? = null): FloatArray {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         val handlerThread = HandlerThread("fgt-decode")
@@ -54,7 +54,7 @@ object AudioDecoder {
                 private var inputDone = false
 
                 override fun onInputBufferAvailable(mc: MediaCodec, index: Int) {
-                    if (inputDone) {
+                    if (inputDone || cancellation?.isCancelled == true) {
                         return
                     }
                     val buffer = try {
@@ -73,6 +73,11 @@ object AudioDecoder {
                 }
 
                 override fun onOutputBufferAvailable(mc: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+                    if (cancellation?.isCancelled == true) {
+                        mc.releaseOutputBuffer(index, false)
+                        done.countDown()
+                        return
+                    }
                     if (info.size > 0) {
                         val buffer = mc.getOutputBuffer(index)
                         if (buffer != null) {
@@ -104,6 +109,7 @@ object AudioDecoder {
             codec.configure(format, null, null, 0)
             codec.start()
 
+            cancellation?.onCancel { done.countDown() }
             done.await(120, TimeUnit.SECONDS)
 
             return toMono16k(pcm.toByteArray(), rate[0], channels[0].coerceAtLeast(1))
