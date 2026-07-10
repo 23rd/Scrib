@@ -15,6 +15,9 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     @Volatile
     private var whisper: WhisperContext? = null
 
+    @Volatile
+    private var loadedPath: String? = null
+
     override fun transcribe(
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
@@ -31,6 +34,8 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             callback.onTranscriptionResult(text)
         } catch (e: CancelledException) {
             callback.onTranscriptionError(makeError(ErrorType.CANCELLED, null))
+        } catch (e: ModelNotAvailableException) {
+            callback.onTranscriptionError(makeError(ErrorType.MODEL_NOT_AVAILABLE, null))
         } catch (e: DecodeException) {
             callback.onTranscriptionError(makeError(ErrorType.DECODE_FAILED, e.message))
         } catch (e: Throwable) {
@@ -90,14 +95,16 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     }
 
     override fun capabilities(): TranscriberCapabilities {
+        val activeFile = ModelManager.activeFileName(appContext)
+        val englishOnly = activeFile != null && ModelCatalog.isEnglishOnly(activeFile)
         val capabilities = TranscriberCapabilities()
         capabilities.contractVersion = TranscriptionEngine.CONTRACT_VERSION
         capabilities.engineId = ENGINE_ID
         capabilities.engineVersion = appVersion()
-        capabilities.supportedLanguages = languages()
-        capabilities.autoDetectLanguage = true
+        capabilities.supportedLanguages = if (englishOnly) arrayOf("en") else languages()
+        capabilities.autoDetectLanguage = !englishOnly
         capabilities.cancellable = true
-        capabilities.modelReady = ModelManager.isAvailable(appContext)
+        capabilities.modelReady = activeFile != null
         return capabilities
     }
 
@@ -115,9 +122,20 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
 
     @Synchronized
     private fun whisperContext(): WhisperContext {
-        whisper?.let { return it }
-        val model = ModelManager.ensureModel(appContext)
-        return WhisperContext.createContextFromFile(model.absolutePath).also { whisper = it }
+        val model = ModelManager.activeModelFile(appContext) ?: throw ModelNotAvailableException()
+        val path = model.absolutePath
+        whisper?.let {
+            if (loadedPath == path) {
+                return it
+            }
+            it.release()
+            whisper = null
+            loadedPath = null
+        }
+        return WhisperContext.createContextFromFile(path).also {
+            whisper = it
+            loadedPath = path
+        }
     }
 
     private fun makeError(type: Byte, message: String?): TranscriptionError {
@@ -128,6 +146,8 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     }
 
     private class CancelledException : RuntimeException()
+
+    private class ModelNotAvailableException : RuntimeException()
 
     private class DecodeException(message: String) : RuntimeException(message)
 
