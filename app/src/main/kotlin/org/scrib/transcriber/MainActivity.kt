@@ -22,7 +22,8 @@ class MainActivity : ComponentActivity() {
                     onDelete = vm::delete,
                     onAddUrl = vm::addCustom,
                     onImport = vm::importModel,
-                    onSelfTest = vm::selfTest
+                    onSelfTest = vm::selfTest,
+                    onPickLanguage = vm::setupForLanguage
                 )
             }
         }

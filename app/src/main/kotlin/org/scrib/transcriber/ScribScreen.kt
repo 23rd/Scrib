@@ -7,6 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -63,11 +66,13 @@ fun ScribScreen(
     onDelete: (String) -> Unit,
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
-    onSelfTest: () -> Unit
+    onSelfTest: () -> Unit,
+    onPickLanguage: (LanguageOption) -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
     var showAdd by remember { mutableStateOf(false) }
+    var showLanguages by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
@@ -99,6 +104,7 @@ fun ScribScreen(
                     lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
                 )
             }
+            item { LanguageEntry { showLanguages = true } }
             item { StandardHeader() }
             items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
             item {
@@ -140,6 +146,9 @@ fun ScribScreen(
 
     if (showAdd) {
         AddUrlDialog(onDismiss = { showAdd = false }, onConfirm = { showAdd = false; onAddUrl(it) })
+    }
+    if (showLanguages) {
+        LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
     }
     deleteTarget?.let { target ->
         AlertDialog(
@@ -375,6 +384,54 @@ private fun StatusBox(msg: String, error: Boolean) {
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
         )
     }
+}
+
+@Composable
+private fun LanguageEntry(onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(onClick)
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("🌐", fontSize = 18.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text("Find a model for your language", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text("Pick a language — Scrib downloads the right model", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+            }
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Your language") },
+        text = {
+            Column {
+                Text(
+                    "One multilingual model covers ~99 languages — this picks a good size and downloads it.",
+                    fontSize = 12.5.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp
+                )
+                Spacer(Modifier.height(6.dp))
+                Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    LanguageCatalog.LANGUAGES.forEach { lang ->
+                        Column(
+                            Modifier.fillMaxWidth().clickableRow { onPick(lang) }.padding(vertical = 10.dp)
+                        ) {
+                            Text(lang.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
+                            Text(lang.note, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } }
+    )
 }
 
 @Composable

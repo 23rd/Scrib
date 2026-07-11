@@ -108,7 +108,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         startDownload(model)
     }
 
-    private fun startDownload(model: WhisperModel) {
+    private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false) {
         val f = model.fileName
         if (downloads.containsKey(f)) return
         failed.remove(f)
@@ -127,7 +127,9 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                         },
                         isCancelled = { !isActive })
                 }
-                downloads.remove(f); jobs.remove(f); push()
+                downloads.remove(f); jobs.remove(f)
+                if (activateOnComplete) ModelManager.setActive(ctx, f)
+                push()
             } catch (e: ModelManager.CancelledDownloadException) {
                 downloads.remove(f); jobs.remove(f); push()
             } catch (e: Throwable) {
@@ -150,6 +152,21 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         ModelManager.setActive(ctx, fileName)
         statusMsg = ""; statusError = false
         push()
+    }
+
+    fun setupForLanguage(language: LanguageOption) {
+        val f = language.recommendedFileName
+        val model = ModelCatalog.byFileName(f) ?: return
+        if (ModelManager.installedFileNames(ctx).contains(f)) {
+            ModelManager.setActive(ctx, f)
+            statusMsg = "${language.name}: ${model.displayName} is ready and active."
+            statusError = false
+            push()
+        } else {
+            statusMsg = "${language.name}: downloading ${model.displayName}…"
+            statusError = false
+            startDownload(model, activateOnComplete = true)
+        }
     }
 
     fun delete(fileName: String) {
