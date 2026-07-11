@@ -1,0 +1,15 @@
+El audio se transcribe por completo en tu teléfono. No se sube nada — la app solo se conecta para descargar un modelo.
+
+Dos formas de usar Scrib
+
+• Transcribe tu propio audio. Elige cualquier archivo de audio de tu teléfono y obtén el texto — aquí mismo, totalmente sin conexión.
+
+• Un motor de transcripción para otras apps. Scrib también funciona en segundo plano. Las apps que lo admiten — como Forkgram — pueden convertir un mensaje de voz en texto con Scrib, en tu dispositivo. En los ajustes de esa app, elige Scrib como transcriptor sin conexión. No se sube nada.
+
+Modelos
+
+Scrib transcribe con modelos de voz abiertos Whisper. Descarga uno en la pantalla principal, o elige tu idioma y Scrib obtiene uno adecuado. Los modelos más grandes son más precisos; guarda varios y cambia cuando quieras.
+
+Para desarrolladores
+
+Cualquier app puede usar Scrib como transcriptor sin conexión mediante el contrato abierto Open Transcribe (org.opentranscribe.api) — un pequeño servicio AIDL, sin SDK ni red. El contrato es neutral respecto al proveedor, así que las apps no dependen de Scrib: pueden vincular cualquier transcriptor compatible que el usuario tenga instalado.

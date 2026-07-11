@@ -1,0 +1,7 @@
+Erste Version.
+
+• Sprachtranskription auf dem Gerät mit offenen Whisper-Modellen
+• Transkribiere jede Audiodatei auf deinem Telefon, komplett offline
+• Funktioniert als Offline-Transkriptions-Engine für andere Apps über den offenen Open-Transcribe-Vertrag
+• Modellverwaltung: Download nach Name oder Sprache, eigene Modelle hinzufügen, .bin importieren
+• In 12 Sprachen verfügbar

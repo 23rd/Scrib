@@ -1,0 +1,7 @@
+Prima versione.
+
+• Trascrizione vocale sul dispositivo con modelli Whisper aperti
+• Trascrivi qualsiasi file audio sul telefono, completamente offline
+• Funziona come motore di trascrizione offline per altre app tramite il contratto aperto Open Transcribe
+• Gestione dei modelli: download per nome o per lingua, aggiunta di modelli personali, importazione di .bin
+• Disponibile in 12 lingue

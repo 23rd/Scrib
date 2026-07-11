@@ -1,0 +1,7 @@
+Première version.
+
+• Transcription vocale sur l'appareil avec des modèles Whisper ouverts
+• Transcrivez n'importe quel fichier audio de votre téléphone, entièrement hors ligne
+• Fonctionne comme moteur de transcription hors ligne pour d'autres applis via le contrat ouvert Open Transcribe
+• Gestion des modèles : téléchargement par nom ou par langue, ajout de modèles personnels, import de .bin
+• Disponible en 12 langues

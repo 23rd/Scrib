@@ -1,0 +1,7 @@
+Pierwsze wydanie.
+
+• Transkrypcja mowy na urządzeniu z otwartymi modelami Whisper
+• Transkrybuj dowolny plik audio w telefonie, całkowicie offline
+• Działa jako offline'owy silnik transkrypcji dla innych aplikacji przez otwarty kontrakt Open Transcribe
+• Menedżer modeli: pobieranie po nazwie lub języku, dodawanie własnych modeli, import plików .bin
+• Dostępne w 12 językach

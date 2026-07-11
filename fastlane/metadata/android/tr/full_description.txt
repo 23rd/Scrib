@@ -1,0 +1,15 @@
+Ses tamamen telefonunuzda yazıya dökülür. Hiçbir şey yüklenmez — uygulama yalnızca model indirmek için çevrimiçi olur.
+
+Scrib'i kullanmanın iki yolu
+
+• Kendi sesinizi yazıya dökün. Telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.
+
+• Diğer uygulamalar için bir yazıya dökme motoru. Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — Forkgram gibi — bir sesli mesajı Scrib ile cihazınızda metne dönüştürebilir. O uygulamanın ayarlarında Scrib'i çevrimdışı yazıya dökücü olarak seçin. Hiçbir şey yüklenmez.
+
+Modeller
+
+Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.
+
+Geliştiriciler için
+
+Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.

@@ -1,0 +1,1 @@
+Reconnaissance vocale sur l'appareil, entièrement hors ligne.

@@ -1,0 +1,7 @@
+Eerste versie.
+
+• Spraaktranscriptie op het apparaat met open Whisper-modellen
+• Transcribeer elk audiobestand op je telefoon, volledig offline
+• Werkt als offline transcriptie-engine voor andere apps via het open Open Transcribe-contract
+• Modelbeheer: downloaden op naam of taal, eigen modellen toevoegen, .bin importeren
+• Beschikbaar in 12 talen

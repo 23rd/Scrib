@@ -1,0 +1,15 @@
+Audio wordt volledig op je telefoon getranscribeerd. Er wordt niets geüpload — de app gaat alleen online om een model te downloaden.
+
+Twee manieren om Scrib te gebruiken
+
+• Je eigen audio transcriberen. Kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.
+
+• Een transcriptie-engine voor andere apps. Scrib werkt ook op de achtergrond. Apps die dit ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib omzetten naar tekst, op je apparaat. Kies Scrib in de instellingen van die app als offline transcriber. Er wordt niets geüpload.
+
+Modellen
+
+Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.
+
+Voor ontwikkelaars
+
+Elke app kan Scrib als offline transcriber gebruiken via het open Open Transcribe-contract (org.opentranscribe.api) — een kleine AIDL-service, zonder SDK en zonder netwerk. Het contract is leveranciersneutraal, dus apps zijn niet aan Scrib gebonden: ze kunnen elke compatibele transcriber binden die de gebruiker heeft geïnstalleerd.

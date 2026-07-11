@@ -1,0 +1,7 @@
+İlk sürüm.
+
+• Açık Whisper modelleriyle cihazda ses yazıya dökme
+• Telefonunuzdaki herhangi bir ses dosyasını tamamen çevrimdışı yazıya dökün
+• Açık Open Transcribe sözleşmesi aracılığıyla diğer uygulamalar için çevrimdışı yazıya dökme motoru olarak çalışır
+• Model yöneticisi: ada veya dile göre indirme, özel model ekleme, .bin içe aktarma
+• 12 dilde mevcut
