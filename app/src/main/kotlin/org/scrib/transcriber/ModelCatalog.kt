@@ -7,6 +7,7 @@ data class WhisperModel(
     val url: String,
     val approxBytes: Long,
     val multilingual: Boolean,
+    val tier: Int,
     val recommended: Boolean = false,
     val custom: Boolean = false
 )
@@ -21,18 +22,19 @@ object ModelCatalog {
         fileName: String,
         approxBytes: Long,
         multilingual: Boolean,
+        tier: Int,
         recommended: Boolean = false
-    ) = WhisperModel(id, displayName, fileName, BASE + fileName, approxBytes, multilingual, recommended)
+    ) = WhisperModel(id, displayName, fileName, BASE + fileName, approxBytes, multilingual, tier, recommended)
 
     val MODELS: List<WhisperModel> = listOf(
-        standard("tiny-q5_1", "Tiny", "ggml-tiny-q5_1.bin", 32_200_000, true),
-        standard("base-q5_1", "Base", "ggml-base-q5_1.bin", 57_800_000, true, recommended = true),
-        standard("small-q5_1", "Small", "ggml-small-q5_1.bin", 190_000_000, true),
-        standard("medium-q5_0", "Medium", "ggml-medium-q5_0.bin", 539_000_000, true),
-        standard("large-v3-turbo-q5_0", "Large v3 Turbo", "ggml-large-v3-turbo-q5_0.bin", 574_000_000, true),
-        standard("tiny.en-q5_1", "Tiny (English)", "ggml-tiny.en-q5_1.bin", 32_200_000, false),
-        standard("base.en-q5_1", "Base (English)", "ggml-base.en-q5_1.bin", 57_800_000, false),
-        standard("small.en-q5_1", "Small (English)", "ggml-small.en-q5_1.bin", 190_000_000, false)
+        standard("tiny-q5_1", "Tiny", "ggml-tiny-q5_1.bin", 32_200_000, true, 1),
+        standard("base-q5_1", "Base", "ggml-base-q5_1.bin", 57_800_000, true, 2, recommended = true),
+        standard("small-q5_1", "Small", "ggml-small-q5_1.bin", 190_000_000, true, 3),
+        standard("medium-q5_0", "Medium", "ggml-medium-q5_0.bin", 539_000_000, true, 4),
+        standard("large-v3-turbo-q5_0", "Large v3 Turbo", "ggml-large-v3-turbo-q5_0.bin", 574_000_000, true, 5),
+        standard("tiny.en-q5_1", "Tiny (English)", "ggml-tiny.en-q5_1.bin", 32_200_000, false, 1),
+        standard("base.en-q5_1", "Base (English)", "ggml-base.en-q5_1.bin", 57_800_000, false, 2),
+        standard("small.en-q5_1", "Small (English)", "ggml-small.en-q5_1.bin", 190_000_000, false, 3)
     )
 
     fun byFileName(fileName: String): WhisperModel? = MODELS.firstOrNull { it.fileName == fileName }
@@ -49,6 +51,7 @@ object ModelCatalog {
         url = url,
         approxBytes = 0,
         multilingual = !isEnglishOnly(fileName),
+        tier = 3,
         custom = true
     )
 }

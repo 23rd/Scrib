@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Scrib" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#f6f9f8</item>
+        <item name="android:statusBarColor">#f6f9f8</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">#f6f9f8</item>
+    </style>
+</resources>
