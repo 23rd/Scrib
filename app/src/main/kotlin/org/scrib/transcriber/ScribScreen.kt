@@ -41,7 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -67,7 +69,11 @@ fun ScribScreen(
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
     onSelfTest: () -> Unit,
-    onPickLanguage: (LanguageOption) -> Unit
+    onPickLanguage: (LanguageOption) -> Unit,
+    transcription: TranscribeUi?,
+    onTranscribeFile: (Uri, String?) -> Unit,
+    onCancelTranscription: () -> Unit,
+    onDismissTranscription: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
@@ -77,15 +83,10 @@ fun ScribScreen(
 
     val context = LocalContext.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) {
-            val name = runCatching {
-                context.contentResolver.query(uri, null, null, null, null)?.use { c ->
-                    val i = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    if (i >= 0 && c.moveToFirst()) c.getString(i) else null
-                }
-            }.getOrNull()
-            onImport(uri, name)
-        }
+        if (uri != null) onImport(uri, queryDisplayName(context, uri))
+    }
+    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) onTranscribeFile(uri, queryDisplayName(context, uri))
     }
 
     Column(Modifier.fillMaxSize().background(cs.background).systemBarsPadding()) {
@@ -96,6 +97,9 @@ fun ScribScreen(
         ) {
             item {
                 if (state.firstRun) NudgeCard(state, actions) else StatusCard(state)
+            }
+            if (!state.firstRun) {
+                item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
             }
             item {
                 Text(
@@ -149,6 +153,9 @@ fun ScribScreen(
     }
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
+    }
+    transcription?.let { t ->
+        TranscriptionDialog(t, onCancel = onCancelTranscription, onClose = onDismissTranscription)
     }
     deleteTarget?.let { target ->
         AlertDialog(
@@ -387,6 +394,64 @@ private fun StatusBox(msg: String, error: Boolean) {
 }
 
 @Composable
+private fun TranscribeFileButton(onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.primaryContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(onClick)
+    ) {
+        Row(
+            Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        ) {
+            Text("🎙", fontSize = 17.sp)
+            Spacer(Modifier.width(10.dp))
+            Text("Transcribe an audio file", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
+        }
+    }
+}
+
+@Composable
+private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    val clipboard = LocalClipboardManager.current
+    AlertDialog(
+        onDismissRequest = { if (!t.running) onClose() },
+        title = { Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        text = {
+            Column {
+                when {
+                    t.error != null -> Text(t.error, fontSize = 13.sp, color = cs.error, lineHeight = 18.sp)
+                    t.running && t.text.isEmpty() -> {
+                        Text("Decoding & transcribing on-device…", fontSize = 13.sp, color = cs.onSurfaceVariant)
+                        Spacer(Modifier.height(12.dp))
+                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                    }
+                    else -> {
+                        Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
+                            Text(t.text, fontSize = 14.sp, lineHeight = 20.sp, color = cs.onSurface)
+                        }
+                        if (t.running) {
+                            Spacer(Modifier.height(12.dp))
+                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (t.running) TextButton(onClick = onCancel) { Text("Cancel") }
+            else TextButton(onClick = onClose) { Text("Close") }
+        },
+        dismissButton = {
+            if (!t.running && t.error == null && t.text.isNotBlank()) {
+                TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text("Copy") }
+            }
+        }
+    )
+}
+
+@Composable
 private fun LanguageEntry(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
@@ -454,3 +519,10 @@ private fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
 
 private fun Modifier.clickableRow(onClick: () -> Unit): Modifier =
     this.clickable(onClick = onClick)
+
+private fun queryDisplayName(context: android.content.Context, uri: Uri): String? = runCatching {
+    context.contentResolver.query(uri, null, null, null, null)?.use { c ->
+        val i = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (i >= 0 && c.moveToFirst()) c.getString(i) else null
+    }
+}.getOrNull()

@@ -14,6 +14,7 @@ class MainActivity : ComponentActivity() {
             ScribTheme {
                 val vm: ScribViewModel = viewModel()
                 val state by vm.state.collectAsState()
+                val transcription by vm.transcription.collectAsState()
                 ScribScreen(
                     state = state,
                     onDownload = vm::download,
@@ -23,7 +24,11 @@ class MainActivity : ComponentActivity() {
                     onAddUrl = vm::addCustom,
                     onImport = vm::importModel,
                     onSelfTest = vm::selfTest,
-                    onPickLanguage = vm::setupForLanguage
+                    onPickLanguage = vm::setupForLanguage,
+                    transcription = transcription,
+                    onTranscribeFile = vm::transcribeFile,
+                    onCancelTranscription = vm::cancelTranscription,
+                    onDismissTranscription = vm::dismissTranscription
                 )
             }
         }

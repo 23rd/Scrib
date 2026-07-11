@@ -36,6 +36,13 @@ data class ScribUiState(
     val statusError: Boolean
 )
 
+data class TranscribeUi(
+    val fileName: String,
+    val text: String,
+    val running: Boolean,
+    val error: String?
+)
+
 class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     private data class Progress(val pct: Int, val model: WhisperModel?)
@@ -108,11 +115,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         startDownload(model)
     }
 
-    private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false) {
+    private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false, statusLabel: String? = null) {
         val f = model.fileName
         if (downloads.containsKey(f)) return
         failed.remove(f)
         downloads[f] = Progress(0, model)
+        if (statusLabel != null) { statusMsg = "$statusLabel…"; statusError = false }
         push()
         val job = viewModelScope.launch {
             try {
@@ -122,6 +130,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                             val pct = if (total > 0) ((done * 100) / total).toInt() else -1
                             if (downloads[f]?.pct != pct) {
                                 downloads[f] = Progress(pct, model)
+                                if (statusLabel != null && pct >= 0) {
+                                    statusMsg = "$statusLabel… $pct%"
+                                    statusError = false
+                                }
                                 push()
                             }
                         },
@@ -129,9 +141,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 downloads.remove(f); jobs.remove(f)
                 if (activateOnComplete) ModelManager.setActive(ctx, f)
+                if (statusLabel != null) { statusMsg = "${model.displayName} is ready and active."; statusError = false }
                 push()
             } catch (e: ModelManager.CancelledDownloadException) {
-                downloads.remove(f); jobs.remove(f); push()
+                downloads.remove(f); jobs.remove(f)
+                if (statusLabel != null) statusMsg = ""
+                push()
             } catch (e: Throwable) {
                 downloads.remove(f); jobs.remove(f); failed.add(f)
                 statusMsg = "Download failed for ${model.displayName} — check your connection and tap Retry."
@@ -163,9 +178,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             statusError = false
             push()
         } else {
-            statusMsg = "${language.name}: downloading ${model.displayName}…"
-            statusError = false
-            startDownload(model, activateOnComplete = true)
+            startDownload(model, activateOnComplete = true, statusLabel = "${language.name}: downloading ${model.displayName}")
         }
     }
 
@@ -228,5 +241,53 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         Uri.parse(url).host ?: "huggingface.co"
     } catch (e: Exception) {
         "huggingface.co"
+    }
+
+    @Volatile
+    private var transcribeToken: CancellationToken? = null
+
+    private val _transcription = MutableStateFlow<TranscribeUi?>(null)
+    val transcription: StateFlow<TranscribeUi?> = _transcription
+
+    fun transcribeFile(uri: Uri, displayName: String?) {
+        if (transcribeToken != null) return
+        val token = CancellationToken()
+        transcribeToken = token
+        _transcription.value = TranscribeUi(displayName ?: "audio", "", running = true, error = null)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
+                    ?: throw RuntimeException("Can't open the file")
+                val text = TranscriptionEngine.get(ctx).transcribeToText(pfd, "", token) { partial ->
+                    setTranscription { it?.copy(text = partial) }
+                }
+                if (token.isCancelled) {
+                    setTranscription { null }
+                } else {
+                    setTranscription { it?.copy(text = text.ifBlank { "No speech recognized." }, running = false) }
+                }
+            } catch (e: Throwable) {
+                if (token.isCancelled) {
+                    setTranscription { null }
+                } else {
+                    setTranscription { it?.copy(running = false, error = e.message ?: "Transcription failed") }
+                }
+            } finally {
+                transcribeToken = null
+            }
+        }
+    }
+
+    fun cancelTranscription() {
+        transcribeToken?.cancel()
+        _transcription.value = null
+    }
+
+    fun dismissTranscription() {
+        _transcription.value = null
+    }
+
+    private fun setTranscription(f: (TranscribeUi?) -> TranscribeUi?) {
+        _transcription.value = f(_transcription.value)
     }
 }
