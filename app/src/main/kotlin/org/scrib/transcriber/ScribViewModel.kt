@@ -19,9 +19,10 @@ enum class RowState { NotDownloaded, Downloading, Installed, Active, Failed }
 data class ModelRow(
     val id: String,
     val name: String,
-    val subtitle: String,
+    val multilingual: Boolean,
+    val sizeMb: Int,
     val tier: Int,
-    val note: String?,
+    val recommended: Boolean,
     val custom: Boolean,
     val state: RowState,
     val progress: Int
@@ -55,6 +56,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     @Volatile private var statusError = false
 
     private val ctx get() = getApplication<Application>()
+    private fun str(id: Int, vararg args: Any): String = ctx.getString(id, *args)
 
     private val _state = MutableStateFlow(build())
     val state: StateFlow<ScribUiState> = _state
@@ -72,14 +74,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
         val standard = ModelCatalog.MODELS.map { m ->
             ModelRow(
-                id = m.fileName,
-                name = m.displayName,
-                subtitle = (if (m.multilingual) "multilingual" else "English only") + " · ≈" + (m.approxBytes / 1_000_000) + " MB",
-                tier = m.tier,
-                note = if (m.recommended) "recommended" else null,
-                custom = false,
-                state = stateOf(m.fileName),
-                progress = downloads[m.fileName]?.pct ?: 0
+                id = m.fileName, name = m.displayName, multilingual = m.multilingual,
+                sizeMb = (m.approxBytes / 1_000_000).toInt(), tier = m.tier,
+                recommended = m.recommended, custom = false,
+                state = stateOf(m.fileName), progress = downloads[m.fileName]?.pct ?: 0
             )
         }
         val customFiles = LinkedHashSet<String>()
@@ -87,14 +85,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         downloads.forEach { (f, p) -> if (p.model?.custom == true) customFiles.add(f) }
         val custom = customFiles.map { f ->
             ModelRow(
-                id = f,
-                name = f.removePrefix("ggml-").removeSuffix(".bin"),
-                subtitle = (if (ModelCatalog.isEnglishOnly(f)) "English only" else "multilingual") + " · custom",
-                tier = downloads[f]?.model?.tier ?: 3,
-                note = null,
-                custom = true,
-                state = stateOf(f),
-                progress = downloads[f]?.pct ?: 0
+                id = f, name = f.removePrefix("ggml-").removeSuffix(".bin"),
+                multilingual = !ModelCatalog.isEnglishOnly(f), sizeMb = 0,
+                tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
+                state = stateOf(f), progress = downloads[f]?.pct ?: 0
             )
         }
         val activeFriendly = active?.let { f ->
@@ -102,11 +96,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
         return ScribUiState(
             firstRun = installed.isEmpty() && downloads.isEmpty(),
-            activeName = activeFriendly,
-            standard = standard,
-            custom = custom,
-            statusMsg = statusMsg,
-            statusError = statusError
+            activeName = activeFriendly, standard = standard, custom = custom,
+            statusMsg = statusMsg, statusError = statusError
         )
     }
 
@@ -120,7 +111,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         if (downloads.containsKey(f)) return
         failed.remove(f)
         downloads[f] = Progress(0, model)
-        if (statusLabel != null) { statusMsg = "$statusLabel…"; statusError = false }
+        if (statusLabel != null) { statusMsg = str(R.string.status_ellipsis, statusLabel); statusError = false }
         push()
         val job = viewModelScope.launch {
             try {
@@ -131,7 +122,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                             if (downloads[f]?.pct != pct) {
                                 downloads[f] = Progress(pct, model)
                                 if (statusLabel != null && pct >= 0) {
-                                    statusMsg = "$statusLabel… $pct%"
+                                    statusMsg = str(R.string.status_pct, statusLabel, pct)
                                     statusError = false
                                 }
                                 push()
@@ -141,7 +132,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 downloads.remove(f); jobs.remove(f)
                 if (activateOnComplete) ModelManager.setActive(ctx, f)
-                if (statusLabel != null) { statusMsg = "${model.displayName} is ready and active."; statusError = false }
+                if (statusLabel != null) { statusMsg = str(R.string.status_ready_active, model.displayName); statusError = false }
                 push()
             } catch (e: ModelManager.CancelledDownloadException) {
                 downloads.remove(f); jobs.remove(f)
@@ -149,7 +140,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 push()
             } catch (e: Throwable) {
                 downloads.remove(f); jobs.remove(f); failed.add(f)
-                statusMsg = "Download failed for ${model.displayName} — check your connection and tap Retry."
+                statusMsg = str(R.string.status_download_failed_named, model.displayName)
                 statusError = true
                 push()
             }
@@ -172,13 +163,17 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     fun setupForLanguage(language: LanguageOption) {
         val f = language.recommendedFileName
         val model = ModelCatalog.byFileName(f) ?: return
+        val langName = str(language.nameRes)
         if (ModelManager.installedFileNames(ctx).contains(f)) {
             ModelManager.setActive(ctx, f)
-            statusMsg = "${language.name}: ${model.displayName} is ready and active."
+            statusMsg = str(R.string.status_lang_ready_active, langName, model.displayName)
             statusError = false
             push()
         } else {
-            startDownload(model, activateOnComplete = true, statusLabel = "${language.name}: downloading ${model.displayName}")
+            startDownload(
+                model, activateOnComplete = true,
+                statusLabel = str(R.string.status_lang_downloading, langName, model.displayName)
+            )
         }
     }
 
@@ -192,21 +187,21 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         val model = try {
             ModelManager.customModelFromUrl(url)
         } catch (e: Exception) {
-            statusMsg = e.message ?: "Invalid link"; statusError = true; push(); return
+            statusMsg = str(R.string.status_invalid_link); statusError = true; push(); return
         }
-        statusMsg = "Fetching from " + hostOf(model.url) + " — streaming to app storage."
+        statusMsg = str(R.string.status_fetching_from, hostOf(model.url))
         statusError = false
         startDownload(model)
     }
 
     fun importModel(uri: Uri, suggestedName: String?) {
-        statusMsg = "Importing…"; statusError = false; push()
+        statusMsg = str(R.string.status_importing); statusError = false; push()
         viewModelScope.launch {
             try {
                 val name = withContext(Dispatchers.IO) { ModelManager.importFromUri(ctx, uri, suggestedName) }
-                statusMsg = "Imported $name from device."; statusError = false
+                statusMsg = str(R.string.status_imported, name); statusError = false
             } catch (e: Throwable) {
-                statusMsg = "Import failed: ${e.message}"; statusError = true
+                statusMsg = str(R.string.status_import_failed, e.message ?: ""); statusError = true
             }
             push()
         }
@@ -215,24 +210,23 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     fun selfTest() {
         val active = ModelManager.activeModelFile(ctx)
         if (active == null) {
-            statusMsg = "Self-test needs an active model — tap Use on one first."
+            statusMsg = str(R.string.status_selftest_needs_model)
             statusError = true; push(); return
         }
-        statusMsg = "Running self-test…"; statusError = false; push()
+        statusMsg = str(R.string.status_running_selftest); statusError = false; push()
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
+            val (msg, err) = withContext(Dispatchers.IO) {
                 try {
                     val whisper = WhisperContext.createContextFromFile(active.absolutePath)
                     val audio = ctx.assets.open("jfk.wav").use { WavDecoder.decode(it) }
                     val text = whisper.transcribeData(audio, "en")
                     whisper.release()
-                    "Self-test ✓ — " + text.trim()
+                    str(R.string.status_selftest_ok, text.trim()) to false
                 } catch (e: Throwable) {
-                    "Self-test failed: " + e.message
+                    str(R.string.status_selftest_failed, e.message ?: "") to true
                 }
             }
-            statusMsg = result
-            statusError = result.startsWith("Self-test failed")
+            statusMsg = msg; statusError = err
             push()
         }
     }
@@ -257,20 +251,20 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
-                    ?: throw RuntimeException("Can't open the file")
+                    ?: throw RuntimeException(str(R.string.transcribe_cant_open))
                 val text = TranscriptionEngine.get(ctx).transcribeToText(pfd, "", token) { partial ->
                     setTranscription { it?.copy(text = partial) }
                 }
                 if (token.isCancelled) {
                     setTranscription { null }
                 } else {
-                    setTranscription { it?.copy(text = text.ifBlank { "No speech recognized." }, running = false) }
+                    setTranscription { it?.copy(text = text.ifBlank { str(R.string.transcribe_no_speech) }, running = false) }
                 }
             } catch (e: Throwable) {
                 if (token.isCancelled) {
                     setTranscription { null }
                 } else {
-                    setTranscription { it?.copy(running = false, error = e.message ?: "Transcription failed") }
+                    setTranscription { it?.copy(running = false, error = e.message ?: str(R.string.transcribe_failed)) }
                 }
             } finally {
                 transcribeToken = null

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">À propos</string>
+
+    <string name="active_model">MODÈLE ACTIF</string>
+    <string name="ready_to_transcribe">Prêt à transcrire</string>
+    <string name="no_active_model">Aucun modèle actif</string>
+    <string name="pick_model_hint">Choisissez un modèle ci-dessous et touchez « Utiliser ».</string>
+    <string name="privacy_full">L\'audio est transcrit entièrement sur votre téléphone. Rien n\'est envoyé — l\'appli se connecte uniquement pour télécharger un modèle.</string>
+    <string name="privacy_short" formatted="false">Fonctionne à 100% sur l\'appareil. Vos messages vocaux ne quittent jamais le téléphone.</string>
+
+    <string name="setup_transcription">Configurer la transcription</string>
+    <string name="nudge_body">Pas encore de modèle vocal. Téléchargez-en un — Base est un bon compromis : petit téléchargement, précision correcte, fonctionne dans toutes les langues.</string>
+    <string name="download_named_size">Télécharger %1$s · ≈%2$d Mo</string>
+
+    <string name="transcribe_audio_file">Transcrire un fichier audio</string>
+    <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
+
+    <string name="models_explainer">Les modèles plus grands sont plus précis mais plus lents et plus lourds à télécharger. Les modèles « anglais uniquement » sont plus petits et rapides ; pour les autres langues, choisissez Base ou plus grand — Tiny est faible.</string>
+    <string name="standard_models">MODÈLES STANDARD</string>
+    <string name="size">taille</string>
+    <string name="custom_models">MODÈLES PERSONNELS</string>
+    <string name="custom_empty">Ajoutez votre propre modèle GGML par lien direct ou importez un .bin depuis cet appareil.</string>
+
+    <string name="badge_multilingual">multilingue</string>
+    <string name="badge_english_only">anglais uniquement</string>
+    <string name="badge_custom">perso</string>
+    <string name="size_mb">≈%1$d Mo</string>
+    <string name="recommended">recommandé</string>
+    <string name="active_pill">✓ ACTIF</string>
+    <string name="row_download_failed">Échec du téléchargement — vérifiez votre connexion.</string>
+    <string name="downloading_pct">Téléchargement %1$d%%</string>
+
+    <string name="action_download">Télécharger</string>
+    <string name="action_retry">Réessayer</string>
+    <string name="action_cancel">Annuler</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_use">Utiliser</string>
+    <string name="action_close">Fermer</string>
+    <string name="action_copy">Copier</string>
+
+    <string name="add_from_hf">Ajouter un modèle depuis HuggingFace…</string>
+    <string name="import_bin">Importer un .bin depuis l\'appareil…</string>
+    <string name="run_self_test">Autotest sur un extrait d\'exemple</string>
+
+    <string name="delete_model_q">Supprimer le modèle ?</string>
+
+    <string name="lang_entry_title">Trouver un modèle pour votre langue</string>
+    <string name="lang_entry_sub">Choisissez une langue — Scrib télécharge le bon modèle</string>
+    <string name="your_language">Votre langue</string>
+    <string name="lang_dialog_hint">Un modèle multilingue couvre ~99 langues — ceci choisit une bonne taille et la télécharge.</string>
+
+    <string name="hf_dialog_title">Modèle depuis HuggingFace</string>
+    <string name="hf_dialog_body">Collez un lien direct vers un modèle ggml .bin (tout modèle compatible whisper.cpp).</string>
+
+    <string name="lang_english">Anglais</string>
+    <string name="lang_spanish">Espagnol</string>
+    <string name="lang_german">Allemand</string>
+    <string name="lang_french">Français</string>
+    <string name="lang_italian">Italien</string>
+    <string name="lang_portuguese">Portugais</string>
+    <string name="lang_dutch">Néerlandais</string>
+    <string name="lang_russian">Russe</string>
+    <string name="lang_ukrainian">Ukrainien</string>
+    <string name="lang_polish">Polonais</string>
+    <string name="lang_turkish">Turc</string>
+    <string name="lang_arabic">Arabe</string>
+    <string name="lang_chinese">Chinois</string>
+    <string name="lang_japanese">Japonais</string>
+    <string name="lang_korean">Coréen</string>
+    <string name="lang_hindi">Hindi</string>
+
+    <string name="note_english_base">Anglais uniquement · Base</string>
+    <string name="note_multi_base">Multilingue · Base</string>
+    <string name="note_multi_small">Multilingue · Small — plus précis</string>
+
+    <string name="status_download_failed_named">Échec du téléchargement de %1$s — vérifiez votre connexion et touchez « Réessayer ».</string>
+    <string name="status_ready_active">%1$s est prêt et actif.</string>
+    <string name="status_lang_ready_active">%1$s : %2$s est prêt et actif.</string>
+    <string name="status_lang_downloading">%1$s : téléchargement de %2$s</string>
+    <string name="status_ellipsis">%1$s…</string>
+    <string name="status_pct">%1$s… %2$d%%</string>
+    <string name="status_fetching_from">Téléchargement depuis %1$s — enregistrement dans l\'appli.</string>
+    <string name="status_invalid_link">Lien invalide</string>
+    <string name="status_importing">Importation…</string>
+    <string name="status_imported">%1$s importé depuis l\'appareil.</string>
+    <string name="status_import_failed">Échec de l\'importation : %1$s</string>
+    <string name="status_selftest_needs_model">L\'autotest nécessite un modèle actif — touchez d\'abord « Utiliser ».</string>
+    <string name="status_running_selftest">Autotest en cours…</string>
+    <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
+    <string name="status_selftest_failed">Échec de l\'autotest : %1$s</string>
+    <string name="transcribe_no_speech">Aucune parole reconnue.</string>
+    <string name="transcribe_cant_open">Impossible d\'ouvrir le fichier</string>
+    <string name="transcribe_failed">Échec de la transcription</string>
+
+    <string name="about_back">Retour</string>
+    <string name="about_tagline">Reconnaissance vocale sur l\'appareil. Votre audio ne quitte jamais le téléphone.</string>
+    <string name="about_two_ways">Deux façons d\'utiliser Scrib</string>
+    <string name="about_own_h">Transcrire votre propre audio</string>
+    <string name="about_own_b">Choisissez n\'importe quel fichier audio de votre téléphone et obtenez le texte — ici même, entièrement hors ligne.</string>
+    <string name="about_engine_h">Un moteur de transcription pour d\'autres applis</string>
+    <string name="about_engine_b">Scrib fonctionne aussi en arrière-plan. Les applis qui le prennent en charge — comme Forkgram — peuvent convertir un message vocal en texte avec Scrib, sur votre appareil. Dans les réglages de cette appli, choisissez Scrib comme transcripteur hors ligne. Rien n\'est envoyé.</string>
+    <string name="about_models_h">Modèles</string>
+    <string name="about_models_b">Scrib transcrit avec des modèles vocaux ouverts Whisper. Téléchargez-en un sur l\'écran principal, ou choisissez votre langue et Scrib en récupère un adapté. Les modèles plus grands sont plus précis ; gardez-en plusieurs et changez à tout moment.</string>
+    <string name="about_dev_h">Pour les développeurs</string>
+    <string name="about_dev_b">Toute appli peut utiliser Scrib comme transcripteur hors ligne via le contrat ouvert Open Transcribe (org.opentranscribe.api) — un petit service AIDL, sans SDK ni réseau. Le contrat est neutre vis-à-vis du fournisseur, donc les applis ne sont pas liées à Scrib : elles peuvent connecter n\'importe quel transcripteur compatible installé par l\'utilisateur.</string>
+    <string name="about_version">Version 0.1</string>
+</resources>

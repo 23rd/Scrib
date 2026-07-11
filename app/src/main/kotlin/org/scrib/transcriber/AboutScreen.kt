@@ -17,6 +17,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +31,7 @@ fun AboutScreen(onBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             TextButton(onClick = onBack) {
-                Text("‹  Back", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
+                Text("‹  " + stringResource(R.string.about_back), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
             }
         }
         Column(
@@ -38,40 +39,27 @@ fun AboutScreen(onBack: () -> Unit) {
         ) {
             Text("Scrib", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground)
             Text(
-                "On-device speech-to-text. Your audio never leaves your phone.",
+                stringResource(R.string.about_tagline),
                 fontSize = 14.sp, color = cs.onSurfaceVariant, lineHeight = 20.sp,
                 modifier = Modifier.padding(top = 6.dp, bottom = 24.dp)
             )
 
-            Heading("Two ways to use Scrib")
-            SubHeading("Transcribe your own audio")
-            Body("Pick any audio file on your phone and get the text — right here, fully offline.")
-            SubHeading("A transcription engine for other apps")
-            Body(
-                "Scrib also works in the background. Apps that support it — like Forkgram — can turn a voice " +
-                    "message into text using Scrib, on your device. In that app's settings, choose Scrib as the " +
-                    "offline transcriber. Nothing is uploaded."
-            )
+            Heading(stringResource(R.string.about_two_ways))
+            SubHeading(stringResource(R.string.about_own_h))
+            Body(stringResource(R.string.about_own_b))
+            SubHeading(stringResource(R.string.about_engine_h))
+            Body(stringResource(R.string.about_engine_b))
 
             Spacer(Modifier.height(22.dp))
-            Heading("Models")
-            Body(
-                "Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick " +
-                    "your language and Scrib fetches a fitting one. Bigger models are more accurate; keep several " +
-                    "and switch anytime."
-            )
+            Heading(stringResource(R.string.about_models_h))
+            Body(stringResource(R.string.about_models_b))
 
             Spacer(Modifier.height(22.dp))
-            Heading("For developers")
-            Body(
-                "Any app can use Scrib as an offline transcriber through the open Open Transcribe contract " +
-                    "(org.opentranscribe.api) — a small AIDL service, no SDK and no network. The contract is " +
-                    "vendor-neutral, so apps aren't tied to Scrib: they can bind any compatible transcriber the " +
-                    "user has installed."
-            )
+            Heading(stringResource(R.string.about_dev_h))
+            Body(stringResource(R.string.about_dev_b))
 
             Spacer(Modifier.height(28.dp))
-            Text("Version 0.1", fontSize = 12.sp, color = cs.onSurfaceVariant)
+            Text(stringResource(R.string.about_version), fontSize = 12.sp, color = cs.onSurfaceVariant)
             Spacer(Modifier.height(24.dp))
         }
     }

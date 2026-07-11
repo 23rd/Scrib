@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -104,7 +105,7 @@ fun ScribScreen(
             }
             item {
                 Text(
-                    "Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.",
+                    stringResource(R.string.models_explainer),
                     fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
                     lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
                 )
@@ -114,7 +115,7 @@ fun ScribScreen(
             items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
             item {
                 Text(
-                    "CUSTOM MODELS", fontSize = 13.sp, fontWeight = FontWeight.Bold,
+                    stringResource(R.string.custom_models), fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     letterSpacing = 0.8.sp, color = cs.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 22.dp, bottom = 10.dp)
                 )
@@ -122,7 +123,7 @@ fun ScribScreen(
             if (state.custom.isEmpty()) {
                 item {
                     Text(
-                        "Add your own GGML model by direct link or import a .bin from this device.",
+                        stringResource(R.string.custom_empty),
                         fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
                         lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
                     )
@@ -132,8 +133,8 @@ fun ScribScreen(
             }
             item {
                 Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AddButton("+", "Add model from HuggingFace…") { showAdd = true }
-                    AddButton("↥", "Import .bin from device…") { picker.launch(arrayOf("*/*")) }
+                    AddButton("+", stringResource(R.string.add_from_hf)) { showAdd = true }
+                    AddButton("↥", stringResource(R.string.import_bin)) { picker.launch(arrayOf("*/*")) }
                 }
             }
             if (state.statusMsg.isNotEmpty()) {
@@ -142,7 +143,7 @@ fun ScribScreen(
             item {
                 Box(Modifier.fillMaxWidth().padding(top = 22.dp), contentAlignment = Alignment.Center) {
                     TextButton(onClick = onSelfTest) {
-                        Text("Run self-test on sample clip", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                        Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
                     }
                 }
             }
@@ -161,10 +162,10 @@ fun ScribScreen(
     deleteTarget?.let { target ->
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
-            title = { Text("Delete model?") },
+            title = { Text(stringResource(R.string.delete_model_q)) },
             text = { Text(target) },
-            confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text("Delete") } },
-            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Cancel") } }
+            confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text(stringResource(R.string.action_delete)) } },
+            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) } }
         )
     }
 }
@@ -185,7 +186,7 @@ private fun AppBar(onAbout: () -> Unit) {
         Text("Scrib", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground, letterSpacing = (-0.6).sp)
         Spacer(Modifier.weight(1f))
         TextButton(onClick = onAbout) {
-            Text("About", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
+            Text(stringResource(R.string.about), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
         }
     }
 }
@@ -202,17 +203,17 @@ private fun StatusCard(state: ScribUiState) {
         Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Box(Modifier.size(9.dp).clip(RoundedCornerShape(50)).background(cs.primary))
-                Text("ACTIVE MODEL", fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
+                Text(stringResource(R.string.active_model), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
             }
             Spacer(Modifier.height(10.dp))
             if (state.activeName != null) {
                 Text(state.activeName, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cs.onSurface, letterSpacing = (-0.5).sp)
-                Text("Ready to transcribe", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = cs.primary, modifier = Modifier.padding(top = 6.dp))
+                Text(stringResource(R.string.ready_to_transcribe), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = cs.primary, modifier = Modifier.padding(top = 6.dp))
             } else {
-                Text("No active model", fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text("Pick a model below and tap Use.", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
+                Text(stringResource(R.string.no_active_model), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(R.string.pick_model_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
             }
-            PrivacyLine(cs.onSurfaceVariant, cs.outlineVariant, topBorder = true)
+            PrivacyLine(cs.onSurfaceVariant, topBorder = true)
         }
     }
 }
@@ -220,38 +221,40 @@ private fun StatusCard(state: ScribUiState) {
 @Composable
 private fun NudgeCard(state: ScribUiState, actions: Actions) {
     val cs = MaterialTheme.colorScheme
-    val baseFile = state.standard.firstOrNull { it.note == "recommended" }?.id
+    val base = state.standard.firstOrNull { it.recommended }
     Surface(color = cs.primaryContainer, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 16.dp)) {
         Column(Modifier.padding(horizontal = 18.dp, vertical = 20.dp)) {
-            Text("Set up transcription", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = cs.onPrimaryContainer)
+            Text(stringResource(R.string.setup_transcription), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = cs.onPrimaryContainer)
             Text(
-                "No speech model yet. Download one to start — Base is a balanced choice: small download, solid accuracy, works in any language.",
+                stringResource(R.string.nudge_body),
                 fontSize = 13.5.sp, fontWeight = FontWeight.Medium, color = cs.onPrimaryContainer, lineHeight = 20.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
             Surface(
                 color = cs.primary, shape = RoundedCornerShape(22.dp),
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow { baseFile?.let(actions.onDownload) }
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow { base?.let { actions.onDownload(it.id) } }
             ) {
                 Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                    Text("Download Base · ≈57 MB", fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary)
+                    Text(
+                        if (base != null) stringResource(R.string.download_named_size, base.name, base.sizeMb) else stringResource(R.string.action_download),
+                        fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary
+                    )
                 }
             }
-            PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), cs.outlineVariant, topBorder = false)
+            PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), topBorder = false)
         }
     }
 }
 
 @Composable
-private fun PrivacyLine(textColor: Color, border: Color, topBorder: Boolean) {
+private fun PrivacyLine(textColor: Color, topBorder: Boolean) {
     Row(
         Modifier.fillMaxWidth().padding(top = if (topBorder) 13.dp else 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text("🔒", fontSize = 14.sp)
         Text(
-            if (topBorder) "Audio is transcribed entirely on your phone. Nothing is uploaded — the app only goes online to download a model."
-            else "Runs 100% on-device. Your voice messages never leave the phone.",
+            stringResource(if (topBorder) R.string.privacy_full else R.string.privacy_short),
             fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = textColor, lineHeight = 17.sp
         )
     }
@@ -264,10 +267,10 @@ private fun StandardHeader() {
         Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("STANDARD MODELS", fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+        Text(stringResource(R.string.standard_models), fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             listOf(5, 8, 11, 14).forEach { Box(Modifier.width(3.dp).height(it.dp).clip(RoundedCornerShape(1.dp)).background(cs.outline)) }
-            Text("size", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))
+            Text(stringResource(R.string.size), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))
         }
     }
 }
@@ -292,6 +295,8 @@ private fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (Stri
     val bg = if (active) cs.primaryContainer else cs.surface
     val onBg = if (active) cs.onPrimaryContainer else cs.onSurface
     val onBgVar = if (active) cs.onPrimaryContainer.copy(alpha = 0.75f) else cs.onSurfaceVariant
+    val badge = stringResource(if (row.multilingual) R.string.badge_multilingual else R.string.badge_english_only)
+    val sizePart = if (row.custom) stringResource(R.string.badge_custom) else stringResource(R.string.size_mb, row.sizeMb)
     Surface(
         color = bg,
         shape = RoundedCornerShape(18.dp),
@@ -303,12 +308,12 @@ private fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (Stri
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(row.name, fontSize = 16.5.sp, fontWeight = FontWeight.Bold, color = onBg, overflow = TextOverflow.Ellipsis)
-                        if (active) Pill("✓ ACTIVE", cs.primary, cs.onPrimary)
-                        if (row.note != null && !active) Pill(row.note.uppercase(), cs.primary, cs.onPrimary)
+                        if (active) Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary)
+                        if (row.recommended && !active) Pill(stringResource(R.string.recommended).uppercase(), cs.primary, cs.onPrimary)
                     }
-                    Text(row.subtitle, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = onBgVar, modifier = Modifier.padding(top = 4.dp))
+                    Text("$badge · $sizePart", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = onBgVar, modifier = Modifier.padding(top = 4.dp))
                     if (row.state == RowState.Failed) {
-                        Text("Download failed — check your connection.", fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.error, modifier = Modifier.padding(top = 5.dp))
+                        Text(stringResource(R.string.row_download_failed), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.error, modifier = Modifier.padding(top = 5.dp))
                     }
                 }
                 if (row.state != RowState.Downloading) {
@@ -327,29 +332,29 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
     val cs = MaterialTheme.colorScheme
     when (row.state) {
         RowState.NotDownloaded -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Chip("↓ Download", cs.primaryContainer, cs.onPrimaryContainer) { actions.onDownload(row.id) }
+            Chip("↓ " + stringResource(R.string.action_download), cs.primaryContainer, cs.onPrimaryContainer) { actions.onDownload(row.id) }
         }
         RowState.Failed -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Chip("Retry", cs.errorContainer, cs.onErrorContainer) { actions.onDownload(row.id) }
+            Chip(stringResource(R.string.action_retry), cs.errorContainer, cs.onErrorContainer) { actions.onDownload(row.id) }
         }
         RowState.Downloading -> Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Column(Modifier.weight(1f)) {
-                Text("Downloading ${row.progress}%", fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.primary, modifier = Modifier.padding(bottom = 6.dp))
+                Text(stringResource(R.string.downloading_pct, row.progress), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.primary, modifier = Modifier.padding(bottom = 6.dp))
                 LinearProgressIndicator(
                     progress = { (row.progress.coerceIn(0, 100)) / 100f },
                     modifier = Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)),
                     color = cs.primary, trackColor = cs.outlineVariant
                 )
             }
-            TextButton(onClick = { actions.onCancel(row.id) }) { Text("Cancel", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
+            TextButton(onClick = { actions.onCancel(row.id) }) { Text(stringResource(R.string.action_cancel), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
         }
         RowState.Installed -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = { onRequestDelete(row.id) }) { Text("Delete", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
+            TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
             Spacer(Modifier.width(6.dp))
-            Chip("Use", cs.primaryContainer, cs.onPrimaryContainer) { actions.onUse(row.id) }
+            Chip(stringResource(R.string.action_use), cs.primaryContainer, cs.onPrimaryContainer) { actions.onUse(row.id) }
         }
         RowState.Active -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            TextButton(onClick = { onRequestDelete(row.id) }) { Text("Delete", fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer.copy(alpha = 0.85f)) }
+            TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer.copy(alpha = 0.85f)) }
         }
     }
 }
@@ -409,7 +414,7 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ) {
-            Text("Transcribe an audio file", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
+            Text(stringResource(R.string.transcribe_audio_file), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
         }
     }
 }
@@ -426,7 +431,7 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
                 when {
                     t.error != null -> Text(t.error, fontSize = 13.sp, color = cs.error, lineHeight = 18.sp)
                     t.running && t.text.isEmpty() -> {
-                        Text("Decoding & transcribing on-device…", fontSize = 13.sp, color = cs.onSurfaceVariant)
+                        Text(stringResource(R.string.decoding_transcribing), fontSize = 13.sp, color = cs.onSurfaceVariant)
                         Spacer(Modifier.height(12.dp))
                         LinearProgressIndicator(Modifier.fillMaxWidth())
                     }
@@ -443,12 +448,12 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
             }
         },
         confirmButton = {
-            if (t.running) TextButton(onClick = onCancel) { Text("Cancel") }
-            else TextButton(onClick = onClose) { Text("Close") }
+            if (t.running) TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
+            else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
         },
         dismissButton = {
             if (!t.running && t.error == null && t.text.isNotBlank()) {
-                TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text("Copy") }
+                TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text(stringResource(R.string.action_copy)) }
             }
         }
     )
@@ -465,8 +470,8 @@ private fun LanguageEntry(onClick: () -> Unit) {
             Text("🌐", fontSize = 18.sp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text("Find a model for your language", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text("Pick a language — Scrib downloads the right model", fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                Text(stringResource(R.string.lang_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
             }
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }
@@ -478,11 +483,11 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Un
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Your language") },
+        title = { Text(stringResource(R.string.your_language)) },
         text = {
             Column {
                 Text(
-                    "One multilingual model covers ~99 languages — this picks a good size and downloads it.",
+                    stringResource(R.string.lang_dialog_hint),
                     fontSize = 12.5.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp
                 )
                 Spacer(Modifier.height(6.dp))
@@ -491,14 +496,14 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Un
                         Column(
                             Modifier.fillMaxWidth().clickableRow { onPick(lang) }.padding(vertical = 10.dp)
                         ) {
-                            Text(lang.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
-                            Text(lang.note, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                            Text(stringResource(lang.nameRes), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
+                            Text(stringResource(lang.noteRes), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
                         }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } }
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
     )
 }
 
@@ -507,16 +512,16 @@ private fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Model from HuggingFace") },
+        title = { Text(stringResource(R.string.hf_dialog_title)) },
         text = {
             Column {
-                Text("Paste a direct link to a .bin ggml model (any whisper.cpp-compatible model).", fontSize = 13.sp)
+                Text(stringResource(R.string.hf_dialog_body), fontSize = 13.sp)
                 Spacer(Modifier.height(12.dp))
-                OutlinedTextField(value = text, onValueChange = { text = it }, singleLine = false, placeholder = { Text("https://huggingface.co/…/ggml-….bin") })
+                OutlinedTextField(value = text, onValueChange = { text = it }, singleLine = false, placeholder = { Text(stringResource(R.string.hf_placeholder)) })
             }
         },
-        confirmButton = { TextButton(onClick = { if (text.isNotBlank()) onConfirm(text.trim()) }) { Text("Download") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+        confirmButton = { TextButton(onClick = { if (text.isNotBlank()) onConfirm(text.trim()) }) { Text(stringResource(R.string.action_download)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
     )
 }
 

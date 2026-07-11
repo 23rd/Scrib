@@ -1,9 +1,9 @@
 package org.scrib.transcriber
 
 data class LanguageOption(
-    val name: String,
+    val nameRes: Int,
     val recommendedFileName: String,
-    val note: String
+    val noteRes: Int
 )
 
 object LanguageCatalog {
@@ -13,21 +13,21 @@ object LanguageCatalog {
     private const val SMALL = "ggml-small-q5_1.bin"
 
     val LANGUAGES: List<LanguageOption> = listOf(
-        LanguageOption("English", BASE_EN, "English-only · Base"),
-        LanguageOption("Spanish", BASE, "Multilingual · Base"),
-        LanguageOption("German", BASE, "Multilingual · Base"),
-        LanguageOption("French", BASE, "Multilingual · Base"),
-        LanguageOption("Italian", BASE, "Multilingual · Base"),
-        LanguageOption("Portuguese", BASE, "Multilingual · Base"),
-        LanguageOption("Dutch", BASE, "Multilingual · Base"),
-        LanguageOption("Russian", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Ukrainian", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Polish", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Turkish", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Arabic", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Chinese", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Japanese", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Korean", SMALL, "Multilingual · Small — better accuracy"),
-        LanguageOption("Hindi", SMALL, "Multilingual · Small — better accuracy")
+        LanguageOption(R.string.lang_english, BASE_EN, R.string.note_english_base),
+        LanguageOption(R.string.lang_spanish, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_german, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_french, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_italian, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_portuguese, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_dutch, BASE, R.string.note_multi_base),
+        LanguageOption(R.string.lang_russian, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_ukrainian, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_polish, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_turkish, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_arabic, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_chinese, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_japanese, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_korean, SMALL, R.string.note_multi_small),
+        LanguageOption(R.string.lang_hindi, SMALL, R.string.note_multi_small)
     )
 }

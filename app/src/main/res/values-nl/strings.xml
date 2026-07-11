@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">Over</string>
+
+    <string name="active_model">ACTIEF MODEL</string>
+    <string name="ready_to_transcribe">Klaar om te transcriberen</string>
+    <string name="no_active_model">Geen actief model</string>
+    <string name="pick_model_hint">Kies hieronder een model en tik op «Gebruiken».</string>
+    <string name="privacy_full">Audio wordt volledig op je telefoon getranscribeerd. Er wordt niets geüpload — de app gaat alleen online om een model te downloaden.</string>
+    <string name="privacy_short" formatted="false">Draait 100% op het apparaat. Je spraakberichten verlaten nooit de telefoon.</string>
+
+    <string name="setup_transcription">Transcriptie instellen</string>
+    <string name="nudge_body">Nog geen spraakmodel. Download er een — Base is een goede balans: kleine download, degelijke nauwkeurigheid, werkt in elke taal.</string>
+    <string name="download_named_size">%1$s downloaden · ≈%2$d MB</string>
+
+    <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
+    <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
+
+    <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
+    <string name="standard_models">STANDAARDMODELLEN</string>
+    <string name="size">grootte</string>
+    <string name="custom_models">EIGEN MODELLEN</string>
+    <string name="custom_empty">Voeg je eigen GGML-model toe via een directe link of importeer een .bin van dit apparaat.</string>
+
+    <string name="badge_multilingual">meertalig</string>
+    <string name="badge_english_only">alleen Engels</string>
+    <string name="badge_custom">eigen</string>
+    <string name="size_mb">≈%1$d MB</string>
+    <string name="recommended">aanbevolen</string>
+    <string name="active_pill">✓ ACTIEF</string>
+    <string name="row_download_failed">Download mislukt — controleer je verbinding.</string>
+    <string name="downloading_pct">Downloaden %1$d%%</string>
+
+    <string name="action_download">Downloaden</string>
+    <string name="action_retry">Opnieuw</string>
+    <string name="action_cancel">Annuleren</string>
+    <string name="action_delete">Verwijderen</string>
+    <string name="action_use">Gebruiken</string>
+    <string name="action_close">Sluiten</string>
+    <string name="action_copy">Kopiëren</string>
+
+    <string name="add_from_hf">Model van HuggingFace toevoegen…</string>
+    <string name="import_bin">.bin van apparaat importeren…</string>
+    <string name="run_self_test">Zelftest met voorbeeldclip</string>
+
+    <string name="delete_model_q">Model verwijderen?</string>
+
+    <string name="lang_entry_title">Vind een model voor je taal</string>
+    <string name="lang_entry_sub">Kies een taal — Scrib downloadt het juiste model</string>
+    <string name="your_language">Je taal</string>
+    <string name="lang_dialog_hint">Eén meertalig model dekt ~99 talen — dit kiest een goede grootte en downloadt die.</string>
+
+    <string name="hf_dialog_title">Model van HuggingFace</string>
+    <string name="hf_dialog_body">Plak een directe link naar een ggml .bin-model (elk whisper.cpp-compatibel model).</string>
+
+    <string name="lang_english">Engels</string>
+    <string name="lang_spanish">Spaans</string>
+    <string name="lang_german">Duits</string>
+    <string name="lang_french">Frans</string>
+    <string name="lang_italian">Italiaans</string>
+    <string name="lang_portuguese">Portugees</string>
+    <string name="lang_dutch">Nederlands</string>
+    <string name="lang_russian">Russisch</string>
+    <string name="lang_ukrainian">Oekraïens</string>
+    <string name="lang_polish">Pools</string>
+    <string name="lang_turkish">Turks</string>
+    <string name="lang_arabic">Arabisch</string>
+    <string name="lang_chinese">Chinees</string>
+    <string name="lang_japanese">Japans</string>
+    <string name="lang_korean">Koreaans</string>
+    <string name="lang_hindi">Hindi</string>
+
+    <string name="note_english_base">Alleen Engels · Base</string>
+    <string name="note_multi_base">Meertalig · Base</string>
+    <string name="note_multi_small">Meertalig · Small — nauwkeuriger</string>
+
+    <string name="status_download_failed_named">%1$s kon niet worden gedownload — controleer je verbinding en tik op «Opnieuw».</string>
+    <string name="status_ready_active">%1$s is klaar en actief.</string>
+    <string name="status_lang_ready_active">%1$s: %2$s is klaar en actief.</string>
+    <string name="status_lang_downloading">%1$s: %2$s downloaden</string>
+    <string name="status_ellipsis">%1$s…</string>
+    <string name="status_pct">%1$s… %2$d%%</string>
+    <string name="status_fetching_from">Downloaden van %1$s — opslaan in de app.</string>
+    <string name="status_invalid_link">Ongeldige link</string>
+    <string name="status_importing">Importeren…</string>
+    <string name="status_imported">%1$s geïmporteerd van apparaat.</string>
+    <string name="status_import_failed">Importeren mislukt: %1$s</string>
+    <string name="status_selftest_needs_model">Zelftest heeft een actief model nodig — tik eerst op «Gebruiken».</string>
+    <string name="status_running_selftest">Zelftest wordt uitgevoerd…</string>
+    <string name="status_selftest_ok">Zelftest ✓ — %1$s</string>
+    <string name="status_selftest_failed">Zelftest mislukt: %1$s</string>
+    <string name="transcribe_no_speech">Geen spraak herkend.</string>
+    <string name="transcribe_cant_open">Kan het bestand niet openen</string>
+    <string name="transcribe_failed">Transcriptie mislukt</string>
+
+    <string name="about_back">Terug</string>
+    <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>
+    <string name="about_two_ways">Twee manieren om Scrib te gebruiken</string>
+    <string name="about_own_h">Je eigen audio transcriberen</string>
+    <string name="about_own_b">Kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.</string>
+    <string name="about_engine_h">Een transcriptie-engine voor andere apps</string>
+    <string name="about_engine_b">Scrib werkt ook op de achtergrond. Apps die dit ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib omzetten naar tekst, op je apparaat. Kies Scrib in de instellingen van die app als offline transcriber. Er wordt niets geüpload.</string>
+    <string name="about_models_h">Modellen</string>
+    <string name="about_models_b">Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
+    <string name="about_dev_h">Voor ontwikkelaars</string>
+    <string name="about_dev_b">Elke app kan Scrib als offline transcriber gebruiken via het open Open Transcribe-contract (org.opentranscribe.api) — een kleine AIDL-service, zonder SDK en zonder netwerk. Het contract is leveranciersneutraal, dus apps zijn niet aan Scrib gebonden: ze kunnen elke compatibele transcriber binden die de gebruiker heeft geïnstalleerd.</string>
+    <string name="about_version">Versie 0.1</string>
+</resources>

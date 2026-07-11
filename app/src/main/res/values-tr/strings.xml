@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">Hakkında</string>
+
+    <string name="active_model">ETKİN MODEL</string>
+    <string name="ready_to_transcribe">Yazıya dökmeye hazır</string>
+    <string name="no_active_model">Etkin model yok</string>
+    <string name="pick_model_hint">Aşağıdan bir model seçip «Kullan» düğmesine dokunun.</string>
+    <string name="privacy_full">Ses tamamen telefonunuzda yazıya dökülür. Hiçbir şey yüklenmez — uygulama yalnızca model indirmek için çevrimiçi olur.</string>
+    <string name="privacy_short" formatted="false">%100 cihazda çalışır. Sesli mesajlarınız telefonu asla terk etmez.</string>
+
+    <string name="setup_transcription">Yazıya dökmeyi ayarla</string>
+    <string name="nudge_body">Henüz konuşma modeli yok. Bir tane indirin — Base dengeli bir seçim: küçük indirme, iyi doğruluk, her dilde çalışır.</string>
+    <string name="download_named_size">%1$s indir · ≈%2$d MB</string>
+
+    <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
+    <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
+
+    <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
+    <string name="standard_models">STANDART MODELLER</string>
+    <string name="size">boyut</string>
+    <string name="custom_models">ÖZEL MODELLER</string>
+    <string name="custom_empty">Kendi GGML modelinizi doğrudan bağlantıyla ekleyin veya bu cihazdan bir .bin içe aktarın.</string>
+
+    <string name="badge_multilingual">çok dilli</string>
+    <string name="badge_english_only">yalnızca İngilizce</string>
+    <string name="badge_custom">özel</string>
+    <string name="size_mb">≈%1$d MB</string>
+    <string name="recommended">önerilen</string>
+    <string name="active_pill">✓ ETKİN</string>
+    <string name="row_download_failed">İndirme başarısız — bağlantınızı kontrol edin.</string>
+    <string name="downloading_pct">İndiriliyor %1$d%%</string>
+
+    <string name="action_download">İndir</string>
+    <string name="action_retry">Yeniden dene</string>
+    <string name="action_cancel">İptal</string>
+    <string name="action_delete">Sil</string>
+    <string name="action_use">Kullan</string>
+    <string name="action_close">Kapat</string>
+    <string name="action_copy">Kopyala</string>
+
+    <string name="add_from_hf">HuggingFace üzerinden model ekle…</string>
+    <string name="import_bin">Cihazdan .bin içe aktar…</string>
+    <string name="run_self_test">Örnek klip üzerinde otomatik test</string>
+
+    <string name="delete_model_q">Model silinsin mi?</string>
+
+    <string name="lang_entry_title">Diliniz için bir model bulun</string>
+    <string name="lang_entry_sub">Bir dil seçin — Scrib doğru modeli indirir</string>
+    <string name="your_language">Diliniz</string>
+    <string name="lang_dialog_hint">Tek bir çok dilli model ~99 dili kapsar — bu, iyi bir boyut seçip indirir.</string>
+
+    <string name="hf_dialog_title">HuggingFace modeli</string>
+    <string name="hf_dialog_body">.bin ggml modeline doğrudan bir bağlantı yapıştırın (whisper.cpp ile uyumlu herhangi biri).</string>
+
+    <string name="lang_english">İngilizce</string>
+    <string name="lang_spanish">İspanyolca</string>
+    <string name="lang_german">Almanca</string>
+    <string name="lang_french">Fransızca</string>
+    <string name="lang_italian">İtalyanca</string>
+    <string name="lang_portuguese">Portekizce</string>
+    <string name="lang_dutch">Felemenkçe</string>
+    <string name="lang_russian">Rusça</string>
+    <string name="lang_ukrainian">Ukraynaca</string>
+    <string name="lang_polish">Lehçe</string>
+    <string name="lang_turkish">Türkçe</string>
+    <string name="lang_arabic">Arapça</string>
+    <string name="lang_chinese">Çince</string>
+    <string name="lang_japanese">Japonca</string>
+    <string name="lang_korean">Korece</string>
+    <string name="lang_hindi">Hintçe</string>
+
+    <string name="note_english_base">Yalnızca İngilizce · Base</string>
+    <string name="note_multi_base">Çok dilli · Base</string>
+    <string name="note_multi_small">Çok dilli · Small — daha doğru</string>
+
+    <string name="status_download_failed_named">%1$s indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
+    <string name="status_ready_active">%1$s hazır ve etkin.</string>
+    <string name="status_lang_ready_active">%1$s: %2$s hazır ve etkin.</string>
+    <string name="status_lang_downloading">%1$s: %2$s indiriliyor</string>
+    <string name="status_ellipsis">%1$s…</string>
+    <string name="status_pct">%1$s… %2$d%%</string>
+    <string name="status_fetching_from">%1$s adresinden indiriliyor — uygulamaya kaydediliyor.</string>
+    <string name="status_invalid_link">Geçersiz bağlantı</string>
+    <string name="status_importing">İçe aktarılıyor…</string>
+    <string name="status_imported">%1$s cihazdan içe aktarıldı.</string>
+    <string name="status_import_failed">İçe aktarma başarısız: %1$s</string>
+    <string name="status_selftest_needs_model">Otomatik test için etkin bir model gerekir — önce «Kullan» düğmesine dokunun.</string>
+    <string name="status_running_selftest">Otomatik test çalışıyor…</string>
+    <string name="status_selftest_ok">Otomatik test ✓ — %1$s</string>
+    <string name="status_selftest_failed">Otomatik test başarısız: %1$s</string>
+    <string name="transcribe_no_speech">Konuşma algılanmadı.</string>
+    <string name="transcribe_cant_open">Dosya açılamıyor</string>
+    <string name="transcribe_failed">Yazıya dökme başarısız</string>
+
+    <string name="about_back">Geri</string>
+    <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
+    <string name="about_two_ways">Scrib\'i kullanmanın iki yolu</string>
+    <string name="about_own_h">Kendi sesinizi yazıya dökün</string>
+    <string name="about_own_b">Telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.</string>
+    <string name="about_engine_h">Diğer uygulamalar için bir yazıya dökme motoru</string>
+    <string name="about_engine_b">Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — Forkgram gibi — bir sesli mesajı Scrib ile cihazınızda metne dönüştürebilir. O uygulamanın ayarlarında Scrib\'i çevrimdışı yazıya dökücü olarak seçin. Hiçbir şey yüklenmez.</string>
+    <string name="about_models_h">Modeller</string>
+    <string name="about_models_b">Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
+    <string name="about_dev_h">Geliştiriciler için</string>
+    <string name="about_dev_b">Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib\'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib\'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.</string>
+    <string name="about_version">Sürüm 0.1</string>
+</resources>

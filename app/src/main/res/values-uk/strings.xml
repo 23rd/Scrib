@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="about">Про програму</string>
+
+    <string name="active_model">АКТИВНА МОДЕЛЬ</string>
+    <string name="ready_to_transcribe">Готова до розпізнавання</string>
+    <string name="no_active_model">Немає активної моделі</string>
+    <string name="pick_model_hint">Виберіть модель нижче й торкніться «Вибрати».</string>
+    <string name="privacy_full">Аудіо розпізнається повністю на вашому телефоні. Нічого не завантажується — застосунок виходить у мережу лише щоб завантажити модель.</string>
+    <string name="privacy_short" formatted="false">Працює на 100% на пристрої. Ваші голосові ніколи не залишають телефон.</string>
+
+    <string name="setup_transcription">Налаштування розпізнавання</string>
+    <string name="nudge_body">Ще немає моделі мовлення. Завантажте одну — Base хороший баланс: невеликий розмір, пристойна точність, працює будь-якою мовою.</string>
+    <string name="download_named_size">Завантажити %1$s · ≈%2$d МБ</string>
+
+    <string name="transcribe_audio_file">Розпізнати аудіофайл</string>
+    <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
+
+    <string name="models_explainer">Більші моделі точніші, але повільніші й більші для завантаження. Моделі «лише англійська» менші й швидші; для інших мов беріть Base або більшу — Tiny слабенька.</string>
+    <string name="standard_models">СТАНДАРТНІ МОДЕЛІ</string>
+    <string name="size">розмір</string>
+    <string name="custom_models">ВЛАСНІ МОДЕЛІ</string>
+    <string name="custom_empty">Додайте власну GGML-модель за прямим посиланням або імпортуйте .bin із цього пристрою.</string>
+
+    <string name="badge_multilingual">багатомовна</string>
+    <string name="badge_english_only">лише англійська</string>
+    <string name="badge_custom">власна</string>
+    <string name="size_mb">≈%1$d МБ</string>
+    <string name="recommended">рекомендовано</string>
+    <string name="active_pill">✓ АКТИВНА</string>
+    <string name="row_download_failed">Помилка завантаження — перевірте з’єднання.</string>
+    <string name="downloading_pct">Завантаження %1$d%%</string>
+
+    <string name="action_download">Завантажити</string>
+    <string name="action_retry">Повторити</string>
+    <string name="action_cancel">Скасувати</string>
+    <string name="action_delete">Видалити</string>
+    <string name="action_use">Вибрати</string>
+    <string name="action_close">Закрити</string>
+    <string name="action_copy">Копіювати</string>
+
+    <string name="add_from_hf">Додати модель із HuggingFace…</string>
+    <string name="import_bin">Імпортувати .bin із пристрою…</string>
+    <string name="run_self_test">Самоперевірка на тестовому кліпі</string>
+
+    <string name="delete_model_q">Видалити модель?</string>
+
+    <string name="lang_entry_title">Знайти модель для вашої мови</string>
+    <string name="lang_entry_sub">Виберіть мову — Scrib завантажить потрібну модель</string>
+    <string name="your_language">Ваша мова</string>
+    <string name="lang_dialog_hint">Одна багатомовна модель охоплює ~99 мов — це вибирає відповідний розмір і завантажує.</string>
+
+    <string name="hf_dialog_title">Модель із HuggingFace</string>
+    <string name="hf_dialog_body">Вставте пряме посилання на .bin ggml-модель (будь-яку, сумісну з whisper.cpp).</string>
+
+    <string name="lang_english">Англійська</string>
+    <string name="lang_spanish">Іспанська</string>
+    <string name="lang_german">Німецька</string>
+    <string name="lang_french">Французька</string>
+    <string name="lang_italian">Італійська</string>
+    <string name="lang_portuguese">Португальська</string>
+    <string name="lang_dutch">Нідерландська</string>
+    <string name="lang_russian">Російська</string>
+    <string name="lang_ukrainian">Українська</string>
+    <string name="lang_polish">Польська</string>
+    <string name="lang_turkish">Турецька</string>
+    <string name="lang_arabic">Арабська</string>
+    <string name="lang_chinese">Китайська</string>
+    <string name="lang_japanese">Японська</string>
+    <string name="lang_korean">Корейська</string>
+    <string name="lang_hindi">Гінді</string>
+
+    <string name="note_english_base">Лише англійська · Base</string>
+    <string name="note_multi_base">Багатомовна · Base</string>
+    <string name="note_multi_small">Багатомовна · Small — точніше</string>
+
+    <string name="status_download_failed_named">Не вдалося завантажити %1$s — перевірте з’єднання й торкніться «Повторити».</string>
+    <string name="status_ready_active">%1$s готова й активна.</string>
+    <string name="status_lang_ready_active">%1$s: %2$s готова й активна.</string>
+    <string name="status_lang_downloading">%1$s: завантаження %2$s</string>
+    <string name="status_ellipsis">%1$s…</string>
+    <string name="status_pct">%1$s… %2$d%%</string>
+    <string name="status_fetching_from">Завантаження з %1$s — збереження в застосунок.</string>
+    <string name="status_invalid_link">Неправильне посилання</string>
+    <string name="status_importing">Імпорт…</string>
+    <string name="status_imported">Імпортовано %1$s із пристрою.</string>
+    <string name="status_import_failed">Помилка імпорту: %1$s</string>
+    <string name="status_selftest_needs_model">Для самоперевірки потрібна активна модель — спершу торкніться «Вибрати».</string>
+    <string name="status_running_selftest">Запуск самоперевірки…</string>
+    <string name="status_selftest_ok">Самоперевірка ✓ — %1$s</string>
+    <string name="status_selftest_failed">Самоперевірка не вдалася: %1$s</string>
+    <string name="transcribe_no_speech">Мовлення не розпізнано.</string>
+    <string name="transcribe_cant_open">Не вдалося відкрити файл</string>
+    <string name="transcribe_failed">Помилка розпізнавання</string>
+
+    <string name="about_back">Назад</string>
+    <string name="about_tagline">Розпізнавання мовлення на пристрої. Ваше аудіо ніколи не залишає телефон.</string>
+    <string name="about_two_ways">Два способи використовувати Scrib</string>
+    <string name="about_own_h">Розпізнати власне аудіо</string>
+    <string name="about_own_b">Виберіть будь-який аудіофайл на телефоні й отримайте текст — прямо тут, повністю офлайн.</string>
+    <string name="about_engine_h">Рушій розпізнавання для інших застосунків</string>
+    <string name="about_engine_b">Scrib також працює у фоні. Застосунки, що це підтримують — наприклад Forkgram — можуть перетворювати голосові на текст через Scrib, на вашому пристрої. У налаштуваннях того застосунку виберіть Scrib як офлайн-розпізнавач. Нічого не завантажується.</string>
+    <string name="about_models_h">Моделі</string>
+    <string name="about_models_b">Scrib розпізнає відкритими моделями мовлення Whisper. Завантажте модель на головному екрані або виберіть мову — Scrib підбере відповідну. Більші моделі точніші; тримайте кілька й перемикайтеся будь-коли.</string>
+    <string name="about_dev_h">Для розробників</string>
+    <string name="about_dev_b">Будь-який застосунок може використовувати Scrib як офлайн-розпізнавач через відкритий контракт Open Transcribe (org.opentranscribe.api) — невеликий AIDL-сервіс, без SDK і без мережі. Контракт вендор-нейтральний, тож застосунки не прив’язані до Scrib: вони можуть під’єднати будь-який сумісний розпізнавач, установлений користувачем.</string>
+    <string name="about_version">Версія 0.1</string>
+</resources>
