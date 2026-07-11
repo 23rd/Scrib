@@ -22,6 +22,7 @@ android {
             cmake {
                 cppFlags '-O3'
                 cFlags '-O3'
+                arguments '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
             }
         }
     }
