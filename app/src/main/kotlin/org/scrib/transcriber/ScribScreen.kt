@@ -73,7 +73,8 @@ fun ScribScreen(
     transcription: TranscribeUi?,
     onTranscribeFile: (Uri, String?) -> Unit,
     onCancelTranscription: () -> Unit,
-    onDismissTranscription: () -> Unit
+    onDismissTranscription: () -> Unit,
+    onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
@@ -90,7 +91,7 @@ fun ScribScreen(
     }
 
     Column(Modifier.fillMaxSize().background(cs.background).systemBarsPadding()) {
-        AppBar()
+        AppBar(onAbout)
         LazyColumn(
             Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 28.dp)
@@ -169,10 +170,10 @@ fun ScribScreen(
 }
 
 @Composable
-private fun AppBar() {
+private fun AppBar(onAbout: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, end = 16.dp, bottom = 12.dp),
+        Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, end = 8.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(2.5.dp)) {
@@ -182,6 +183,10 @@ private fun AppBar() {
         }
         Spacer(Modifier.width(9.dp))
         Text("Scrib", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground, letterSpacing = (-0.6).sp)
+        Spacer(Modifier.weight(1f))
+        TextButton(onClick = onAbout) {
+            Text("About", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
+        }
     }
 }
 
@@ -404,8 +409,6 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ) {
-            Text("🎙", fontSize = 17.sp)
-            Spacer(Modifier.width(10.dp))
             Text("Transcribe an audio file", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
         }
     }
