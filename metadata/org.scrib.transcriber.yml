@@ -4,11 +4,6 @@
 # metadata/org.scrib.transcriber.yml in the fdroiddata repository
 # (https://gitlab.com/fdroid/fdroiddata). The same format is read by the
 # `fdroid` tool for a self-hosted repository.
-#
-# TODO before submission:
-#   - set SourceCode / IssueTracker / Repo to the real public URLs
-#   - push a signed `v0.1` git tag on the commit to be built
-#   - add screenshots under fastlane/metadata/android/en-US/images/
 
 Categories:
   - Multimedia
