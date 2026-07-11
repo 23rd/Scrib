@@ -53,6 +53,11 @@ android {
         }
     }
 
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
+
     sourceSets {
         main {
             kotlin.srcDirs += 'src/main/kotlin'

@@ -1,0 +1,19 @@
+Scrib turns speech into text entirely on your device, using open Whisper speech models. Nothing is uploaded — the app only goes online to download a model you choose.
+
+Two ways to use it
+
+• Transcribe your own audio. Pick any audio file on your phone and get the text, right in the app, fully offline.
+
+• A transcription engine for other apps. Scrib also runs in the background. Apps that support it — such as Forkgram — can turn a voice message into text through Scrib, on your device. In that app's settings, choose Scrib as the offline transcriber.
+
+Models
+
+Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick your language and Scrib fetches a suitable one. Larger models are more accurate but slower and bigger to download; keep several and switch any time. You can also add any whisper.cpp-compatible model by direct link, or import a .bin from your device. Models are downloaded separately and are not bundled in the app.
+
+Privacy
+
+Transcription runs 100% on device. Your voice messages never leave your phone. The only network access is downloading a speech model you pick.
+
+For developers
+
+Any app can use Scrib as an offline transcriber through the open Open Transcribe contract (org.opentranscribe.api) — a small AIDL service, no SDK and no network. The contract is vendor-neutral, so apps aren't tied to Scrib: they can bind any compatible transcriber the user has installed.

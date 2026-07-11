@@ -1,0 +1,37 @@
+# F-Droid build recipe for Scrib.
+#
+# For official inclusion this file is submitted as
+# metadata/org.scrib.transcriber.yml in the fdroiddata repository
+# (https://gitlab.com/fdroid/fdroiddata). The same format is read by the
+# `fdroid` tool for a self-hosted repository.
+#
+# TODO before submission:
+#   - set SourceCode / IssueTracker / Repo to the real public URLs
+#   - push a signed `v0.1` git tag on the commit to be built
+#   - add screenshots under fastlane/metadata/android/en-US/images/
+
+Categories:
+  - Multimedia
+License: GPL-3.0-or-later
+AuthorName: 23rd
+SourceCode: https://github.com/23rd/Scrib
+IssueTracker: https://github.com/23rd/Scrib/issues
+Summary: On-device voice transcription
+
+RepoType: git
+Repo: https://github.com/23rd/Scrib
+
+Builds:
+  - versionName: '0.1'
+    versionCode: 1
+    commit: v0.1
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
+AutoUpdateMode: Version v%v
+UpdateCheckMode: Tags
+CurrentVersion: '0.1'
+CurrentVersionCode: 1

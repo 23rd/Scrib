@@ -1,0 +1,1 @@
+On-device voice transcription. Your audio never leaves your phone.

@@ -1,0 +1,7 @@
+First release.
+
+• On-device voice transcription with open Whisper models
+• Transcribe any audio file on your phone, fully offline
+• Works as an offline transcription engine for other apps via the open Open Transcribe contract
+• Model manager: download by name or by language, add custom models, import .bin files
+• Available in 12 languages
