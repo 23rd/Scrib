@@ -1,0 +1,2 @@
+• Fixed the navigation bar buttons being invisible in the light theme
+• Added the app icon and banner to the F-Droid listing

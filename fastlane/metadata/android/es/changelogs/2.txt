@@ -1,0 +1,2 @@
+• Corregidos los botones de navegación invisibles en el tema claro
+• Añadidos el icono de la aplicación y el banner en la ficha de F-Droid

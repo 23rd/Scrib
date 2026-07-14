@@ -1,0 +1,2 @@
+• Açık temada görünmeyen gezinme düğmeleri düzeltildi
+• Uygulama simgesi ve afiş F-Droid sayfasına eklendi

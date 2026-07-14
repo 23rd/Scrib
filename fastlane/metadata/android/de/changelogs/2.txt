@@ -1,0 +1,2 @@
+• Unsichtbare Navigationsleisten-Schaltflächen im hellen Design behoben
+• App-Symbol und Banner im F-Droid-Eintrag hinzugefügt

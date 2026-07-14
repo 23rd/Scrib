@@ -1,0 +1,2 @@
+• Naprawiono niewidoczne przyciski nawigacji w jasnym motywie
+• Dodano ikonę aplikacji i baner na stronie F-Droid

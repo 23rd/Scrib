@@ -1,0 +1,2 @@
+• Corretti i pulsanti di navigazione invisibili nel tema chiaro
+• Aggiunti l'icona dell'app e il banner nella scheda F-Droid

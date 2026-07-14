@@ -1,0 +1,2 @@
+• Onzichtbare navigatieknoppen in het lichte thema opgelost
+• App-pictogram en banner toegevoegd aan de F-Droid-vermelding
