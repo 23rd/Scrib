@@ -57,7 +57,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            if (pcm.isEmpty()) {
+            if (pcm.sampleCount == 0) {
                 throw DecodeException("No audio decoded")
             }
             return transcribePcm(pcm, languageHint, cancellation, onPartial)
@@ -70,7 +70,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     }
 
     private fun transcribePcm(
-        pcm: FloatArray,
+        pcm: DecodedAudio,
         languageHint: String?,
         cancellation: CancellationToken,
         onPartial: (String) -> Unit
@@ -82,7 +82,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val text = whisperContext().transcribeData(pcm, language, abortFlag) { partial ->
+            val text = whisperContext().transcribeBuffer(pcm.samples, pcm.sampleCount, language, abortFlag) { partial ->
                 onPartial(partial.trim())
             }.trim()
             if (cancellation.isCancelled) {

@@ -4,6 +4,7 @@ import android.content.res.AssetManager
 import android.os.Build
 import android.util.Log
 import java.io.File
+import java.nio.ByteBuffer
 
 private const val LOG_TAG = "LibWhisper"
 
@@ -48,7 +49,30 @@ class WhisperContext private constructor(private var ptr: Long) {
         require(ptr != 0L)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
-        val callback = if (onSegment != null) object : WhisperSegmentCallback {
+        WhisperLib.fullTranscribe(ptr, numThreads, data, language ?: "", segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
+        return collectText()
+    }
+
+    // Same, but reads the samples from a direct buffer, so long recordings never need a
+    // Java-heap array.
+    @Synchronized
+    fun transcribeBuffer(
+        samples: ByteBuffer,
+        sampleCount: Int,
+        language: String?,
+        abortFlag: WhisperAbortFlag? = null,
+        onSegment: ((String) -> Unit)? = null
+    ): String {
+        require(ptr != 0L)
+        require(samples.isDirect)
+        val numThreads = WhisperCpuConfig.preferredThreadCount
+        Log.d(LOG_TAG, "Selecting $numThreads threads")
+        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
+        return collectText()
+    }
+
+    private fun segmentCallback(onSegment: ((String) -> Unit)?): WhisperSegmentCallback? =
+        if (onSegment != null) object : WhisperSegmentCallback {
             override fun onSegment(text: String) {
                 try {
                     onSegment(text)
@@ -56,7 +80,8 @@ class WhisperContext private constructor(private var ptr: Long) {
                 }
             }
         } else null
-        WhisperLib.fullTranscribe(ptr, numThreads, data, language ?: "", callback, abortFlag?.nativePtr() ?: 0L)
+
+    private fun collectText(): String {
         val textCount = WhisperLib.getTextSegmentCount(ptr)
         return buildString {
             for (i in 0 until textCount) {
@@ -138,6 +163,7 @@ private class WhisperLib {
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
+        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
         external fun newAbortFlag(): Long
         external fun setAbortFlag(flagPtr: Long)
         external fun freeAbortFlag(flagPtr: Long)

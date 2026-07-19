@@ -258,13 +258,9 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jo
     return (*env)->NewStringUTF(env, code);
 }
 
-JNIEXPORT void JNICALL
-Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
-    UNUSED(thiz);
+static void fgt_full_transcribe(
+        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
     struct whisper_context *context = (struct whisper_context *) context_ptr;
-    jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
-    const jsize audio_data_length = (*env)->GetArrayLength(env, audio_data);
 
     // The below adapted from the Objective-C iOS sample
     struct whisper_full_params params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
@@ -313,7 +309,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     whisper_reset_timings(context);
 
     LOGI("About to run whisper_full");
-    if (whisper_full(context, params, audio_data_arr, audio_data_length) != 0) {
+    if (whisper_full(context, params, samples, n_samples) != 0) {
         LOGI("Failed to run the model");
     } else {
         whisper_print_timings(context);
@@ -321,7 +317,29 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     if (lang_chars != NULL) {
         (*env)->ReleaseStringUTFChars(env, language, lang_chars);
     }
+}
+
+JNIEXPORT void JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
+    UNUSED(thiz);
+    jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
+    const jsize audio_data_length = (*env)->GetArrayLength(env, audio_data);
+    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, segment_callback, abort_flag_ptr);
     (*env)->ReleaseFloatArrayElements(env, audio_data, audio_data_arr, JNI_ABORT);
+}
+
+// Reads the samples from a direct buffer, so long recordings never need a Java-heap array.
+JNIEXPORT void JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribeDirect(
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
+    UNUSED(thiz);
+    const float *samples = (const float *) (*env)->GetDirectBufferAddress(env, audio_buffer);
+    if (samples == NULL || n_samples <= 0) {
+        LOGW("No direct buffer address, skipping transcription");
+        return;
+    }
+    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, segment_callback, abort_flag_ptr);
 }
 
 JNIEXPORT jint JNICALL
