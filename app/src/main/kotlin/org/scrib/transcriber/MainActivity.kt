@@ -1,9 +1,13 @@
 package org.scrib.transcriber
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -12,8 +16,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val sharedVm: ScribViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Only on the first creation: a recreation (rotation) must not restart the work.
+        if (savedInstanceState == null) {
+            maybeTranscribeShared(intent)
+        }
         setContent {
             ScribTheme {
                 val vm: ScribViewModel = viewModel()
@@ -43,5 +54,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    // A file arriving through the system share sheet goes straight into transcription. Without a
+    // model there is nothing to run it with — the first-run screen then explains the download.
+    private fun maybeTranscribeShared(intent: Intent?) {
+        if (intent?.action != Intent.ACTION_SEND) {
+            return
+        }
+        val uri = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
+        } ?: return
+        if (ModelManager.activeFileName(this) == null) {
+            return
+        }
+        sharedVm.transcribeFile(uri, queryDisplayName(this, uri))
     }
 }

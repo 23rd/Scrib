@@ -528,7 +528,7 @@ private fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
 private fun Modifier.clickableRow(onClick: () -> Unit): Modifier =
     this.clickable(onClick = onClick)
 
-private fun queryDisplayName(context: android.content.Context, uri: Uri): String? = runCatching {
+internal fun queryDisplayName(context: android.content.Context, uri: Uri): String? = runCatching {
     context.contentResolver.query(uri, null, null, null, null)?.use { c ->
         val i = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         if (i >= 0 && c.moveToFirst()) c.getString(i) else null
