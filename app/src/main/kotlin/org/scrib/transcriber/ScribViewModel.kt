@@ -2,6 +2,7 @@ package org.scrib.transcriber
 
 import android.app.Application
 import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.whispercpp.whisper.WhisperContext
@@ -41,7 +42,8 @@ data class TranscribeUi(
     val fileName: String,
     val text: String,
     val running: Boolean,
-    val error: String?
+    val error: String?,
+    val sourceUri: Uri? = null
 )
 
 class ScribViewModel(app: Application) : AndroidViewModel(app) {
@@ -247,7 +249,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         if (transcribeToken != null) return
         val token = CancellationToken()
         transcribeToken = token
-        _transcription.value = TranscribeUi(displayName ?: "audio", "", running = true, error = null)
+        _transcription.value = TranscribeUi(displayName ?: "audio", "", running = true, error = null, sourceUri = uri)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
@@ -270,6 +272,34 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 transcribeToken = null
             }
         }
+    }
+
+    fun saveTranscript(uri: Uri) {
+        val text = _transcription.value?.text ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val ok = try {
+                writeText(uri, text, "wt")
+                true
+            } catch (e: Throwable) {
+                // Some providers reject the explicit truncate mode; retry with the default one.
+                try {
+                    writeText(uri, text, "w")
+                    true
+                } catch (e2: Throwable) {
+                    false
+                }
+            }
+            withContext(Dispatchers.Main) {
+                val msg = if (ok) R.string.transcript_saved else R.string.transcript_save_failed
+                Toast.makeText(ctx, str(msg), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun writeText(uri: Uri, text: String, mode: String) {
+        val out = ctx.contentResolver.openOutputStream(uri, mode)
+            ?: throw RuntimeException("Can't open $uri")
+        out.bufferedWriter().use { it.write(text) }
     }
 
     fun cancelTranscription() {

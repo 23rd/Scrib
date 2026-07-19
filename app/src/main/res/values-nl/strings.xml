@@ -38,6 +38,10 @@
     <string name="action_use">Gebruiken</string>
     <string name="action_close">Sluiten</string>
     <string name="action_copy">Kopiëren</string>
+    <string name="action_share">Delen</string>
+    <string name="action_save_txt">Als .txt opslaan</string>
+    <string name="transcript_saved">Transcriptie opgeslagen.</string>
+    <string name="transcript_save_failed">Transcriptie kon niet worden opgeslagen.</string>
 
     <string name="add_from_hf">Model van HuggingFace toevoegen…</string>
     <string name="import_bin">.bin van apparaat importeren…</string>

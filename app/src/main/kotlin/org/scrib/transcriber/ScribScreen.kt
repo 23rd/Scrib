@@ -1,6 +1,9 @@
 package org.scrib.transcriber
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -75,6 +80,7 @@ fun ScribScreen(
     onTranscribeFile: (Uri, String?) -> Unit,
     onCancelTranscription: () -> Unit,
     onDismissTranscription: () -> Unit,
+    onSaveTranscript: (Uri) -> Unit,
     onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
@@ -157,7 +163,7 @@ fun ScribScreen(
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
     }
     transcription?.let { t ->
-        TranscriptionDialog(t, onCancel = onCancelTranscription, onClose = onDismissTranscription)
+        TranscriptionDialog(t, onCancel = onCancelTranscription, onClose = onDismissTranscription, onSave = onSaveTranscript)
     }
     deleteTarget?.let { target ->
         AlertDialog(
@@ -419,10 +425,30 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
     }
 }
 
+// Pre-fills the save dialog with the transcript name and, when the provider supports it, opens
+// the picker at the source recording's location — SAF cannot write there without the user's pick.
+private class CreateTranscriptDocument(private val initialUri: Uri?) : ActivityResultContracts.CreateDocument("text/plain") {
+    override fun createIntent(context: Context, input: String): Intent =
+        super.createIntent(context, input).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            if (initialUri != null) {
+                putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
+            }
+        }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: () -> Unit) {
+private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: () -> Unit, onSave: (Uri) -> Unit) {
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+    val baseName = t.fileName.substringBeforeLast('.').ifBlank { "transcript" }
+    val saveContract = remember(t.sourceUri) { CreateTranscriptDocument(t.sourceUri) }
+    val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
+        if (uri != null) onSave(uri)
+    }
+    val finished = !t.running && t.error == null && t.text.isNotBlank()
     AlertDialog(
         onDismissRequest = { if (!t.running) onClose() },
         title = { Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
@@ -445,16 +471,25 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
                         }
                     }
                 }
+                if (finished) {
+                    Spacer(Modifier.height(10.dp))
+                    FlowRow {
+                        TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text(stringResource(R.string.action_copy)) }
+                        TextButton(onClick = {
+                            val send = Intent(Intent.ACTION_SEND)
+                                .setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, t.text)
+                                .putExtra(Intent.EXTRA_SUBJECT, baseName)
+                            context.startActivity(Intent.createChooser(send, null))
+                        }) { Text(stringResource(R.string.action_share)) }
+                        TextButton(onClick = { saveLauncher.launch("$baseName.txt") }) { Text(stringResource(R.string.action_save_txt)) }
+                    }
+                }
             }
         },
         confirmButton = {
             if (t.running) TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
             else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
-        },
-        dismissButton = {
-            if (!t.running && t.error == null && t.text.isNotBlank()) {
-                TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text(stringResource(R.string.action_copy)) }
-            }
         }
     )
 }

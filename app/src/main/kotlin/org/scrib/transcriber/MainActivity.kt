@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
                         onTranscribeFile = vm::transcribeFile,
                         onCancelTranscription = vm::cancelTranscription,
                         onDismissTranscription = vm::dismissTranscription,
+                        onSaveTranscript = vm::saveTranscript,
                         onAbout = { showAbout = true }
                     )
                 }
