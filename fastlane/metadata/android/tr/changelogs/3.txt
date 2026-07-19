@@ -1,0 +1,3 @@
+• Uzun kayıtlar yazıya dökülürken oluşan çökme düzeltildi
+• Uygulama, ses ve video dosyaları için sistem paylaşım menüsüne eklendi
+• Metni paylaşma ve .txt dosyası olarak kaydetme eklendi

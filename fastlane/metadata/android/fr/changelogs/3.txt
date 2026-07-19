@@ -1,0 +1,3 @@
+• Correction du plantage lors de la transcription de longs enregistrements
+• Ajout de l'application au menu de partage du système pour les fichiers audio et vidéo
+• Ajout du partage de la transcription et de son enregistrement en fichier .txt

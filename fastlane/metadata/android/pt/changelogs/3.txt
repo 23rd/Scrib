@@ -1,0 +1,3 @@
+• Corrigida a falha ao transcrever gravações longas
+• Adicionado o aplicativo ao menu de compartilhamento do sistema para arquivos de áudio e vídeo
+• Adicionado o compartilhamento da transcrição e o salvamento como arquivo .txt

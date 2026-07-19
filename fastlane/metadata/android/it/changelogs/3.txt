@@ -1,0 +1,3 @@
+• Corretto il crash durante la trascrizione di registrazioni lunghe
+• Aggiunta l'app al menu di condivisione di sistema per file audio e video
+• Aggiunta la condivisione della trascrizione e il salvataggio come file .txt

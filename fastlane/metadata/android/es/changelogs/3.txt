@@ -1,0 +1,3 @@
+• Corregido el cierre inesperado al transcribir grabaciones largas
+• Añadida la aplicación al menú compartir del sistema para archivos de audio y vídeo
+• Añadido compartir la transcripción y guardarla como archivo .txt

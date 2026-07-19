@@ -1,0 +1,3 @@
+• Fixed the crash when transcribing long recordings
+• Added the app to the system share sheet for audio and video files
+• Added transcript sharing and saving as a .txt file

@@ -1,0 +1,3 @@
+• Crash bij het transcriberen van lange opnamen opgelost
+• App toegevoegd aan het systeemdeelmenu voor audio- en videobestanden
+• Delen van de transcriptie en opslaan als .txt-bestand toegevoegd

@@ -1,0 +1,3 @@
+• Naprawiono awarię podczas transkrypcji długich nagrań
+• Dodano aplikację do systemowego menu udostępniania dla plików audio i wideo
+• Dodano udostępnianie transkrypcji i zapisywanie jej jako pliku .txt
