@@ -1,0 +1,74 @@
+name: Latest APK
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: latest-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      # Manual runs rebuild the same tag a push would have built.
+      - name: Switch to the newest release tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git checkout "$(git tag --list 'v*' --sort=-version:refname | head -n1)"
+          git submodule update --init --recursive
+
+      - name: Resolve the version
+        run: |
+          tag="$(git describe --tags --exact-match --match 'v*')"
+          grep -qF "versionName '${tag#v}'" app/build.gradle
+          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew :app:assembleRelease
+
+      - name: Sign the APK
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
+          KEYSTORE_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+        run: |
+          tools="$ANDROID_HOME/build-tools/35.0.0"
+          printf '%s' "$KEYSTORE_B64" | base64 -d > release.jks
+          "$tools/zipalign" -f -P 16 4 \
+            app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
+          "$tools/apksigner" sign --ks release.jks --ks-key-alias scrib \
+            --ks-pass env:KEYSTORE_PASS --out Scrib.apk aligned.apk
+          "$tools/apksigner" verify Scrib.apk
+          rm release.jks
+
+      - name: Update the latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git push --force origin HEAD:refs/tags/latest
+          title="Scrib $VERSION"
+          notes="$(printf 'Version %s · %s · arm64-v8a.\nSigned with its own key — cannot update an F-Droid install.' \
+            "$VERSION" "$(date -u +%Y-%m-%d)")"
+          if gh release view latest >/dev/null 2>&1; then
+            gh release edit latest --title "$title" --notes "$notes"
+            gh release upload latest Scrib.apk --clobber
+          else
+            gh release create latest Scrib.apk --title "$title" --notes "$notes"
+          fi
