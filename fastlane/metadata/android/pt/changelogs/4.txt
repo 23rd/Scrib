@@ -1,0 +1,2 @@
+• Adicionada a transcrição ao vivo para outros aplicativos
+• Adicionado o download do APK na página de versões do GitHub

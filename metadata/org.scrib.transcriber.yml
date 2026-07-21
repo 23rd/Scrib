@@ -44,7 +44,16 @@ Builds:
       - yes
     ndk: '27.2.12479018'
 
+  - versionName: '0.4'
+    versionCode: 4
+    commit: v0.4
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: '0.3'
-CurrentVersionCode: 3
+CurrentVersion: '0.4'
+CurrentVersionCode: 4

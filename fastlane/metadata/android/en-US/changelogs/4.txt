@@ -1,0 +1,2 @@
+• Added live transcription for other apps through the transcription API
+• Added APK downloads on the GitHub releases page

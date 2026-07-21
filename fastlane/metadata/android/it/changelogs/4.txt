@@ -1,0 +1,2 @@
+• Aggiunta la trascrizione in tempo reale per altre app
+• Aggiunto il download dell'APK dalla pagina delle release di GitHub

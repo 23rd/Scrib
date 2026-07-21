@@ -1,0 +1,2 @@
+• Ajout de la transcription en direct pour les autres applications
+• Ajout du téléchargement de l'APK sur la page des versions GitHub
