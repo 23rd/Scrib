@@ -18,6 +18,11 @@ import java.util.concurrent.atomic.AtomicLong
 // outside the Java heap: an hour of audio is ~230 MB, several times the heap growth limit.
 class DecodedAudio(val samples: ByteBuffer, val sampleCount: Int)
 
+// Where converted 16 kHz mono samples go: a decoded file, or a live stream's pending window.
+interface PcmSink {
+    fun add(sample: Float)
+}
+
 object AudioDecoder {
 
     private const val TAG = "AudioDecoder"
@@ -204,7 +209,7 @@ object AudioDecoder {
 
     // Accumulates the converted samples in native memory, sized up front from the track duration
     // so the usual case is a single allocation with no growth copies.
-    private class SampleSink(initialCapacity: Int) {
+    private class SampleSink(initialCapacity: Int) : PcmSink {
         private var buffer = try {
             allocateSamples(initialCapacity)
         } catch (e: OutOfMemoryError) {
@@ -212,7 +217,7 @@ object AudioDecoder {
         }
         private var floats = buffer.asFloatBuffer()
 
-        fun add(sample: Float) {
+        override fun add(sample: Float) {
             if (!floats.hasRemaining()) {
                 grow()
             }
@@ -243,11 +248,11 @@ object AudioDecoder {
 
     // Converts decoder output chunks (interleaved PCM at the source rate) into 16 kHz mono
     // samples as they arrive. Chunks need not be frame-aligned: partial frames are carried over.
-    private class ChunkConverter(
+    class ChunkConverter(
         private val srcRate: Int,
         private val channels: Int,
         encoding: Int,
-        private val sink: SampleSink,
+        private val sink: PcmSink,
     ) {
         private val bytesPerSample = when (encoding) {
             AudioFormat.ENCODING_PCM_16BIT -> 2

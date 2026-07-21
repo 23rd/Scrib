@@ -7,14 +7,20 @@ import android.os.ParcelFileDescriptor
 import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.ITranscriptionService
 import org.opentranscribe.api.ITranscriptionSession
+import org.opentranscribe.api.ITranscriptionStream
+import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
 import org.opentranscribe.api.TranscriptionRequest
+import java.util.Collections
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class TranscriptionService : Service() {
 
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+
+    // Streams run on their own threads, so they need cancelling by hand when the service goes away.
+    private val streams = Collections.synchronizedSet(mutableSetOf<AudioStream>())
 
     private val binder = object : ITranscriptionService.Stub() {
 
@@ -43,11 +49,42 @@ class TranscriptionService : Service() {
                 }
             }
         }
+
+        override fun openStream(
+            request: StreamRequest?,
+            callback: ITranscriptionCallback?
+        ): ITranscriptionStream? {
+            if (callback == null) {
+                return null
+            }
+            val stream = TranscriptionEngine.get(applicationContext).openStream(request, callback)
+            streams.add(stream)
+            stream.start { streams.remove(stream) }
+            return object : ITranscriptionStream.Stub() {
+                override fun write(pcm: ByteArray?, length: Int) {
+                    if (pcm != null) {
+                        stream.write(pcm, length)
+                    }
+                }
+
+                override fun endOfStream() {
+                    stream.endOfStream()
+                }
+
+                override fun cancel() {
+                    stream.cancel()
+                }
+            }
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onDestroy() {
+        synchronized(streams) {
+            streams.forEach { it.cancel() }
+            streams.clear()
+        }
         executor.shutdownNow()
         super.onDestroy()
     }

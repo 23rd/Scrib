@@ -6,8 +6,8 @@ import com.whispercpp.whisper.WhisperAbortFlag
 import com.whispercpp.whisper.WhisperContext
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
+import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
-import org.opentranscribe.api.TranscriptionError
 import org.opentranscribe.api.TranscriptionRequest
 
 class WhisperTranscriptionEngine(private val appContext: Context) : TranscriptionEngine {
@@ -33,15 +33,21 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             }
             callback.onTranscriptionResult(text)
         } catch (e: CancelledException) {
-            callback.onTranscriptionError(makeError(ErrorType.CANCELLED, null))
+            callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
         } catch (e: ModelNotAvailableException) {
-            callback.onTranscriptionError(makeError(ErrorType.MODEL_NOT_AVAILABLE, null))
+            callback.onTranscriptionError(transcriptionError(ErrorType.MODEL_NOT_AVAILABLE))
         } catch (e: DecodeException) {
-            callback.onTranscriptionError(makeError(ErrorType.DECODE_FAILED, e.message))
+            callback.onTranscriptionError(transcriptionError(ErrorType.DECODE_FAILED, e.message))
         } catch (e: Throwable) {
-            callback.onTranscriptionError(makeError(ErrorType.UNEXPECTED, e.message))
+            callback.onTranscriptionError(transcriptionError(ErrorType.UNEXPECTED, e.message))
         }
     }
+
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
+        AudioStream(request, callback) { samples, sampleCount, language, prompt, abortFlag ->
+            val chunk = whisperContext().transcribeChunk(samples, sampleCount, language, prompt, abortFlag)
+            TranscribedSegment(chunk.text, chunk.language)
+        }
 
     override fun transcribeToText(
         audio: ParcelFileDescriptor,
@@ -105,6 +111,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         capabilities.autoDetectLanguage = !englishOnly
         capabilities.cancellable = true
         capabilities.modelReady = activeFile != null
+        capabilities.streaming = true
         return capabilities
     }
 
@@ -137,19 +144,6 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             loadedPath = path
         }
     }
-
-    private fun makeError(type: Byte, message: String?): TranscriptionError {
-        val error = TranscriptionError()
-        error.type = type
-        error.message = message
-        return error
-    }
-
-    private class CancelledException : RuntimeException()
-
-    private class ModelNotAvailableException : RuntimeException()
-
-    private class DecodeException(message: String) : RuntimeException(message)
 
     private companion object {
         const val ENGINE_ID = "whisper.cpp"

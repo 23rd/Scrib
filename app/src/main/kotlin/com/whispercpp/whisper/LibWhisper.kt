@@ -12,6 +12,8 @@ interface WhisperSegmentCallback {
     fun onSegment(text: String)
 }
 
+class WhisperChunk(val text: String, val language: String?)
+
 class WhisperAbortFlag {
 
     private var ptr: Long = WhisperLib.newAbortFlag()
@@ -67,8 +69,24 @@ class WhisperContext private constructor(private var ptr: Long) {
         require(samples.isDirect)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
-        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
+        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
         return collectText()
+    }
+
+    // One chunk of a live stream. The detected language is read under the same lock, so a
+    // parallel file request cannot overwrite it in between.
+    @Synchronized
+    fun transcribeChunk(
+        samples: ByteBuffer,
+        sampleCount: Int,
+        language: String?,
+        prompt: String?,
+        abortFlag: WhisperAbortFlag?
+    ): WhisperChunk {
+        require(ptr != 0L)
+        require(samples.isDirect)
+        WhisperLib.fullTranscribeDirect(ptr, WhisperCpuConfig.preferredThreadCount, samples, sampleCount, language ?: "", prompt ?: "", true, null, abortFlag?.nativePtr() ?: 0L)
+        return WhisperChunk(collectText(), WhisperLib.fullLangId(ptr))
     }
 
     private fun segmentCallback(onSegment: ((String) -> Unit)?): WhisperSegmentCallback? =
@@ -163,7 +181,8 @@ private class WhisperLib {
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
-        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
+        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
+        external fun fullLangId(contextPtr: Long): String?
         external fun newAbortFlag(): Long
         external fun setAbortFlag(flagPtr: Long)
         external fun freeAbortFlag(flagPtr: Long)

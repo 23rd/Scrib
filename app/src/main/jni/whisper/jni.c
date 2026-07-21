@@ -259,7 +259,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jo
 }
 
 static void fgt_full_transcribe(
-        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jlong abort_flag_ptr) {
     struct whisper_context *context = (struct whisper_context *) context_ptr;
 
     // The below adapted from the Objective-C iOS sample
@@ -273,6 +273,7 @@ static void fgt_full_transcribe(
     params.offset_ms = 0;
     params.no_context = true;
     params.single_segment = false;
+    params.suppress_nst = suppress_non_speech != JNI_FALSE;
 
     const char *lang_chars = NULL;
     if (language != NULL) {
@@ -284,6 +285,15 @@ static void fgt_full_transcribe(
         params.language = "auto";
     }
     params.detect_language = false;
+
+    // Text decoded before this chunk, so a stream's words carry over a segment boundary.
+    const char *prompt_chars = NULL;
+    if (prompt != NULL) {
+        prompt_chars = (*env)->GetStringUTFChars(env, prompt, NULL);
+    }
+    if (prompt_chars != NULL && strlen(prompt_chars) > 0) {
+        params.initial_prompt = prompt_chars;
+    }
 
     struct fgt_segment_ctx seg_ctx;
     seg_ctx.env = env;
@@ -317,6 +327,9 @@ static void fgt_full_transcribe(
     if (lang_chars != NULL) {
         (*env)->ReleaseStringUTFChars(env, language, lang_chars);
     }
+    if (prompt_chars != NULL) {
+        (*env)->ReleaseStringUTFChars(env, prompt, prompt_chars);
+    }
 }
 
 JNIEXPORT void JNICALL
@@ -325,21 +338,35 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     UNUSED(thiz);
     jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
     const jsize audio_data_length = (*env)->GetArrayLength(env, audio_data);
-    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, segment_callback, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, NULL, JNI_FALSE, segment_callback, abort_flag_ptr);
     (*env)->ReleaseFloatArrayElements(env, audio_data, audio_data_arr, JNI_ABORT);
 }
 
 // Reads the samples from a direct buffer, so long recordings never need a Java-heap array.
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribeDirect(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jlong abort_flag_ptr) {
     UNUSED(thiz);
     const float *samples = (const float *) (*env)->GetDirectBufferAddress(env, audio_buffer);
     if (samples == NULL || n_samples <= 0) {
         LOGW("No direct buffer address, skipping transcription");
         return;
     }
-    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, segment_callback, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, prompt, suppress_non_speech, segment_callback, abort_flag_ptr);
+}
+
+// The language whisper used for the last run, so a stream can pin auto-detection to its first
+// chunk instead of re-detecting on every one.
+JNIEXPORT jstring JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullLangId(
+        JNIEnv *env, jobject thiz, jlong context_ptr) {
+    UNUSED(thiz);
+    struct whisper_context *context = (struct whisper_context *) context_ptr;
+    const char *code = whisper_lang_str(whisper_full_lang_id(context));
+    if (code == NULL) {
+        return NULL;
+    }
+    return (*env)->NewStringUTF(env, code);
 }
 
 JNIEXPORT jint JNICALL

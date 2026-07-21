@@ -3,7 +3,9 @@ package org.scrib.transcriber
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import org.opentranscribe.api.ITranscriptionCallback
+import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
+import org.opentranscribe.api.TranscriptionError
 import org.opentranscribe.api.TranscriptionRequest
 
 interface TranscriptionEngine {
@@ -22,10 +24,13 @@ interface TranscriptionEngine {
         onPartial: (String) -> Unit
     ): String
 
+    // The caller starts the returned stream and feeds it PCM as it is captured.
+    fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream
+
     fun capabilities(): TranscriberCapabilities
 
     companion object {
-        const val CONTRACT_VERSION = 1
+        const val CONTRACT_VERSION = 2
 
         @Volatile
         private var instance: TranscriptionEngine? = null
@@ -36,4 +41,17 @@ interface TranscriptionEngine {
             }
         }
     }
+}
+
+class CancelledException : RuntimeException()
+
+class ModelNotAvailableException : RuntimeException()
+
+class DecodeException(message: String) : RuntimeException(message)
+
+fun transcriptionError(type: Byte, message: String? = null): TranscriptionError {
+    val error = TranscriptionError()
+    error.type = type
+    error.message = message
+    return error
 }

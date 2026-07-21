@@ -8,4 +8,5 @@ parcelable TranscriberCapabilities {
     boolean autoDetectLanguage;
     boolean cancellable;
     boolean modelReady;
+    boolean streaming;
 }
