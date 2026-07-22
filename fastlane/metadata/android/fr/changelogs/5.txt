@@ -1,0 +1,1 @@
+• Correction du plantage lors de l'interruption de la transcription pendant le décodage de l'audio

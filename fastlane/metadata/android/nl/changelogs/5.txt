@@ -1,0 +1,1 @@
+• Crash bij het onderbreken van de transcriptie tijdens het decoderen van audio opgelost

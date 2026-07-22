@@ -1,0 +1,1 @@
+• Corrigida a falha ao interromper a transcrição durante a decodificação do áudio

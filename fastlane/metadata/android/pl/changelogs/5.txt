@@ -1,0 +1,1 @@
+• Naprawiono awarię przy przerwaniu transkrypcji podczas dekodowania dźwięku

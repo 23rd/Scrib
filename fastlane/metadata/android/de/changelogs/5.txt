@@ -1,0 +1,1 @@
+• Absturz beim Unterbrechen der Transkription während der Audiodekodierung behoben
