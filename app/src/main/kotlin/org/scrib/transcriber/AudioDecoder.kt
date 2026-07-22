@@ -12,6 +12,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 
 // 16 kHz mono float32 PCM in a direct buffer, ready to hand to native code. The samples live
@@ -36,6 +37,8 @@ object AudioDecoder {
 
     private const val STALL_TIMEOUT_NS = 30_000_000_000L
 
+    private const val DRAIN_TIMEOUT_SECONDS = 5L
+
     // Decodes whatever the platform supports (Opus/OGG voice notes, AAC/MP4 round videos) from the
     // file descriptor into 16 kHz mono float32 PCM. Uses async MediaCodec so decoding runs at the
     // codec's full speed instead of polling with per-packet timeouts. Each output chunk is
@@ -44,7 +47,9 @@ object AudioDecoder {
     fun decodeToPcm16kMono(pfd: ParcelFileDescriptor, cancellation: CancellationToken? = null): DecodedAudio {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
+        var handler: Handler? = null
         val handlerThread = HandlerThread("fgt-decode")
+        val stopping = AtomicBoolean(false)
         try {
             extractor.setDataSource(pfd.fileDescriptor)
 
@@ -78,6 +83,7 @@ object AudioDecoder {
             )
 
             handlerThread.start()
+            handler = Handler(handlerThread.looper)
             codec = MediaCodec.createDecoderByType(mime)
             codec.setCallback(object : MediaCodec.Callback() {
                 private var inputDone = false
@@ -85,26 +91,31 @@ object AudioDecoder {
 
                 override fun onInputBufferAvailable(mc: MediaCodec, index: Int) {
                     lastActivity.set(System.nanoTime())
-                    if (inputDone || cancellation?.isCancelled == true) {
+                    if (inputDone || stopping.get() || cancellation?.isCancelled == true) {
                         return
                     }
-                    val buffer = try {
-                        mc.getInputBuffer(index)
+                    try {
+                        val buffer = mc.getInputBuffer(index) ?: return
+                        val size = extractor.readSampleData(buffer, 0)
+                        if (size < 0) {
+                            mc.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            inputDone = true
+                        } else {
+                            mc.queueInputBuffer(index, 0, size, extractor.sampleTime, 0)
+                            extractor.advance()
+                        }
                     } catch (e: Exception) {
-                        null
-                    } ?: return
-                    val size = extractor.readSampleData(buffer, 0)
-                    if (size < 0) {
-                        mc.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                        inputDone = true
-                    } else {
-                        mc.queueInputBuffer(index, 0, size, extractor.sampleTime, 0)
-                        extractor.advance()
+                        // Codec state can change under us; throwing here would kill the process.
+                        Log.w(TAG, "Feeding the decoder failed", e)
+                        done.countDown()
                     }
                 }
 
                 override fun onOutputBufferAvailable(mc: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
                     lastActivity.set(System.nanoTime())
+                    if (stopping.get()) {
+                        return
+                    }
                     if (cancellation?.isCancelled == true) {
                         mc.releaseOutputBuffer(index, false)
                         done.countDown()
@@ -157,7 +168,7 @@ object AudioDecoder {
                     Log.w(TAG, "Codec error", e)
                     done.countDown()
                 }
-            }, Handler(handlerThread.looper))
+            }, handler)
             codec.configure(format, null, null, 0)
             codec.start()
 
@@ -180,6 +191,10 @@ object AudioDecoder {
                 return sink.result()
             }
         } finally {
+            // Callbacks use the codec and the extractor from the decode thread. Raise the flag,
+            // then drain that thread, so none of them is in flight while we tear both down.
+            stopping.set(true)
+            awaitDrained(handler)
             try {
                 codec?.stop()
             } catch (ignore: Exception) {
@@ -190,6 +205,18 @@ object AudioDecoder {
             }
             extractor.release()
             handlerThread.quitSafely()
+        }
+    }
+
+    private fun awaitDrained(handler: Handler?) {
+        val drained = CountDownLatch(1)
+        if (handler?.post { drained.countDown() } != true) {
+            return
+        }
+        try {
+            drained.await(DRAIN_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        } catch (ignore: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 
