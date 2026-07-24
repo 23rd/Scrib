@@ -39,7 +39,7 @@
     <string name="action_close">Sluiten</string>
     <string name="action_copy">Kopiëren</string>
     <string name="action_share">Delen</string>
-    <string name="action_save_txt">Als .txt opslaan</string>
+    <string name="action_save_ext">Als .%1$s opslaan</string>
     <string name="transcript_saved">Transcriptie opgeslagen.</string>
     <string name="transcript_save_failed">Transcriptie kon niet worden opgeslagen.</string>
 

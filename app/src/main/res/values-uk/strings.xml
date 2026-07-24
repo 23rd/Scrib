@@ -39,7 +39,7 @@
     <string name="action_close">Закрити</string>
     <string name="action_copy">Копіювати</string>
     <string name="action_share">Поділитися</string>
-    <string name="action_save_txt">Зберегти .txt</string>
+    <string name="action_save_ext">Зберегти .%1$s</string>
     <string name="transcript_saved">Текст збережено.</string>
     <string name="transcript_save_failed">Не вдалося зберегти текст.</string>
 

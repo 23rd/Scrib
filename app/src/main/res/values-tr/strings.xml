@@ -39,7 +39,7 @@
     <string name="action_close">Kapat</string>
     <string name="action_copy">Kopyala</string>
     <string name="action_share">Paylaş</string>
-    <string name="action_save_txt">.txt olarak kaydet</string>
+    <string name="action_save_ext">.%1$s olarak kaydet</string>
     <string name="transcript_saved">Metin kaydedildi.</string>
     <string name="transcript_save_failed">Metin kaydedilemedi.</string>
 

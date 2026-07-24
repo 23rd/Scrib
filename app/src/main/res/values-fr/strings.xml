@@ -39,7 +39,7 @@
     <string name="action_close">Fermer</string>
     <string name="action_copy">Copier</string>
     <string name="action_share">Partager</string>
-    <string name="action_save_txt">Enregistrer en .txt</string>
+    <string name="action_save_ext">Enregistrer en .%1$s</string>
     <string name="transcript_saved">Transcription enregistrée.</string>
     <string name="transcript_save_failed">Impossible d\'enregistrer la transcription.</string>
 

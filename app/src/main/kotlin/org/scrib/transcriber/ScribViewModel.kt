@@ -43,8 +43,14 @@ data class TranscribeUi(
     val text: String,
     val running: Boolean,
     val error: String?,
-    val sourceUri: Uri? = null
-)
+    val sourceUri: Uri? = null,
+    val segments: List<TranscriptSegment> = emptyList(),
+    val format: TranscriptFormat = TranscriptFormat.TXT
+) {
+    // What the screen shows and what Copy, Share and Save hand over. Falls back to the plain text
+    // while the run is still going and when nothing was recognised.
+    val formatted: String get() = if (segments.isEmpty()) text else segments.format(format)
+}
 
 class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -254,13 +260,19 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
                     ?: throw RuntimeException(str(R.string.transcribe_cant_open))
-                val text = TranscriptionEngine.get(ctx).transcribeToText(pfd, "", token) { partial ->
+                val segments = TranscriptionEngine.get(ctx).transcribeToSegments(pfd, "", token) { partial ->
                     setTranscription { it?.copy(text = partial) }
                 }
+                val text = segments.format(TranscriptFormat.TXT)
                 if (token.isCancelled) {
                     setTranscription { null }
                 } else {
-                    setTranscription { it?.copy(text = text.ifBlank { str(R.string.transcribe_no_speech) }, running = false) }
+                    setTranscription {
+                        it?.copy(
+                            text = text.ifBlank { str(R.string.transcribe_no_speech) },
+                            segments = segments, running = false
+                        )
+                    }
                 }
             } catch (e: Throwable) {
                 if (token.isCancelled) {
@@ -274,8 +286,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun setTranscriptFormat(format: TranscriptFormat) {
+        setTranscription { it?.copy(format = format) }
+    }
+
     fun saveTranscript(uri: Uri) {
-        val text = _transcription.value?.text ?: return
+        val text = _transcription.value?.formatted ?: return
         viewModelScope.launch(Dispatchers.IO) {
             val ok = try {
                 writeText(uri, text, "wt")

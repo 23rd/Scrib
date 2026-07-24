@@ -39,7 +39,7 @@
     <string name="action_close">Zamknij</string>
     <string name="action_copy">Kopiuj</string>
     <string name="action_share">Udostępnij</string>
-    <string name="action_save_txt">Zapisz .txt</string>
+    <string name="action_save_ext">Zapisz .%1$s</string>
     <string name="transcript_saved">Zapisano transkrypcję.</string>
     <string name="transcript_save_failed">Nie udało się zapisać transkrypcji.</string>
 

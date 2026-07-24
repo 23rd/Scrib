@@ -17,12 +17,12 @@ interface TranscriptionEngine {
         cancellation: CancellationToken
     )
 
-    fun transcribeToText(
+    fun transcribeToSegments(
         audio: ParcelFileDescriptor,
         languageHint: String?,
         cancellation: CancellationToken,
         onPartial: (String) -> Unit
-    ): String
+    ): List<TranscriptSegment>
 
     // The caller starts the returned stream and feeds it PCM as it is captured.
     fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream

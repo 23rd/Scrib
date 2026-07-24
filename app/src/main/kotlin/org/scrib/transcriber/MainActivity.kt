@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
                         onCancelTranscription = vm::cancelTranscription,
                         onDismissTranscription = vm::dismissTranscription,
                         onSaveTranscript = vm::saveTranscript,
+                        onTranscriptFormat = vm::setTranscriptFormat,
                         onAbout = { showAbout = true }
                     )
                 }

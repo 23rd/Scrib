@@ -25,13 +25,14 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         cancellation: CancellationToken
     ) {
         try {
-            val text = transcribeToText(audio, request?.languageHint, cancellation) { partial ->
+            // The contract hands clients plain text; the timings stay in the app's own screen.
+            val segments = transcribeToSegments(audio, request?.languageHint, cancellation) { partial ->
                 try {
                     callback.onTranscriptionProgress(partial)
                 } catch (ignore: Exception) {
                 }
             }
-            callback.onTranscriptionResult(text)
+            callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
         } catch (e: ModelNotAvailableException) {
@@ -49,12 +50,12 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             TranscribedSegment(chunk.text, chunk.language)
         }
 
-    override fun transcribeToText(
+    override fun transcribeToSegments(
         audio: ParcelFileDescriptor,
         languageHint: String?,
         cancellation: CancellationToken,
         onPartial: (String) -> Unit
-    ): String {
+    ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
                 throw CancelledException()
@@ -80,7 +81,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         languageHint: String?,
         cancellation: CancellationToken,
         onPartial: (String) -> Unit
-    ): String {
+    ): List<TranscriptSegment> {
         val abortFlag = WhisperAbortFlag()
         cancellation.onCancel { abortFlag.cancel() }
         try {
@@ -88,13 +89,15 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val text = whisperContext().transcribeBuffer(pcm.samples, pcm.sampleCount, language, abortFlag) { partial ->
+            val segments = whisperContext().transcribeBuffer(pcm.samples, pcm.sampleCount, language, abortFlag) { partial ->
                 onPartial(partial.trim())
-            }.trim()
+            }
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            return text
+            return segments
+                .filter { it.text.isNotBlank() }
+                .map { TranscriptSegment(it.startMs, it.endMs, it.text) }
         } finally {
             abortFlag.close()
         }

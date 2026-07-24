@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -50,6 +51,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,6 +83,7 @@ fun ScribScreen(
     onCancelTranscription: () -> Unit,
     onDismissTranscription: () -> Unit,
     onSaveTranscript: (Uri) -> Unit,
+    onTranscriptFormat: (TranscriptFormat) -> Unit,
     onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
@@ -163,7 +166,10 @@ fun ScribScreen(
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
     }
     transcription?.let { t ->
-        TranscriptionDialog(t, onCancel = onCancelTranscription, onClose = onDismissTranscription, onSave = onSaveTranscript)
+        TranscriptionDialog(
+            t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
+            onSave = onSaveTranscript, onFormat = onTranscriptFormat
+        )
     }
     deleteTarget?.let { target ->
         AlertDialog(
@@ -427,7 +433,7 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
 
 // Pre-fills the save dialog with the transcript name and, when the provider supports it, opens
 // the picker at the source recording's location — SAF cannot write there without the user's pick.
-private class CreateTranscriptDocument(private val initialUri: Uri?) : ActivityResultContracts.CreateDocument("text/plain") {
+private class CreateTranscriptDocument(private val initialUri: Uri?, mimeType: String) : ActivityResultContracts.CreateDocument(mimeType) {
     override fun createIntent(context: Context, input: String): Intent =
         super.createIntent(context, input).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -437,18 +443,33 @@ private class CreateTranscriptDocument(private val initialUri: Uri?) : ActivityR
         }
 }
 
+// Document providers rewrite a file name whose extension disagrees with the type they were asked
+// for — .srt would come back as .srt.txt. Asking for the type the platform itself maps the
+// extension to keeps the name, and an unmapped one passes as an opaque file rather than as text.
+private fun transcriptMimeType(format: TranscriptFormat): String =
+    MimeTypeMap.getSingleton().getMimeTypeFromExtension(format.extension) ?: "application/octet-stream"
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: () -> Unit, onSave: (Uri) -> Unit) {
+private fun TranscriptionDialog(
+    t: TranscribeUi,
+    onCancel: () -> Unit,
+    onClose: () -> Unit,
+    onSave: (Uri) -> Unit,
+    onFormat: (TranscriptFormat) -> Unit
+) {
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     val baseName = t.fileName.substringBeforeLast('.').ifBlank { "transcript" }
-    val saveContract = remember(t.sourceUri) { CreateTranscriptDocument(t.sourceUri) }
+    val saveContract = remember(t.sourceUri, t.format) {
+        CreateTranscriptDocument(t.sourceUri, transcriptMimeType(t.format))
+    }
     val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
         if (uri != null) onSave(uri)
     }
     val finished = !t.running && t.error == null && t.text.isNotBlank()
+    val timed = t.format != TranscriptFormat.TXT && t.segments.isNotEmpty()
     AlertDialog(
         onDismissRequest = { if (!t.running) onClose() },
         title = { Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
@@ -463,7 +484,13 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
                     }
                     else -> {
                         Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
-                            Text(t.text, fontSize = 14.sp, lineHeight = 20.sp, color = cs.onSurface)
+                            Text(
+                                t.formatted,
+                                fontSize = if (timed) 12.sp else 14.sp,
+                                lineHeight = if (timed) 17.sp else 20.sp,
+                                fontFamily = if (timed) FontFamily.Monospace else null,
+                                color = cs.onSurface
+                            )
                         }
                         if (t.running) {
                             Spacer(Modifier.height(12.dp))
@@ -472,17 +499,23 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
                     }
                 }
                 if (finished) {
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(12.dp))
+                    if (t.segments.isNotEmpty()) {
+                        FormatPicker(t.format, onFormat)
+                        Spacer(Modifier.height(2.dp))
+                    }
                     FlowRow {
-                        TextButton(onClick = { clipboard.setText(AnnotatedString(t.text)) }) { Text(stringResource(R.string.action_copy)) }
+                        TextButton(onClick = { clipboard.setText(AnnotatedString(t.formatted)) }) { Text(stringResource(R.string.action_copy)) }
                         TextButton(onClick = {
                             val send = Intent(Intent.ACTION_SEND)
                                 .setType("text/plain")
-                                .putExtra(Intent.EXTRA_TEXT, t.text)
+                                .putExtra(Intent.EXTRA_TEXT, t.formatted)
                                 .putExtra(Intent.EXTRA_SUBJECT, baseName)
                             context.startActivity(Intent.createChooser(send, null))
                         }) { Text(stringResource(R.string.action_share)) }
-                        TextButton(onClick = { saveLauncher.launch("$baseName.txt") }) { Text(stringResource(R.string.action_save_txt)) }
+                        TextButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
+                            Text(stringResource(R.string.action_save_ext, t.format.extension))
+                        }
                     }
                 }
             }
@@ -492,6 +525,29 @@ private fun TranscriptionDialog(t: TranscribeUi, onCancel: () -> Unit, onClose: 
             else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
         }
     )
+}
+
+// Plain text, or one of the timestamped formats. The pick drives the view as well as the export,
+// so what is copied or saved is what was on screen.
+@Composable
+private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        TranscriptFormat.entries.forEach { format ->
+            val on = format == selected
+            Surface(
+                color = if (on) cs.primary else cs.surfaceContainer,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.clickableRow { onSelect(format) }
+            ) {
+                Text(
+                    format.name, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.5.sp,
+                    color = if (on) cs.onPrimary else cs.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
 }
 
 @Composable

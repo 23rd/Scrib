@@ -39,7 +39,7 @@
     <string name="action_close">Закрыть</string>
     <string name="action_copy">Копировать</string>
     <string name="action_share">Поделиться</string>
-    <string name="action_save_txt">Сохранить .txt</string>
+    <string name="action_save_ext">Сохранить .%1$s</string>
     <string name="transcript_saved">Текст сохранён.</string>
     <string name="transcript_save_failed">Не удалось сохранить текст.</string>
 

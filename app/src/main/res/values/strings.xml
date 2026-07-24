@@ -41,7 +41,7 @@
     <string name="action_close">Close</string>
     <string name="action_copy">Copy</string>
     <string name="action_share">Share</string>
-    <string name="action_save_txt">Save .txt</string>
+    <string name="action_save_ext">Save .%1$s</string>
     <string name="transcript_saved">Transcript saved.</string>
     <string name="transcript_save_failed">Couldn\'t save the transcript.</string>
 

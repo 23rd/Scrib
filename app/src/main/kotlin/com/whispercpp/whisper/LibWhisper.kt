@@ -14,6 +14,8 @@ interface WhisperSegmentCallback {
 
 class WhisperChunk(val text: String, val language: String?)
 
+class WhisperSegment(val startMs: Long, val endMs: Long, val text: String)
+
 class WhisperAbortFlag {
 
     private var ptr: Long = WhisperLib.newAbortFlag()
@@ -56,7 +58,8 @@ class WhisperContext private constructor(private var ptr: Long) {
     }
 
     // Same, but reads the samples from a direct buffer, so long recordings never need a
-    // Java-heap array.
+    // Java-heap array. Returns the segments whisper decoded, each with its position in the
+    // recording, so a caller can lay the text out as subtitles rather than one block.
     @Synchronized
     fun transcribeBuffer(
         samples: ByteBuffer,
@@ -64,13 +67,13 @@ class WhisperContext private constructor(private var ptr: Long) {
         language: String?,
         abortFlag: WhisperAbortFlag? = null,
         onSegment: ((String) -> Unit)? = null
-    ): String {
+    ): List<WhisperSegment> {
         require(ptr != 0L)
         require(samples.isDirect)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
         WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
-        return collectText()
+        return collectSegments()
     }
 
     // One chunk of a live stream. The detected language is read under the same lock, so a
@@ -106,6 +109,22 @@ class WhisperContext private constructor(private var ptr: Long) {
                 append(WhisperLib.getTextSegment(ptr, i))
             }
         }
+    }
+
+    // Whisper reports segment bounds in centiseconds.
+    private fun collectSegments(): List<WhisperSegment> {
+        val count = WhisperLib.getTextSegmentCount(ptr)
+        val segments = ArrayList<WhisperSegment>(count)
+        for (i in 0 until count) {
+            segments.add(
+                WhisperSegment(
+                    WhisperLib.getTextSegmentT0(ptr, i) * 10,
+                    WhisperLib.getTextSegmentT1(ptr, i) * 10,
+                    WhisperLib.getTextSegment(ptr, i)
+                )
+            )
+        }
+        return segments
     }
 
     @Synchronized

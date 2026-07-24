@@ -39,7 +39,7 @@
     <string name="action_close">Schließen</string>
     <string name="action_copy">Kopieren</string>
     <string name="action_share">Teilen</string>
-    <string name="action_save_txt">Als .txt speichern</string>
+    <string name="action_save_ext">Als .%1$s speichern</string>
     <string name="transcript_saved">Transkript gespeichert.</string>
     <string name="transcript_save_failed">Transkript konnte nicht gespeichert werden.</string>
 
