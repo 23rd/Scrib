@@ -164,10 +164,17 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_freeContext(
     whisper_free(context);
 }
 
+// The text handed to the callback is cumulative, as the API contract requires, so it is grown in
+// place: rebuilding it from every segment on each call walks the whole transcript again and turns a
+// long recording's progress reporting into quadratic work.
 struct fgt_segment_ctx {
     JNIEnv *env;
     jobject callback;
     jmethodID mid;
+    char *text;
+    size_t len;
+    size_t cap;
+    int reported;
 };
 
 static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *state, int n_new, void *user_data) {
@@ -178,22 +185,33 @@ static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *s
         return;
     }
     int n = whisper_full_n_segments(ctx);
-    size_t cap = 1;
-    for (int i = 0; i < n; i++) {
+    for (int i = cb->reported; i < n; i++) {
         const char *t = whisper_full_get_segment_text(ctx, i);
-        if (t != NULL) cap += strlen(t);
+        if (t == NULL) {
+            continue;
+        }
+        size_t add = strlen(t);
+        if (cb->len + add + 1 > cb->cap) {
+            size_t cap = cb->cap ? cb->cap : 1024;
+            while (cb->len + add + 1 > cap) {
+                cap *= 2;
+            }
+            char *grown = (char *) realloc(cb->text, cap);
+            if (grown == NULL) {
+                cb->reported = i;
+                return;
+            }
+            cb->text = grown;
+            cb->cap = cap;
+        }
+        memcpy(cb->text + cb->len, t, add + 1);
+        cb->len += add;
     }
-    char *buf = (char *) malloc(cap);
-    if (buf == NULL) {
+    cb->reported = n;
+    if (cb->text == NULL) {
         return;
     }
-    buf[0] = '\0';
-    for (int i = 0; i < n; i++) {
-        const char *t = whisper_full_get_segment_text(ctx, i);
-        if (t != NULL) strcat(buf, t);
-    }
-    jstring js = (*cb->env)->NewStringUTF(cb->env, buf);
-    free(buf);
+    jstring js = (*cb->env)->NewStringUTF(cb->env, cb->text);
     (*cb->env)->CallVoidMethod(cb->env, cb->callback, cb->mid, js);
     if ((*cb->env)->ExceptionCheck(cb->env)) {
         (*cb->env)->ExceptionClear(cb->env);
@@ -299,6 +317,10 @@ static void fgt_full_transcribe(
     seg_ctx.env = env;
     seg_ctx.callback = segment_callback;
     seg_ctx.mid = NULL;
+    seg_ctx.text = NULL;
+    seg_ctx.len = 0;
+    seg_ctx.cap = 0;
+    seg_ctx.reported = 0;
     if (segment_callback != NULL) {
         jclass cb_class = (*env)->GetObjectClass(env, segment_callback);
         seg_ctx.mid = (*env)->GetMethodID(env, cb_class, "onSegment", "(Ljava/lang/String;)V");
@@ -324,6 +346,7 @@ static void fgt_full_transcribe(
     } else {
         whisper_print_timings(context);
     }
+    free(seg_ctx.text);
     if (lang_chars != NULL) {
         (*env)->ReleaseStringUTFChars(env, language, lang_chars);
     }
