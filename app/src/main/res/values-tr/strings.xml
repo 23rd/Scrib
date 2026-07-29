@@ -13,8 +13,15 @@
     <string name="nudge_body">Henüz konuşma modeli yok. Bir tane indirin — Base dengeli bir seçim: küçük indirme, iyi doğruluk, her dilde çalışır.</string>
     <string name="download_named_size">%1$s indir · ≈%2$d MB</string>
 
+    <string name="record_and_transcribe">Kaydet ve yazıya dök</string>
     <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
+    <string name="recording">Kayıt</string>
+    <string name="record_hint">Mikrofona konuşun. Kayıt bu telefonda yazıya dökülür ve sonra silinir.</string>
+    <string name="record_name">Kayıt %1$s</string>
+    <string name="record_denied">Kayıt için mikrofon erişimi gerekiyor.</string>
+    <string name="record_failed">Kayıt başlatılamadı — mikrofonu başka bir uygulama kullanıyor olabilir.</string>
+    <string name="record_empty">Hiçbir şey kaydedilmedi.</string>
 
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
     <string name="standard_models">STANDART MODELLER</string>
@@ -37,6 +44,7 @@
     <string name="action_delete">Sil</string>
     <string name="action_use">Kullan</string>
     <string name="action_close">Kapat</string>
+    <string name="action_stop">Durdur</string>
     <string name="action_copy">Kopyala</string>
     <string name="action_share">Paylaş</string>
     <string name="action_save_ext">.%1$s olarak kaydet</string>
@@ -101,7 +109,7 @@
     <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
     <string name="about_two_ways">Scrib\'i kullanmanın iki yolu</string>
     <string name="about_own_h">Kendi sesinizi yazıya dökün</string>
-    <string name="about_own_b">Telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.</string>
+    <string name="about_own_b">Doğrudan uygulamada kaydedin ya da telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.</string>
     <string name="about_engine_h">Diğer uygulamalar için bir yazıya dökme motoru</string>
     <string name="about_engine_b">Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — Forkgram gibi — bir sesli mesajı Scrib ile cihazınızda metne dönüştürebilir. O uygulamanın ayarlarında Scrib\'i çevrimdışı yazıya dökücü olarak seçin. Hiçbir şey yüklenmez.</string>
     <string name="about_models_h">Modeller</string>

@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
             ScribTheme {
                 val vm: ScribViewModel = viewModel()
                 val state by vm.state.collectAsState()
+                val recording by vm.recording.collectAsState()
                 val transcription by vm.transcription.collectAsState()
                 var showAbout by rememberSaveable { mutableStateOf(false) }
                 if (showAbout) {
@@ -45,6 +46,10 @@ class MainActivity : ComponentActivity() {
                         onImport = vm::importModel,
                         onSelfTest = vm::selfTest,
                         onPickLanguage = vm::setupForLanguage,
+                        recording = recording,
+                        onStartRecording = vm::startRecording,
+                        onStopRecording = vm::stopRecording,
+                        onCancelRecording = vm::cancelRecording,
                         transcription = transcription,
                         onTranscribeFile = vm::transcribeFile,
                         onCancelTranscription = vm::cancelTranscription,
@@ -55,6 +60,15 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+    }
+
+    // The platform hands a backgrounded app silence instead of the microphone, so a take that
+    // would go on filling with nothing is finished here — a rotation is not leaving the app.
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            sharedVm.stopRecording()
         }
     }
 

@@ -13,8 +13,15 @@
     <string name="nudge_body">Модели ещё нет. Скачайте одну — Base хороший баланс: небольшой размер, приличная точность, работает на любом языке.</string>
     <string name="download_named_size">Скачать %1$s · ≈%2$d МБ</string>
 
+    <string name="record_and_transcribe">Записать и распознать</string>
     <string name="transcribe_audio_file">Распознать аудиофайл</string>
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>
+    <string name="recording">Запись</string>
+    <string name="record_hint">Говорите в микрофон. Запись распознаётся на этом телефоне, а потом удаляется.</string>
+    <string name="record_name">Запись %1$s</string>
+    <string name="record_denied">Для записи нужен доступ к микрофону.</string>
+    <string name="record_failed">Не удалось начать запись — возможно, микрофон занят другим приложением.</string>
+    <string name="record_empty">Ничего не записано.</string>
 
     <string name="models_explainer">Крупные модели точнее, но медленнее и больше по размеру. Модели «только английский» меньше и быстрее; для других языков берите Base или крупнее — Tiny слабовата.</string>
     <string name="standard_models">СТАНДАРТНЫЕ МОДЕЛИ</string>
@@ -37,6 +44,7 @@
     <string name="action_delete">Удалить</string>
     <string name="action_use">Выбрать</string>
     <string name="action_close">Закрыть</string>
+    <string name="action_stop">Стоп</string>
     <string name="action_copy">Копировать</string>
     <string name="action_share">Поделиться</string>
     <string name="action_save_ext">Сохранить .%1$s</string>
@@ -101,7 +109,7 @@
     <string name="about_tagline">Распознавание речи на устройстве. Ваше аудио не покидает телефон.</string>
     <string name="about_two_ways">Два способа использовать Scrib</string>
     <string name="about_own_h">Распознать своё аудио</string>
-    <string name="about_own_b">Выберите любой аудиофайл на телефоне и получите текст — прямо здесь, полностью офлайн.</string>
+    <string name="about_own_b">Запишите прямо в приложении или выберите любой аудиофайл на телефоне и получите текст — прямо здесь, полностью офлайн.</string>
     <string name="about_engine_h">Движок распознавания для других приложений</string>
     <string name="about_engine_b">Scrib также работает в фоне. Приложения, которые это поддерживают — например Forkgram — могут превращать голосовые в текст через Scrib, на вашем устройстве. В настройках того приложения выберите Scrib как офлайн-распознаватель. Ничего не загружается.</string>
     <string name="about_models_h">Модели</string>

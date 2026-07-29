@@ -56,6 +56,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
+import kotlin.math.sqrt
 
 private data class Actions(
     val onDownload: (String) -> Unit,
@@ -78,6 +80,10 @@ fun ScribScreen(
     onImport: (Uri, String?) -> Unit,
     onSelfTest: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
+    recording: RecordingUi?,
+    onStartRecording: () -> Unit,
+    onStopRecording: () -> Unit,
+    onCancelRecording: () -> Unit,
     transcription: TranscribeUi?,
     onTranscribeFile: (Uri, String?) -> Unit,
     onCancelTranscription: () -> Unit,
@@ -99,6 +105,11 @@ fun ScribScreen(
     val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onTranscribeFile(uri, queryDisplayName(context, uri))
     }
+    // Already granted, and the contract answers without showing anything; a refusal is reported by
+    // the recording attempt itself.
+    val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        onStartRecording()
+    }
 
     Column(Modifier.fillMaxSize().background(cs.background).systemBarsPadding()) {
         AppBar(onAbout)
@@ -110,6 +121,7 @@ fun ScribScreen(
                 if (state.firstRun) NudgeCard(state, actions) else StatusCard(state)
             }
             if (!state.firstRun) {
+                item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
             }
             item {
@@ -164,6 +176,9 @@ fun ScribScreen(
     }
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
+    }
+    recording?.let { r ->
+        RecordingDialog(r, onStop = onStopRecording, onCancel = onCancelRecording)
     }
     transcription?.let { t ->
         TranscriptionDialog(
@@ -413,6 +428,75 @@ private fun StatusBox(msg: String, error: Boolean) {
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
         )
     }
+}
+
+@Composable
+private fun RecordButton(onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.primary, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(onClick)
+    ) {
+        Row(
+            Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        ) {
+            Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(cs.onPrimary))
+            Spacer(Modifier.width(10.dp))
+            Text(stringResource(R.string.record_and_transcribe), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary)
+        }
+    }
+}
+
+@Composable
+private fun RecordingDialog(r: RecordingUi, onStop: () -> Unit, onCancel: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        // Neither a tap outside nor Back may drop a take by accident: the two buttons are the way out.
+        onDismissRequest = {},
+        title = { Text(stringResource(R.string.recording)) },
+        text = {
+            Column {
+                Text(
+                    elapsed(r.elapsedMs), fontSize = 32.sp, fontWeight = FontWeight.ExtraBold,
+                    fontFamily = FontFamily.Monospace, color = cs.onSurface
+                )
+                Spacer(Modifier.height(14.dp))
+                LevelMeter(r.levels)
+                Spacer(Modifier.height(14.dp))
+                Text(stringResource(R.string.record_hint), fontSize = 12.5.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp)
+            }
+        },
+        confirmButton = { TextButton(onClick = onStop) { Text(stringResource(R.string.action_stop)) } },
+        dismissButton = { TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) } }
+    )
+}
+
+// The app's own bars, driven by the microphone: one per sampled level, newest on the right, and a
+// square root so ordinary speech still moves them.
+@Composable
+private fun LevelMeter(levels: List<Float>) {
+    val cs = MaterialTheme.colorScheme
+    Row(
+        Modifier.fillMaxWidth().height(34.dp),
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        for (i in 0 until METER_BARS) {
+            val level = levels.getOrElse(levels.size - METER_BARS + i) { 0f }
+            val height = 3.dp + 29.dp * sqrt(level.coerceIn(0f, 1f))
+            Box(
+                Modifier.weight(1f).height(height).clip(RoundedCornerShape(2.dp))
+                    .background(cs.primary.copy(alpha = if (level > 0f) 1f else 0.35f))
+            )
+        }
+    }
+}
+
+private const val METER_BARS = 28
+
+private fun elapsed(ms: Long): String {
+    val seconds = (ms / 1000).coerceAtLeast(0)
+    return String.format(Locale.ROOT, "%d:%02d", seconds / 60, seconds % 60)
 }
 
 @Composable

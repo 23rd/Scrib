@@ -13,8 +13,15 @@
     <string name="nudge_body">Ancora nessun modello vocale. Scaricane uno — Base è una scelta equilibrata: download piccolo, buona precisione, funziona in qualsiasi lingua.</string>
     <string name="download_named_size">Scarica %1$s · ≈%2$d MB</string>
 
+    <string name="record_and_transcribe">Registra e trascrivi</string>
     <string name="transcribe_audio_file">Trascrivi un file audio</string>
     <string name="decoding_transcribing">Decodifica e trascrizione sul dispositivo…</string>
+    <string name="recording">Registrazione</string>
+    <string name="record_hint">Parla nel microfono. La registrazione viene trascritta su questo telefono e poi eliminata.</string>
+    <string name="record_name">Registrazione %1$s</string>
+    <string name="record_denied">Per registrare serve l\'accesso al microfono.</string>
+    <string name="record_failed">Impossibile avviare la registrazione — forse un\'altra app sta usando il microfono.</string>
+    <string name="record_empty">Non è stato registrato nulla.</string>
 
     <string name="models_explainer">I modelli più grandi sono più precisi ma più lenti e pesanti da scaricare. I modelli «solo inglese» sono più piccoli e veloci; per altre lingue scegli Base o più grande — Tiny è debole.</string>
     <string name="standard_models">MODELLI STANDARD</string>
@@ -37,6 +44,7 @@
     <string name="action_delete">Elimina</string>
     <string name="action_use">Usa</string>
     <string name="action_close">Chiudi</string>
+    <string name="action_stop">Ferma</string>
     <string name="action_copy">Copia</string>
     <string name="action_share">Condividi</string>
     <string name="action_save_ext">Salva .%1$s</string>
@@ -101,7 +109,7 @@
     <string name="about_tagline">Da voce a testo sul dispositivo. Il tuo audio non lascia mai il telefono.</string>
     <string name="about_two_ways">Due modi di usare Scrib</string>
     <string name="about_own_h">Trascrivi il tuo audio</string>
-    <string name="about_own_b">Scegli un file audio qualsiasi sul telefono e ottieni il testo — proprio qui, completamente offline.</string>
+    <string name="about_own_b">Registra direttamente nell\'app o scegli un file audio qualsiasi sul telefono e ottieni il testo — proprio qui, completamente offline.</string>
     <string name="about_engine_h">Un motore di trascrizione per altre app</string>
     <string name="about_engine_b">Scrib funziona anche in background. Le app che lo supportano — come Forkgram — possono trasformare un messaggio vocale in testo con Scrib, sul tuo dispositivo. Nelle impostazioni di quell\'app, scegli Scrib come trascrittore offline. Non viene caricato nulla.</string>
     <string name="about_models_h">Modelli</string>

@@ -15,8 +15,15 @@
     <string name="nudge_body">No speech model yet. Download one to start — Base is a balanced choice: small download, solid accuracy, works in any language.</string>
     <string name="download_named_size">Download %1$s · ≈%2$d MB</string>
 
+    <string name="record_and_transcribe">Record and transcribe</string>
     <string name="transcribe_audio_file">Transcribe an audio file</string>
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
+    <string name="recording">Recording</string>
+    <string name="record_hint">Speak into the microphone. The recording is transcribed on this phone and then discarded.</string>
+    <string name="record_name">Recording %1$s</string>
+    <string name="record_denied">Microphone access is needed to record.</string>
+    <string name="record_failed">Couldn\'t start recording — another app may be using the microphone.</string>
+    <string name="record_empty">Nothing was recorded.</string>
 
     <string name="models_explainer">Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.</string>
     <string name="standard_models">STANDARD MODELS</string>
@@ -39,6 +46,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_use">Use</string>
     <string name="action_close">Close</string>
+    <string name="action_stop">Stop</string>
     <string name="action_copy">Copy</string>
     <string name="action_share">Share</string>
     <string name="action_save_ext">Save .%1$s</string>
@@ -104,7 +112,7 @@
     <string name="about_tagline">On-device speech-to-text. Your audio never leaves your phone.</string>
     <string name="about_two_ways">Two ways to use Scrib</string>
     <string name="about_own_h">Transcribe your own audio</string>
-    <string name="about_own_b">Pick any audio file on your phone and get the text — right here, fully offline.</string>
+    <string name="about_own_b">Record straight into the app, or pick any audio file on your phone, and get the text — right here, fully offline.</string>
     <string name="about_engine_h">A transcription engine for other apps</string>
     <string name="about_engine_b">Scrib also works in the background. Apps that support it — like Forkgram — can turn a voice message into text using Scrib, on your device. In that app\'s settings, choose Scrib as the offline transcriber. Nothing is uploaded.</string>
     <string name="about_models_h">Models</string>

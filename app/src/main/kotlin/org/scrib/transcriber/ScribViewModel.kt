@@ -1,18 +1,26 @@
 package org.scrib.transcriber
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.SystemClock
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.whispercpp.whisper.WhisperContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 
 enum class RowState { NotDownloaded, Downloading, Installed, Active, Failed }
@@ -37,6 +45,10 @@ data class ScribUiState(
     val statusMsg: String,
     val statusError: Boolean
 )
+
+// A take in progress: how long it has been running and the recent microphone levels the meter
+// draws, newest last.
+data class RecordingUi(val elapsedMs: Long, val levels: List<Float>)
 
 data class TranscribeUi(
     val fileName: String,
@@ -252,10 +264,16 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     val transcription: StateFlow<TranscribeUi?> = _transcription
 
     fun transcribeFile(uri: Uri, displayName: String?) {
+        startTranscription(uri, displayName ?: "audio", source = uri)
+    }
+
+    // A recording has no place in the user's storage to point the save dialog at, and its file is
+    // the app's own — hence the source stays null and the finished run cleans up after itself.
+    private fun startTranscription(uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}) {
         if (transcribeToken != null) return
         val token = CancellationToken()
         transcribeToken = token
-        _transcription.value = TranscribeUi(displayName ?: "audio", "", running = true, error = null, sourceUri = uri)
+        _transcription.value = TranscribeUi(name, "", running = true, error = null, sourceUri = source)
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
@@ -282,6 +300,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 }
             } finally {
                 transcribeToken = null
+                onFinished()
             }
         }
     }
@@ -329,5 +348,93 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun setTranscription(f: (TranscribeUi?) -> TranscribeUi?) {
         _transcription.value = f(_transcription.value)
+    }
+
+    private val recorder = VoiceRecorder(ctx)
+
+    private val _recording = MutableStateFlow<RecordingUi?>(null)
+    val recording: StateFlow<RecordingUi?> = _recording
+
+    private var recordJob: Job? = null
+    private var recordFile: File? = null
+
+    fun startRecording() {
+        if (_recording.value != null || transcribeToken != null) return
+        if (ctx.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            toast(R.string.record_denied); return
+        }
+        val file = File(recordingsDir(), str(R.string.record_name, stamp()) + RECORDING_EXTENSION)
+        try {
+            recorder.start(file)
+        } catch (e: Throwable) {
+            toast(R.string.record_failed); return
+        }
+        recordFile = file
+        _recording.value = RecordingUi(0, emptyList())
+        val startedAt = SystemClock.elapsedRealtime()
+        recordJob = viewModelScope.launch {
+            while (true) {
+                delay(LEVEL_INTERVAL_MS)
+                val level = recorder.level()
+                val current = _recording.value ?: break
+                _recording.value = current.copy(
+                    elapsedMs = SystemClock.elapsedRealtime() - startedAt,
+                    levels = (current.levels + level).takeLast(LEVEL_HISTORY)
+                )
+            }
+        }
+    }
+
+    // Stopping hands the take straight to transcription — that is the only reason it was recorded.
+    fun stopRecording() {
+        val file = endRecording() ?: return
+        if (!recorder.stop() || file.length() == 0L) {
+            file.delete()
+            toast(R.string.record_empty); return
+        }
+        startTranscription(Uri.fromFile(file), file.nameWithoutExtension, source = null) { file.delete() }
+    }
+
+    fun cancelRecording() {
+        val file = endRecording() ?: return
+        recorder.stop()
+        file.delete()
+    }
+
+    private fun endRecording(): File? {
+        recordJob?.cancel()
+        recordJob = null
+        _recording.value = null
+        val file = recordFile
+        recordFile = null
+        return file
+    }
+
+    // Nothing is kept between runs: a leftover here is from a take whose process died mid-recording.
+    private fun recordingsDir(): File {
+        val dir = File(ctx.cacheDir, "recordings")
+        dir.mkdirs()
+        dir.listFiles()?.forEach { it.delete() }
+        return dir
+    }
+
+    private fun stamp(): String = SimpleDateFormat(STAMP_PATTERN, Locale.ROOT).format(Date())
+
+    // The status box sits far below the record button; a take that never started has to say so
+    // where the user is looking.
+    private fun toast(id: Int) = Toast.makeText(ctx, str(id), Toast.LENGTH_SHORT).show()
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelRecording()
+    }
+
+    private companion object {
+        const val LEVEL_INTERVAL_MS = 100L
+        const val LEVEL_HISTORY = 28
+        const val RECORDING_EXTENSION = ".m4a"
+
+        // Doubles as the name on screen and on the saved transcript, so no colon and no dot.
+        const val STAMP_PATTERN = "yyyy-MM-dd HH-mm"
     }
 }

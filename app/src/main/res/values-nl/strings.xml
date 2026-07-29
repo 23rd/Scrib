@@ -13,8 +13,15 @@
     <string name="nudge_body">Nog geen spraakmodel. Download er een — Base is een goede balans: kleine download, degelijke nauwkeurigheid, werkt in elke taal.</string>
     <string name="download_named_size">%1$s downloaden · ≈%2$d MB</string>
 
+    <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
+    <string name="recording">Opname</string>
+    <string name="record_hint">Spreek in de microfoon. De opname wordt op deze telefoon getranscribeerd en daarna verwijderd.</string>
+    <string name="record_name">Opname %1$s</string>
+    <string name="record_denied">Toegang tot de microfoon is nodig om op te nemen.</string>
+    <string name="record_failed">Opnemen kon niet starten — misschien gebruikt een andere app de microfoon.</string>
+    <string name="record_empty">Er is niets opgenomen.</string>
 
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
     <string name="standard_models">STANDAARDMODELLEN</string>
@@ -37,6 +44,7 @@
     <string name="action_delete">Verwijderen</string>
     <string name="action_use">Gebruiken</string>
     <string name="action_close">Sluiten</string>
+    <string name="action_stop">Stoppen</string>
     <string name="action_copy">Kopiëren</string>
     <string name="action_share">Delen</string>
     <string name="action_save_ext">Als .%1$s opslaan</string>
@@ -101,7 +109,7 @@
     <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>
     <string name="about_two_ways">Twee manieren om Scrib te gebruiken</string>
     <string name="about_own_h">Je eigen audio transcriberen</string>
-    <string name="about_own_b">Kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.</string>
+    <string name="about_own_b">Neem meteen in de app op of kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.</string>
     <string name="about_engine_h">Een transcriptie-engine voor andere apps</string>
     <string name="about_engine_b">Scrib werkt ook op de achtergrond. Apps die dit ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib omzetten naar tekst, op je apparaat. Kies Scrib in de instellingen van die app als offline transcriber. Er wordt niets geüpload.</string>
     <string name="about_models_h">Modellen</string>
