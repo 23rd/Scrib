@@ -1,0 +1,2 @@
+• Dodano dyktafon, który transkrybuje prosto z mikrofonu
+• Dodano formaty transkrypcji SRT, VTT i LRC ze znacznikami czasu

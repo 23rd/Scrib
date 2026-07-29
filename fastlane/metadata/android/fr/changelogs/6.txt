@@ -1,0 +1,2 @@
+• Ajout d'un enregistreur vocal qui transcrit directement depuis le micro
+• Ajout des formats de transcription horodatés SRT, VTT et LRC

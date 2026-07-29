@@ -1,0 +1,2 @@
+• Added a voice recorder that transcribes straight from the microphone
+• Added timestamped SRT, VTT and LRC transcript formats

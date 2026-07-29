@@ -1,0 +1,2 @@
+• Spraakrecorder toegevoegd die rechtstreeks vanaf de microfoon transcribeert
+• Transcriptieformaten SRT, VTT en LRC met tijdcodes toegevoegd

@@ -1,0 +1,2 @@
+• Adicionado um gravador de voz que transcreve direto do microfone
+• Adicionados os formatos de transcrição com marcação de tempo SRT, VTT e LRC

@@ -1,0 +1,2 @@
+• Doğrudan mikrofondan yazıya döken ses kaydedici eklendi
+• Zaman damgalı SRT, VTT ve LRC yazı biçimleri eklendi

@@ -1,0 +1,2 @@
+• Sprachaufnahme direkt in der App hinzugefügt
+• Transkriptformate SRT, VTT und LRC mit Zeitstempeln hinzugefügt
