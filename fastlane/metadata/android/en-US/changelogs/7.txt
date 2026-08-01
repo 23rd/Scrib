@@ -1,0 +1,4 @@
+• Added transcription progress with estimated time left
+• Added background transcription that keeps running when you leave the app
+• Added Copy and Share while a transcription is still running
+• Improved transcript updates on long recordings

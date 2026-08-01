@@ -1,0 +1,4 @@
+• Ajout de l'indicateur de progression avec le temps restant
+• La transcription continue désormais si vous quittez l'application
+• Ajout de Copier et Partager pendant la transcription
+• Amélioration de la mise à jour du texte sur les longs enregistrements

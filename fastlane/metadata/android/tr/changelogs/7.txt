@@ -1,0 +1,4 @@
+• Kalan süreyi gösteren ilerleme göstergesi eklendi
+• Yazıya dökme artık uygulamadan çıksanız da sürüyor
+• Yazıya dökme sırasında Kopyala ve Paylaş eklendi
+• Uzun kayıtlarda metnin güncellenmesi iyileştirildi

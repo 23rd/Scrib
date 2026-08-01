@@ -1,0 +1,4 @@
+• Adicionado o indicador de progresso com o tempo restante
+• A transcrição agora continua mesmo se você sair do app
+• Adicionados Copiar e Compartilhar durante a transcrição
+• Melhorada a atualização do texto em gravações longas

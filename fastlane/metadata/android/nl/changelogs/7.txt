@@ -1,0 +1,4 @@
+• Voortgangsindicator met resterende tijd toegevoegd
+• Transcriptie gaat nu door als je de app verlaat
+• Kopiëren en Delen tijdens de transcriptie toegevoegd
+• Bijwerken van de tekst bij lange opnamen verbeterd

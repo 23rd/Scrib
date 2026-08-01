@@ -1,0 +1,4 @@
+• Dodano wskaźnik postępu z pozostałym czasem
+• Transkrypcja działa teraz dalej po wyjściu z aplikacji
+• Dodano Kopiuj i Udostępnij w trakcie transkrypcji
+• Ulepszono aktualizowanie tekstu przy długich nagraniach

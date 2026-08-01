@@ -71,7 +71,16 @@ Builds:
       - yes
     ndk: '27.2.12479018'
 
+  - versionName: '0.7'
+    versionCode: 7
+    commit: v0.7
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: '0.6'
-CurrentVersionCode: 6
+CurrentVersion: '0.7'
+CurrentVersionCode: 7

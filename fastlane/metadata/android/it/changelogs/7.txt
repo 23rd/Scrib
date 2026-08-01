@@ -1,0 +1,4 @@
+• Aggiunto l'indicatore di avanzamento con il tempo rimanente
+• La trascrizione ora prosegue anche se esci dall'app
+• Aggiunti Copia e Condividi durante la trascrizione
+• Migliorato l'aggiornamento del testo nelle registrazioni lunghe

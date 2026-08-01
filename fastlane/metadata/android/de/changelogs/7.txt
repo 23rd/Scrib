@@ -1,0 +1,4 @@
+• Fortschrittsanzeige mit verbleibender Zeit hinzugefügt
+• Transkription läuft jetzt weiter, wenn du die App verlässt
+• Kopieren und Teilen schon während der Transkription hinzugefügt
+• Aktualisierung des Transkripts bei langen Aufnahmen verbessert
