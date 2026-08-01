@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Записати й розпізнати</string>
     <string name="transcribe_audio_file">Розпізнати аудіофайл</string>
     <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
+    <string name="transcribing_pct">Розпізнавання… %1$d%%</string>
+    <string name="transcribing_pct_eta">Розпізнавання… %1$d%% · %2$s</string>
+    <string name="eta_minutes">залишилося близько %1$d хв</string>
+    <string name="eta_seconds">залишилося близько %1$d с</string>
+    <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>
+    <string name="notif_channel_transcription">Розпізнавання</string>
+    <string name="notif_transcribing">Розпізнавання</string>
     <string name="recording">Запис</string>
     <string name="record_hint">Говоріть у мікрофон. Запис розпізнається на цьому телефоні, а потім видаляється.</string>
     <string name="record_name">Запис %1$s</string>

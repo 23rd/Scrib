@@ -57,7 +57,10 @@ data class TranscribeUi(
     val error: String?,
     val sourceUri: Uri? = null,
     val segments: List<TranscriptSegment> = emptyList(),
-    val format: TranscriptFormat = TranscriptFormat.TXT
+    val format: TranscriptFormat = TranscriptFormat.TXT,
+    // How far whisper is through the audio, or -1 while the file is still being decoded.
+    val percent: Int = -1,
+    val etaMs: Long? = null
 ) {
     // What the screen shows and what Copy, Share and Save hand over. Falls back to the plain text
     // while the run is still going and when nothing was recognised.
@@ -257,60 +260,19 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         "huggingface.co"
     }
 
-    @Volatile
-    private var transcribeToken: CancellationToken? = null
-
-    private val _transcription = MutableStateFlow<TranscribeUi?>(null)
-    val transcription: StateFlow<TranscribeUi?> = _transcription
+    // The run itself lives outside the view model so that leaving the app cannot take it down.
+    val transcription: StateFlow<TranscribeUi?> = TranscriptionRun.state
 
     fun transcribeFile(uri: Uri, displayName: String?) {
-        startTranscription(uri, displayName ?: "audio", source = uri)
-    }
-
-    // A recording has no place in the user's storage to point the save dialog at, and its file is
-    // the app's own — hence the source stays null and the finished run cleans up after itself.
-    private fun startTranscription(uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}) {
-        if (transcribeToken != null) return
-        val token = CancellationToken()
-        transcribeToken = token
-        _transcription.value = TranscribeUi(name, "", running = true, error = null, sourceUri = source)
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val pfd = ctx.contentResolver.openFileDescriptor(uri, "r")
-                    ?: throw RuntimeException(str(R.string.transcribe_cant_open))
-                val segments = TranscriptionEngine.get(ctx).transcribeToSegments(pfd, "", token) { partial ->
-                    setTranscription { it?.copy(text = partial) }
-                }
-                val text = segments.format(TranscriptFormat.TXT)
-                if (token.isCancelled) {
-                    setTranscription { null }
-                } else {
-                    setTranscription {
-                        it?.copy(
-                            text = text.ifBlank { str(R.string.transcribe_no_speech) },
-                            segments = segments, running = false
-                        )
-                    }
-                }
-            } catch (e: Throwable) {
-                if (token.isCancelled) {
-                    setTranscription { null }
-                } else {
-                    setTranscription { it?.copy(running = false, error = e.message ?: str(R.string.transcribe_failed)) }
-                }
-            } finally {
-                transcribeToken = null
-                onFinished()
-            }
-        }
+        TranscriptionRun.start(ctx, uri, displayName ?: "audio", source = uri)
     }
 
     fun setTranscriptFormat(format: TranscriptFormat) {
-        setTranscription { it?.copy(format = format) }
+        TranscriptionRun.setFormat(format)
     }
 
     fun saveTranscript(uri: Uri) {
-        val text = _transcription.value?.formatted ?: return
+        val text = transcription.value?.formatted ?: return
         viewModelScope.launch(Dispatchers.IO) {
             val ok = try {
                 writeText(uri, text, "wt")
@@ -338,16 +300,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun cancelTranscription() {
-        transcribeToken?.cancel()
-        _transcription.value = null
+        TranscriptionRun.cancel()
     }
 
     fun dismissTranscription() {
-        _transcription.value = null
-    }
-
-    private fun setTranscription(f: (TranscribeUi?) -> TranscribeUi?) {
-        _transcription.value = f(_transcription.value)
+        TranscriptionRun.dismiss()
     }
 
     private val recorder = VoiceRecorder(ctx)
@@ -359,7 +316,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     private var recordFile: File? = null
 
     fun startRecording() {
-        if (_recording.value != null || transcribeToken != null) return
+        if (_recording.value != null || TranscriptionRun.running) return
         if (ctx.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             toast(R.string.record_denied); return
         }
@@ -392,7 +349,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             file.delete()
             toast(R.string.record_empty); return
         }
-        startTranscription(Uri.fromFile(file), file.nameWithoutExtension, source = null) { file.delete() }
+        TranscriptionRun.start(ctx, Uri.fromFile(file), file.nameWithoutExtension, source = null) { file.delete() }
     }
 
     fun cancelRecording() {

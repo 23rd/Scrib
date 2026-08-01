@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Записать и распознать</string>
     <string name="transcribe_audio_file">Распознать аудиофайл</string>
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>
+    <string name="transcribing_pct">Распознавание… %1$d%%</string>
+    <string name="transcribing_pct_eta">Распознавание… %1$d%% · %2$s</string>
+    <string name="eta_minutes">осталось около %1$d мин</string>
+    <string name="eta_seconds">осталось около %1$d с</string>
+    <string name="transcribe_background_hint">Продолжается, даже если выйти из приложения.</string>
+    <string name="notif_channel_transcription">Распознавание</string>
+    <string name="notif_transcribing">Распознавание</string>
     <string name="recording">Запись</string>
     <string name="record_hint">Говорите в микрофон. Запись распознаётся на этом телефоне, а потом удаляется.</string>
     <string name="record_name">Запись %1$s</string>

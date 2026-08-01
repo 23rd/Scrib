@@ -12,6 +12,11 @@ interface WhisperSegmentCallback {
     fun onSegment(text: String)
 }
 
+// How far through the audio whisper is, 0..100.
+interface WhisperProgressCallback {
+    fun onProgress(percent: Int)
+}
+
 class WhisperChunk(val text: String, val language: String?)
 
 class WhisperSegment(val startMs: Long, val endMs: Long, val text: String)
@@ -66,13 +71,14 @@ class WhisperContext private constructor(private var ptr: Long) {
         sampleCount: Int,
         language: String?,
         abortFlag: WhisperAbortFlag? = null,
-        onSegment: ((String) -> Unit)? = null
+        onSegment: ((String) -> Unit)? = null,
+        onProgress: ((Int) -> Unit)? = null
     ): List<WhisperSegment> {
         require(ptr != 0L)
         require(samples.isDirect)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
-        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, segmentCallback(onSegment), abortFlag?.nativePtr() ?: 0L)
+        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, segmentCallback(onSegment), progressCallback(onProgress), abortFlag?.nativePtr() ?: 0L)
         return collectSegments()
     }
 
@@ -88,7 +94,7 @@ class WhisperContext private constructor(private var ptr: Long) {
     ): WhisperChunk {
         require(ptr != 0L)
         require(samples.isDirect)
-        WhisperLib.fullTranscribeDirect(ptr, WhisperCpuConfig.preferredThreadCount, samples, sampleCount, language ?: "", prompt ?: "", true, null, abortFlag?.nativePtr() ?: 0L)
+        WhisperLib.fullTranscribeDirect(ptr, WhisperCpuConfig.preferredThreadCount, samples, sampleCount, language ?: "", prompt ?: "", true, null, null, abortFlag?.nativePtr() ?: 0L)
         return WhisperChunk(collectText(), WhisperLib.fullLangId(ptr))
     }
 
@@ -97,6 +103,16 @@ class WhisperContext private constructor(private var ptr: Long) {
             override fun onSegment(text: String) {
                 try {
                     onSegment(text)
+                } catch (ignore: Throwable) {
+                }
+            }
+        } else null
+
+    private fun progressCallback(onProgress: ((Int) -> Unit)?): WhisperProgressCallback? =
+        if (onProgress != null) object : WhisperProgressCallback {
+            override fun onProgress(percent: Int) {
+                try {
+                    onProgress(percent)
                 } catch (ignore: Throwable) {
                 }
             }
@@ -200,7 +216,7 @@ private class WhisperLib {
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
-        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
+        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, segmentCallback: WhisperSegmentCallback?, progressCallback: WhisperProgressCallback?, abortFlagPtr: Long)
         external fun fullLangId(contextPtr: Long): String?
         external fun newAbortFlag(): Long
         external fun setAbortFlag(flagPtr: Long)

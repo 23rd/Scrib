@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Registra e trascrivi</string>
     <string name="transcribe_audio_file">Trascrivi un file audio</string>
     <string name="decoding_transcribing">Decodifica e trascrizione sul dispositivo…</string>
+    <string name="transcribing_pct">Trascrizione… %1$d%%</string>
+    <string name="transcribing_pct_eta">Trascrizione… %1$d%% · %2$s</string>
+    <string name="eta_minutes">circa %1$d min rimanenti</string>
+    <string name="eta_seconds">circa %1$d s rimanenti</string>
+    <string name="transcribe_background_hint">Continua anche se esci dall\'app.</string>
+    <string name="notif_channel_transcription">Trascrizione</string>
+    <string name="notif_transcribing">Trascrizione</string>
     <string name="recording">Registrazione</string>
     <string name="record_hint">Parla nel microfono. La registrazione viene trascritta su questo telefono e poi eliminata.</string>
     <string name="record_name">Registrazione %1$s</string>

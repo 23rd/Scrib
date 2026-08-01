@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Nagraj i transkrybuj</string>
     <string name="transcribe_audio_file">Transkrybuj plik audio</string>
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>
+    <string name="transcribing_pct">Transkrypcja… %1$d%%</string>
+    <string name="transcribing_pct_eta">Transkrypcja… %1$d%% · %2$s</string>
+    <string name="eta_minutes">pozostało około %1$d min</string>
+    <string name="eta_seconds">pozostało około %1$d s</string>
+    <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>
+    <string name="notif_channel_transcription">Transkrypcja</string>
+    <string name="notif_transcribing">Transkrypcja</string>
     <string name="recording">Nagrywanie</string>
     <string name="record_hint">Mów do mikrofonu. Nagranie zostanie przepisane na tym telefonie, a potem usunięte.</string>
     <string name="record_name">Nagranie %1$s</string>

@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
+    <string name="transcribing_pct">Transcriberen… %1$d%%</string>
+    <string name="transcribing_pct_eta">Transcriberen… %1$d%% · %2$s</string>
+    <string name="eta_minutes">nog ongeveer %1$d min</string>
+    <string name="eta_seconds">nog ongeveer %1$d sec</string>
+    <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>
+    <string name="notif_channel_transcription">Transcriptie</string>
+    <string name="notif_transcribing">Transcriberen</string>
     <string name="recording">Opname</string>
     <string name="record_hint">Spreek in de microfoon. De opname wordt op deze telefoon getranscribeerd en daarna verwijderd.</string>
     <string name="record_name">Opname %1$s</string>

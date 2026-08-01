@@ -39,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -109,6 +110,15 @@ fun ScribScreen(
     // the recording attempt itself.
     val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         onStartRecording()
+    }
+    // Asked for at the first run, where the shade is about to become the only place the progress
+    // shows. A refusal costs the notification, not the run.
+    val notifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    val started = transcription != null
+    LaunchedEffect(started) {
+        if (started && android.os.Build.VERSION.SDK_INT >= 33) {
+            notifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
     }
 
     Column(Modifier.fillMaxSize().background(cs.background).systemBarsPadding()) {
@@ -552,7 +562,11 @@ private fun TranscriptionDialog(
     val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
         if (uri != null) onSave(uri)
     }
+    // Copy and Share are offered the moment there is text, not only at the end: a long run's words
+    // should never be trapped behind its remaining minutes. Save waits — a partial file on disk
+    // looks finished later on.
     val finished = !t.running && t.error == null && t.text.isNotBlank()
+    val hasText = t.error == null && t.text.isNotBlank()
     val timed = t.format != TranscriptFormat.TXT && t.segments.isNotEmpty()
     AlertDialog(
         onDismissRequest = { if (!t.running) onClose() },
@@ -564,7 +578,7 @@ private fun TranscriptionDialog(
                     t.running && t.text.isEmpty() -> {
                         Text(stringResource(R.string.decoding_transcribing), fontSize = 13.sp, color = cs.onSurfaceVariant)
                         Spacer(Modifier.height(12.dp))
-                        LinearProgressIndicator(Modifier.fillMaxWidth())
+                        RunProgress(t)
                     }
                     else -> {
                         Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
@@ -578,13 +592,13 @@ private fun TranscriptionDialog(
                         }
                         if (t.running) {
                             Spacer(Modifier.height(12.dp))
-                            LinearProgressIndicator(Modifier.fillMaxWidth())
+                            RunProgress(t)
                         }
                     }
                 }
-                if (finished) {
+                if (hasText) {
                     Spacer(Modifier.height(12.dp))
-                    if (t.segments.isNotEmpty()) {
+                    if (finished && t.segments.isNotEmpty()) {
                         FormatPicker(t.format, onFormat)
                         Spacer(Modifier.height(2.dp))
                     }
@@ -597,8 +611,10 @@ private fun TranscriptionDialog(
                                 .putExtra(Intent.EXTRA_SUBJECT, baseName)
                             context.startActivity(Intent.createChooser(send, null))
                         }) { Text(stringResource(R.string.action_share)) }
-                        TextButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
-                            Text(stringResource(R.string.action_save_ext, t.format.extension))
+                        if (finished) {
+                            TextButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
+                                Text(stringResource(R.string.action_save_ext, t.format.extension))
+                            }
                         }
                     }
                 }
@@ -609,6 +625,39 @@ private fun TranscriptionDialog(
             else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
         }
     )
+}
+
+// Whisper only starts reporting once decoding is done and the model is loaded, so the bar spins
+// until then rather than sitting at a misleading zero. The line underneath doubles as the promise
+// that walking away is safe — the run keeps going in the notification.
+@Composable
+private fun RunProgress(t: TranscribeUi) {
+    val cs = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    Column(Modifier.fillMaxWidth()) {
+        if (t.percent < 0) {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        } else {
+            LinearProgressIndicator(
+                progress = { t.percent.coerceIn(0, 100) / 100f },
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                if (t.etaMs != null) {
+                    stringResource(R.string.transcribing_pct_eta, t.percent, remaining(context, t.etaMs))
+                } else {
+                    stringResource(R.string.transcribing_pct, t.percent)
+                },
+                fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = cs.primary
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(
+            stringResource(R.string.transcribe_background_hint),
+            fontSize = 11.5.sp, color = cs.onSurfaceVariant, lineHeight = 16.sp
+        )
+    }
 }
 
 // Plain text, or one of the timestamped formats. The pick drives the view as well as the export,

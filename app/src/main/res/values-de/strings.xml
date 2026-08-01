@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Aufnehmen und transkribieren</string>
     <string name="transcribe_audio_file">Audiodatei transkribieren</string>
     <string name="decoding_transcribing">Dekodieren &amp; Transkribieren auf dem Gerät…</string>
+    <string name="transcribing_pct">Transkribieren… %1$d%%</string>
+    <string name="transcribing_pct_eta">Transkribieren… %1$d%% · %2$s</string>
+    <string name="eta_minutes">noch etwa %1$d Min.</string>
+    <string name="eta_seconds">noch etwa %1$d Sek.</string>
+    <string name="transcribe_background_hint">Läuft weiter, wenn du die App verlässt.</string>
+    <string name="notif_channel_transcription">Transkription</string>
+    <string name="notif_transcribing">Transkribieren</string>
     <string name="recording">Aufnahme</string>
     <string name="record_hint">Sprich ins Mikrofon. Die Aufnahme wird auf diesem Telefon transkribiert und danach verworfen.</string>
     <string name="record_name">Aufnahme %1$s</string>

@@ -16,6 +16,13 @@
     <string name="record_and_transcribe">Kaydet ve yazıya dök</string>
     <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
+    <string name="transcribing_pct">Yazıya dökülüyor… %1$d%%</string>
+    <string name="transcribing_pct_eta">Yazıya dökülüyor… %1$d%% · %2$s</string>
+    <string name="eta_minutes">yaklaşık %1$d dk kaldı</string>
+    <string name="eta_seconds">yaklaşık %1$d sn kaldı</string>
+    <string name="transcribe_background_hint">Uygulamadan çıksanız da sürer.</string>
+    <string name="notif_channel_transcription">Yazıya dökme</string>
+    <string name="notif_transcribing">Yazıya dökülüyor</string>
     <string name="recording">Kayıt</string>
     <string name="record_hint">Mikrofona konuşun. Kayıt bu telefonda yazıya dökülür ve sonra silinir.</string>
     <string name="record_name">Kayıt %1$s</string>

@@ -54,6 +54,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         audio: ParcelFileDescriptor,
         languageHint: String?,
         cancellation: CancellationToken,
+        onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit
     ): List<TranscriptSegment> {
         try {
@@ -67,7 +68,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             if (pcm.sampleCount == 0) {
                 throw DecodeException("No audio decoded")
             }
-            return transcribePcm(pcm, languageHint, cancellation, onPartial)
+            return transcribePcm(pcm, languageHint, cancellation, onProgress, onPartial)
         } finally {
             try {
                 audio.close()
@@ -80,6 +81,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         pcm: DecodedAudio,
         languageHint: String?,
         cancellation: CancellationToken,
+        onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit
     ): List<TranscriptSegment> {
         val abortFlag = WhisperAbortFlag()
@@ -89,9 +91,11 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val segments = whisperContext().transcribeBuffer(pcm.samples, pcm.sampleCount, language, abortFlag) { partial ->
-                onPartial(partial.trim())
-            }
+            val segments = whisperContext().transcribeBuffer(
+                pcm.samples, pcm.sampleCount, language, abortFlag,
+                onSegment = { partial -> onPartial(partial.trim()) },
+                onProgress = onProgress
+            )
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }

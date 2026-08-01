@@ -18,6 +18,13 @@
     <string name="record_and_transcribe">Record and transcribe</string>
     <string name="transcribe_audio_file">Transcribe an audio file</string>
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
+    <string name="transcribing_pct">Transcribing… %1$d%%</string>
+    <string name="transcribing_pct_eta">Transcribing… %1$d%% · %2$s</string>
+    <string name="eta_minutes">about %1$d min left</string>
+    <string name="eta_seconds">about %1$d sec left</string>
+    <string name="transcribe_background_hint">Keeps running if you leave the app.</string>
+    <string name="notif_channel_transcription">Transcription</string>
+    <string name="notif_transcribing">Transcribing</string>
     <string name="recording">Recording</string>
     <string name="record_hint">Speak into the microphone. The recording is transcribed on this phone and then discarded.</string>
     <string name="record_name">Recording %1$s</string>

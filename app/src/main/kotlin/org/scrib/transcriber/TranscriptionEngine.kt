@@ -21,6 +21,7 @@ interface TranscriptionEngine {
         audio: ParcelFileDescriptor,
         languageHint: String?,
         cancellation: CancellationToken,
+        onProgress: (Int) -> Unit = {},
         onPartial: (String) -> Unit
     ): List<TranscriptSegment>
 

@@ -219,6 +219,29 @@ static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *s
     (*cb->env)->DeleteLocalRef(cb->env, js);
 }
 
+// Whisper reports how far through the audio it is, in whole percent. It fires on every decoded
+// window, so the same percent arrives many times over — only the changes are worth a JNI call.
+struct fgt_progress_ctx {
+    JNIEnv *env;
+    jobject callback;
+    jmethodID mid;
+    int reported;
+};
+
+static void fgt_progress(struct whisper_context *ctx, struct whisper_state *state, int progress, void *user_data) {
+    UNUSED(ctx);
+    UNUSED(state);
+    struct fgt_progress_ctx *cb = (struct fgt_progress_ctx *) user_data;
+    if (cb == NULL || cb->callback == NULL || cb->mid == NULL || progress == cb->reported) {
+        return;
+    }
+    cb->reported = progress;
+    (*cb->env)->CallVoidMethod(cb->env, cb->callback, cb->mid, (jint) progress);
+    if ((*cb->env)->ExceptionCheck(cb->env)) {
+        (*cb->env)->ExceptionClear(cb->env);
+    }
+}
+
 struct fgt_abort_flag {
     volatile int cancelled;
 };
@@ -277,7 +300,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jo
 }
 
 static void fgt_full_transcribe(
-        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
     struct whisper_context *context = (struct whisper_context *) context_ptr;
 
     // The below adapted from the Objective-C iOS sample
@@ -330,6 +353,20 @@ static void fgt_full_transcribe(
         }
     }
 
+    struct fgt_progress_ctx prog_ctx;
+    prog_ctx.env = env;
+    prog_ctx.callback = progress_callback;
+    prog_ctx.mid = NULL;
+    prog_ctx.reported = -1;
+    if (progress_callback != NULL) {
+        jclass cb_class = (*env)->GetObjectClass(env, progress_callback);
+        prog_ctx.mid = (*env)->GetMethodID(env, cb_class, "onProgress", "(I)V");
+        if (prog_ctx.mid != NULL) {
+            params.progress_callback = fgt_progress;
+            params.progress_callback_user_data = &prog_ctx;
+        }
+    }
+
     struct fgt_abort_flag *abort_flag = (struct fgt_abort_flag *) abort_flag_ptr;
     if (abort_flag != NULL) {
         params.abort_callback = fgt_should_abort;
@@ -361,21 +398,21 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     UNUSED(thiz);
     jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
     const jsize audio_data_length = (*env)->GetArrayLength(env, audio_data);
-    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, NULL, JNI_FALSE, segment_callback, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, NULL, JNI_FALSE, segment_callback, NULL, abort_flag_ptr);
     (*env)->ReleaseFloatArrayElements(env, audio_data, audio_data_arr, JNI_ABORT);
 }
 
 // Reads the samples from a direct buffer, so long recordings never need a Java-heap array.
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribeDirect(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
     UNUSED(thiz);
     const float *samples = (const float *) (*env)->GetDirectBufferAddress(env, audio_buffer);
     if (samples == NULL || n_samples <= 0) {
         LOGW("No direct buffer address, skipping transcription");
         return;
     }
-    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, prompt, suppress_non_speech, segment_callback, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, prompt, suppress_non_speech, segment_callback, progress_callback, abort_flag_ptr);
 }
 
 // The language whisper used for the last run, so a stream can pin auto-detection to its first
