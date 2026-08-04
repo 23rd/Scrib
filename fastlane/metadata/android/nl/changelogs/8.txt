@@ -1,0 +1,3 @@
+• Spraaktoetsenbord toegevoegd om in elke app te dicteren
+• Zet Scrib aan in de toetsenbordinstellingen en druk op de microfoontoets
+• De tekst komt waar je aan het schrijven was en je toetsenbord komt terug

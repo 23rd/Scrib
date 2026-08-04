@@ -1,0 +1,3 @@
+• Ajout du clavier vocal pour dicter dans n'importe quelle application
+• Activez Scrib dans les réglages de clavier, puis appuyez sur la touche micro
+• Le texte arrive là où vous écriviez et votre clavier revient à l'arrêt

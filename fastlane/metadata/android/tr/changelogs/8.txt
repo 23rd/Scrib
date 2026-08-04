@@ -1,0 +1,3 @@
+• Herhangi bir uygulamaya dikte etmek için sesli klavye eklendi
+• Scrib'i klavye ayarlarından açın ve mikrofon tuşuna basın
+• Metin yazdığınız yere gelir, durunca klavyeniz geri döner

@@ -1,0 +1,3 @@
+• Adicionado o teclado de voz para ditar em qualquer app
+• Ative o Scrib nas configurações de teclado e toque na tecla de microfone
+• O texto vai para onde você estava escrevendo e seu teclado volta ao parar

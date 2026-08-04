@@ -1,0 +1,3 @@
+• Aggiunta la tastiera vocale per dettare in qualsiasi app
+• Attiva Scrib nelle impostazioni della tastiera e premi il tasto microfono
+• Il testo arriva dove stavi scrivendo e la tastiera torna quando ti fermi

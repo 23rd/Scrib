@@ -1,0 +1,3 @@
+• Dodano klawiaturę głosową do dyktowania w dowolnej aplikacji
+• Włącz Scrib w systemowych ustawieniach klawiatur i naciśnij klawisz mikrofonu
+• Tekst trafia tam, gdzie piszesz, a klawiatura wraca po zatrzymaniu

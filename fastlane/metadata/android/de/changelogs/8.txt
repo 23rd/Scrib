@@ -1,0 +1,3 @@
+• Sprachtastatur zum Diktieren in jede App hinzugefügt
+• Schalte Scrib in den Tastatur-Einstellungen ein und drücke die Mikrofontaste
+• Der Text landet dort, wo du geschrieben hast, und deine Tastatur kommt zurück

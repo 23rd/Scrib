@@ -1,0 +1,3 @@
+• Added voice keyboard that dictates into any app
+• Switch Scrib on in system keyboard settings, then press the microphone key
+• Dictated text lands where you were writing, and your keyboard comes back when you stop
