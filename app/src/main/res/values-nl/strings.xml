@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
     <string name="ime_entry_sub">Dicteer in elke app — zet Scrib aan in de toetsenbordlijst van het systeem</string>
-    <string name="ime_ready">Klaar — tik op Spreken en dicteer.</string>
+    <string name="ime_ready">Tik op de microfoon en dicteer.</string>
     <string name="ime_listening">Luisteren… tekst verschijnt bij elke pauze.</string>
     <string name="ime_finishing">Laatste woorden worden getranscribeerd…</string>
     <string name="ime_speak">Spreken</string>
-    <string name="ime_working">Transcriberen…</string>
+    <string name="ime_backspace">Wissen</string>
     <string name="ime_keyboard">Toetsenbord</string>
-    <string name="ime_allow">Toestaan</string>
-    <string name="ime_open_app">Scrib openen</string>
     <string name="ime_needs_model">Nog geen spraakmodel — open Scrib en download er een.</string>
 
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>

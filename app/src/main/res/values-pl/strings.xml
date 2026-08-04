@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
     <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji — włącz Scrib na systemowej liście klawiatur</string>
-    <string name="ime_ready">Gotowe — dotknij Mów i dyktuj.</string>
+    <string name="ime_ready">Dotknij mikrofonu i dyktuj.</string>
     <string name="ime_listening">Słucham… tekst pojawia się przy każdej pauzie.</string>
     <string name="ime_finishing">Transkrypcja ostatnich słów…</string>
     <string name="ime_speak">Mów</string>
-    <string name="ime_working">Transkrypcja…</string>
+    <string name="ime_backspace">Usuń</string>
     <string name="ime_keyboard">Klawiatura</string>
-    <string name="ime_allow">Zezwól</string>
-    <string name="ime_open_app">Otwórz Scrib</string>
     <string name="ime_needs_model">Brak modelu mowy — otwórz Scrib i pobierz jeden.</string>
 
     <string name="models_explainer">Większe modele są dokładniejsze, ale wolniejsze i większe do pobrania. Modele «tylko angielski» są mniejsze i szybsze; dla innych języków wybierz Base lub większy — Tiny jest słaby.</string>

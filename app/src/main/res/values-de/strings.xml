@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Stimme</string>
     <string name="ime_entry_title">Sprachtastatur</string>
     <string name="ime_entry_sub">Diktiere in jede App — schalte Scrib in der Tastaturliste des Systems ein</string>
-    <string name="ime_ready">Bereit — tippe auf Sprechen und diktiere.</string>
+    <string name="ime_ready">Tippe auf das Mikrofon und diktiere.</string>
     <string name="ime_listening">Ich höre zu… Text erscheint bei jeder Pause.</string>
     <string name="ime_finishing">Die letzten Worte werden transkribiert…</string>
     <string name="ime_speak">Sprechen</string>
-    <string name="ime_working">Transkribieren…</string>
+    <string name="ime_backspace">Löschen</string>
     <string name="ime_keyboard">Tastatur</string>
-    <string name="ime_allow">Erlauben</string>
-    <string name="ime_open_app">Scrib öffnen</string>
     <string name="ime_needs_model">Noch kein Sprachmodell — öffne Scrib und lade eines herunter.</string>
 
     <string name="models_explainer">Größere Modelle sind genauer, aber langsamer und größer beim Download. Modelle „nur Englisch“ sind kleiner und schneller; für andere Sprachen wähle Base oder größer — Tiny ist schwach.</string>

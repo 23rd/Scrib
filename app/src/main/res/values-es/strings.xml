@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Voz</string>
     <string name="ime_entry_title">Teclado de voz</string>
     <string name="ime_entry_sub">Dicta en cualquier app — activa Scrib en la lista de teclados del sistema</string>
-    <string name="ime_ready">Listo — toca Hablar y dicta.</string>
+    <string name="ime_ready">Toca el micrófono y dicta.</string>
     <string name="ime_listening">Escuchando… el texto aparece en cada pausa.</string>
     <string name="ime_finishing">Transcribiendo las últimas palabras…</string>
     <string name="ime_speak">Hablar</string>
-    <string name="ime_working">Transcribiendo…</string>
+    <string name="ime_backspace">Borrar</string>
     <string name="ime_keyboard">Teclado</string>
-    <string name="ime_allow">Permitir</string>
-    <string name="ime_open_app">Abrir Scrib</string>
     <string name="ime_needs_model">Aún no hay modelo de voz — abre Scrib y descarga uno.</string>
 
     <string name="models_explainer">Los modelos más grandes son más precisos pero más lentos y pesados de descargar. Los modelos «solo inglés» son más pequeños y rápidos; para otros idiomas elige Base o mayor — Tiny es débil.</string>

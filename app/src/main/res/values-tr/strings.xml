@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
     <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin — Scrib\'i sistem klavye listesinden açın</string>
-    <string name="ime_ready">Hazır — Konuş\'a dokunup dikte edin.</string>
+    <string name="ime_ready">Mikrofona dokunup dikte edin.</string>
     <string name="ime_listening">Dinliyor… metin her duraklamada beliriyor.</string>
     <string name="ime_finishing">Son sözler yazıya dökülüyor…</string>
     <string name="ime_speak">Konuş</string>
-    <string name="ime_working">Yazıya dökülüyor…</string>
+    <string name="ime_backspace">Sil</string>
     <string name="ime_keyboard">Klavye</string>
-    <string name="ime_allow">İzin ver</string>
-    <string name="ime_open_app">Scrib\'i aç</string>
     <string name="ime_needs_model">Henüz konuşma modeli yok — Scrib\'i açıp bir tane indirin.</string>
 
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>

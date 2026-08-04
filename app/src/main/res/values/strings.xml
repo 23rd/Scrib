@@ -35,14 +35,12 @@
     <string name="ime_label">Scrib Voice</string>
     <string name="ime_entry_title">Voice keyboard</string>
     <string name="ime_entry_sub">Dictate into any app — switch Scrib on in the system keyboard list</string>
-    <string name="ime_ready">Ready — tap Speak to dictate.</string>
+    <string name="ime_ready">Tap the microphone to dictate.</string>
     <string name="ime_listening">Listening… text appears at every pause.</string>
     <string name="ime_finishing">Transcribing the last words…</string>
     <string name="ime_speak">Speak</string>
-    <string name="ime_working">Transcribing…</string>
+    <string name="ime_backspace">Backspace</string>
     <string name="ime_keyboard">Keyboard</string>
-    <string name="ime_allow">Allow</string>
-    <string name="ime_open_app">Open Scrib</string>
     <string name="ime_needs_model">No speech model yet — open Scrib and download one.</string>
 
     <string name="models_explainer">Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.</string>

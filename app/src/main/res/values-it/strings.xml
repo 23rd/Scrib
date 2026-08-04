@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Voce</string>
     <string name="ime_entry_title">Tastiera vocale</string>
     <string name="ime_entry_sub">Detta in qualsiasi app — attiva Scrib nell\'elenco delle tastiere di sistema</string>
-    <string name="ime_ready">Pronto — tocca Parla e detta.</string>
+    <string name="ime_ready">Tocca il microfono e detta.</string>
     <string name="ime_listening">In ascolto… il testo compare a ogni pausa.</string>
     <string name="ime_finishing">Trascrizione delle ultime parole…</string>
     <string name="ime_speak">Parla</string>
-    <string name="ime_working">Trascrizione…</string>
+    <string name="ime_backspace">Cancella</string>
     <string name="ime_keyboard">Tastiera</string>
-    <string name="ime_allow">Consenti</string>
-    <string name="ime_open_app">Apri Scrib</string>
     <string name="ime_needs_model">Ancora nessun modello vocale — apri Scrib e scaricane uno.</string>
 
     <string name="models_explainer">I modelli più grandi sono più precisi ma più lenti e pesanti da scaricare. I modelli «solo inglese» sono più piccoli e veloci; per altre lingue scegli Base o più grande — Tiny è debole.</string>

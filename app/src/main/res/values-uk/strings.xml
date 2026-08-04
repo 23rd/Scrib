@@ -33,14 +33,12 @@
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
     <string name="ime_entry_sub">Диктуйте в будь-якому застосунку — увімкніть Scrib у системному списку клавіатур</string>
-    <string name="ime_ready">Готово — натисніть «Говорити» й диктуйте.</string>
+    <string name="ime_ready">Натисніть мікрофон і диктуйте.</string>
     <string name="ime_listening">Слухаю… текст з’являється на кожній паузі.</string>
     <string name="ime_finishing">Розпізнаю останні слова…</string>
     <string name="ime_speak">Говорити</string>
-    <string name="ime_working">Розпізнаю…</string>
+    <string name="ime_backspace">Видалити</string>
     <string name="ime_keyboard">Клавіатура</string>
-    <string name="ime_allow">Дозволити</string>
-    <string name="ime_open_app">Відкрити Scrib</string>
     <string name="ime_needs_model">Моделі ще немає — відкрийте Scrib і завантажте її.</string>
 
     <string name="models_explainer">Більші моделі точніші, але повільніші й більші для завантаження. Моделі «лише англійська» менші й швидші; для інших мов беріть Base або більшу — Tiny слабенька.</string>
