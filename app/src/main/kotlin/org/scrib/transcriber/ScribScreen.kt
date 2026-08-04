@@ -133,6 +133,7 @@ fun ScribScreen(
             if (!state.firstRun) {
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
+                item { KeyboardEntry() }
             }
             item {
                 Text(
@@ -696,6 +697,32 @@ private fun LanguageEntry(onClick: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.lang_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+            }
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+// The voice keyboard is useless until it is switched on in the system's own keyboard list, and
+// nothing in the app can do that on the user's behalf.
+@Composable
+private fun KeyboardEntry() {
+    val cs = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow {
+            runCatching {
+                context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
+            }
+        }
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("⌨", fontSize = 18.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.ime_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(R.string.ime_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
             }
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }

@@ -30,6 +30,19 @@
     <string name="record_failed">Aufnahme konnte nicht gestartet werden — vielleicht nutzt eine andere App das Mikrofon.</string>
     <string name="record_empty">Es wurde nichts aufgenommen.</string>
 
+    <string name="ime_label">Scrib Stimme</string>
+    <string name="ime_entry_title">Sprachtastatur</string>
+    <string name="ime_entry_sub">Diktiere in jede App — schalte Scrib in der Tastaturliste des Systems ein</string>
+    <string name="ime_ready">Bereit — tippe auf Sprechen und diktiere.</string>
+    <string name="ime_listening">Ich höre zu… Text erscheint bei jeder Pause.</string>
+    <string name="ime_finishing">Die letzten Worte werden transkribiert…</string>
+    <string name="ime_speak">Sprechen</string>
+    <string name="ime_working">Transkribieren…</string>
+    <string name="ime_keyboard">Tastatur</string>
+    <string name="ime_allow">Erlauben</string>
+    <string name="ime_open_app">Scrib öffnen</string>
+    <string name="ime_needs_model">Noch kein Sprachmodell — öffne Scrib und lade eines herunter.</string>
+
     <string name="models_explainer">Größere Modelle sind genauer, aber langsamer und größer beim Download. Modelle „nur Englisch“ sind kleiner und schneller; für andere Sprachen wähle Base oder größer — Tiny ist schwach.</string>
     <string name="standard_models">STANDARDMODELLE</string>
     <string name="size">Größe</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Nimm direkt in der App auf oder wähle eine beliebige Audiodatei auf deinem Telefon und erhalte den Text — direkt hier, komplett offline.</string>
     <string name="about_engine_h">Eine Transkriptions-Engine für andere Apps</string>
     <string name="about_engine_b">Scrib läuft auch im Hintergrund. Apps, die das unterstützen — wie Forkgram — können eine Sprachnachricht mit Scrib in Text umwandeln, auf deinem Gerät. Wähle Scrib in den Einstellungen dieser App als Offline-Transkriber. Nichts wird hochgeladen.</string>
+    <string name="about_keyboard_h">In jede App diktieren</string>
+    <string name="about_keyboard_b">Scrib kann als Sprachtastatur arbeiten. Schalte sie in den Tastatur-Einstellungen deines Telefons ein, drücke dann die Mikrofontaste einer Tastatur wie HeliBoard oder wähle Scrib Stimme im Tastaturumschalter — und sprich. Der Text landet direkt dort, wo du geschrieben hast, und deine Tastatur kommt zurück, sobald du aufhörst.</string>
     <string name="about_models_h">Modelle</string>
     <string name="about_models_b">Scrib transkribiert mit offenen Whisper-Sprachmodellen. Lade eins auf dem Hauptbildschirm herunter oder wähle deine Sprache, und Scrib holt ein passendes. Größere Modelle sind genauer; behalte mehrere und wechsle jederzeit.</string>
     <string name="about_dev_h">Für Entwickler</string>

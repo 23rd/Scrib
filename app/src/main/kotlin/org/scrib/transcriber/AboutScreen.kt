@@ -49,6 +49,8 @@ fun AboutScreen(onBack: () -> Unit) {
             Body(stringResource(R.string.about_own_b))
             SubHeading(stringResource(R.string.about_engine_h))
             Body(stringResource(R.string.about_engine_b))
+            SubHeading(stringResource(R.string.about_keyboard_h))
+            Body(stringResource(R.string.about_keyboard_b))
 
             Spacer(Modifier.height(22.dp))
             Heading(stringResource(R.string.about_models_h))

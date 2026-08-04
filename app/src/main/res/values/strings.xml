@@ -32,6 +32,19 @@
     <string name="record_failed">Couldn\'t start recording — another app may be using the microphone.</string>
     <string name="record_empty">Nothing was recorded.</string>
 
+    <string name="ime_label">Scrib Voice</string>
+    <string name="ime_entry_title">Voice keyboard</string>
+    <string name="ime_entry_sub">Dictate into any app — switch Scrib on in the system keyboard list</string>
+    <string name="ime_ready">Ready — tap Speak to dictate.</string>
+    <string name="ime_listening">Listening… text appears at every pause.</string>
+    <string name="ime_finishing">Transcribing the last words…</string>
+    <string name="ime_speak">Speak</string>
+    <string name="ime_working">Transcribing…</string>
+    <string name="ime_keyboard">Keyboard</string>
+    <string name="ime_allow">Allow</string>
+    <string name="ime_open_app">Open Scrib</string>
+    <string name="ime_needs_model">No speech model yet — open Scrib and download one.</string>
+
     <string name="models_explainer">Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.</string>
     <string name="standard_models">STANDARD MODELS</string>
     <string name="size">size</string>
@@ -122,6 +135,8 @@
     <string name="about_own_b">Record straight into the app, or pick any audio file on your phone, and get the text — right here, fully offline.</string>
     <string name="about_engine_h">A transcription engine for other apps</string>
     <string name="about_engine_b">Scrib also works in the background. Apps that support it — like Forkgram — can turn a voice message into text using Scrib, on your device. In that app\'s settings, choose Scrib as the offline transcriber. Nothing is uploaded.</string>
+    <string name="about_keyboard_h">Dictate into any app</string>
+    <string name="about_keyboard_b">Scrib can act as a voice keyboard. Switch it on in your phone\'s keyboard settings, then press the microphone key of a keyboard like HeliBoard, or pick Scrib Voice from the keyboard switcher, and speak — the text goes straight into whatever you were writing, and your keyboard comes back when you stop.</string>
     <string name="about_models_h">Models</string>
     <string name="about_models_b">Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick your language and Scrib fetches a fitting one. Bigger models are more accurate; keep several and switch anytime.</string>
     <string name="about_dev_h">For developers</string>

@@ -28,6 +28,10 @@ interface TranscriptionEngine {
     // The caller starts the returned stream and feeds it PCM as it is captured.
     fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream
 
+    // Hands the model's native memory back until the next request needs it. Blocks while a
+    // transcription is running, so it does not belong on the main thread.
+    fun releaseModel()
+
     fun capabilities(): TranscriberCapabilities
 
     companion object {

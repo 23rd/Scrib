@@ -49,5 +49,19 @@
                 <action android:name="org.opentranscribe.api.ITranscriptionService"/>
             </intent-filter>
         </service>
+
+        <!-- Only the system may bind an input method, which is what the permission below says. -->
+        <service
+            android:name=".ScribInputMethodService"
+            android:exported="true"
+            android:label="@string/ime_label"
+            android:permission="android.permission.BIND_INPUT_METHOD">
+            <intent-filter>
+                <action android:name="android.view.InputMethod"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/method"/>
+        </service>
     </application>
 </manifest>

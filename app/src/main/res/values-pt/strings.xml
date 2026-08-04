@@ -30,6 +30,19 @@
     <string name="record_failed">Não foi possível iniciar a gravação — outro app pode estar usando o microfone.</string>
     <string name="record_empty">Nada foi gravado.</string>
 
+    <string name="ime_label">Scrib Voz</string>
+    <string name="ime_entry_title">Teclado de voz</string>
+    <string name="ime_entry_sub">Dite em qualquer app — ative o Scrib na lista de teclados do sistema</string>
+    <string name="ime_ready">Pronto — toque em Falar e dite.</string>
+    <string name="ime_listening">Ouvindo… o texto aparece a cada pausa.</string>
+    <string name="ime_finishing">Transcrevendo as últimas palavras…</string>
+    <string name="ime_speak">Falar</string>
+    <string name="ime_working">Transcrevendo…</string>
+    <string name="ime_keyboard">Teclado</string>
+    <string name="ime_allow">Permitir</string>
+    <string name="ime_open_app">Abrir o Scrib</string>
+    <string name="ime_needs_model">Ainda não há modelo de voz — abra o Scrib e baixe um.</string>
+
     <string name="models_explainer">Modelos maiores são mais precisos, mas mais lentos e pesados para baixar. Os modelos «apenas inglês» são menores e mais rápidos; para outros idiomas escolha Base ou maior — Tiny é fraco.</string>
     <string name="standard_models">MODELOS PADRÃO</string>
     <string name="size">tamanho</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Grave direto no app ou escolha qualquer arquivo de áudio no telefone e obtenha o texto — aqui mesmo, totalmente offline.</string>
     <string name="about_engine_h">Um mecanismo de transcrição para outros apps</string>
     <string name="about_engine_b">O Scrib também funciona em segundo plano. Apps que dão suporte — como o Forkgram — podem transformar uma mensagem de voz em texto usando o Scrib, no seu dispositivo. Nas configurações desse app, escolha o Scrib como transcritor offline. Nada é enviado.</string>
+    <string name="about_keyboard_h">Ditar em qualquer app</string>
+    <string name="about_keyboard_b">O Scrib também funciona como teclado de voz. Ative-o nas configurações de teclado do seu telefone, depois toque na tecla de microfone de um teclado como o HeliBoard ou escolha Scrib Voz no seletor de teclados, e fale. O texto vai direto para onde você estava escrevendo, e seu teclado volta quando você para.</string>
     <string name="about_models_h">Modelos</string>
     <string name="about_models_b">O Scrib transcreve com modelos de voz abertos Whisper. Baixe um na tela principal, ou escolha seu idioma e o Scrib busca um adequado. Modelos maiores são mais precisos; mantenha vários e alterne quando quiser.</string>
     <string name="about_dev_h">Para desenvolvedores</string>

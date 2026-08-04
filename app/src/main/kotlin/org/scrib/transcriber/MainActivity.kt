@@ -1,6 +1,8 @@
 package org.scrib.transcriber
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -19,11 +21,14 @@ class MainActivity : ComponentActivity() {
 
     private val sharedVm: ScribViewModel by viewModels()
 
+    private var pendingMicrophone = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Only on the first creation: a recreation (rotation) must not restart the work.
         if (savedInstanceState == null) {
             maybeTranscribeShared(intent)
+            takeMicrophoneRequest(intent)
         }
         setContent {
             ScribTheme {
@@ -63,6 +68,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // The app is often already running when the voice keyboard sends the user here, and then the
+    // intent arrives without a fresh creation.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        takeMicrophoneRequest(intent)
+    }
+
+    // Asked for here rather than where the intent arrives: a request made while the activity is
+    // still coming to the front is dropped without ever showing the dialog.
+    override fun onResume() {
+        super.onResume()
+        if (!pendingMicrophone) {
+            return
+        }
+        pendingMicrophone = false
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 0)
+        }
+    }
+
     // The platform hands a backgrounded app silence instead of the microphone, so a take that
     // would go on filling with nothing is finished here — a rotation is not leaving the app.
     override fun onStop() {
@@ -88,5 +114,20 @@ class MainActivity : ComponentActivity() {
             return
         }
         sharedVm.transcribeFile(uri, queryDisplayName(this, uri))
+    }
+
+    // An input method has no activity of its own to ask from, so the voice keyboard sends the user
+    // here for the one permission it cannot do without. The extra is consumed on arrival, or a
+    // rotation would ask again.
+    private fun takeMicrophoneRequest(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_REQUEST_MICROPHONE, false) != true) {
+            return
+        }
+        intent.removeExtra(EXTRA_REQUEST_MICROPHONE)
+        pendingMicrophone = true
+    }
+
+    companion object {
+        const val EXTRA_REQUEST_MICROPHONE = "org.scrib.transcriber.REQUEST_MICROPHONE"
     }
 }

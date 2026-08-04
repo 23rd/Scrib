@@ -30,6 +30,19 @@
     <string name="record_failed">Не удалось начать запись — возможно, микрофон занят другим приложением.</string>
     <string name="record_empty">Ничего не записано.</string>
 
+    <string name="ime_label">Scrib Голос</string>
+    <string name="ime_entry_title">Голосовая клавиатура</string>
+    <string name="ime_entry_sub">Диктуйте в любом приложении — включите Scrib в системном списке клавиатур</string>
+    <string name="ime_ready">Готово — нажмите «Говорить» и диктуйте.</string>
+    <string name="ime_listening">Слушаю… текст появляется на каждой паузе.</string>
+    <string name="ime_finishing">Распознаю последние слова…</string>
+    <string name="ime_speak">Говорить</string>
+    <string name="ime_working">Распознаю…</string>
+    <string name="ime_keyboard">Клавиатура</string>
+    <string name="ime_allow">Разрешить</string>
+    <string name="ime_open_app">Открыть Scrib</string>
+    <string name="ime_needs_model">Модели ещё нет — откройте Scrib и скачайте её.</string>
+
     <string name="models_explainer">Крупные модели точнее, но медленнее и больше по размеру. Модели «только английский» меньше и быстрее; для других языков берите Base или крупнее — Tiny слабовата.</string>
     <string name="standard_models">СТАНДАРТНЫЕ МОДЕЛИ</string>
     <string name="size">размер</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Запишите прямо в приложении или выберите любой аудиофайл на телефоне и получите текст — прямо здесь, полностью офлайн.</string>
     <string name="about_engine_h">Движок распознавания для других приложений</string>
     <string name="about_engine_b">Scrib также работает в фоне. Приложения, которые это поддерживают — например Forkgram — могут превращать голосовые в текст через Scrib, на вашем устройстве. В настройках того приложения выберите Scrib как офлайн-распознаватель. Ничего не загружается.</string>
+    <string name="about_keyboard_h">Диктовка в любом приложении</string>
+    <string name="about_keyboard_b">Scrib умеет работать как голосовая клавиатура. Включите её в настройках клавиатур телефона, затем нажмите кнопку микрофона в клавиатуре вроде HeliBoard или выберите Scrib Голос в переключателе клавиатур — и говорите. Текст попадёт прямо туда, где вы писали, а ваша клавиатура вернётся, когда вы закончите.</string>
     <string name="about_models_h">Модели</string>
     <string name="about_models_b">Scrib распознаёт открытыми моделями Whisper. Скачайте модель на главном экране или выберите язык — Scrib подберёт подходящую. Крупнее = точнее; можно держать несколько и переключаться.</string>
     <string name="about_dev_h">Для разработчиков</string>

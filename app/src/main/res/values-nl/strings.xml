@@ -30,6 +30,19 @@
     <string name="record_failed">Opnemen kon niet starten — misschien gebruikt een andere app de microfoon.</string>
     <string name="record_empty">Er is niets opgenomen.</string>
 
+    <string name="ime_label">Scrib Stem</string>
+    <string name="ime_entry_title">Spraaktoetsenbord</string>
+    <string name="ime_entry_sub">Dicteer in elke app — zet Scrib aan in de toetsenbordlijst van het systeem</string>
+    <string name="ime_ready">Klaar — tik op Spreken en dicteer.</string>
+    <string name="ime_listening">Luisteren… tekst verschijnt bij elke pauze.</string>
+    <string name="ime_finishing">Laatste woorden worden getranscribeerd…</string>
+    <string name="ime_speak">Spreken</string>
+    <string name="ime_working">Transcriberen…</string>
+    <string name="ime_keyboard">Toetsenbord</string>
+    <string name="ime_allow">Toestaan</string>
+    <string name="ime_open_app">Scrib openen</string>
+    <string name="ime_needs_model">Nog geen spraakmodel — open Scrib en download er een.</string>
+
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
     <string name="standard_models">STANDAARDMODELLEN</string>
     <string name="size">grootte</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Neem meteen in de app op of kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.</string>
     <string name="about_engine_h">Een transcriptie-engine voor andere apps</string>
     <string name="about_engine_b">Scrib werkt ook op de achtergrond. Apps die dit ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib omzetten naar tekst, op je apparaat. Kies Scrib in de instellingen van die app als offline transcriber. Er wordt niets geüpload.</string>
+    <string name="about_keyboard_h">Dicteren in elke app</string>
+    <string name="about_keyboard_b">Scrib kan als spraaktoetsenbord werken. Zet het aan in de toetsenbordinstellingen van je telefoon, druk dan op de microfoontoets van een toetsenbord zoals HeliBoard of kies Scrib Stem in de toetsenbordwisselaar, en spreek. De tekst komt direct terecht waar je aan het schrijven was, en je toetsenbord komt terug zodra je stopt.</string>
     <string name="about_models_h">Modellen</string>
     <string name="about_models_b">Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
     <string name="about_dev_h">Voor ontwikkelaars</string>

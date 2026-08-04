@@ -107,6 +107,13 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         }
     }
 
+    @Synchronized
+    override fun releaseModel() {
+        whisper?.release()
+        whisper = null
+        loadedPath = null
+    }
+
     override fun capabilities(): TranscriberCapabilities {
         val activeFile = ModelManager.activeFileName(appContext)
         val englishOnly = activeFile != null && ModelCatalog.isEnglishOnly(activeFile)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app's scheme once more, for the input method: it is drawn with plain views, which cannot
+     reach the Compose theme the rest of the app is painted with. -->
+<resources>
+    <color name="ime_background">#EEF3F1</color>
+    <color name="ime_surface">#FFFFFF</color>
+    <color name="ime_on_surface">#171D1C</color>
+    <color name="ime_on_surface_variant">#3F4A48</color>
+    <color name="ime_outline">#D3DEDC</color>
+    <color name="ime_primary">#006A6A</color>
+    <color name="ime_on_primary">#FFFFFF</color>
+    <color name="ime_alert">#BA1A1A</color>
+</resources>

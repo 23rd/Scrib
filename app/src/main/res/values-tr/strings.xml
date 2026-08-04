@@ -30,6 +30,19 @@
     <string name="record_failed">Kayıt başlatılamadı — mikrofonu başka bir uygulama kullanıyor olabilir.</string>
     <string name="record_empty">Hiçbir şey kaydedilmedi.</string>
 
+    <string name="ime_label">Scrib Ses</string>
+    <string name="ime_entry_title">Sesli klavye</string>
+    <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin — Scrib\'i sistem klavye listesinden açın</string>
+    <string name="ime_ready">Hazır — Konuş\'a dokunup dikte edin.</string>
+    <string name="ime_listening">Dinliyor… metin her duraklamada beliriyor.</string>
+    <string name="ime_finishing">Son sözler yazıya dökülüyor…</string>
+    <string name="ime_speak">Konuş</string>
+    <string name="ime_working">Yazıya dökülüyor…</string>
+    <string name="ime_keyboard">Klavye</string>
+    <string name="ime_allow">İzin ver</string>
+    <string name="ime_open_app">Scrib\'i aç</string>
+    <string name="ime_needs_model">Henüz konuşma modeli yok — Scrib\'i açıp bir tane indirin.</string>
+
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
     <string name="standard_models">STANDART MODELLER</string>
     <string name="size">boyut</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Doğrudan uygulamada kaydedin ya da telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.</string>
     <string name="about_engine_h">Diğer uygulamalar için bir yazıya dökme motoru</string>
     <string name="about_engine_b">Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — Forkgram gibi — bir sesli mesajı Scrib ile cihazınızda metne dönüştürebilir. O uygulamanın ayarlarında Scrib\'i çevrimdışı yazıya dökücü olarak seçin. Hiçbir şey yüklenmez.</string>
+    <string name="about_keyboard_h">Herhangi bir uygulamaya dikte edin</string>
+    <string name="about_keyboard_b">Scrib sesli klavye olarak da çalışabilir. Telefonunuzun klavye ayarlarından açın, sonra HeliBoard gibi bir klavyenin mikrofon tuşuna basın ya da klavye değiştiriciden Scrib Ses\'i seçin ve konuşun. Metin doğrudan yazmakta olduğunuz yere gider, siz durunca klavyeniz geri gelir.</string>
     <string name="about_models_h">Modeller</string>
     <string name="about_models_b">Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
     <string name="about_dev_h">Geliştiriciler için</string>

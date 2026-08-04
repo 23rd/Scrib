@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One voice subtype is what puts Scrib in the list a keyboard's microphone key switches to. -->
+<input-method xmlns:android="http://schemas.android.com/apk/res/android"
+    android:settingsActivity="org.scrib.transcriber.MainActivity"
+    android:supportsSwitchingToNextInputMethod="true">
+    <subtype
+        android:label="@string/app_name"
+        android:imeSubtypeMode="voice"
+        android:overridesImplicitlyEnabledSubtype="true"/>
+</input-method>

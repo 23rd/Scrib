@@ -30,6 +30,19 @@
     <string name="record_failed">Nie udało się rozpocząć nagrywania — mikrofon może być zajęty przez inną aplikację.</string>
     <string name="record_empty">Nic nie nagrano.</string>
 
+    <string name="ime_label">Scrib Głos</string>
+    <string name="ime_entry_title">Klawiatura głosowa</string>
+    <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji — włącz Scrib na systemowej liście klawiatur</string>
+    <string name="ime_ready">Gotowe — dotknij Mów i dyktuj.</string>
+    <string name="ime_listening">Słucham… tekst pojawia się przy każdej pauzie.</string>
+    <string name="ime_finishing">Transkrypcja ostatnich słów…</string>
+    <string name="ime_speak">Mów</string>
+    <string name="ime_working">Transkrypcja…</string>
+    <string name="ime_keyboard">Klawiatura</string>
+    <string name="ime_allow">Zezwól</string>
+    <string name="ime_open_app">Otwórz Scrib</string>
+    <string name="ime_needs_model">Brak modelu mowy — otwórz Scrib i pobierz jeden.</string>
+
     <string name="models_explainer">Większe modele są dokładniejsze, ale wolniejsze i większe do pobrania. Modele «tylko angielski» są mniejsze i szybsze; dla innych języków wybierz Base lub większy — Tiny jest słaby.</string>
     <string name="standard_models">MODELE STANDARDOWE</string>
     <string name="size">rozmiar</string>
@@ -119,6 +132,8 @@
     <string name="about_own_b">Nagraj bezpośrednio w aplikacji albo wybierz dowolny plik audio w telefonie i uzyskaj tekst — tutaj, całkowicie offline.</string>
     <string name="about_engine_h">Silnik transkrypcji dla innych aplikacji</string>
     <string name="about_engine_b">Scrib działa też w tle. Aplikacje, które to obsługują — jak Forkgram — mogą zamienić wiadomość głosową na tekst za pomocą Scrib, na Twoim urządzeniu. W ustawieniach tej aplikacji wybierz Scrib jako transkryptor offline. Nic nie jest wysyłane.</string>
+    <string name="about_keyboard_h">Dyktowanie w dowolnej aplikacji</string>
+    <string name="about_keyboard_b">Scrib może działać jako klawiatura głosowa. Włącz ją w ustawieniach klawiatur telefonu, następnie naciśnij klawisz mikrofonu w klawiaturze takiej jak HeliBoard albo wybierz Scrib Głos w przełączniku klawiatur — i mów. Tekst trafia prosto tam, gdzie piszesz, a Twoja klawiatura wraca, gdy skończysz.</string>
     <string name="about_models_h">Modele</string>
     <string name="about_models_b">Scrib transkrybuje otwartymi modelami mowy Whisper. Pobierz jeden na ekranie głównym lub wybierz język, a Scrib pobierze odpowiedni. Większe modele są dokładniejsze; trzymaj kilka i przełączaj kiedy chcesz.</string>
     <string name="about_dev_h">Dla programistów</string>
