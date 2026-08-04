@@ -66,16 +66,12 @@ class ScribInputMethodService : InputMethodService() {
         return fresh
     }
 
-    // The take starts on its own: the user got here by pressing a microphone, not by choosing a
-    // keyboard, and a second tap to begin would only be in the way.
+    // Showing the keyboard is not the same as wanting to talk: the microphone opens on the key
+    // below and nowhere else, so switching here by accident never starts recording.
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         notice = null
-        if (stage == Stage.Idle && blocker() == Blocker.None) {
-            listen()
-        } else {
-            render()
-        }
+        render()
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
@@ -341,7 +337,7 @@ private class DictationView(context: Context) : LinearLayout(context) {
 
     private val alertColor = color(R.color.ime_alert)
     private val quietColor = color(R.color.ime_on_surface_variant)
-    private val basePadding = dp(14)
+    private val basePadding = dp(24)
 
     init {
         orientation = VERTICAL
