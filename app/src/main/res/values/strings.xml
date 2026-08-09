@@ -144,5 +144,5 @@
     <string name="about_models_b">Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick your language and Scrib fetches a fitting one. Bigger models are more accurate; keep several and switch anytime.</string>
     <string name="about_dev_h">For developers</string>
     <string name="about_dev_b">Any app can use Scrib as an offline transcriber through the open Open Transcribe contract (org.opentranscribe.api) — a small AIDL service, no SDK and no network. The contract is vendor-neutral, so apps aren\'t tied to Scrib: they can bind any compatible transcriber the user has installed.</string>
-    <string name="about_version">Version 0.1</string>
+    <string name="about_version">Version %s</string>
 </resources>

@@ -61,7 +61,7 @@ fun AboutScreen(onBack: () -> Unit) {
             Body(stringResource(R.string.about_dev_b))
 
             Spacer(Modifier.height(28.dp))
-            Text(stringResource(R.string.about_version), fontSize = 12.sp, color = cs.onSurfaceVariant)
+            Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME), fontSize = 12.sp, color = cs.onSurfaceVariant)
             Spacer(Modifier.height(24.dp))
         }
     }
