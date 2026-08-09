@@ -154,5 +154,5 @@
     <string name="about_models_b">Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
     <string name="about_dev_h">Voor ontwikkelaars</string>
     <string name="about_dev_b">Elke app kan Scrib als offline transcriber gebruiken via het open Open Transcribe-contract (org.opentranscribe.api) — een kleine AIDL-service, zonder SDK en zonder netwerk. Het contract is leveranciersneutraal, dus apps zijn niet aan Scrib gebonden: ze kunnen elke compatibele transcriber binden die de gebruiker heeft geïnstalleerd.</string>
-    <string name="about_version">Versie 0.1</string>
+    <string name="about_version">Versie %s</string>
 </resources>

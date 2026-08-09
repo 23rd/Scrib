@@ -154,5 +154,5 @@
     <string name="about_models_b">Scrib распознаёт открытыми моделями Whisper. Скачайте модель на главном экране или выберите язык — Scrib подберёт подходящую. Крупнее = точнее; можно держать несколько и переключаться.</string>
     <string name="about_dev_h">Для разработчиков</string>
     <string name="about_dev_b">Любое приложение может использовать Scrib как офлайн-распознаватель через открытый контракт Open Transcribe (org.opentranscribe.api) — небольшой AIDL-сервис, без SDK и без сети. Контракт вендор-нейтральный, поэтому приложения не привязаны к Scrib: они могут подключить любой совместимый распознаватель, установленный у пользователя.</string>
-    <string name="about_version">Версия 0.1</string>
+    <string name="about_version">Версия %s</string>
 </resources>

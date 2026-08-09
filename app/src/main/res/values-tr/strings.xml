@@ -154,5 +154,5 @@
     <string name="about_models_b">Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
     <string name="about_dev_h">Geliştiriciler için</string>
     <string name="about_dev_b">Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib\'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib\'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.</string>
-    <string name="about_version">Sürüm 0.1</string>
+    <string name="about_version">Sürüm %s</string>
 </resources>
