@@ -38,9 +38,12 @@ private class CpuInfo(private val lines: List<String>) {
         .toList()
 
 
+    // A uniform CPU -- every core the same speed, as on x86 and on SoCs without big.LITTLE --
+    // has no slow cores to drop, so all of them are worth using.
     private fun List<Int>.countDroppingMin(): Int {
         val min = min()
-        return count { it > min }
+        val faster = count { it > min }
+        return if (faster > 0) faster else size
     }
 
     private fun List<Int>.countKeepingMin(): Int {

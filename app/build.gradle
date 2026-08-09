@@ -2,6 +2,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
+// F-Droid builds the arm64 APK every phone wants; the release workflow passes -Pabis to fold
+// the remaining architectures into the single universal APK it attaches to a GitHub release.
+def abis = (findProperty('abis') ?: 'arm64-v8a').toString().split(',').toList()
+
 android {
     namespace 'org.scrib.transcriber'
     compileSdk 35
@@ -16,7 +20,7 @@ android {
         versionName '0.8'
 
         ndk {
-            abiFilters 'arm64-v8a'
+            abiFilters.addAll(abis)
         }
         externalNativeBuild {
             cmake {

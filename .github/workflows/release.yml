@@ -42,7 +42,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew :app:assembleRelease
+      # One universal APK, so a laptop running Waydroid or an older 32-bit phone is served by
+      # the same download. F-Droid keeps building the arm64-only default.
+      - run: ./gradlew :app:assembleRelease -Pabis=arm64-v8a,armeabi-v7a,x86_64,x86
 
       - name: Sign the APK
         env:
@@ -64,7 +66,7 @@ jobs:
         run: |
           git push --force origin HEAD:refs/tags/latest
           title="Scrib $VERSION"
-          notes="$(printf 'Version %s · %s · arm64-v8a.\nSigned with its own key — cannot update an F-Droid install.' \
+          notes="$(printf 'Version %s · %s · arm64-v8a, armeabi-v7a, x86_64, x86.\nSigned with its own key — cannot update an F-Droid install.' \
             "$VERSION" "$(date -u +%Y-%m-%d)")"
           if gh release view latest >/dev/null 2>&1; then
             gh release edit latest --title "$title" --notes "$notes"
