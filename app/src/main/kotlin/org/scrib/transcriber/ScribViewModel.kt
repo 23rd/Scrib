@@ -307,6 +307,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     // The run itself lives outside the view model so that leaving the app cannot take it down.
     val transcription: StateFlow<TranscribeUi?> = TranscriptionRun.state
 
+    init {
+        TranscriptionRun.restore(ctx)
+    }
+
     fun transcribeFile(uri: Uri, displayName: String?) {
         TranscriptionRun.start(ctx, uri, displayName ?: "audio", source = uri)
     }
@@ -344,11 +348,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun cancelTranscription() {
-        TranscriptionRun.cancel()
+        TranscriptionRun.cancel(ctx)
     }
 
     fun dismissTranscription() {
-        TranscriptionRun.dismiss()
+        TranscriptionRun.dismiss(ctx)
     }
 
     private val recorder = VoiceRecorder(ctx)

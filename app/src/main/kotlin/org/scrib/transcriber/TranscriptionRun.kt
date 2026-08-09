@@ -36,6 +36,7 @@ object TranscriptionRun {
         val app = context.applicationContext
         val cancellation = CancellationToken()
         token = cancellation
+        TranscriptStore.clear(app)
         _state.value = TranscribeUi(name, "", running = true, error = null, sourceUri = source)
         TranscriptionForegroundService.start(app)
         scope.launch {
@@ -61,6 +62,9 @@ object TranscriptionRun {
                             segments = segments, running = false, percent = 100, etaMs = null
                         )
                     }
+                    if (segments.isNotEmpty()) {
+                        _state.value?.let { TranscriptStore.save(app, it) }
+                    }
                 }
             } catch (e: Throwable) {
                 if (cancellation.isCancelled) {
@@ -80,12 +84,21 @@ object TranscriptionRun {
         }
     }
 
-    fun cancel() {
+    fun restore(context: Context) {
+        if (token != null || _state.value != null) {
+            return
+        }
+        TranscriptStore.load(context.applicationContext)?.let { _state.value = it }
+    }
+
+    fun cancel(context: Context) {
         token?.cancel()
+        TranscriptStore.clear(context.applicationContext)
         _state.value = null
     }
 
-    fun dismiss() {
+    fun dismiss(context: Context) {
+        TranscriptStore.clear(context.applicationContext)
         _state.value = null
     }
 
