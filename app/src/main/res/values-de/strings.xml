@@ -30,6 +30,11 @@
     <string name="record_failed">Aufnahme konnte nicht gestartet werden — vielleicht nutzt eine andere App das Mikrofon.</string>
     <string name="record_empty">Es wurde nichts aufgenommen.</string>
 
+    <string name="vad_entry_title">Stille überspringen</string>
+    <string name="vad_entry_sub">Nur die Stellen mit Sprache transkribieren — Aufnahmen mit langen Pausen sind schneller fertig und Stille landet nicht mehr im Text. Bei durchgehender Sprache kein Gewinn. Einmaliger Download von 1 MB.</string>
+    <string name="vad_entry_downloading">Sprachaktivitätserkennung wird geladen… %1$d%%</string>
+    <string name="status_vad_failed">Sprachaktivitätserkennung konnte nicht geladen werden — prüfe deine Verbindung und versuch es erneut.</string>
+
     <string name="ime_label">Scrib Stimme</string>
     <string name="ime_entry_title">Sprachtastatur</string>
     <string name="ime_entry_sub">Diktiere in jede App — schalte Scrib in der Tastaturliste des Systems ein</string>

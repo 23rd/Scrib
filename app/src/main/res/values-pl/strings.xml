@@ -30,6 +30,11 @@
     <string name="record_failed">Nie udało się rozpocząć nagrywania — mikrofon może być zajęty przez inną aplikację.</string>
     <string name="record_empty">Nic nie nagrano.</string>
 
+    <string name="vad_entry_title">Pomijaj ciszę</string>
+    <string name="vad_entry_sub">Transkrybuj tylko fragmenty z mową — nagrania z długimi pauzami kończą się szybciej, a cisza przestaje trafiać do tekstu. Brak zysku przy ciągłej mowie. Jednorazowe pobranie 1 MB.</string>
+    <string name="vad_entry_downloading">Pobieranie detektora mowy… %1$d%%</string>
+    <string name="status_vad_failed">Nie udało się pobrać detektora mowy — sprawdź połączenie i spróbuj ponownie.</string>
+
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
     <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji — włącz Scrib na systemowej liście klawiatur</string>

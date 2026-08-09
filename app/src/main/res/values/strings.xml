@@ -32,6 +32,11 @@
     <string name="record_failed">Couldn\'t start recording — another app may be using the microphone.</string>
     <string name="record_empty">Nothing was recorded.</string>
 
+    <string name="vad_entry_title">Skip silence</string>
+    <string name="vad_entry_sub">Transcribe only the parts that hold speech — recordings with long pauses finish sooner and silence stops leaking into the text. No gain on non-stop speech. One-off 1 MB download.</string>
+    <string name="vad_entry_downloading">Downloading the speech detector… %1$d%%</string>
+    <string name="status_vad_failed">Couldn\'t download the speech detector — check your connection and try again.</string>
+
     <string name="ime_label">Scrib Voice</string>
     <string name="ime_entry_title">Voice keyboard</string>
     <string name="ime_entry_sub">Dictate into any app — switch Scrib on in the system keyboard list</string>

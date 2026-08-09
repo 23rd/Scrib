@@ -91,17 +91,19 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val segments = whisperContext().transcribeBuffer(
+            val result = whisperContext().transcribeBuffer(
                 pcm.samples, pcm.sampleCount, language, abortFlag,
+                vadModelPath = ModelManager.vadModelPath(appContext),
                 onSegment = { partial -> onPartial(partial.trim()) },
                 onProgress = onProgress
             )
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            return segments
+            val segments = result.segments
                 .filter { it.text.isNotBlank() }
                 .map { TranscriptSegment(it.startMs, it.endMs, it.text) }
+            return markParagraphs(segments, result.speech.map { SpeechSpan(it.startMs, it.endMs) })
         } finally {
             abortFlag.close()
         }

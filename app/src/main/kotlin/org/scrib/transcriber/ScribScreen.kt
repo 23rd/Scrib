@@ -36,6 +36,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -81,6 +82,7 @@ fun ScribScreen(
     onImport: (Uri, String?) -> Unit,
     onSelfTest: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
+    onSkipSilence: (Boolean) -> Unit,
     recording: RecordingUi?,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
@@ -134,6 +136,7 @@ fun ScribScreen(
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
                 item { KeyboardEntry() }
+                item { SkipSilenceEntry(state, onSkipSilence) }
             }
             item {
                 Text(
@@ -725,6 +728,35 @@ private fun KeyboardEntry() {
                 Text(stringResource(R.string.ime_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
             }
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+// Finding the speech first needs a detector of its own, so the switch downloads it once and only
+// then takes effect. Off by default: it is a second pass over the audio and a second copy of the
+// speech in memory, which a short voice message has nothing to gain from.
+@Composable
+private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    val busy = state.vadProgress >= 0
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .clickableRow { if (!busy) onToggle(!state.skipSilence) }
+    ) {
+        Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("🤫", fontSize = 18.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.vad_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(
+                    if (busy) stringResource(R.string.vad_entry_downloading, state.vadProgress)
+                    else stringResource(R.string.vad_entry_sub),
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Switch(checked = state.skipSilence, enabled = !busy, onCheckedChange = { onToggle(it) })
         }
     }
 }

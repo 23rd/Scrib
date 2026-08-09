@@ -30,6 +30,11 @@
     <string name="record_failed">Не вдалося почати запис — можливо, мікрофон зайнятий іншим застосунком.</string>
     <string name="record_empty">Нічого не записано.</string>
 
+    <string name="vad_entry_title">Пропускати тишу</string>
+    <string name="vad_entry_sub">Розшифровувати лише ті місця, де є мовлення — записи з довгими паузами завершуються швидше, а тиша перестає потрапляти в текст. На безперервному мовленні виграшу немає. Разове завантаження 1 МБ.</string>
+    <string name="vad_entry_downloading">Завантаження детектора мовлення… %1$d%%</string>
+    <string name="status_vad_failed">Не вдалося завантажити детектор мовлення — перевірте з’єднання й спробуйте ще раз.</string>
+
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
     <string name="ime_entry_sub">Диктуйте в будь-якому застосунку — увімкніть Scrib у системному списку клавіатур</string>

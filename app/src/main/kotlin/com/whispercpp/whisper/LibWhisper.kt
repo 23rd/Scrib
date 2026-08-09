@@ -21,6 +21,11 @@ class WhisperChunk(val text: String, val language: String?)
 
 class WhisperSegment(val startMs: Long, val endMs: Long, val text: String)
 
+// A stretch the VAD heard speech in. Only populated when the run used a VAD model.
+class WhisperSpeechSpan(val startMs: Long, val endMs: Long)
+
+class WhisperTranscription(val segments: List<WhisperSegment>, val speech: List<WhisperSpeechSpan>)
+
 class WhisperAbortFlag {
 
     private var ptr: Long = WhisperLib.newAbortFlag()
@@ -64,26 +69,30 @@ class WhisperContext private constructor(private var ptr: Long) {
 
     // Same, but reads the samples from a direct buffer, so long recordings never need a
     // Java-heap array. Returns the segments whisper decoded, each with its position in the
-    // recording, so a caller can lay the text out as subtitles rather than one block.
+    // recording, so a caller can lay the text out as subtitles rather than one block. With a
+    // vadModelPath the quiet stretches are skipped, and the timings still refer to the original
+    // recording, not to what is left after the silence is dropped.
     @Synchronized
     fun transcribeBuffer(
         samples: ByteBuffer,
         sampleCount: Int,
         language: String?,
         abortFlag: WhisperAbortFlag? = null,
+        vadModelPath: String? = null,
         onSegment: ((String) -> Unit)? = null,
         onProgress: ((Int) -> Unit)? = null
-    ): List<WhisperSegment> {
+    ): WhisperTranscription {
         require(ptr != 0L)
         require(samples.isDirect)
         val numThreads = WhisperCpuConfig.preferredThreadCount
         Log.d(LOG_TAG, "Selecting $numThreads threads")
-        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, segmentCallback(onSegment), progressCallback(onProgress), abortFlag?.nativePtr() ?: 0L)
-        return collectSegments()
+        WhisperLib.fullTranscribeDirect(ptr, numThreads, samples, sampleCount, language ?: "", "", false, vadModelPath ?: "", segmentCallback(onSegment), progressCallback(onProgress), abortFlag?.nativePtr() ?: 0L)
+        return WhisperTranscription(collectSegments(), collectSpeechSpans())
     }
 
     // One chunk of a live stream. The detected language is read under the same lock, so a
-    // parallel file request cannot overwrite it in between.
+    // parallel file request cannot overwrite it in between. No VAD here: the stream is already cut
+    // at its own pauses and hands over only the windows that hold speech.
     @Synchronized
     fun transcribeChunk(
         samples: ByteBuffer,
@@ -94,7 +103,7 @@ class WhisperContext private constructor(private var ptr: Long) {
     ): WhisperChunk {
         require(ptr != 0L)
         require(samples.isDirect)
-        WhisperLib.fullTranscribeDirect(ptr, WhisperCpuConfig.preferredThreadCount, samples, sampleCount, language ?: "", prompt ?: "", true, null, null, abortFlag?.nativePtr() ?: 0L)
+        WhisperLib.fullTranscribeDirect(ptr, WhisperCpuConfig.preferredThreadCount, samples, sampleCount, language ?: "", prompt ?: "", true, "", null, null, abortFlag?.nativePtr() ?: 0L)
         return WhisperChunk(collectText(), WhisperLib.fullLangId(ptr))
     }
 
@@ -141,6 +150,21 @@ class WhisperContext private constructor(private var ptr: Long) {
             )
         }
         return segments
+    }
+
+    // Whisper reports these in centiseconds too.
+    private fun collectSpeechSpans(): List<WhisperSpeechSpan> {
+        val count = WhisperLib.getSpeechSpanCount(ptr)
+        val spans = ArrayList<WhisperSpeechSpan>(count)
+        for (i in 0 until count) {
+            spans.add(
+                WhisperSpeechSpan(
+                    WhisperLib.getSpeechSpanT0(ptr, i) * 10,
+                    WhisperLib.getSpeechSpanT1(ptr, i) * 10
+                )
+            )
+        }
+        return spans
     }
 
     @Synchronized
@@ -216,7 +240,7 @@ private class WhisperLib {
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
-        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, segmentCallback: WhisperSegmentCallback?, progressCallback: WhisperProgressCallback?, abortFlagPtr: Long)
+        external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, vadModelPath: String, segmentCallback: WhisperSegmentCallback?, progressCallback: WhisperProgressCallback?, abortFlagPtr: Long)
         external fun fullLangId(contextPtr: Long): String?
         external fun newAbortFlag(): Long
         external fun setAbortFlag(flagPtr: Long)
@@ -227,6 +251,9 @@ private class WhisperLib {
         external fun getTextSegment(contextPtr: Long, index: Int): String
         external fun getTextSegmentT0(contextPtr: Long, index: Int): Long
         external fun getTextSegmentT1(contextPtr: Long, index: Int): Long
+        external fun getSpeechSpanCount(contextPtr: Long): Int
+        external fun getSpeechSpanT0(contextPtr: Long, index: Int): Long
+        external fun getSpeechSpanT1(contextPtr: Long, index: Int): Long
         external fun getSystemInfo(): String
     }
 }

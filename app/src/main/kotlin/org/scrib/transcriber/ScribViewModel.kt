@@ -43,7 +43,10 @@ data class ScribUiState(
     val standard: List<ModelRow>,
     val custom: List<ModelRow>,
     val statusMsg: String,
-    val statusError: Boolean
+    val statusError: Boolean,
+    val skipSilence: Boolean,
+    // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
+    val vadProgress: Int
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -77,6 +80,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     @Volatile private var statusMsg = ""
     @Volatile private var statusError = false
+    @Volatile private var vadPct = -1
+    private var vadJob: Job? = null
 
     private val ctx get() = getApplication<Application>()
     private fun str(id: Int, vararg args: Any): String = ctx.getString(id, *args)
@@ -120,7 +125,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         return ScribUiState(
             firstRun = installed.isEmpty() && downloads.isEmpty(),
             activeName = activeFriendly, standard = standard, custom = custom,
-            statusMsg = statusMsg, statusError = statusError
+            statusMsg = statusMsg, statusError = statusError,
+            skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct
         )
     }
 
@@ -175,6 +181,44 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         jobs.remove(fileName)?.cancel()
         downloads.remove(fileName)
         push()
+    }
+
+    // Skipping silence needs a model of its own, fetched the first time it is asked for. The
+    // setting only goes on once that has landed, so it can never point at a model that isn't there.
+    fun setSkipSilence(enabled: Boolean) {
+        if (!enabled) {
+            vadJob?.cancel(); vadJob = null; vadPct = -1
+            ModelManager.setSkipSilence(ctx, false)
+            push(); return
+        }
+        if (ModelManager.isVadInstalled(ctx)) {
+            ModelManager.setSkipSilence(ctx, true)
+            push(); return
+        }
+        if (vadJob != null) return
+        vadPct = 0
+        push()
+        vadJob = viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    ModelManager.downloadVad(ctx,
+                        onProgress = { done, total ->
+                            val pct = if (total > 0) ((done * 100) / total).toInt() else -1
+                            if (vadPct != pct) {
+                                vadPct = pct
+                                push()
+                            }
+                        },
+                        isCancelled = { !isActive })
+                }
+                ModelManager.setSkipSilence(ctx, true)
+            } catch (e: ModelManager.CancelledDownloadException) {
+            } catch (e: Throwable) {
+                statusMsg = str(R.string.status_vad_failed); statusError = true
+            }
+            vadPct = -1; vadJob = null
+            push()
+        }
     }
 
     fun activate(fileName: String) {

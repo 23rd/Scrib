@@ -30,6 +30,11 @@
     <string name="record_failed">Opnemen kon niet starten — misschien gebruikt een andere app de microfoon.</string>
     <string name="record_empty">Er is niets opgenomen.</string>
 
+    <string name="vad_entry_title">Stiltes overslaan</string>
+    <string name="vad_entry_sub">Transcribeer alleen de delen met spraak — opnames met lange pauzes zijn eerder klaar en stilte belandt niet meer in de tekst. Geen winst bij onafgebroken spraak. Eenmalige download van 1 MB.</string>
+    <string name="vad_entry_downloading">Spraakdetector downloaden… %1$d%%</string>
+    <string name="status_vad_failed">Spraakdetector kon niet worden gedownload — controleer je verbinding en probeer het opnieuw.</string>
+
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
     <string name="ime_entry_sub">Dicteer in elke app — zet Scrib aan in de toetsenbordlijst van het systeem</string>

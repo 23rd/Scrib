@@ -300,7 +300,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jo
 }
 
 static void fgt_full_transcribe(
-        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jstring vad_model, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
     struct whisper_context *context = (struct whisper_context *) context_ptr;
 
     // The below adapted from the Objective-C iOS sample
@@ -334,6 +334,19 @@ static void fgt_full_transcribe(
     }
     if (prompt_chars != NULL && strlen(prompt_chars) > 0) {
         params.initial_prompt = prompt_chars;
+    }
+
+    // With a VAD model whisper decodes only the stretches that hold speech: a recording with long
+    // quiet spells finishes sooner, and the pauses stop being decoded into invented words. It
+    // copies the speech into a second native buffer, so an hour of unbroken talk costs about twice
+    // the audio in memory while it runs — which is why this is the caller's choice, not the default.
+    const char *vad_chars = NULL;
+    if (vad_model != NULL) {
+        vad_chars = (*env)->GetStringUTFChars(env, vad_model, NULL);
+    }
+    if (vad_chars != NULL && strlen(vad_chars) > 0) {
+        params.vad = true;
+        params.vad_model_path = vad_chars;
     }
 
     struct fgt_segment_ctx seg_ctx;
@@ -378,7 +391,19 @@ static void fgt_full_transcribe(
     whisper_reset_timings(context);
 
     LOGI("About to run whisper_full");
-    if (whisper_full(context, params, samples, n_samples) != 0) {
+    int result = whisper_full(context, params, samples, n_samples);
+    // A VAD model that fails to load takes the whole run down with it, and an empty transcript is
+    // a poor answer to a broken detector. Decoding the quiet parts as well is slower, but it is
+    // the result the user asked for. A cancelled run fails the same way and must stay cancelled.
+    if (result != 0 && params.vad && !fgt_should_abort(abort_flag)) {
+        LOGW("Transcription with VAD failed, retrying without it");
+        params.vad = false;
+        params.vad_model_path = NULL;
+        seg_ctx.len = 0;
+        seg_ctx.reported = 0;
+        result = whisper_full(context, params, samples, n_samples);
+    }
+    if (result != 0) {
         LOGI("Failed to run the model");
     } else {
         whisper_print_timings(context);
@@ -390,6 +415,9 @@ static void fgt_full_transcribe(
     if (prompt_chars != NULL) {
         (*env)->ReleaseStringUTFChars(env, prompt, prompt_chars);
     }
+    if (vad_chars != NULL) {
+        (*env)->ReleaseStringUTFChars(env, vad_model, vad_chars);
+    }
 }
 
 JNIEXPORT void JNICALL
@@ -398,21 +426,21 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
     UNUSED(thiz);
     jfloat *audio_data_arr = (*env)->GetFloatArrayElements(env, audio_data, NULL);
     const jsize audio_data_length = (*env)->GetArrayLength(env, audio_data);
-    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, NULL, JNI_FALSE, segment_callback, NULL, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, audio_data_arr, audio_data_length, language, NULL, JNI_FALSE, NULL, segment_callback, NULL, abort_flag_ptr);
     (*env)->ReleaseFloatArrayElements(env, audio_data, audio_data_arr, JNI_ABORT);
 }
 
 // Reads the samples from a direct buffer, so long recordings never need a Java-heap array.
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribeDirect(
-        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jobject audio_buffer, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jstring vad_model, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
     UNUSED(thiz);
     const float *samples = (const float *) (*env)->GetDirectBufferAddress(env, audio_buffer);
     if (samples == NULL || n_samples <= 0) {
         LOGW("No direct buffer address, skipping transcription");
         return;
     }
-    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, prompt, suppress_non_speech, segment_callback, progress_callback, abort_flag_ptr);
+    fgt_full_transcribe(env, context_ptr, num_threads, samples, n_samples, language, prompt, suppress_non_speech, vad_model, segment_callback, progress_callback, abort_flag_ptr);
 }
 
 // The language whisper used for the last run, so a stream can pin auto-detection to its first
@@ -462,6 +490,36 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_getTextSegmentT1(
     UNUSED(thiz);
     struct whisper_context *context = (struct whisper_context *) context_ptr;
     return whisper_full_get_segment_t1(context, index);
+}
+
+// The stretches the VAD found speech in, on the original recording's timeline. The decoded
+// segments run edge to edge — a removed silence ends up inside one of them, never between two —
+// so these spans are the only place the pauses survive. Empty when the run had no VAD.
+JNIEXPORT jint JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanCount(
+        JNIEnv *env, jobject thiz, jlong context_ptr) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct whisper_context *context = (struct whisper_context *) context_ptr;
+    return whisper_full_n_vad_segments(context);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanT0(
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct whisper_context *context = (struct whisper_context *) context_ptr;
+    return whisper_full_get_vad_segment_t0(context, index);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanT1(
+        JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct whisper_context *context = (struct whisper_context *) context_ptr;
+    return whisper_full_get_vad_segment_t1(context, index);
 }
 
 JNIEXPORT jstring JNICALL

@@ -30,6 +30,11 @@
     <string name="record_failed">Impossibile avviare la registrazione — forse un\'altra app sta usando il microfono.</string>
     <string name="record_empty">Non è stato registrato nulla.</string>
 
+    <string name="vad_entry_title">Salta i silenzi</string>
+    <string name="vad_entry_sub">Trascrivi solo le parti con del parlato — le registrazioni con pause lunghe finiscono prima e il silenzio non finisce più nel testo. Nessun guadagno sul parlato continuo. Download una tantum di 1 MB.</string>
+    <string name="vad_entry_downloading">Download del rilevatore vocale… %1$d%%</string>
+    <string name="status_vad_failed">Impossibile scaricare il rilevatore vocale — controlla la connessione e riprova.</string>
+
     <string name="ime_label">Scrib Voce</string>
     <string name="ime_entry_title">Tastiera vocale</string>
     <string name="ime_entry_sub">Detta in qualsiasi app — attiva Scrib nell\'elenco delle tastiere di sistema</string>

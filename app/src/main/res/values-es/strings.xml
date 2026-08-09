@@ -30,6 +30,11 @@
     <string name="record_failed">No se pudo iniciar la grabación — puede que otra app esté usando el micrófono.</string>
     <string name="record_empty">No se grabó nada.</string>
 
+    <string name="vad_entry_title">Omitir los silencios</string>
+    <string name="vad_entry_sub">Transcribe solo las partes con voz — las grabaciones con pausas largas terminan antes y el silencio deja de colarse en el texto. Sin ganancia si se habla sin parar. Descarga única de 1 MB.</string>
+    <string name="vad_entry_downloading">Descargando el detector de voz… %1$d%%</string>
+    <string name="status_vad_failed">No se pudo descargar el detector de voz — revisa tu conexión e inténtalo de nuevo.</string>
+
     <string name="ime_label">Scrib Voz</string>
     <string name="ime_entry_title">Teclado de voz</string>
     <string name="ime_entry_sub">Dicta en cualquier app — activa Scrib en la lista de teclados del sistema</string>

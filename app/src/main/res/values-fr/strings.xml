@@ -30,6 +30,11 @@
     <string name="record_failed">Impossible de démarrer l\'enregistrement — une autre application utilise peut-être le micro.</string>
     <string name="record_empty">Rien n\'a été enregistré.</string>
 
+    <string name="vad_entry_title">Ignorer les silences</string>
+    <string name="vad_entry_sub">Ne transcrire que les passages contenant de la parole — les enregistrements avec de longues pauses se terminent plus vite et les silences ne se glissent plus dans le texte. Aucun gain sur une parole continue. Téléchargement unique de 1 Mo.</string>
+    <string name="vad_entry_downloading">Téléchargement du détecteur de parole… %1$d%%</string>
+    <string name="status_vad_failed">Impossible de télécharger le détecteur de parole — vérifiez votre connexion et réessayez.</string>
+
     <string name="ime_label">Scrib Voix</string>
     <string name="ime_entry_title">Clavier vocal</string>
     <string name="ime_entry_sub">Dictez dans n\'importe quelle appli — activez Scrib dans la liste des claviers du système</string>

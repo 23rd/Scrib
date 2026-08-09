@@ -11,7 +11,12 @@ object ModelManager {
     private const val MIN_VALID_SIZE = 1_000_000L
     private const val PREFS = "models"
     private const val KEY_ACTIVE = "activeModelFile"
+    private const val KEY_SKIP_SILENCE = "skipSilence"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
+
+    // The VAD model is a fraction of the size of even the smallest whisper one, so it cannot be
+    // held to the same floor.
+    private const val MIN_VALID_VAD_SIZE = 500_000L
 
     fun modelsDir(context: Context): File {
         val dir = File(context.getExternalFilesDir(null), "models")
@@ -33,15 +38,19 @@ object ModelManager {
         }
     }
 
-    private fun valid(file: File): Boolean = file.exists() && file.length() > MIN_VALID_SIZE
+    private fun valid(file: File, minSize: Long = MIN_VALID_SIZE): Boolean =
+        file.exists() && file.length() > minSize
 
     fun fileFor(context: Context, fileName: String): File = File(modelsDir(context), fileName)
 
     fun isInstalled(context: Context, model: WhisperModel): Boolean = valid(fileFor(context, model.fileName))
 
+    // The VAD model sits in the same directory but transcribes nothing, so it is kept out of every
+    // list: left in, it would be offered as a model to switch to and, on a fresh install, would be
+    // picked as the active one.
     fun installedFileNames(context: Context): List<String> =
         modelsDir(context).listFiles()
-            ?.filter { it.isFile && it.name.endsWith(".bin") && valid(it) }
+            ?.filter { it.isFile && it.name.endsWith(".bin") && it.name != ModelCatalog.VAD_FILE && valid(it) }
             ?.map { it.name }
             ?.sorted()
             ?: emptyList()
@@ -99,11 +108,47 @@ object ModelManager {
         return dest
     }
 
+    fun isVadInstalled(context: Context): Boolean =
+        valid(fileFor(context, ModelCatalog.VAD_FILE), MIN_VALID_VAD_SIZE)
+
+    fun skipSilence(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SKIP_SILENCE, false)
+
+    fun setSkipSilence(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_SKIP_SILENCE, enabled).apply()
+    }
+
+    // The path to hand whisper, or null when silence is to be decoded along with everything else.
+    // The model can go missing after the setting was turned on — a cleared app storage, a restore
+    // onto another phone — so the file is checked, not just the preference.
+    fun vadModelPath(context: Context): String? {
+        if (!skipSilence(context) || !isVadInstalled(context)) {
+            return null
+        }
+        return fileFor(context, ModelCatalog.VAD_FILE).absolutePath
+    }
+
+    @Synchronized
+    fun downloadVad(
+        context: Context,
+        onProgress: (downloaded: Long, total: Long) -> Unit,
+        isCancelled: () -> Boolean
+    ): File {
+        val dest = fileFor(context, ModelCatalog.VAD_FILE)
+        if (valid(dest, MIN_VALID_VAD_SIZE)) {
+            return dest
+        }
+        downloadUrl(ModelCatalog.VAD_URL, dest, onProgress, isCancelled, MIN_VALID_VAD_SIZE)
+        return dest
+    }
+
     private fun downloadUrl(
         url: String,
         dest: File,
         onProgress: (Long, Long) -> Unit,
-        isCancelled: () -> Boolean
+        isCancelled: () -> Boolean,
+        minSize: Long = MIN_VALID_SIZE
     ) {
         dest.parentFile?.mkdirs()
         val temp = File(dest.absolutePath + ".part")
@@ -138,7 +183,7 @@ object ModelManager {
         } finally {
             connection.disconnect()
         }
-        if (temp.length() <= MIN_VALID_SIZE) {
+        if (temp.length() <= minSize) {
             temp.delete()
             throw RuntimeException("Downloaded file is too small")
         }

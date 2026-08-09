@@ -16,6 +16,11 @@ object ModelCatalog {
 
     private const val BASE = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/"
 
+    // Silero VAD, which finds the speech in a recording. It transcribes nothing on its own and is
+    // never the active model — it is a small companion to whichever whisper model is chosen.
+    const val VAD_FILE = "ggml-silero-v5.1.2.bin"
+    const val VAD_URL = "https://huggingface.co/ggml-org/whisper-vad/resolve/main/$VAD_FILE"
+
     private fun standard(
         id: String,
         displayName: String,

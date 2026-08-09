@@ -30,6 +30,11 @@
     <string name="record_failed">Kayıt başlatılamadı — mikrofonu başka bir uygulama kullanıyor olabilir.</string>
     <string name="record_empty">Hiçbir şey kaydedilmedi.</string>
 
+    <string name="vad_entry_title">Sessizlikleri atla</string>
+    <string name="vad_entry_sub">Yalnızca konuşma içeren bölümler yazıya dökülür — uzun duraklamalı kayıtlar daha erken biter ve sessizlik metne sızmaz. Kesintisiz konuşmada kazanç yok. Tek seferlik 1 MB indirme.</string>
+    <string name="vad_entry_downloading">Konuşma algılayıcı indiriliyor… %1$d%%</string>
+    <string name="status_vad_failed">Konuşma algılayıcı indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
+
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
     <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin — Scrib\'i sistem klavye listesinden açın</string>

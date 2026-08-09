@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
                         onImport = vm::importModel,
                         onSelfTest = vm::selfTest,
                         onPickLanguage = vm::setupForLanguage,
+                        onSkipSilence = vm::setSkipSilence,
                         recording = recording,
                         onStartRecording = vm::startRecording,
                         onStopRecording = vm::stopRecording,

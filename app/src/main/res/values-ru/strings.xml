@@ -30,6 +30,11 @@
     <string name="record_failed">Не удалось начать запись — возможно, микрофон занят другим приложением.</string>
     <string name="record_empty">Ничего не записано.</string>
 
+    <string name="vad_entry_title">Пропускать тишину</string>
+    <string name="vad_entry_sub">Расшифровывать только те места, где есть речь — записи с долгими паузами считаются быстрее, а тишина перестаёт попадать в текст. На непрерывной речи выигрыша нет. Разовая загрузка 1 МБ.</string>
+    <string name="vad_entry_downloading">Загрузка детектора речи… %1$d%%</string>
+    <string name="status_vad_failed">Не удалось скачать детектор речи — проверьте соединение и попробуйте снова.</string>
+
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосовая клавиатура</string>
     <string name="ime_entry_sub">Диктуйте в любом приложении — включите Scrib в системном списке клавиатур</string>
