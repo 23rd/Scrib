@@ -89,7 +89,16 @@ Builds:
       - yes
     ndk: '27.2.12479018'
 
+  - versionName: '0.9'
+    versionCode: 9
+    commit: v0.9
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: '0.8'
-CurrentVersionCode: 8
+CurrentVersion: '0.9'
+CurrentVersionCode: 9

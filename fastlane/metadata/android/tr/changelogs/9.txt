@@ -1,0 +1,5 @@
+• Sessizlikleri atlama eklendi: uzun duraklamalı kayıtlar daha çabuk biter
+• Uzun metinlere paragraf araları eklendi
+• İşlemcinizin desteklediği komutlar kullanılarak hız artırıldı
+• Birçok telefonda işlemci çekirdeklerinin yalnızca birkaçının kullanılması düzeltildi
+• Tüm işlemci mimarileri için evrensel indirme eklendi

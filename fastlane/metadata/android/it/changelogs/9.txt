@@ -1,0 +1,5 @@
+• Aggiunto il salto dei silenzi: le registrazioni con lunghe pause finiscono prima
+• Aggiunti gli a capo tra i paragrafi nelle trascrizioni lunghe
+• Migliorata la velocità usando le istruzioni supportate dal tuo processore
+• Corretta la trascrizione che usava solo pochi core su molti telefoni
+• Aggiunto un download universale per tutte le architetture di processore

@@ -1,0 +1,5 @@
+• Añadido el salto de silencios: las grabaciones con pausas largas terminan antes
+• Añadidos saltos de párrafo en las transcripciones largas
+• Mejorada la velocidad usando las instrucciones que admite tu procesador
+• Corregido que la transcripción usara solo unos pocos núcleos en muchos teléfonos
+• Añadida una descarga universal para todas las arquitecturas de procesador

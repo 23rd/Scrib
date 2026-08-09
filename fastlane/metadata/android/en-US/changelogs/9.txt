@@ -1,0 +1,5 @@
+• Added silence skipping so recordings with long pauses finish sooner
+• Added paragraph breaks to long transcripts
+• Improved speed by using the processor instructions your phone supports
+• Fixed transcription running on only a few of the processor cores on many phones
+• Added a universal download that runs on all processor architectures

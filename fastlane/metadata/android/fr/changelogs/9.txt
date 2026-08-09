@@ -1,0 +1,5 @@
+• Ajout du saut des silences : les enregistrements avec de longues pauses se terminent plus vite
+• Ajout des sauts de paragraphe dans les longues transcriptions
+• Vitesse améliorée en utilisant les instructions prises en charge par votre processeur
+• Correction de la transcription qui n'utilisait que quelques cœurs sur de nombreux téléphones
+• Ajout d'un téléchargement universel pour toutes les architectures de processeur

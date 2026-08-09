@@ -1,0 +1,5 @@
+• Adicionado o salto de silêncios: gravações com pausas longas terminam mais rápido
+• Adicionadas quebras de parágrafo nas transcrições longas
+• Velocidade melhorada usando as instruções que seu processador suporta
+• Corrigida a transcrição que usava apenas alguns núcleos em muitos celulares
+• Adicionado um download universal para todas as arquiteturas de processador

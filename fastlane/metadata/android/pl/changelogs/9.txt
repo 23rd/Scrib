@@ -1,0 +1,5 @@
+• Dodano pomijanie ciszy — nagrania z długimi pauzami kończą się szybciej
+• Dodano akapity w długich transkrypcjach
+• Przyspieszono działanie dzięki instrukcjom obsługiwanym przez procesor
+• Naprawiono transkrypcję, która na wielu telefonach używała tylko kilku rdzeni
+• Dodano uniwersalny plik do pobrania dla wszystkich architektur procesorów

@@ -1,0 +1,5 @@
+• Überspringen von Stille hinzugefügt — Aufnahmen mit langen Pausen sind schneller fertig
+• Absätze in langen Transkripten hinzugefügt
+• Geschwindigkeit verbessert durch Prozessorbefehle, die dein Handy unterstützt
+• Behoben, dass die Transkription auf vielen Handys nur wenige Kerne nutzte
+• Universellen Download für alle Prozessorarchitekturen hinzugefügt

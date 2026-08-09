@@ -1,0 +1,5 @@
+• Stilte overslaan toegevoegd — opnamen met lange pauzes zijn sneller klaar
+• Alinea's toegevoegd in lange transcripties
+• Snelheid verbeterd door instructies te gebruiken die je telefoon ondersteunt
+• Opgelost dat de transcriptie op veel telefoons maar een paar kernen gebruikte
+• Universele download toegevoegd voor alle processorarchitecturen
