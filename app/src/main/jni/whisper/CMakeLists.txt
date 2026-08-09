@@ -27,6 +27,16 @@ set(
 
 find_library(LOG_LIB log)
 
+# The arm64 CPU kernels are built once per instruction-set level and loaded at run time, so a
+# phone that has the dot product instructions gets kernels that use them while an older one
+# still gets kernels it can run at all. Building them into one library is not an option: the
+# flags below decide the instructions the compiler may emit, and there is no second chance
+# once a library is loaded. The other architectures keep the single baseline build.
+if (${ANDROID_ABI} STREQUAL "arm64-v8a")
+    set(GGML_BACKEND_DL      ON CACHE BOOL "" FORCE)
+    set(GGML_CPU_ALL_VARIANTS ON CACHE BOOL "" FORCE)
+endif ()
+
 include(FetchContent)
 
 function(build_library target_name)

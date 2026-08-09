@@ -8,12 +8,38 @@
 #include <string.h>
 #include "whisper.h"
 #include "ggml.h"
+#include "ggml-backend.h"
 
 #define UNUSED(x) (void)(x)
 #define TAG "JNI"
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,     TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN,     TAG, __VA_ARGS__)
+
+// On arm64 the CPU kernels live in one library per instruction-set level rather than inside
+// whisper's own, and one of them has to be registered before a context can be created. They are
+// listed fastest first: ggml refuses to load a backend the processor cannot run, so the first
+// one that loads is the best this phone supports. Loading by name rather than by scanning the
+// library directory is deliberate -- the libraries are read straight out of the apk and never
+// unpacked to a directory of their own. Nothing to do on the other architectures, where the
+// kernels are still linked in.
+static void load_cpu_backend(void) {
+    static const char *const backends[] = {
+            "libggml-cpu-android_armv8.2_2.so", // dot product, so anything from about 2019
+            "libggml-cpu-android_armv8.0_1.so", // the plain arm64 every phone can run
+    };
+
+    if (ggml_backend_reg_count() > 0) {
+        return;
+    }
+    for (size_t i = 0; i < sizeof(backends) / sizeof(backends[0]); ++i) {
+        if (ggml_backend_load(backends[i]) != NULL) {
+            LOGI("Loaded cpu backend %s\n", backends[i]);
+            return;
+        }
+    }
+    LOGW("Found no loadable cpu backend\n");
+}
 
 static inline int min(int a, int b) {
     return (a < b) ? a : b;
@@ -136,6 +162,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_initContextFromAsset(
         JNIEnv *env, jobject thiz, jobject assetManager, jstring asset_path_str) {
     UNUSED(thiz);
     struct whisper_context *context = NULL;
+    load_cpu_backend();
     const char *asset_path_chars = (*env)->GetStringUTFChars(env, asset_path_str, NULL);
     context = whisper_init_from_asset(env, assetManager, asset_path_chars);
     (*env)->ReleaseStringUTFChars(env, asset_path_str, asset_path_chars);
@@ -147,6 +174,7 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_initContext(
         JNIEnv *env, jobject thiz, jstring model_path_str) {
     UNUSED(thiz);
     struct whisper_context *context = NULL;
+    load_cpu_backend();
     const char *model_path_chars = (*env)->GetStringUTFChars(env, model_path_str, NULL);
     struct whisper_context_params cparams = whisper_context_default_params();
     cparams.flash_attn = true;

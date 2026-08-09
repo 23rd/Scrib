@@ -65,6 +65,18 @@ android {
         includeInBundle false
     }
 
+    // ggml builds a cpu backend for every instruction set it knows; only the two jni.c asks for
+    // are worth a megabyte of apk each. The rest need instructions no phone sells with (SME), or
+    // measured slower than the plain build on real hardware -- the SVE kernels are written for
+    // server cores and run at about half the speed on a phone.
+    packaging {
+        jniLibs {
+            excludes += ['**/libggml-cpu-android_armv8.2_1.so',
+                         '**/libggml-cpu-android_armv8.6*.so',
+                         '**/libggml-cpu-android_armv9*.so']
+        }
+    }
+
     sourceSets {
         main {
             kotlin.srcDirs += 'src/main/kotlin'
