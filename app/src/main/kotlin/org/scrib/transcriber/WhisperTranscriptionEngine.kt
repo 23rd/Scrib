@@ -91,7 +91,14 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
-            val result = whisperContext().transcribeBuffer(
+            val context = whisperContext()
+            val window = context.audioWindowSamples
+            if (window > 0 && pcm.sampleCount > window) {
+                throw DecodeException(
+                    appContext.getString(R.string.transcribe_model_window, window / SAMPLE_RATE)
+                )
+            }
+            val result = context.transcribeBuffer(
                 pcm.samples, pcm.sampleCount, language, abortFlag,
                 vadModelPath = ModelManager.vadModelPath(appContext),
                 onSegment = { partial -> onPartial(partial.trim()) },
@@ -118,17 +125,31 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
 
     override fun capabilities(): TranscriberCapabilities {
         val activeFile = ModelManager.activeFileName(appContext)
-        val englishOnly = activeFile != null && ModelCatalog.isEnglishOnly(activeFile)
+        val parakeet = activeModelIsParakeet()
+        val englishOnly = !parakeet && activeFile != null && ModelCatalog.isEnglishOnly(activeFile)
         val capabilities = TranscriberCapabilities()
         capabilities.contractVersion = TranscriptionEngine.CONTRACT_VERSION
-        capabilities.engineId = ENGINE_ID
+        capabilities.engineId = if (parakeet) PARAKEET_ENGINE_ID else ENGINE_ID
         capabilities.engineVersion = appVersion()
-        capabilities.supportedLanguages = if (englishOnly) arrayOf("en") else languages()
+        capabilities.supportedLanguages = when {
+            parakeet -> ModelCatalog.PARAKEET_LANGUAGES.toTypedArray()
+            englishOnly -> arrayOf("en")
+            else -> languages()
+        }
         capabilities.autoDetectLanguage = !englishOnly
         capabilities.cancellable = true
         capabilities.modelReady = activeFile != null
         capabilities.streaming = true
         return capabilities
+    }
+
+    private fun activeModelIsParakeet(): Boolean {
+        val model = ModelManager.activeModelFile(appContext) ?: return false
+        return try {
+            WhisperContext.isParakeetModel(model.absolutePath)
+        } catch (ignore: Throwable) {
+            false
+        }
     }
 
     private fun languages(): Array<String>? = try {
@@ -163,5 +184,8 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
 
     private companion object {
         const val ENGINE_ID = "whisper.cpp"
+        const val PARAKEET_ENGINE_ID = "parakeet.cpp"
+
+        const val SAMPLE_RATE = 16000
     }
 }

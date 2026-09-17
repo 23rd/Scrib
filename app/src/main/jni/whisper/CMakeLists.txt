@@ -22,6 +22,7 @@ option(GGML_HOME "whisper: Path to external GGML source" OFF)
 set(
     SOURCE_FILES
     ${WHISPER_LIB_DIR}/src/whisper.cpp
+    ${WHISPER_LIB_DIR}/src/parakeet.cpp
     ${CMAKE_SOURCE_DIR}/jni.c
     )
 
@@ -48,6 +49,7 @@ function(build_library target_name)
 
     target_compile_definitions(${target_name} PUBLIC GGML_USE_CPU)
     target_compile_definitions(${target_name} PRIVATE WHISPER_VERSION="${WHISPER_VERSION}")
+    target_compile_definitions(${target_name} PRIVATE PARAKEET_VERSION="${WHISPER_VERSION}")
 
     if (${target_name} STREQUAL "whisper_v8fp16_va")
         target_compile_options(${target_name} PRIVATE -march=armv8.2-a+fp16)

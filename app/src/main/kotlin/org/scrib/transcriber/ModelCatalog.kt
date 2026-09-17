@@ -42,6 +42,11 @@ object ModelCatalog {
         standard("small.en-q5_1", "Small (English)", "ggml-small.en-q5_1.bin", 190_000_000, false, 3)
     )
 
+    val PARAKEET_LANGUAGES: List<String> = listOf(
+        "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hr", "hu", "it",
+        "lt", "lv", "mt", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "uk"
+    )
+
     fun byFileName(fileName: String): WhisperModel? = MODELS.firstOrNull { it.fileName == fileName }
 
     fun isEnglishOnly(fileName: String): Boolean {

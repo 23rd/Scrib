@@ -4,9 +4,11 @@
 #include <android/log.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/sysinfo.h>
 #include <string.h>
 #include "whisper.h"
+#include "parakeet.h"
 #include "ggml.h"
 #include "ggml-backend.h"
 
@@ -23,7 +25,23 @@
 // library directory is deliberate -- the libraries are read straight out of the apk and never
 // unpacked to a directory of their own. Nothing to do on the other architectures, where the
 // kernels are still linked in.
+static void fgt_log(enum ggml_log_level level, const char *text, void *user_data) {
+    UNUSED(user_data);
+    if (level == GGML_LOG_LEVEL_ERROR) {
+        __android_log_write(ANDROID_LOG_ERROR, TAG, text);
+    } else if (level == GGML_LOG_LEVEL_WARN) {
+        __android_log_write(ANDROID_LOG_WARN, TAG, text);
+    }
+}
+
 static void load_cpu_backend(void) {
+    static bool logging_set = false;
+    if (!logging_set) {
+        logging_set = true;
+        whisper_log_set(fgt_log, NULL);
+        parakeet_log_set(fgt_log, NULL);
+    }
+
     static const char *const backends[] = {
             "libggml-cpu-android_armv8.2_2.so", // dot product, so anything from about 2019
             "libggml-cpu-android_armv8.0_1.so", // the plain arm64 every phone can run
@@ -39,6 +57,38 @@ static void load_cpu_backend(void) {
         }
     }
     LOGW("Found no loadable cpu backend\n");
+}
+
+
+struct fgt_context {
+    struct whisper_context *whisper;
+    struct parakeet_context *parakeet;
+};
+
+static bool fgt_is_parakeet_model(const char *path) {
+    FILE *file = fopen(path, "rb");
+    if (file == NULL) {
+        return false;
+    }
+    int32_t header[7];
+    const size_t got = fread(header, sizeof(header[0]), 7, file);
+    fclose(file);
+    return got == 7 && (uint32_t) header[0] == GGML_FILE_MAGIC && header[6] != FGT_WHISPER_N_TEXT_CTX;
+}
+
+static struct fgt_context *fgt_wrap(struct whisper_context *whisper, struct parakeet_context *parakeet) {
+    if (whisper == NULL && parakeet == NULL) {
+        return NULL;
+    }
+    struct fgt_context *context = (struct fgt_context *) calloc(1, sizeof(struct fgt_context));
+    if (context == NULL) {
+        whisper_free(whisper);
+        parakeet_free(parakeet);
+        return NULL;
+    }
+    context->whisper = whisper;
+    context->parakeet = parakeet;
+    return context;
 }
 
 static inline int min(int a, int b) {
@@ -98,7 +148,6 @@ Java_com_whispercppdemo_whisper_WhisperLib_00024Companion_initContextFromInputSt
         JNIEnv *env, jobject thiz, jobject input_stream) {
     UNUSED(thiz);
 
-    struct whisper_context *context = NULL;
     struct whisper_model_loader loader = {};
     struct input_stream_context inp_ctx = {};
 
@@ -118,8 +167,7 @@ Java_com_whispercppdemo_whisper_WhisperLib_00024Companion_initContextFromInputSt
 
     loader.eof(loader.context);
 
-    context = whisper_init(&loader);
-    return (jlong) context;
+    return (jlong) fgt_wrap(whisper_init(&loader), NULL);
 }
 
 static size_t asset_read(void *ctx, void *output, size_t read_size) {
@@ -161,26 +209,30 @@ JNIEXPORT jlong JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_initContextFromAsset(
         JNIEnv *env, jobject thiz, jobject assetManager, jstring asset_path_str) {
     UNUSED(thiz);
-    struct whisper_context *context = NULL;
     load_cpu_backend();
     const char *asset_path_chars = (*env)->GetStringUTFChars(env, asset_path_str, NULL);
-    context = whisper_init_from_asset(env, assetManager, asset_path_chars);
+    struct whisper_context *whisper = whisper_init_from_asset(env, assetManager, asset_path_chars);
     (*env)->ReleaseStringUTFChars(env, asset_path_str, asset_path_chars);
-    return (jlong) context;
+    return (jlong) fgt_wrap(whisper, NULL);
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_initContext(
         JNIEnv *env, jobject thiz, jstring model_path_str) {
     UNUSED(thiz);
-    struct whisper_context *context = NULL;
     load_cpu_backend();
     const char *model_path_chars = (*env)->GetStringUTFChars(env, model_path_str, NULL);
-    struct whisper_context_params cparams = whisper_context_default_params();
-    cparams.flash_attn = true;
-    context = whisper_init_from_file_with_params(model_path_chars, cparams);
+    struct whisper_context *whisper = NULL;
+    struct parakeet_context *parakeet = NULL;
+    if (fgt_is_parakeet_model(model_path_chars)) {
+        parakeet = parakeet_init_from_file_with_params(model_path_chars, parakeet_context_default_params());
+    } else {
+        struct whisper_context_params cparams = whisper_context_default_params();
+        cparams.flash_attn = true;
+        whisper = whisper_init_from_file_with_params(model_path_chars, cparams);
+    }
     (*env)->ReleaseStringUTFChars(env, model_path_str, model_path_chars);
-    return (jlong) context;
+    return (jlong) fgt_wrap(whisper, parakeet);
 }
 
 JNIEXPORT void JNICALL
@@ -188,8 +240,35 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_freeContext(
         JNIEnv *env, jobject thiz, jlong context_ptr) {
     UNUSED(env);
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    whisper_free(context);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    if (context == NULL) {
+        return;
+    }
+    whisper_free(context->whisper);
+    parakeet_free(context->parakeet);
+    free(context);
+}
+
+JNIEXPORT jint JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_audioWindowSamples(
+        JNIEnv *env, jobject thiz, jlong context_ptr) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    if (context == NULL || context->parakeet == NULL) {
+        return 0;
+    }
+    return parakeet_n_audio_ctx(context->parakeet) * PARAKEET_HOP_LENGTH;
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_isParakeetModel(
+        JNIEnv *env, jobject thiz, jstring model_path_str) {
+    UNUSED(thiz);
+    const char *model_path_chars = (*env)->GetStringUTFChars(env, model_path_str, NULL);
+    const bool parakeet = fgt_is_parakeet_model(model_path_chars);
+    (*env)->ReleaseStringUTFChars(env, model_path_str, model_path_chars);
+    return parakeet ? JNI_TRUE : JNI_FALSE;
 }
 
 // The text handed to the callback is cumulative, as the API contract requires, so it is grown in
@@ -205,37 +284,29 @@ struct fgt_segment_ctx {
     int reported;
 };
 
-static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *state, int n_new, void *user_data) {
-    UNUSED(state);
-    UNUSED(n_new);
-    struct fgt_segment_ctx *cb = (struct fgt_segment_ctx *) user_data;
-    if (cb == NULL || cb->callback == NULL || cb->mid == NULL) {
-        return;
+static bool fgt_append_segment(struct fgt_segment_ctx *cb, const char *t) {
+    if (t == NULL) {
+        return true;
     }
-    int n = whisper_full_n_segments(ctx);
-    for (int i = cb->reported; i < n; i++) {
-        const char *t = whisper_full_get_segment_text(ctx, i);
-        if (t == NULL) {
-            continue;
+    size_t add = strlen(t);
+    if (cb->len + add + 1 > cb->cap) {
+        size_t cap = cb->cap ? cb->cap : 1024;
+        while (cb->len + add + 1 > cap) {
+            cap *= 2;
         }
-        size_t add = strlen(t);
-        if (cb->len + add + 1 > cb->cap) {
-            size_t cap = cb->cap ? cb->cap : 1024;
-            while (cb->len + add + 1 > cap) {
-                cap *= 2;
-            }
-            char *grown = (char *) realloc(cb->text, cap);
-            if (grown == NULL) {
-                cb->reported = i;
-                return;
-            }
-            cb->text = grown;
-            cb->cap = cap;
+        char *grown = (char *) realloc(cb->text, cap);
+        if (grown == NULL) {
+            return false;
         }
-        memcpy(cb->text + cb->len, t, add + 1);
-        cb->len += add;
+        cb->text = grown;
+        cb->cap = cap;
     }
-    cb->reported = n;
+    memcpy(cb->text + cb->len, t, add + 1);
+    cb->len += add;
+    return true;
+}
+
+static void fgt_emit_text(struct fgt_segment_ctx *cb) {
     if (cb->text == NULL) {
         return;
     }
@@ -245,6 +316,42 @@ static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *s
         (*cb->env)->ExceptionClear(cb->env);
     }
     (*cb->env)->DeleteLocalRef(cb->env, js);
+}
+
+static void fgt_new_segment(struct whisper_context *ctx, struct whisper_state *state, int n_new, void *user_data) {
+    UNUSED(state);
+    UNUSED(n_new);
+    struct fgt_segment_ctx *cb = (struct fgt_segment_ctx *) user_data;
+    if (cb == NULL || cb->callback == NULL || cb->mid == NULL) {
+        return;
+    }
+    int n = whisper_full_n_segments(ctx);
+    for (int i = cb->reported; i < n; i++) {
+        if (!fgt_append_segment(cb, whisper_full_get_segment_text(ctx, i))) {
+            cb->reported = i;
+            return;
+        }
+    }
+    cb->reported = n;
+    fgt_emit_text(cb);
+}
+
+static void fgt_parakeet_new_segment(struct parakeet_context *ctx, struct parakeet_state *state, int n_new, void *user_data) {
+    UNUSED(state);
+    UNUSED(n_new);
+    struct fgt_segment_ctx *cb = (struct fgt_segment_ctx *) user_data;
+    if (cb == NULL || cb->callback == NULL || cb->mid == NULL) {
+        return;
+    }
+    int n = parakeet_full_n_segments(ctx);
+    for (int i = cb->reported; i < n; i++) {
+        if (!fgt_append_segment(cb, parakeet_full_get_segment_text(ctx, i))) {
+            cb->reported = i;
+            return;
+        }
+    }
+    cb->reported = n;
+    fgt_emit_text(cb);
 }
 
 // Whisper reports how far through the audio it is, in whole percent. It fires on every decoded
@@ -270,6 +377,20 @@ static void fgt_progress(struct whisper_context *ctx, struct whisper_state *stat
     }
 }
 
+static void fgt_parakeet_progress(struct parakeet_context *ctx, struct parakeet_state *state, int progress, void *user_data) {
+    UNUSED(ctx);
+    UNUSED(state);
+    struct fgt_progress_ctx *cb = (struct fgt_progress_ctx *) user_data;
+    if (cb == NULL || cb->callback == NULL || cb->mid == NULL || progress == cb->reported) {
+        return;
+    }
+    cb->reported = progress;
+    (*cb->env)->CallVoidMethod(cb->env, cb->callback, cb->mid, (jint) progress);
+    if ((*cb->env)->ExceptionCheck(cb->env)) {
+        (*cb->env)->ExceptionClear(cb->env);
+    }
+}
+
 struct fgt_abort_flag {
     volatile int cancelled;
 };
@@ -280,6 +401,12 @@ static bool fgt_should_abort(void *user_data) {
 }
 
 static bool fgt_encoder_begin(struct whisper_context *ctx, struct whisper_state *state, void *user_data) {
+    UNUSED(ctx);
+    UNUSED(state);
+    return !fgt_should_abort(user_data);
+}
+
+static bool fgt_parakeet_encoder_begin(struct parakeet_context *ctx, struct parakeet_state *state, void *user_data) {
     UNUSED(ctx);
     UNUSED(state);
     return !fgt_should_abort(user_data);
@@ -327,10 +454,8 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_languageId(JNIEnv *env, jo
     return (*env)->NewStringUTF(env, code);
 }
 
-static void fgt_full_transcribe(
-        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jstring vad_model, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-
+static void fgt_whisper_transcribe(
+        JNIEnv *env, struct whisper_context *context, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jstring vad_model, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
     // The below adapted from the Objective-C iOS sample
     struct whisper_full_params params = whisper_full_default_params(WHISPER_SAMPLING_GREEDY);
     params.print_realtime = false;
@@ -448,6 +573,76 @@ static void fgt_full_transcribe(
     }
 }
 
+static void fgt_parakeet_transcribe(
+        JNIEnv *env, struct parakeet_context *context, jint num_threads, const float *samples, jint n_samples, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
+    struct parakeet_full_params params = parakeet_full_default_params(PARAKEET_SAMPLING_GREEDY);
+    params.n_threads = num_threads;
+    params.offset_ms = 0;
+    params.no_context = true;
+
+    struct fgt_segment_ctx seg_ctx;
+    seg_ctx.env = env;
+    seg_ctx.callback = segment_callback;
+    seg_ctx.mid = NULL;
+    seg_ctx.text = NULL;
+    seg_ctx.len = 0;
+    seg_ctx.cap = 0;
+    seg_ctx.reported = 0;
+    if (segment_callback != NULL) {
+        jclass cb_class = (*env)->GetObjectClass(env, segment_callback);
+        seg_ctx.mid = (*env)->GetMethodID(env, cb_class, "onSegment", "(Ljava/lang/String;)V");
+        if (seg_ctx.mid != NULL) {
+            params.new_segment_callback = fgt_parakeet_new_segment;
+            params.new_segment_callback_user_data = &seg_ctx;
+        }
+    }
+
+    struct fgt_progress_ctx prog_ctx;
+    prog_ctx.env = env;
+    prog_ctx.callback = progress_callback;
+    prog_ctx.mid = NULL;
+    prog_ctx.reported = -1;
+    if (progress_callback != NULL) {
+        jclass cb_class = (*env)->GetObjectClass(env, progress_callback);
+        prog_ctx.mid = (*env)->GetMethodID(env, cb_class, "onProgress", "(I)V");
+        if (prog_ctx.mid != NULL) {
+            params.progress_callback = fgt_parakeet_progress;
+            params.progress_callback_user_data = &prog_ctx;
+        }
+    }
+
+    struct fgt_abort_flag *abort_flag = (struct fgt_abort_flag *) abort_flag_ptr;
+    if (abort_flag != NULL) {
+        params.abort_callback = fgt_should_abort;
+        params.abort_callback_user_data = abort_flag;
+        params.encoder_begin_callback = fgt_parakeet_encoder_begin;
+        params.encoder_begin_callback_user_data = abort_flag;
+    }
+
+    parakeet_reset_timings(context);
+
+    LOGI("About to run parakeet_full");
+    if (parakeet_full(context, params, samples, n_samples) != 0) {
+        LOGI("Failed to run the model");
+    } else {
+        parakeet_print_timings(context);
+    }
+    free(seg_ctx.text);
+}
+
+static void fgt_full_transcribe(
+        JNIEnv *env, jlong context_ptr, jint num_threads, const float *samples, jint n_samples, jstring language, jstring prompt, jboolean suppress_non_speech, jstring vad_model, jobject segment_callback, jobject progress_callback, jlong abort_flag_ptr) {
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    if (context == NULL) {
+        return;
+    }
+    if (context->parakeet != NULL) {
+        fgt_parakeet_transcribe(env, context->parakeet, num_threads, samples, n_samples, segment_callback, progress_callback, abort_flag_ptr);
+    } else {
+        fgt_whisper_transcribe(env, context->whisper, num_threads, samples, n_samples, language, prompt, suppress_non_speech, vad_model, segment_callback, progress_callback, abort_flag_ptr);
+    }
+}
+
 JNIEXPORT void JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullTranscribe(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint num_threads, jfloatArray audio_data, jstring language, jobject segment_callback, jlong abort_flag_ptr) {
@@ -477,8 +672,11 @@ JNIEXPORT jstring JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_fullLangId(
         JNIEnv *env, jobject thiz, jlong context_ptr) {
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    const char *code = whisper_lang_str(whisper_full_lang_id(context));
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    if (context == NULL || context->whisper == NULL) {
+        return NULL;
+    }
+    const char *code = whisper_lang_str(whisper_full_lang_id(context->whisper));
     if (code == NULL) {
         return NULL;
     }
@@ -490,16 +688,20 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_getTextSegmentCount(
         JNIEnv *env, jobject thiz, jlong context_ptr) {
     UNUSED(env);
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_n_segments(context);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return context->parakeet != NULL
+           ? parakeet_full_n_segments(context->parakeet)
+           : whisper_full_n_segments(context->whisper);
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_getTextSegment(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    const char *text = whisper_full_get_segment_text(context, index);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    const char *text = context->parakeet != NULL
+                       ? parakeet_full_get_segment_text(context->parakeet, index)
+                       : whisper_full_get_segment_text(context->whisper, index);
     jstring string = (*env)->NewStringUTF(env, text);
     return string;
 }
@@ -508,16 +710,20 @@ JNIEXPORT jlong JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_getTextSegmentT0(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_get_segment_t0(context, index);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return context->parakeet != NULL
+           ? parakeet_full_get_segment_t0(context->parakeet, index)
+           : whisper_full_get_segment_t0(context->whisper, index);
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_getTextSegmentT1(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_get_segment_t1(context, index);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return context->parakeet != NULL
+           ? parakeet_full_get_segment_t1(context->parakeet, index)
+           : whisper_full_get_segment_t1(context->whisper, index);
 }
 
 // The stretches the VAD found speech in, on the original recording's timeline. The decoded
@@ -528,8 +734,8 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanCount(
         JNIEnv *env, jobject thiz, jlong context_ptr) {
     UNUSED(env);
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_n_vad_segments(context);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return context->whisper != NULL ? whisper_full_n_vad_segments(context->whisper) : 0;
 }
 
 JNIEXPORT jlong JNICALL
@@ -537,8 +743,8 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanT0(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
     UNUSED(env);
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_get_vad_segment_t0(context, index);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return whisper_full_get_vad_segment_t0(context->whisper, index);
 }
 
 JNIEXPORT jlong JNICALL
@@ -546,8 +752,8 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_getSpeechSpanT1(
         JNIEnv *env, jobject thiz, jlong context_ptr, jint index) {
     UNUSED(env);
     UNUSED(thiz);
-    struct whisper_context *context = (struct whisper_context *) context_ptr;
-    return whisper_full_get_vad_segment_t1(context, index);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return whisper_full_get_vad_segment_t1(context->whisper, index);
 }
 
 JNIEXPORT jstring JNICALL

@@ -127,6 +127,7 @@
     <string name="transcribe_no_speech">Aucune parole reconnue.</string>
     <string name="transcribe_cant_open">Impossible d\'ouvrir le fichier</string>
     <string name="transcribe_failed">Échec de la transcription</string>
+    <string name="transcribe_model_window">Ce modèle transcrit au maximum %1$d secondes à la fois — cet enregistrement est plus long.</string>
 
     <string name="about_back">Retour</string>
     <string name="about_tagline">Reconnaissance vocale sur l\'appareil. Votre audio ne quitte jamais le téléphone.</string>

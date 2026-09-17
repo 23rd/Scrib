@@ -127,6 +127,7 @@
     <string name="transcribe_no_speech">Nenhuma fala reconhecida.</string>
     <string name="transcribe_cant_open">Não foi possível abrir o arquivo</string>
     <string name="transcribe_failed">Falha na transcrição</string>
+    <string name="transcribe_model_window">Este modelo transcreve no máximo %1$d segundos de cada vez — esta gravação é mais longa.</string>
 
     <string name="about_back">Voltar</string>
     <string name="about_tagline">Voz para texto no dispositivo. Seu áudio nunca sai do telefone.</string>

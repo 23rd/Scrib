@@ -51,6 +51,8 @@ class WhisperAbortFlag {
 
 class WhisperContext private constructor(private var ptr: Long) {
 
+    val audioWindowSamples: Int = WhisperLib.audioWindowSamples(ptr)
+
     // Whisper C++ requires that a context is not accessed from more than one thread
     // at a time; the callers here are already serialized, and this enforces it too.
     @Synchronized
@@ -198,6 +200,8 @@ class WhisperContext private constructor(private var ptr: Long) {
 
         fun getSystemInfo(): String = WhisperLib.getSystemInfo()
 
+        fun isParakeetModel(modelPath: String): Boolean = WhisperLib.isParakeetModel(modelPath)
+
         fun supportedLanguages(): List<String> {
             val count = WhisperLib.languageCount()
             val languages = ArrayList<String>(count)
@@ -239,6 +243,8 @@ private class WhisperLib {
         external fun initContextFromAsset(assetManager: AssetManager, assetPath: String): Long
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
+        external fun audioWindowSamples(contextPtr: Long): Int
+        external fun isParakeetModel(modelPath: String): Boolean
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
         external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, vadModelPath: String, segmentCallback: WhisperSegmentCallback?, progressCallback: WhisperProgressCallback?, abortFlagPtr: Long)
         external fun fullLangId(contextPtr: Long): String?
