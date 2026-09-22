@@ -322,6 +322,28 @@ class ScribInputMethodService : InputMethodService() {
             else -> getString(R.string.ime_ready)
         }
         view?.render(
+            message = message,
+            alert = notice != null || blocker != Blocker.None,
+            listening = stage == Stage.Listening,
+            enabled = stage != Stage.Finishing,
+            modelName = ModelManager.activeDisplayName(this)
+        )
+    }
+}
+
+// Built by hand rather than inflated: the window is a status line, a level meter and three round
+// keys, and a layout file would say less about it than this does.
+    private class DictationView(context: Context) : LinearLayout(context) {
+
+    var onRecord: () -> Unit = {}
+    var onKeyboard: () -> Unit = {}
+    var onBackspace: () -> Unit = {}
+
+    private val status = TextView(context)
+    private val model = TextView(context)
+    private val meter = LevelMeter(context)
+    private val record = RoundKey(context, filled = true)
+    private val keyboard = RoundKey(context, filled = false)
     private val backspace = RoundKey(context, filled = false)
 
     private val alertColor = color(R.color.ime_alert)
@@ -336,6 +358,20 @@ class ScribInputMethodService : InputMethodService() {
 
         status.textSize = 13.5f
         status.gravity = Gravity.CENTER
+        status.setTextColor(quietColor)
+        addView(status, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
+
+        model.textSize = 11f
+        model.gravity = Gravity.CENTER
+        model.setTextColor(quietColor)
+        model.alpha = 0.75f
+        addView(model, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+            topMargin = dp(2)
+        })
+
+        meter.color = color(R.color.ime_primary)
+        addView(meter, LayoutParams(LayoutParams.MATCH_PARENT, dp(20)).apply { topMargin = dp(12) })
+
         keyboard.glyph = RoundKey.Glyph.Keyboard
         keyboard.contentDescription = context.getString(R.string.ime_keyboard)
         keyboard.setOnClickListener { onKeyboard() }
@@ -359,6 +395,17 @@ class ScribInputMethodService : InputMethodService() {
         keys.addView(backspace, LayoutParams(dp(46), dp(46)))
         addView(keys, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
             topMargin = dp(16)
+        })
+    }
+
+    fun render(message: String, alert: Boolean, listening: Boolean, enabled: Boolean, modelName: String?) {
+        status.text = message
+        status.setTextColor(if (alert) alertColor else quietColor)
+        model.text = modelName ?: ""
+        model.visibility = if (modelName.isNullOrEmpty()) View.GONE else View.VISIBLE
+        record.glyph = if (listening) RoundKey.Glyph.Stop else RoundKey.Glyph.Mic
+        record.contentDescription = context.getString(if (listening) R.string.action_stop else R.string.ime_speak)
+        record.isEnabled = enabled
         record.alpha = if (enabled) 1f else 0.45f
         meter.alpha = if (listening) 1f else 0.4f
     }

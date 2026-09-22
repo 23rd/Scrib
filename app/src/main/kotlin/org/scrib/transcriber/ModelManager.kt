@@ -56,12 +56,6 @@ object ModelManager {
             ?: emptyList()
 
     fun installedCustomFileNames(context: Context): List<String> =
-        installedFileNames(context).filter { ModelCatalog.byFileName(it) == null }
-
-    fun activeFileName(context: Context): String? {
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val stored = prefs.getString(KEY_ACTIVE, null)
-        if (stored != null && valid(fileFor(context, stored))) {
             return stored
         }
         val installed = installedFileNames(context)
@@ -73,7 +67,9 @@ object ModelManager {
         return fileFor(context, name)
     }
 
-    fun hasActiveModel(context: Context): Boolean = activeModelFile(context) != null
+    fun activeDisplayName(context: Context): String? {
+    internal fun storedActiveName(context: Context): String? =
+    internal fun clearActiveSelection(context: Context, fileName: String) {
 
     fun isAvailable(context: Context): Boolean = hasActiveModel(context)
 
@@ -83,11 +79,11 @@ object ModelManager {
     }
 
     fun delete(context: Context, fileName: String) {
-        fileFor(context, fileName).delete()
-        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        if (prefs.getString(KEY_ACTIVE, null) == fileName) {
-            prefs.edit().remove(KEY_ACTIVE).apply()
+        if (SherpaPlugins.plugin?.deleteModel(context, fileName) == true) {
+            return
         }
+        fileFor(context, fileName).delete()
+        clearActiveSelection(context, fileName)
     }
 
     @Synchronized
@@ -140,13 +136,6 @@ object ModelManager {
             return dest
         }
         downloadUrl(ModelCatalog.VAD_URL, dest, onProgress, isCancelled, MIN_VALID_VAD_SIZE)
-        return dest
-    }
-
-    private fun downloadUrl(
-        url: String,
-        dest: File,
-        onProgress: (Long, Long) -> Unit,
         isCancelled: () -> Boolean,
         minSize: Long = MIN_VALID_SIZE
     ) {
