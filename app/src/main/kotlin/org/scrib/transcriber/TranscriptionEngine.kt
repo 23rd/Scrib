@@ -38,11 +38,16 @@ interface TranscriptionEngine {
         const val CONTRACT_VERSION = 2
 
         @Volatile
-        private var instance: TranscriptionEngine? = null
+        private var whisper: TranscriptionEngine? = null
 
         fun get(context: Context): TranscriptionEngine {
-            return instance ?: synchronized(this) {
-                instance ?: WhisperTranscriptionEngine(context.applicationContext).also { instance = it }
+            val app = context.applicationContext
+            val plugin = SherpaPlugins.plugin
+            if (plugin != null && plugin.selectedId(app) != null) {
+                return plugin.engine(app)
+            }
+            return whisper ?: synchronized(this) {
+                whisper ?: WhisperTranscriptionEngine(context.applicationContext).also { whisper = it }
             }
         }
     }

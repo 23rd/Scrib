@@ -56,6 +56,15 @@ object ModelManager {
             ?: emptyList()
 
     fun installedCustomFileNames(context: Context): List<String> =
+        installedFileNames(context).filter { ModelCatalog.byFileName(it) == null }
+
+    fun activeFileName(context: Context): String? {
+        SherpaPlugins.plugin?.selectedId(context)?.let {
+            return it
+        }
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val stored = prefs.getString(KEY_ACTIVE, null)
+        if (stored != null && valid(fileFor(context, stored))) {
             return stored
         }
         val installed = installedFileNames(context)
@@ -64,12 +73,38 @@ object ModelManager {
 
     fun activeModelFile(context: Context): File? {
         val name = activeFileName(context) ?: return null
+        if (SherpaPlugins.plugin?.selectedId(context) != null) {
+            return null
+        }
         return fileFor(context, name)
     }
 
     fun activeDisplayName(context: Context): String? {
+        SherpaPlugins.plugin?.displayName(context)?.let {
+            return it
+        }
+        val name = activeFileName(context) ?: return null
+        return ModelCatalog.byFileName(name)?.displayName
+            ?: name.removePrefix("ggml-").removeSuffix(".bin")
+    }
+
     internal fun storedActiveName(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_ACTIVE, null)
+
     internal fun clearActiveSelection(context: Context, fileName: String) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        if (prefs.getString(KEY_ACTIVE, null) == fileName) {
+            prefs.edit().remove(KEY_ACTIVE).apply()
+        }
+    }
+
+    fun hasActiveModel(context: Context): Boolean {
+        val plugin = SherpaPlugins.plugin
+        if (plugin?.selectedId(context) != null) {
+            return plugin.hasActiveModel(context)
+        }
+        return activeModelFile(context) != null
+    }
 
     fun isAvailable(context: Context): Boolean = hasActiveModel(context)
 
@@ -136,6 +171,13 @@ object ModelManager {
             return dest
         }
         downloadUrl(ModelCatalog.VAD_URL, dest, onProgress, isCancelled, MIN_VALID_VAD_SIZE)
+        return dest
+    }
+
+    internal fun downloadUrl(
+        url: String,
+        dest: File,
+        onProgress: (Long, Long) -> Unit,
         isCancelled: () -> Boolean,
         minSize: Long = MIN_VALID_SIZE
     ) {

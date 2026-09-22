@@ -60,6 +60,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
+import kotlin.math.sqrt
+
+internal data class Actions(
+    val onDownload: (String) -> Unit,
+    val onCancel: (String) -> Unit,
+    val onUse: (String) -> Unit,
     val onDelete: (String) -> Unit,
     val onAddUrl: (String) -> Unit,
     val onImport: (Uri, String?) -> Unit,
@@ -75,6 +82,13 @@ fun ScribScreen(
     onDelete: (String) -> Unit,
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
+    onSelfTest: () -> Unit,
+    onPickLanguage: (LanguageOption) -> Unit,
+    onSkipSilence: (Boolean) -> Unit,
+    sherpaPlugin: SherpaPlugin?,
+    recording: RecordingUi?,
+    onStartRecording: () -> Unit,
+    onStopRecording: () -> Unit,
     onCancelRecording: () -> Unit,
     transcription: TranscribeUi?,
     onTranscribeFile: (Uri, String?) -> Unit,
@@ -128,6 +142,24 @@ fun ScribScreen(
                     lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
                 )
             }
+            item { LanguageEntry { showLanguages = true } }
+            item { StandardHeader() }
+            items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
+            state.sherpaRow?.let { row ->
+                item {
+                    sherpaPlugin?.SettingsBlocks(
+                        row = row,
+                        onDownload = actions.onDownload,
+                        onCancel = actions.onCancel,
+                        onUse = actions.onUse,
+                        onDelete = actions.onDelete,
+                        onRequestDelete = { deleteTarget = it }
+                    )
+                }
+            }
+            item {
+                Text(
+                    stringResource(R.string.custom_models), fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     letterSpacing = 0.8.sp, color = cs.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 22.dp, bottom = 10.dp)
                 )
@@ -175,6 +207,17 @@ fun ScribScreen(
         TranscriptionDialog(
             t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
             onSave = onSaveTranscript, onFormat = onTranscriptFormat
+        )
+    }
+    deleteTarget?.let { target ->
+        val context = LocalContext.current
+        AlertDialog(
+            onDismissRequest = { deleteTarget = null },
+            title = { Text(stringResource(R.string.delete_model_q)) },
+            text = { Text(sherpaPlugin?.displayNameFor(context, target) ?: target) },
+            confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text(stringResource(R.string.action_delete)) } },
+            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) } }
+        )
     }
 }
 
@@ -294,6 +337,18 @@ private fun QualityBars(tier: Int, active: Boolean) {
             Box(Modifier.width(3.dp).height(h).clip(RoundedCornerShape(1.5.dp)).background(if (i < tier) on else off))
         }
     }
+}
+
+@Composable
+internal fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    val active = row.state == RowState.Active
+    val bg = if (active) cs.primaryContainer else cs.surface
+    val onBg = if (active) cs.onPrimaryContainer else cs.onSurface
+    val onBgVar = if (active) cs.onPrimaryContainer.copy(alpha = 0.75f) else cs.onSurfaceVariant
+    val sizePart = if (row.custom) stringResource(R.string.badge_custom) else stringResource(R.string.size_mb, row.sizeMb)
+    Surface(
+        color = bg,
         shape = RoundedCornerShape(18.dp),
         border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) cs.primary else cs.outlineVariant),
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
@@ -303,6 +358,13 @@ private fun QualityBars(tier: Int, active: Boolean) {
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(row.name, fontSize = 16.5.sp, fontWeight = FontWeight.Bold, color = onBg, overflow = TextOverflow.Ellipsis)
+                        if (active) Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary)
+                        if (row.recommended && !active) Pill(stringResource(R.string.recommended).uppercase(), cs.primary, cs.onPrimary)
+                    }
+                    Text("${row.badge} · $sizePart", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = onBgVar, modifier = Modifier.padding(top = 4.dp))
+                    if (row.state == RowState.Failed) {
+                        Text(stringResource(R.string.row_download_failed), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.error, modifier = Modifier.padding(top = 5.dp))
+                    }
                 }
                 if (row.state != RowState.Downloading) {
                     Spacer(Modifier.width(12.dp))

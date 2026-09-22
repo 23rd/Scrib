@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="other_engines">OTHER ENGINES</string>
+    <string name="badge_russian_only">Russian only</string>
+    <string name="status_selftest_whisper_only">The self-test only runs on Whisper models — switch to one to check it.</string>
+</resources>

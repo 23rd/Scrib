@@ -28,6 +28,7 @@ enum class RowState { NotDownloaded, Downloading, Installed, Active, Failed }
 data class ModelRow(
     val id: String,
     val name: String,
+    val badge: String,
     val multilingual: Boolean,
     val sizeMb: Int,
     val tier: Int,
@@ -41,12 +42,13 @@ data class ScribUiState(
     val firstRun: Boolean,
     val activeName: String?,
     val standard: List<ModelRow>,
+    val sherpaRow: ModelRow?,
     val custom: List<ModelRow>,
     val statusMsg: String,
     val statusError: Boolean,
     val skipSilence: Boolean,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
-    val vadProgress: Int
+    val vadProgress: Int,
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -83,6 +85,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     @Volatile private var vadPct = -1
     private var vadJob: Job? = null
 
+    private val extProgress = ConcurrentHashMap<String, Int>()
+    private val extJobs = ConcurrentHashMap<String, Job>()
+    private val extFailed = ConcurrentHashMap.newKeySet<String>()
+
     private val ctx get() = getApplication<Application>()
     private fun str(id: Int, vararg args: Any): String = ctx.getString(id, *args)
 
@@ -102,7 +108,9 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
         val standard = ModelCatalog.MODELS.map { m ->
             ModelRow(
-                id = m.fileName, name = m.displayName, multilingual = m.multilingual,
+                id = m.fileName, name = m.displayName,
+                badge = str(if (m.multilingual) R.string.badge_multilingual else R.string.badge_english_only),
+                multilingual = m.multilingual,
                 sizeMb = (m.approxBytes / 1_000_000).toInt(), tier = m.tier,
                 recommended = m.recommended, custom = false,
                 state = stateOf(m.fileName), progress = downloads[m.fileName]?.pct ?: 0
@@ -112,27 +120,78 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         customFiles.addAll(ModelManager.installedCustomFileNames(ctx))
         downloads.forEach { (f, p) -> if (p.model?.custom == true) customFiles.add(f) }
         val custom = customFiles.map { f ->
+            val multi = !ModelCatalog.isEnglishOnly(f)
             ModelRow(
                 id = f, name = f.removePrefix("ggml-").removeSuffix(".bin"),
-                multilingual = !ModelCatalog.isEnglishOnly(f), sizeMb = 0,
+                badge = str(if (multi) R.string.badge_multilingual else R.string.badge_english_only),
+                multilingual = multi, sizeMb = 0,
                 tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
                 state = stateOf(f), progress = downloads[f]?.pct ?: 0
             )
         }
-        val activeFriendly = active?.let { f ->
-            ModelCatalog.byFileName(f)?.displayName ?: f.removePrefix("ggml-").removeSuffix(".bin")
-        }
+        val activeFriendly = ModelManager.activeDisplayName(ctx)
+        val plugin = SherpaPlugins.plugin
+        val sherpaId = plugin?.modelId
+        val sherpaRow = plugin?.modelRow(
+            ctx, active,
+            progress = sherpaId?.let { extProgress[it] } ?: 0,
+            downloading = sherpaId != null && extJobs.containsKey(sherpaId),
+            failed = sherpaId != null && extFailed.contains(sherpaId)
+        )
+        val sherpaEmpty = sherpaRow == null || sherpaRow.state == RowState.NotDownloaded
         return ScribUiState(
-            firstRun = installed.isEmpty() && downloads.isEmpty(),
-            activeName = activeFriendly, standard = standard, custom = custom,
+            firstRun = installed.isEmpty() && downloads.isEmpty() && extJobs.isEmpty() && sherpaEmpty,
+            activeName = activeFriendly, standard = standard, sherpaRow = sherpaRow, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
-            skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct
+            skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
         )
     }
 
     fun download(fileName: String) {
+        val plugin = SherpaPlugins.plugin
+        if (plugin != null && fileName == plugin.modelId) {
+            startExternalDownload(plugin, fileName)
+            return
+        }
         val model = ModelCatalog.byFileName(fileName) ?: downloads[fileName]?.model ?: return
         startDownload(model)
+    }
+
+    private fun startExternalDownload(plugin: SherpaPlugin, id: String) {
+        if (extJobs.containsKey(id)) {
+            return
+        }
+        extFailed.remove(id)
+        extProgress[id] = 0
+        push()
+        val job = viewModelScope.launch {
+            try {
+                withContext(Dispatchers.IO) {
+                    plugin.downloadModel(ctx, id,
+                        onProgress = { done, total ->
+                            val pct = if (total > 0) ((done * 100) / total).toInt() else -1
+                            if (extProgress[id] != pct) {
+                                extProgress[id] = pct
+                                push()
+                            }
+                        },
+                        isCancelled = { !isActive })
+                }
+                extProgress.remove(id)
+                extJobs.remove(id)
+                push()
+            } catch (e: ModelManager.CancelledDownloadException) {
+                extProgress.remove(id)
+                extJobs.remove(id)
+                push()
+            } catch (e: Throwable) {
+                extProgress.remove(id)
+                extJobs.remove(id)
+                extFailed.add(id)
+                push()
+            }
+        }
+        extJobs[id] = job
     }
 
     private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false, statusLabel: String? = null) {
@@ -178,6 +237,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun cancel(fileName: String) {
+        if (extJobs.containsKey(fileName)) {
+            extJobs.remove(fileName)?.cancel()
+            extProgress.remove(fileName)
+            push()
+            return
+        }
         jobs.remove(fileName)?.cancel()
         downloads.remove(fileName)
         push()
@@ -242,17 +307,6 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 statusLabel = str(R.string.status_lang_downloading, langName, model.displayName)
             )
         }
-    }
-
-    fun delete(fileName: String) {
-        ModelManager.delete(ctx, fileName)
-        failed.remove(fileName)
-        push()
-    }
-
-    fun addCustom(url: String) {
-        val model = try {
-            ModelManager.customModelFromUrl(url)
         } catch (e: Exception) {
             statusMsg = str(R.string.status_invalid_link); statusError = true; push(); return
         }
@@ -275,6 +329,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun selfTest() {
+        SherpaPlugins.plugin?.selfTestNotice(ctx)?.let {
+            statusMsg = it
+            statusError = false; push(); return
+        }
         val active = ModelManager.activeModelFile(ctx)
         if (active == null) {
             statusMsg = str(R.string.status_selftest_needs_model)

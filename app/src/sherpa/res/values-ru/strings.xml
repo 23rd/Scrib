@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="other_engines">ДРУГИЕ ДВИЖКИ</string>
+    <string name="badge_russian_only">только русский</string>
+    <string name="status_selftest_whisper_only">Самопроверка работает только на Whisper-моделях — переключитесь на одну из них.</string>
+</resources>

@@ -7,17 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
-
-class MainActivity : ComponentActivity() {
 
     private val sharedVm: ScribViewModel by viewModels()
 
@@ -30,12 +19,6 @@ class MainActivity : ComponentActivity() {
             maybeTranscribeShared(intent)
             takeMicrophoneRequest(intent)
         }
-        setContent {
-            ScribTheme {
-                val vm: ScribViewModel = viewModel()
-                val state by vm.state.collectAsState()
-                val recording by vm.recording.collectAsState()
-                val transcription by vm.transcription.collectAsState()
                 var showAbout by rememberSaveable { mutableStateOf(false) }
                 if (showAbout) {
                     BackHandler { showAbout = false }
@@ -52,6 +35,7 @@ class MainActivity : ComponentActivity() {
                         onSelfTest = vm::selfTest,
                         onPickLanguage = vm::setupForLanguage,
                         onSkipSilence = vm::setSkipSilence,
+                        sherpaPlugin = SherpaPlugins.plugin,
                         recording = recording,
                         onStartRecording = vm::startRecording,
                         onStopRecording = vm::stopRecording,
