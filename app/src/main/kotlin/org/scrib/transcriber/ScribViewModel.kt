@@ -49,6 +49,7 @@ data class ScribUiState(
     val skipSilence: Boolean,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
+    val dictionaryEnabled: Boolean
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -144,6 +145,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             activeName = activeFriendly, standard = standard, sherpaRow = sherpaRow, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
+            dictionaryEnabled = Dictionary.isEnabled(ctx)
         )
     }
 
@@ -307,6 +309,26 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 statusLabel = str(R.string.status_lang_downloading, langName, model.displayName)
             )
         }
+    }
+
+    fun delete(fileName: String) {
+        if (SherpaPlugins.plugin?.deleteModel(ctx, fileName) == true) {
+            extFailed.remove(fileName)
+            push()
+            return
+        }
+        ModelManager.delete(ctx, fileName)
+        failed.remove(fileName)
+        push()
+    }
+
+    fun refresh() {
+        push()
+    }
+
+    fun addCustom(url: String) {
+        val model = try {
+            ModelManager.customModelFromUrl(url)
         } catch (e: Exception) {
             statusMsg = str(R.string.status_invalid_link); statusError = true; push(); return
         }

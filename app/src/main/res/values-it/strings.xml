@@ -67,6 +67,7 @@
     <string name="action_delete">Elimina</string>
     <string name="action_use">Usa</string>
     <string name="action_close">Chiudi</string>
+    <string name="action_save">Salva</string>
     <string name="action_stop">Ferma</string>
     <string name="action_copy">Copia</string>
     <string name="action_share">Condividi</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Autotest in corso…</string>
     <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
     <string name="status_selftest_failed">Autotest non riuscito: %1$s</string>
+
+    <string name="dict_entry_title">Sostituzioni di parole</string>
+    <string name="dict_entry_sub">Correggi le parole riconosciute male, es. дископ → десктоп</string>
+    <string name="dict_entry_on">Attivo — applicato ai risultati</string>
+    <string name="dict_dialog_title">Sostituzioni di parole</string>
+    <string name="dict_dialog_body">Una regola per riga: «sentito=testo».</string>
+    <string name="dict_enable">Attivato</string>
+    <string name="dict_import">Importa</string>
+    <string name="dict_export">Esporta</string>
+    <string name="dict_saved">Dizionario salvato.</string>
+    <string name="dict_import_failed">Impossibile leggere il file.</string>
     <string name="transcribe_no_speech">Nessun parlato riconosciuto.</string>
     <string name="transcribe_cant_open">Impossibile aprire il file</string>
     <string name="transcribe_failed">Trascrizione non riuscita</string>

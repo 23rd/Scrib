@@ -67,6 +67,7 @@
     <string name="action_delete">Verwijderen</string>
     <string name="action_use">Gebruiken</string>
     <string name="action_close">Sluiten</string>
+    <string name="action_save">Opslaan</string>
     <string name="action_stop">Stoppen</string>
     <string name="action_copy">Kopiëren</string>
     <string name="action_share">Delen</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Zelftest wordt uitgevoerd…</string>
     <string name="status_selftest_ok">Zelftest ✓ — %1$s</string>
     <string name="status_selftest_failed">Zelftest mislukt: %1$s</string>
+
+    <string name="dict_entry_title">Woordvervangingen</string>
+    <string name="dict_entry_sub">Corrigeer woorden die verkeerd worden herkend, bijv. дископ → десктоп</string>
+    <string name="dict_entry_on">Aan — toegepast op resultaten</string>
+    <string name="dict_dialog_title">Woordvervangingen</string>
+    <string name="dict_dialog_body">Eén regel per regel: «gehoord=tekst».</string>
+    <string name="dict_enable">Ingeschakeld</string>
+    <string name="dict_import">Importeren</string>
+    <string name="dict_export">Exporteren</string>
+    <string name="dict_saved">Woordenboek opgeslagen.</string>
+    <string name="dict_import_failed">Bestand kon niet worden gelezen.</string>
     <string name="transcribe_no_speech">Geen spraak herkend.</string>
     <string name="transcribe_cant_open">Kan het bestand niet openen</string>
     <string name="transcribe_failed">Transcriptie mislukt</string>

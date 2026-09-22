@@ -67,6 +67,7 @@
     <string name="action_delete">Удалить</string>
     <string name="action_use">Выбрать</string>
     <string name="action_close">Закрыть</string>
+    <string name="action_save">Сохранить</string>
     <string name="action_stop">Стоп</string>
     <string name="action_copy">Копировать</string>
     <string name="action_share">Поделиться</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Запуск самопроверки…</string>
     <string name="status_selftest_ok">Самопроверка ✓ — %1$s</string>
     <string name="status_selftest_failed">Самопроверка не удалась: %1$s</string>
+
+    <string name="dict_entry_title">Замены слов</string>
+    <string name="dict_entry_sub">Исправляйте слова, которые распознаются неверно: дископ → десктоп</string>
+    <string name="dict_entry_on">Включено — действует на результаты распознавания</string>
+    <string name="dict_dialog_title">Замены слов</string>
+    <string name="dict_dialog_body">По одному правилу на строку: «слышит=вставить».</string>
+    <string name="dict_enable">Включено</string>
+    <string name="dict_import">Импорт</string>
+    <string name="dict_export">Экспорт</string>
+    <string name="dict_saved">Словарь сохранён.</string>
+    <string name="dict_import_failed">Не удалось прочитать файл.</string>
     <string name="transcribe_no_speech">Речь не распознана.</string>
     <string name="transcribe_cant_open">Не удалось открыть файл</string>
     <string name="transcribe_failed">Ошибка распознавания</string>

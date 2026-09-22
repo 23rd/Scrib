@@ -67,6 +67,7 @@
     <string name="action_delete">Eliminar</string>
     <string name="action_use">Usar</string>
     <string name="action_close">Cerrar</string>
+    <string name="action_save">Guardar</string>
     <string name="action_stop">Detener</string>
     <string name="action_copy">Copiar</string>
     <string name="action_share">Compartir</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Ejecutando autoprueba…</string>
     <string name="status_selftest_ok">Autoprueba ✓ — %1$s</string>
     <string name="status_selftest_failed">Autoprueba fallida: %1$s</string>
+
+    <string name="dict_entry_title">Sustituciones de palabras</string>
+    <string name="dict_entry_sub">Corrige palabras que se reconocen mal, p. ej. дископ → десктоп</string>
+    <string name="dict_entry_on">Activado — se aplica a los resultados</string>
+    <string name="dict_dialog_title">Sustituciones de palabras</string>
+    <string name="dict_dialog_body">Una regla por línea: «oído=texto».</string>
+    <string name="dict_enable">Activado</string>
+    <string name="dict_import">Importar</string>
+    <string name="dict_export">Exportar</string>
+    <string name="dict_saved">Diccionario guardado.</string>
+    <string name="dict_import_failed">No se pudo leer el archivo.</string>
     <string name="transcribe_no_speech">No se reconoció voz.</string>
     <string name="transcribe_cant_open">No se puede abrir el archivo</string>
     <string name="transcribe_failed">Error de transcripción</string>

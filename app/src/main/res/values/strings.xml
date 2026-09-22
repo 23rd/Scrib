@@ -69,6 +69,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_use">Use</string>
     <string name="action_close">Close</string>
+    <string name="action_save">Save</string>
     <string name="action_stop">Stop</string>
     <string name="action_copy">Copy</string>
     <string name="action_share">Share</string>
@@ -127,6 +128,17 @@
     <string name="status_running_selftest">Running self-test…</string>
     <string name="status_selftest_ok">Self-test ✓ — %1$s</string>
     <string name="status_selftest_failed">Self-test failed: %1$s</string>
+
+    <string name="dict_entry_title">Word replacements</string>
+    <string name="dict_entry_sub">Fix words the recognizer mishears, e.g. дископ → десктоп</string>
+    <string name="dict_entry_on">On — applied to transcription results</string>
+    <string name="dict_dialog_title">Word replacements</string>
+    <string name="dict_dialog_body">One rule per line: «heard=text».</string>
+    <string name="dict_enable">Enabled</string>
+    <string name="dict_import">Import</string>
+    <string name="dict_export">Export</string>
+    <string name="dict_saved">Dictionary saved.</string>
+    <string name="dict_import_failed">Couldn\'t read the file.</string>
     <string name="transcribe_no_speech">No speech recognized.</string>
     <string name="transcribe_cant_open">Can\'t open the file</string>
     <string name="transcribe_failed">Transcription failed</string>

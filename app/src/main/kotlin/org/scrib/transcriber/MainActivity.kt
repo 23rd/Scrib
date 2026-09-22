@@ -7,6 +7,21 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+class MainActivity : ComponentActivity() {
 
     private val sharedVm: ScribViewModel by viewModels()
 
@@ -19,6 +34,22 @@ import androidx.activity.ComponentActivity
             maybeTranscribeShared(intent)
             takeMicrophoneRequest(intent)
         }
+        setContent {
+            ScribTheme {
+                val vm: ScribViewModel = viewModel()
+                val lifecycleOwner = LocalLifecycleOwner.current
+                DisposableEffect(lifecycleOwner) {
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            vm.refresh()
+                        }
+                    }
+                    lifecycleOwner.lifecycle.addObserver(observer)
+                    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+                }
+                val state by vm.state.collectAsState()
+                val recording by vm.recording.collectAsState()
+                val transcription by vm.transcription.collectAsState()
                 var showAbout by rememberSaveable { mutableStateOf(false) }
                 if (showAbout) {
                     BackHandler { showAbout = false }

@@ -67,6 +67,7 @@
     <string name="action_delete">Видалити</string>
     <string name="action_use">Вибрати</string>
     <string name="action_close">Закрити</string>
+    <string name="action_save">Зберегти</string>
     <string name="action_stop">Стоп</string>
     <string name="action_copy">Копіювати</string>
     <string name="action_share">Поділитися</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Запуск самоперевірки…</string>
     <string name="status_selftest_ok">Самоперевірка ✓ — %1$s</string>
     <string name="status_selftest_failed">Самоперевірка не вдалася: %1$s</string>
+
+    <string name="dict_entry_title">Заміни слів</string>
+    <string name="dict_entry_sub">Виправляйте слова, які розпізнаються невірно: дископ → десктоп</string>
+    <string name="dict_entry_on">Увімкнено — діє на результати</string>
+    <string name="dict_dialog_title">Заміни слів</string>
+    <string name="dict_dialog_body">По одному правилу на рядок: «чує=вставити».</string>
+    <string name="dict_enable">Увімкнено</string>
+    <string name="dict_import">Імпорт</string>
+    <string name="dict_export">Експорт</string>
+    <string name="dict_saved">Словник збережено.</string>
+    <string name="dict_import_failed">Не вдалося прочитати файл.</string>
     <string name="transcribe_no_speech">Мовлення не розпізнано.</string>
     <string name="transcribe_cant_open">Не вдалося відкрити файл</string>
     <string name="transcribe_failed">Помилка розпізнавання</string>

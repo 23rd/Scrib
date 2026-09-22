@@ -137,6 +137,13 @@ fun ScribScreen(
             }
             if (!state.firstRun) {
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
+                item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
+                item { KeyboardEntry() }
+                item { SkipSilenceEntry(state, onSkipSilence) }
+                item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
+            }
+            item {
+                Text(
                     stringResource(R.string.models_explainer),
                     fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
                     lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
@@ -766,6 +773,33 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             }
             Spacer(Modifier.width(8.dp))
             Switch(checked = state.skipSilence, enabled = !busy, onCheckedChange = { onToggle(it) })
+        }
+    }
+}
+@Composable
+private fun DictionaryEntry(enabled: Boolean, onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text("\uD83D\uDCDD", fontSize = 18.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.dict_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(
+                    stringResource(if (enabled) R.string.dict_entry_on else R.string.dict_entry_sub),
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
+            }
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Unit) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,

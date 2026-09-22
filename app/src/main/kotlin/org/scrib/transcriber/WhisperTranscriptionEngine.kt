@@ -47,7 +47,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
         AudioStream(request, callback) { samples, sampleCount, language, prompt, abortFlag ->
             val chunk = whisperContext().transcribeChunk(samples, sampleCount, language, prompt, abortFlag)
-            TranscribedSegment(chunk.text, chunk.language)
+            TranscribedSegment(Dictionary.applyReplacements(appContext, chunk.text), chunk.language)
         }
 
     override fun transcribeToSegments(
@@ -109,7 +109,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             }
             val segments = result.segments
                 .filter { it.text.isNotBlank() }
-                .map { TranscriptSegment(it.startMs, it.endMs, it.text) }
+                .map { TranscriptSegment(it.startMs, it.endMs, Dictionary.applyReplacements(appContext, it.text)) }
             return markParagraphs(segments, result.speech.map { SpeechSpan(it.startMs, it.endMs) })
         } finally {
             abortFlag.close()

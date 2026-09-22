@@ -67,6 +67,7 @@
     <string name="action_delete">Löschen</string>
     <string name="action_use">Verwenden</string>
     <string name="action_close">Schließen</string>
+    <string name="action_save">Speichern</string>
     <string name="action_stop">Stopp</string>
     <string name="action_copy">Kopieren</string>
     <string name="action_share">Teilen</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Selbsttest läuft…</string>
     <string name="status_selftest_ok">Selbsttest ✓ — %1$s</string>
     <string name="status_selftest_failed">Selbsttest fehlgeschlagen: %1$s</string>
+
+    <string name="dict_entry_title">Wortersetzungen</string>
+    <string name="dict_entry_sub">Korrigiere Wörter, die falsch erkannt werden, z. B. дископ → десктоп</string>
+    <string name="dict_entry_on">An — gilt für Transkriptionsergebnisse</string>
+    <string name="dict_dialog_title">Wortersetzungen</string>
+    <string name="dict_dialog_body">Eine Regel pro Zeile: «Gehört=Text».</string>
+    <string name="dict_enable">Aktiviert</string>
+    <string name="dict_import">Importieren</string>
+    <string name="dict_export">Exportieren</string>
+    <string name="dict_saved">Wörterbuch gespeichert.</string>
+    <string name="dict_import_failed">Datei konnte nicht gelesen werden.</string>
     <string name="transcribe_no_speech">Keine Sprache erkannt.</string>
     <string name="transcribe_cant_open">Datei kann nicht geöffnet werden</string>
     <string name="transcribe_failed">Transkription fehlgeschlagen</string>

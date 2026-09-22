@@ -67,6 +67,7 @@
     <string name="action_delete">Sil</string>
     <string name="action_use">Kullan</string>
     <string name="action_close">Kapat</string>
+    <string name="action_save">Kaydet</string>
     <string name="action_stop">Durdur</string>
     <string name="action_copy">Kopyala</string>
     <string name="action_share">Paylaş</string>
@@ -124,6 +125,17 @@
     <string name="status_running_selftest">Otomatik test çalışıyor…</string>
     <string name="status_selftest_ok">Otomatik test ✓ — %1$s</string>
     <string name="status_selftest_failed">Otomatik test başarısız: %1$s</string>
+
+    <string name="dict_entry_title">Sözcük değiştirmeler</string>
+    <string name="dict_entry_sub">Yanlış tanınan sözcükleri düzelt, örn. дископ → десктоп</string>
+    <string name="dict_entry_on">Açık — sonuçlara uygulanır</string>
+    <string name="dict_dialog_title">Sözcük değiştirmeler</string>
+    <string name="dict_dialog_body">Satır başına bir kural: «duyulan=metin».</string>
+    <string name="dict_enable">Etkin</string>
+    <string name="dict_import">İçe aktar</string>
+    <string name="dict_export">Dışa aktar</string>
+    <string name="dict_saved">Sözlük kaydedildi.</string>
+    <string name="dict_import_failed">Dosya okunamadı.</string>
     <string name="transcribe_no_speech">Konuşma algılanmadı.</string>
     <string name="transcribe_cant_open">Dosya açılamıyor</string>
     <string name="transcribe_failed">Yazıya dökme başarısız</string>
