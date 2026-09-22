@@ -49,6 +49,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -58,13 +60,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.util.Locale
-import kotlin.math.sqrt
-
-private data class Actions(
-    val onDownload: (String) -> Unit,
-    val onCancel: (String) -> Unit,
-    val onUse: (String) -> Unit,
     val onDelete: (String) -> Unit,
     val onAddUrl: (String) -> Unit,
     val onImport: (Uri, String?) -> Unit,
@@ -80,12 +75,6 @@ fun ScribScreen(
     onDelete: (String) -> Unit,
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
-    onSelfTest: () -> Unit,
-    onPickLanguage: (LanguageOption) -> Unit,
-    onSkipSilence: (Boolean) -> Unit,
-    recording: RecordingUi?,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
     onCancelRecording: () -> Unit,
     transcription: TranscribeUi?,
     onTranscribeFile: (Uri, String?) -> Unit,
@@ -134,23 +123,11 @@ fun ScribScreen(
             }
             if (!state.firstRun) {
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
-                item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
-                item { KeyboardEntry() }
-                item { SkipSilenceEntry(state, onSkipSilence) }
-            }
-            item {
-                Text(
                     stringResource(R.string.models_explainer),
                     fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
                     lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
                 )
             }
-            item { LanguageEntry { showLanguages = true } }
-            item { StandardHeader() }
-            items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
-            item {
-                Text(
-                    stringResource(R.string.custom_models), fontSize = 13.sp, fontWeight = FontWeight.Bold,
                     letterSpacing = 0.8.sp, color = cs.onSurfaceVariant,
                     modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 22.dp, bottom = 10.dp)
                 )
@@ -198,16 +175,6 @@ fun ScribScreen(
         TranscriptionDialog(
             t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
             onSave = onSaveTranscript, onFormat = onTranscriptFormat
-        )
-    }
-    deleteTarget?.let { target ->
-        AlertDialog(
-            onDismissRequest = { deleteTarget = null },
-            title = { Text(stringResource(R.string.delete_model_q)) },
-            text = { Text(target) },
-            confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text(stringResource(R.string.action_delete)) } },
-            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) } }
-        )
     }
 }
 
@@ -273,7 +240,7 @@ private fun NudgeCard(state: ScribUiState, actions: Actions) {
             )
             Surface(
                 color = cs.primary, shape = RoundedCornerShape(22.dp),
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow { base?.let { actions.onDownload(it.id) } }
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow(RoundedCornerShape(22.dp)) { base?.let { actions.onDownload(it.id) } }
             ) {
                 Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
                     Text(
@@ -327,19 +294,6 @@ private fun QualityBars(tier: Int, active: Boolean) {
             Box(Modifier.width(3.dp).height(h).clip(RoundedCornerShape(1.5.dp)).background(if (i < tier) on else off))
         }
     }
-}
-
-@Composable
-private fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit) {
-    val cs = MaterialTheme.colorScheme
-    val active = row.state == RowState.Active
-    val bg = if (active) cs.primaryContainer else cs.surface
-    val onBg = if (active) cs.onPrimaryContainer else cs.onSurface
-    val onBgVar = if (active) cs.onPrimaryContainer.copy(alpha = 0.75f) else cs.onSurfaceVariant
-    val badge = stringResource(if (row.multilingual) R.string.badge_multilingual else R.string.badge_english_only)
-    val sizePart = if (row.custom) stringResource(R.string.badge_custom) else stringResource(R.string.size_mb, row.sizeMb)
-    Surface(
-        color = bg,
         shape = RoundedCornerShape(18.dp),
         border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) cs.primary else cs.outlineVariant),
         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
@@ -349,13 +303,6 @@ private fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (Stri
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(row.name, fontSize = 16.5.sp, fontWeight = FontWeight.Bold, color = onBg, overflow = TextOverflow.Ellipsis)
-                        if (active) Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary)
-                        if (row.recommended && !active) Pill(stringResource(R.string.recommended).uppercase(), cs.primary, cs.onPrimary)
-                    }
-                    Text("$badge · $sizePart", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = onBgVar, modifier = Modifier.padding(top = 4.dp))
-                    if (row.state == RowState.Failed) {
-                        Text(stringResource(R.string.row_download_failed), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.error, modifier = Modifier.padding(top = 5.dp))
-                    }
                 }
                 if (row.state != RowState.Downloading) {
                     Spacer(Modifier.width(12.dp))
@@ -409,7 +356,7 @@ private fun Pill(text: String, bg: Color, fg: Color) {
 
 @Composable
 private fun Chip(text: String, bg: Color, fg: Color, onClick: () -> Unit) {
-    Surface(color = bg, shape = RoundedCornerShape(20.dp), modifier = Modifier.clickableRow(onClick)) {
+    Surface(color = bg, shape = RoundedCornerShape(20.dp), modifier = Modifier.clickableRow(RoundedCornerShape(20.dp), onClick)) {
         Text(text, fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = fg, modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp))
     }
 }
@@ -419,7 +366,7 @@ private fun AddButton(glyph: String, label: String, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surface, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cs.outline),
-        modifier = Modifier.fillMaxWidth().clickableRow(onClick)
+        modifier = Modifier.fillMaxWidth().clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 18.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(glyph, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = cs.primary)
@@ -449,7 +396,7 @@ private fun RecordButton(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.primary, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
@@ -518,7 +465,7 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.primaryContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
@@ -675,7 +622,7 @@ private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat
             Surface(
                 color = if (on) cs.primary else cs.surfaceContainer,
                 shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.clickableRow { onSelect(format) }
+                modifier = Modifier.clickableRow(RoundedCornerShape(20.dp)) { onSelect(format) }
             ) {
                 Text(
                     format.name, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.5.sp,
@@ -692,7 +639,7 @@ private fun LanguageEntry(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("🌐", fontSize = 18.sp)
@@ -714,7 +661,7 @@ private fun KeyboardEntry() {
     val context = LocalContext.current
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow {
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp)) {
             runCatching {
                 context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
             }
@@ -742,7 +689,7 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-            .clickableRow { if (!busy) onToggle(!state.skipSilence) }
+            .clickableRow(RoundedCornerShape(16.dp)) { if (!busy) onToggle(!state.skipSilence) }
     ) {
         Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("🤫", fontSize = 18.sp)
@@ -757,12 +704,6 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             }
             Spacer(Modifier.width(8.dp))
             Switch(checked = state.skipSilence, enabled = !busy, onCheckedChange = { onToggle(it) })
-        }
-    }
-}
-
-@Composable
-private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Unit) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -777,7 +718,7 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Un
                 Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
                     LanguageCatalog.LANGUAGES.forEach { lang ->
                         Column(
-                            Modifier.fillMaxWidth().clickableRow { onPick(lang) }.padding(vertical = 10.dp)
+                            Modifier.fillMaxWidth().clickableRow(RectangleShape) { onPick(lang) }.padding(vertical = 10.dp)
                         ) {
                             Text(stringResource(lang.nameRes), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
                             Text(stringResource(lang.noteRes), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
@@ -808,8 +749,19 @@ private fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
     )
 }
 
-private fun Modifier.clickableRow(onClick: () -> Unit): Modifier =
-    this.clickable(onClick = onClick)
+private fun Modifier.clickableRow(shape: Shape, onClick: () -> Unit): Modifier =
+    this.clip(shape).clickable(onClick = onClick)
+
+private fun openDictionary(context: android.content.Context) {
+    runCatching {
+        context.startActivity(
+            Intent().setClassName(
+                context.packageName,
+                "org.scrib.transcriber.DictionaryActivity"
+            )
+        )
+    }
+}
 
 internal fun queryDisplayName(context: android.content.Context, uri: Uri): String? = runCatching {
     context.contentResolver.query(uri, null, null, null, null)?.use { c ->
