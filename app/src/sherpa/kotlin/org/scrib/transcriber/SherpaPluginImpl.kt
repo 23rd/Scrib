@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -315,8 +316,20 @@ private fun AddSherpaModelDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(Modifier.height(8.dp))
-                TextButton(onClick = { pickFolder.launch(null) }) {
-                    Text(stringResource(R.string.sherpa_folder_button))
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer, shape = RoundedCornerShape(20.dp),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+                    modifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp))
+                        .clickable(onClick = { pickFolder.launch(null) })
+                ) {
+                    Text(
+                        stringResource(R.string.sherpa_folder_button),
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                    )
                 }
                 slotLabels.forEach { (role, label) ->
                     val fileName = parts[role]?.let { queryDisplayName(context, it) }
