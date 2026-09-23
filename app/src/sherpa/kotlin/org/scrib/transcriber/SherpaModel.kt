@@ -2,12 +2,19 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.net.Uri
+import com.k2fsa.sherpa.onnx.FeatureConfig
+import com.k2fsa.sherpa.onnx.OfflineModelConfig
+import com.k2fsa.sherpa.onnx.OfflineRecognizer
+import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
+import com.k2fsa.sherpa.onnx.OfflineSenseVoiceModelConfig
+import com.k2fsa.sherpa.onnx.OfflineTransducerModelConfig
+import com.k2fsa.sherpa.onnx.OnlineModelConfig
+import com.k2fsa.sherpa.onnx.OnlineRecognizer
+import com.k2fsa.sherpa.onnx.OnlineRecognizerConfig
+import com.k2fsa.sherpa.onnx.OnlineTransducerModelConfig
 import java.io.File
 import org.json.JSONObject
 
-// A user-added sherpa transducer model: four files plus a sidecar describing them. Nothing is
-// hardcoded — the user brings encoder, decoder, joiner and tokens, e.g. downloaded from
-// Hugging Face, and points the app at them through the file picker.
 data class SherpaModelInfo(
     val id: String,
     val displayName: String,
@@ -24,15 +31,19 @@ object SherpaModel {
     const val ROLE_ENCODER = "encoder"
     const val ROLE_DECODER = "decoder"
     const val ROLE_JOINER = "joiner"
+    const val ROLE_MODEL = "model"
     const val ROLE_TOKENS = "tokens"
 
     const val TYPE_DEFAULT = ""
     const val TYPE_NEMO = "nemo_transducer"
+    const val TYPE_STREAMING_TRANSDUCER = "streaming_transducer"
+    const val TYPE_SENSE_VOICE = "sense_voice"
 
     private const val SIDECAR = "model.json"
 
-    private const val MIN_ONNX_BYTES = 1_000_000L
     private const val MIN_TOKENS_BYTES = 100L
+
+    private val SENSE_VOICE_LANGUAGES = setOf("auto", "zh", "en", "ja", "ko", "yue")
 
     // Legacy curated installs (shipped by older builds, since removed from source): exact
     // ids and file names, so they can be moved under the new root and converted into a regular
@@ -64,15 +75,134 @@ object SherpaModel {
     fun byId(context: Context, id: String): SherpaModelInfo? =
         list(context).firstOrNull { it.id == id }
 
-    fun isComplete(dir: File, files: Map<String, String>): Boolean {
-        val enc = File(dir, files[ROLE_ENCODER] ?: return false)
-        val dec = File(dir, files[ROLE_DECODER] ?: return false)
-        val join = File(dir, files[ROLE_JOINER] ?: return false)
-        val tok = File(dir, files[ROLE_TOKENS] ?: return false)
-        return enc.length() > MIN_ONNX_BYTES &&
-            dec.length() > MIN_ONNX_BYTES &&
-            join.length() > MIN_ONNX_BYTES &&
-            tok.length() > MIN_TOKENS_BYTES
+    fun requiredRoles(modelType: String): List<String> =
+        if (modelType == TYPE_SENSE_VOICE) {
+            listOf(ROLE_MODEL, ROLE_TOKENS)
+        } else {
+            listOf(ROLE_ENCODER, ROLE_DECODER, ROLE_JOINER, ROLE_TOKENS)
+        }
+
+    fun isStreaming(modelType: String): Boolean =
+        modelType == TYPE_STREAMING_TRANSDUCER
+
+    fun isComplete(dir: File, files: Map<String, String>, modelType: String = TYPE_DEFAULT): Boolean {
+        return requiredRoles(modelType).all { role ->
+            val file = files[role]?.let { File(dir, it) } ?: return@all false
+            file.isFile && if (role == ROLE_TOKENS) {
+                file.length() > MIN_TOKENS_BYTES
+            } else {
+                file.length() > 0L
+            }
+        }
+    }
+
+    fun isComplete(dir: File, info: SherpaModelInfo): Boolean =
+        isComplete(dir, info.files, info.modelType)
+
+    fun buildConfig(
+        dir: File,
+        info: SherpaModelInfo,
+        provider: String = "cpu",
+        languageHint: String? = null
+    ): OfflineRecognizerConfig {
+        val tokens = File(dir, info.files.getValue(ROLE_TOKENS)).absolutePath
+        val modelConfig = if (info.modelType == TYPE_SENSE_VOICE) {
+            OfflineModelConfig(
+                senseVoice = OfflineSenseVoiceModelConfig(
+                    model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath,
+                    language = senseVoiceLanguage(info, languageHint),
+                    useInverseTextNormalization = true
+                ),
+                tokens = tokens,
+                numThreads = 4,
+                provider = provider
+            )
+        } else {
+            OfflineModelConfig(
+                transducer = OfflineTransducerModelConfig(
+                    encoder = File(dir, info.files.getValue(ROLE_ENCODER)).absolutePath,
+                    decoder = File(dir, info.files.getValue(ROLE_DECODER)).absolutePath,
+                    joiner = File(dir, info.files.getValue(ROLE_JOINER)).absolutePath
+                ),
+                tokens = tokens,
+                numThreads = 4,
+                provider = provider,
+                modelType = info.modelType
+            )
+        }
+        return OfflineRecognizerConfig(
+            featConfig = FeatureConfig(sampleRate = 16_000, featureDim = 80),
+            modelConfig = modelConfig
+        )
+    }
+
+    fun buildOnlineConfig(
+        dir: File,
+        info: SherpaModelInfo,
+        provider: String = "cpu"
+    ): OnlineRecognizerConfig {
+        val modelConfig = OnlineModelConfig(
+            transducer = OnlineTransducerModelConfig(
+                encoder = File(dir, info.files.getValue(ROLE_ENCODER)).absolutePath,
+                decoder = File(dir, info.files.getValue(ROLE_DECODER)).absolutePath,
+                joiner = File(dir, info.files.getValue(ROLE_JOINER)).absolutePath
+            ),
+            tokens = File(dir, info.files.getValue(ROLE_TOKENS)).absolutePath,
+            numThreads = 4,
+            provider = provider,
+            modelType = "zipformer2"
+        )
+        return OnlineRecognizerConfig(
+            featConfig = FeatureConfig(sampleRate = 16_000, featureDim = 80),
+            modelConfig = modelConfig,
+            enableEndpoint = false
+        )
+    }
+
+    fun senseVoiceLanguage(info: SherpaModelInfo, languageHint: String? = null): String {
+        val hint = languageHint?.trim()?.lowercase()
+        if (hint != null && hint in SENSE_VOICE_LANGUAGES) {
+            return hint
+        }
+        return info.languages?.singleOrNull()?.lowercase()?.takeIf { it in SENSE_VOICE_LANGUAGES }
+            ?: "auto"
+    }
+
+    fun validateLoadable(dir: File, info: SherpaModelInfo) {
+        if (isStreaming(info.modelType)) {
+            val recognizer = try {
+                OnlineRecognizer(null, buildOnlineConfig(dir, info))
+            } catch (e: Throwable) {
+                throw RuntimeException("Sherpa could not load this model: ${e.message ?: "invalid files"}", e)
+            }
+            val stream = recognizer.createStream()
+            try {
+                stream.acceptWaveform(FloatArray(16_000), 16_000)
+                stream.inputFinished()
+                while (recognizer.isReady(stream)) {
+                    recognizer.decode(stream)
+                }
+                recognizer.getResult(stream)
+            } finally {
+                stream.release()
+                recognizer.release()
+            }
+        } else {
+            val recognizer = try {
+                OfflineRecognizer(null, buildConfig(dir, info))
+            } catch (e: Throwable) {
+                throw RuntimeException("Sherpa could not load this model: ${e.message ?: "invalid files"}", e)
+            }
+            val stream = recognizer.createStream()
+            try {
+                stream.acceptWaveform(FloatArray(16_000), 16_000)
+                recognizer.decode(stream)
+                recognizer.getResult(stream)
+            } finally {
+                stream.release()
+                recognizer.release()
+            }
+        }
     }
 
     fun importModel(
@@ -85,19 +215,16 @@ object SherpaModel {
         val app = context.applicationContext
         val name = displayName.trim()
         require(name.isNotEmpty()) { "Enter a name" }
-        val encoder = parts[ROLE_ENCODER] ?: throw RuntimeException("Choose all four files")
-        val decoder = parts[ROLE_DECODER] ?: throw RuntimeException("Choose all four files")
-        val joiner = parts[ROLE_JOINER] ?: throw RuntimeException("Choose all four files")
-        val tokens = parts[ROLE_TOKENS] ?: throw RuntimeException("Choose all four files")
+        val roles = requiredRoles(modelType)
+        val missing = roles.filterNot { parts.containsKey(it) }
+        require(missing.isEmpty()) { "Choose all model files" }
         val id = uniqueSlug(app, name)
         val dir = dirFor(app, id).also { it.mkdirs() }
         try {
-            val names = mapOf(
-                ROLE_ENCODER to copyPart(app, encoder, dir, ".onnx"),
-                ROLE_DECODER to copyPart(app, decoder, dir, ".onnx"),
-                ROLE_JOINER to copyPart(app, joiner, dir, ".onnx"),
-                ROLE_TOKENS to copyPart(app, tokens, dir, ".txt")
-            )
+            val names = roles.associateWith { role ->
+                val extension = if (role == ROLE_TOKENS) ".txt" else ".onnx"
+                copyPart(app, parts.getValue(role), dir, extension)
+            }
             val info = SherpaModelInfo(
                 id = id,
                 displayName = name,
@@ -106,11 +233,11 @@ object SherpaModel {
                 files = names,
                 totalBytes = names.values.sumOf { File(dir, it).length() }
             )
-            writeSidecar(dir, info)
-            if (!isComplete(dir, names)) {
-                dir.deleteRecursively()
-                throw RuntimeException("Files look too small to be a model")
+            if (!isComplete(dir, info)) {
+                throw RuntimeException("Model files are incomplete")
             }
+            validateLoadable(dir, info)
+            writeSidecar(dir, info)
             return info
         } catch (e: Throwable) {
             dir.deleteRecursively()
@@ -176,12 +303,8 @@ object SherpaModel {
     private fun readSidecar(dir: File): SherpaModelInfo? = runCatching {
         val json = JSONObject(File(dir, SIDECAR).readText())
         val files = json.getJSONObject("files")
-        val names = mapOf(
-            ROLE_ENCODER to files.getString(ROLE_ENCODER),
-            ROLE_DECODER to files.getString(ROLE_DECODER),
-            ROLE_JOINER to files.getString(ROLE_JOINER),
-            ROLE_TOKENS to files.getString(ROLE_TOKENS)
-        )
+        val modelType = json.optString("modelType", TYPE_DEFAULT)
+        val names = requiredRoles(modelType).associateWith { files.getString(it) }
         val langs = json.optString("languages", "")
             .split(',', ' ')
             .map { it.trim().lowercase() }
@@ -191,7 +314,7 @@ object SherpaModel {
         SherpaModelInfo(
             id = dir.name,
             displayName = json.optString("displayName", dir.name),
-            modelType = json.optString("modelType", TYPE_DEFAULT),
+            modelType = modelType,
             languages = langs,
             files = names,
             totalBytes = names.values.sumOf { File(dir, it).length() }
