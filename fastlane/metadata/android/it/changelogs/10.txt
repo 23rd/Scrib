@@ -1,0 +1,7 @@
+• Aggiunti importazione ed esportazione del dizionario
+• Aggiunta l'importazione di modelli sherpa dalla selezione file
+• Aggiunte sezioni dei modelli comprimibili
+• Aggiunta la visualizzazione del modello attivo nella tastiera vocale
+• Aggiunto il supporto ai modelli Parakeet
+• Aggiunto il mantenimento della trascrizione finita alla chiusura del processo
+• Corretta l'interruzione che tagliava le parole finali

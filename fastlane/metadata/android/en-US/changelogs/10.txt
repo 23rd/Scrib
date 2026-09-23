@@ -1,0 +1,7 @@
+• Added import and export of word dictionary
+• Added importing of sherpa models through file picker
+• Added collapsible model sections
+• Added showing of active model in voice keyboard
+• Added Parakeet model support
+• Added keeping of finished transcript after process death
+• Fixed stop tap cutting trailing words

@@ -1,0 +1,7 @@
+• Sözlüğü içe ve dışa aktarma eklendi
+• Dosya seçici üzerinden sherpa modellerini içe aktarma eklendi
+• Katlanabilir model bölümleri eklendi
+• Sesli klavyede etkin modelin gösterilmesi eklendi
+• Parakeet model desteği eklendi
+• İşlem sonlandıktan sonra bitmiş metnin korunması eklendi
+• Durdurmanın son sözcükleri kesmesi düzeltildi

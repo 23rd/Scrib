@@ -1,0 +1,7 @@
+• Ajout de l'import et de l'export du dictionnaire
+• Ajout de l'import de modèles sherpa depuis le sélecteur de fichiers
+• Ajout des sections de modèles repliables
+• Ajout de l'affichage du modèle actif dans le clavier vocal
+• Ajout de la prise en charge des modèles Parakeet
+• Ajout de la conservation de la transcription terminée à la fin du processus
+• Correction de l'arrêt qui coupait les derniers mots

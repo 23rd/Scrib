@@ -1,0 +1,7 @@
+• Dodano import i eksport słownika
+• Dodano importowanie modeli sherpa przez wybór plików
+• Dodano zwijane sekcje modeli
+• Dodano wyświetlanie aktywnego modelu w klawiaturze głosowej
+• Dodano obsługę modeli Parakeet
+• Dodano zachowywanie gotowej transkrypcji po zamknięciu procesu
+• Naprawiono ucinanie końcowych słów przez zatrzymanie

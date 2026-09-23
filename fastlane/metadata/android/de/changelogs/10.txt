@@ -1,0 +1,7 @@
+• Import und Export des Wörterbuchs hinzugefügt
+• Importieren von Sherpa-Modellen über die Dateiauswahl hinzugefügt
+• Einklappbare Modellbereiche hinzugefügt
+• Anzeige des aktiven Modells in der Sprachtastatur hinzugefügt
+• Unterstützung für Parakeet-Modelle hinzugefügt
+• Beibehalten fertiger Transkripte nach Prozessende hinzugefügt
+• Behoben, dass Stopp die Schlusswörter abschnitt
