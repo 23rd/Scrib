@@ -157,7 +157,7 @@ fun ScribScreen(
                 Text(
                     stringResource(R.string.models_explainer),
                     fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                    lineHeight = 20.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
+                    lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
                 )
             }
             item { LanguageEntry { showLanguages = true } }
@@ -783,7 +783,7 @@ private fun LanguageEntry(onClick: () -> Unit) {
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.lang_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
             }
             Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
