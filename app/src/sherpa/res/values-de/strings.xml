@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="other_engines">SHERPA-MODELLE</string>
+    <string name="status_selftest_whisper_only">Der Selbsttest läuft nur mit Whisper-Modellen – wechsle zu einem Modell, um ihn zu prüfen.</string>
+    <string name="sherpa_empty_hint">Füge ein Transducer- oder SenseVoice-Modell hinzu.</string>
+    <string name="add_sherpa">Sherpa-Modell hinzufügen…</string>
+    <string name="sherpa_add_title">Neues Sherpa-Modell</string>
+    <string name="sherpa_name_label">Name</string>
+    <string name="sherpa_type_label">Modelltyp</string>
+    <string name="sherpa_type_default">Standard-Transducer (Zipformer, Conformer…)</string>
+    <string name="sherpa_type_nemo">NeMo-Transducer (GigaAM, Parakeet…)</string>
+    <string name="sherpa_type_streaming">Streaming-Transducer (Zipformer2…)</string>
+    <string name="sherpa_type_sense_voice">SenseVoice (Modell + Tokens)</string>
+    <string name="sherpa_langs_label">Sprachen, optional</string>
+    <string name="sherpa_langs_hint">ru, en</string>
+    <string name="sherpa_slot_model">Modell — *.onnx</string>
+    <string name="sherpa_slot_encoder">Encoder — *.onnx</string>
+    <string name="sherpa_slot_decoder">Decoder — *.onnx</string>
+    <string name="sherpa_slot_joiner">Joiner — *.onnx</string>
+    <string name="sherpa_slot_tokens">Tokens — *.txt</string>
+    <string name="sherpa_choose">Auswählen</string>
+    <string name="sherpa_folder_button">In Ordner suchen…</string>
+    <string name="sherpa_need_name">Namen eingeben</string>
+    <string name="sherpa_need_files">Alle Dateien für diesen Modelltyp auswählen</string>
+    <string name="sherpa_add_confirm">Hinzufügen</string>
+</resources>

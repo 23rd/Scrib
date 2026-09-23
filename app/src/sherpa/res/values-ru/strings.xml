@@ -2,15 +2,18 @@
 <resources>
     <string name="other_engines">SHERPA-МОДЕЛИ</string>
     <string name="status_selftest_whisper_only">Самопроверка работает только на Whisper-моделях — переключитесь на одну из них.</string>
-    <string name="sherpa_empty_hint">Добавьте transducer-модель: файлы encoder, decoder, joiner и tokens.</string>
+    <string name="sherpa_empty_hint">Добавьте transducer- или SenseVoice-модель.</string>
     <string name="add_sherpa">Добавить sherpa-модель…</string>
     <string name="sherpa_add_title">Новая sherpa-модель</string>
     <string name="sherpa_name_label">Название</string>
     <string name="sherpa_type_label">Тип модели</string>
     <string name="sherpa_type_default">Обычный transducer (Zipformer, Conformer…)</string>
     <string name="sherpa_type_nemo">NeMo transducer (GigaAM, Parakeet…)</string>
+    <string name="sherpa_type_streaming">Streaming transducer (Zipformer2…)</string>
+    <string name="sherpa_type_sense_voice">SenseVoice (модель + tokens)</string>
     <string name="sherpa_langs_label">Языки, необязательно</string>
     <string name="sherpa_langs_hint">ru, en</string>
+    <string name="sherpa_slot_model">Модель — *.onnx</string>
     <string name="sherpa_slot_encoder">Encoder — *.onnx</string>
     <string name="sherpa_slot_decoder">Decoder — *.onnx</string>
     <string name="sherpa_slot_joiner">Joiner — *.onnx</string>
@@ -18,6 +21,6 @@
     <string name="sherpa_choose">Выбрать</string>
     <string name="sherpa_folder_button">Найти в папке…</string>
     <string name="sherpa_need_name">Введите название</string>
-    <string name="sherpa_need_files">Выберите все четыре файла</string>
+    <string name="sherpa_need_files">Выберите все файлы для этого типа модели</string>
     <string name="sherpa_add_confirm">Добавить</string>
 </resources>

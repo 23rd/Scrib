@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="other_engines">SHERPA MODELLERİ</string>
+    <string name="status_selftest_whisper_only">Seri testi yalnızca Whisper modellerinde çalışır — kontrol etmek için bir modele geçin.</string>
+    <string name="sherpa_empty_hint">Transdüser veya SenseVoice modeli ekleyin.</string>
+    <string name="add_sherpa">Sherpa modeli ekle…</string>
+    <string name="sherpa_add_title">Yeni sherpa modeli</string>
+    <string name="sherpa_name_label">Ad</string>
+    <string name="sherpa_type_label">Model türü</string>
+    <string name="sherpa_type_default">Standart transdüser (Zipformer, Conformer…)</string>
+    <string name="sherpa_type_nemo">NeMo transdüseri (GigaAM, Parakeet…)</string>
+    <string name="sherpa_type_streaming">Streaming transdüseri (Zipformer2…)</string>
+    <string name="sherpa_type_sense_voice">SenseVoice (model + tokens)</string>
+    <string name="sherpa_langs_label">Diller, isteğe bağlı</string>
+    <string name="sherpa_langs_hint">ru, en</string>
+    <string name="sherpa_slot_model">Model — *.onnx</string>
+    <string name="sherpa_slot_encoder">Encoder — *.onnx</string>
+    <string name="sherpa_slot_decoder">Decoder — *.onnx</string>
+    <string name="sherpa_slot_joiner">Joiner — *.onnx</string>
+    <string name="sherpa_slot_tokens">Tokens — *.txt</string>
+    <string name="sherpa_choose">Seç</string>
+    <string name="sherpa_folder_button">Klasörde ara…</string>
+    <string name="sherpa_need_name">Bir ad girin</string>
+    <string name="sherpa_need_files">Bu model türü için tüm dosyaları seçin</string>
+    <string name="sherpa_add_confirm">Ekle</string>
+</resources>
