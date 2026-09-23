@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -128,11 +129,14 @@ class SherpaPluginImpl : SherpaPlugin {
     ) {
         val cs = MaterialTheme.colorScheme
         var showAdd by remember { mutableStateOf(false) }
-        Text(
-            stringResource(R.string.other_engines), fontSize = 13.sp, fontWeight = FontWeight.Bold,
-            letterSpacing = 0.8.sp, color = cs.onSurfaceVariant,
-            modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 22.dp, bottom = 10.dp)
+        var expanded by rememberSaveable { mutableStateOf(true) }
+        SectionHeader(
+            title = stringResource(R.string.other_engines),
+            expanded = expanded,
+            onToggle = { expanded = !expanded },
+            top = 22.dp,
         )
+        if (!expanded) return
         if (rows.isEmpty() && !busy) {
             Text(
                 stringResource(R.string.sherpa_empty_hint),

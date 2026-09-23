@@ -65,6 +65,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
@@ -112,6 +113,7 @@ fun ScribScreen(
     var showLanguages by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var modelsExpanded by rememberSaveable { mutableStateOf(true) }
+    var customExpanded by rememberSaveable { mutableStateOf(true) }
 
     val context = LocalContext.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -175,23 +177,19 @@ fun ScribScreen(
                     )
                 }
             }
-            item {
-                Text(
-                    stringResource(R.string.custom_models), fontSize = 13.sp, fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.8.sp, color = cs.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 22.dp, bottom = 10.dp)
-                )
-            }
-            if (state.custom.isEmpty()) {
-                item {
-                    Text(
-                        stringResource(R.string.custom_empty),
-                        fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                        lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
-                    )
+            item { CustomHeader(expanded = customExpanded, onToggle = { customExpanded = !customExpanded }) }
+            if (customExpanded) {
+                if (state.custom.isEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.custom_empty),
+                            fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                            lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
+                } else {
+                    items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions) { deleteTarget = it } }
                 }
-            } else {
-                items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions) { deleteTarget = it } }
             }
             item {
                 Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -330,29 +328,58 @@ private fun PrivacyLine(textColor: Color, topBorder: Boolean) {
 }
 
 @Composable
-private fun StandardHeader(expanded: Boolean, onToggle: () -> Unit) {
+internal fun SectionHeader(
+    title: String,
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    top: Dp = 0.dp,
+    trailing: @Composable () -> Unit = {},
+) {
     val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 10.dp)
+        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, top = top, bottom = 10.dp)
             .clip(RoundedCornerShape(8.dp)).clickable(onClick = onToggle)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Chevron(expanded = expanded, color = cs.onSurfaceVariant)
-            Text(stringResource(R.string.standard_models), fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+            Text(title, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
         }
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-                listOf(5, 8, 11, 14).forEach { Box(Modifier.width(3.dp).height(it.dp).clip(RoundedCornerShape(1.dp)).background(cs.outline)) }
-            }
-            Text(stringResource(R.string.size), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))
+            trailing()
         }
     }
 }
 
 @Composable
-private fun Chevron(expanded: Boolean, color: Color) {
+private fun StandardHeader(expanded: Boolean, onToggle: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    SectionHeader(
+        title = stringResource(R.string.standard_models),
+        expanded = expanded,
+        onToggle = onToggle,
+        trailing = {
+            Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                listOf(5, 8, 11, 14).forEach { Box(Modifier.width(3.dp).height(it.dp).clip(RoundedCornerShape(1.dp)).background(cs.outline)) }
+            }
+            Text(stringResource(R.string.size), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))
+        }
+    )
+}
+
+@Composable
+private fun CustomHeader(expanded: Boolean, onToggle: () -> Unit) {
+    SectionHeader(
+        title = stringResource(R.string.custom_models),
+        expanded = expanded,
+        onToggle = onToggle,
+        top = 22.dp,
+    )
+}
+
+@Composable
+internal fun Chevron(expanded: Boolean, color: Color) {
     // Next to all-caps text the ink sits above the line-box center, so the mark is nudged up
     // to meet the caps rather than the box.
     Canvas(Modifier.size(12.dp).offset(y = -1.dp)) {
