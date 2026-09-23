@@ -1,0 +1,4 @@
+• Добавлена проверка ролей файлов и конфигурация Sherpa-моделей
+• Добавлены переводы типов Sherpa-моделей
+• Добавлено распознавание SenseVoice и streaming-моделей Zipformer
+• Добавлен выбор SenseVoice и streaming Zipformer в интерфейсе

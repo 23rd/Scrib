@@ -1,0 +1,4 @@
+• Adicionada validação por função e configuração em tempo de execução dos modelos sherpa
+• Adicionadas traduções dos tipos de modelo sherpa
+• Adicionado reconhecimento em tempo de execução dos modelos SenseVoice e Zipformer streaming
+• Adicionada seleção de modelos SenseVoice e Zipformer streaming

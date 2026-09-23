@@ -1,0 +1,4 @@
+• Sherpa modelleri için role dayalı doğrulama ve çalışma zamanı yapılandırması eklendi
+• Sherpa model türlerinin çevirileri eklendi
+• SenseVoice ve streaming Zipformer modelleri için çalışma zamanı tanıma eklendi
+• SenseVoice ve streaming Zipformer model seçimi eklendi

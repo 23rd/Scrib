@@ -1,0 +1,4 @@
+• Rollenbasierte Validierung und Laufzeitkonfiguration von Sherpa-Modellen hinzugefügt
+• Übersetzungen der Sherpa-Modelltypen hinzugefügt
+• Laufzeit-Erkennung von SenseVoice- und Streaming-Zipformer-Modellen hinzugefügt
+• Modellauswahl für SenseVoice und Streaming-Zipformer hinzugefügt

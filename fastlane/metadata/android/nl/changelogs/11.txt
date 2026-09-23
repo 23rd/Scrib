@@ -1,0 +1,4 @@
+• Rolgebaseerde validatie en runtimeconfiguratie van sherpa-modellen toegevoegd
+• Vertalingen van sherpa-modeltypen toegevoegd
+• Runtimeherkenning van SenseVoice- en streaming-Zipformer-modellen toegevoegd
+• Modelkeuze voor SenseVoice en streaming-Zipformer toegevoegd

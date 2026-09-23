@@ -1,0 +1,4 @@
+• Added role-aware validation and runtime configuration of Sherpa models
+• Added translations of Sherpa model types
+• Added runtime recognition of SenseVoice and streaming Zipformer models
+• Added model selection UI for SenseVoice and streaming Zipformer

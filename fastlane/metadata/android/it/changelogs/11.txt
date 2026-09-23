@@ -1,0 +1,4 @@
+• Aggiunta la validazione per ruolo e la configurazione runtime dei modelli sherpa
+• Aggiunte le traduzioni dei tipi di modello sherpa
+• Aggiunto il riconoscimento runtime dei modelli SenseVoice e Zipformer streaming
+• Aggiunta la selezione dei modelli SenseVoice e Zipformer streaming

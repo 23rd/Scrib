@@ -1,0 +1,4 @@
+• Dodano walidację na podstawie ról i konfigurację środowiska uruchomieniowego modeli sherpa
+• Dodano tłumaczenia typów modeli sherpa
+• Dodano rozpoznawanie w czasie działania modeli SenseVoice i streaming Zipformer
+• Dodano wybór modeli SenseVoice i streaming Zipformer
