@@ -720,12 +720,15 @@ private fun LanguageEntry(onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("🌐", fontSize = 18.sp)
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("🌐", fontSize = 18.sp)
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.lang_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
             }
+            Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }
     }
@@ -746,12 +749,15 @@ private fun KeyboardEntry() {
         }
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("⌨", fontSize = 18.sp)
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("⌨", fontSize = 18.sp)
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.ime_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(R.string.ime_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
             }
+            Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }
     }
@@ -770,7 +776,9 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             .clickableRow(RoundedCornerShape(16.dp)) { if (!busy) onToggle(!state.skipSilence) }
     ) {
         Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("🤫", fontSize = 18.sp)
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("🤫", fontSize = 18.sp)
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.vad_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
@@ -793,7 +801,9 @@ private fun DictionaryEntry(enabled: Boolean, onClick: () -> Unit) {
         modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("\uD83D\uDCDD", fontSize = 18.sp)
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("\uD83D\uDCDD", fontSize = 18.sp)
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.dict_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
@@ -802,6 +812,7 @@ private fun DictionaryEntry(enabled: Boolean, onClick: () -> Unit) {
                     fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
                 )
             }
+            Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }
     }
