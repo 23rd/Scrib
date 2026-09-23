@@ -3,17 +3,13 @@ package org.scrib.transcriber
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.util.Log
-import com.k2fsa.sherpa.onnx.FeatureConfig
-import com.k2fsa.sherpa.onnx.OfflineModelConfig
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
-import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
-import com.k2fsa.sherpa.onnx.OfflineTransducerModelConfig
+import com.k2fsa.sherpa.onnx.OnlineRecognizer
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
 import org.opentranscribe.api.TranscriptionRequest
-import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -25,7 +21,13 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     private var recognizer: OfflineRecognizer? = null
 
     @Volatile
+    private var onlineRecognizer: OnlineRecognizer? = null
+
+    @Volatile
     private var loadedId: String? = null
+
+    @Volatile
+    private var loadedLanguage: String? = null
 
     override fun transcribe(
         audio: ParcelFileDescriptor,
@@ -53,20 +55,18 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     }
 
     override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream {
-        val language = activeLanguage()
+        val language = request?.languageHint ?: activeLanguage()
         return AudioStream(request, callback) { samples, sampleCount, _, _, _ ->
             val text = Dictionary.applyReplacements(
-                appContext, decodeWindow(copyWindow(samples, 0, sampleCount))
+                appContext, decodeWindow(copyWindow(samples, 0, sampleCount), request?.languageHint)
             )
             Log.d(TAG, "stream chunk: $sampleCount samples -> ${text.length} chars")
             TranscribedSegment(text, language)
         }
     }
 
-    private fun activeLanguage(): String? {
-        val id = ModelManager.activeFileName(appContext) ?: return null
-        return SherpaModel.byId(appContext, id)?.languages?.firstOrNull()
-    }
+    private fun activeLanguage(): String? =
+        activeModelInfo()?.languages?.singleOrNull()
 
     override fun transcribeToSegments(
         audio: ParcelFileDescriptor,
@@ -86,7 +86,14 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             if (pcm.sampleCount == 0) {
                 throw DecodeException("No audio decoded")
             }
-            return transcribePcm(pcm.samples, pcm.sampleCount, cancellation, onProgress, onPartial)
+            return transcribePcm(
+                pcm.samples,
+                pcm.sampleCount,
+                languageHint,
+                cancellation,
+                onProgress,
+                onPartial
+            )
         } finally {
             try {
                 audio.close()
@@ -98,6 +105,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     private fun transcribePcm(
         samples: ByteBuffer,
         sampleCount: Int,
+        languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit
@@ -106,7 +114,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             throw CancelledException()
         }
         synchronized(nativeLock) {
-            ensureRecognizerLocked()
+            ensureRecognizerLocked(languageHint)
         }
         val windows = (sampleCount + WINDOW_SAMPLES - 1) / WINDOW_SAMPLES
         val segments = ArrayList<TranscriptSegment>(windows)
@@ -118,7 +126,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             val offset = i * WINDOW_SAMPLES
             val length = minOf(WINDOW_SAMPLES, sampleCount - offset)
             val text = Dictionary.applyReplacements(
-                appContext, decodeWindow(copyWindow(samples, offset, length))
+                appContext, decodeWindow(copyWindow(samples, offset, length), languageHint)
             )
             if (text.isNotEmpty()) {
                 val startMs = offset.toLong() * 1000 / SAMPLE_RATE
@@ -138,9 +146,28 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         return segments
     }
 
-    private fun decodeWindow(samples: FloatArray): String {
+    private fun decodeWindow(samples: FloatArray, languageHint: String? = null): String {
         synchronized(nativeLock) {
-            val active = ensureRecognizerLocked()
+            val info = activeModelInfo() ?: throw ModelNotAvailableException()
+            ensureRecognizerLocked(languageHint)
+            if (SherpaModel.isStreaming(info.modelType)) {
+                val active = onlineRecognizer ?: throw ModelNotAvailableException()
+                val stream = active.createStream()
+                try {
+                    stream.acceptWaveform(samples, SAMPLE_RATE)
+                    stream.inputFinished()
+                    while (active.isReady(stream)) {
+                        active.decode(stream)
+                    }
+                    return active.getResult(stream).text.trim()
+                } finally {
+                    try {
+                        stream.release()
+                    } catch (ignore: Exception) {
+                    }
+                }
+            }
+            val active = recognizer ?: throw ModelNotAvailableException()
             val stream = active.createStream()
             try {
                 stream.acceptWaveform(samples, SAMPLE_RATE)
@@ -170,8 +197,14 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 recognizer?.release()
             } catch (ignore: Exception) {
             }
+            try {
+                onlineRecognizer?.release()
+            } catch (ignore: Exception) {
+            }
             recognizer = null
+            onlineRecognizer = null
             loadedId = null
+            loadedLanguage = null
         }
     }
 
@@ -186,7 +219,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         capabilities.autoDetectLanguage = languages == null || languages.size != 1
         capabilities.cancellable = true
         capabilities.modelReady = info != null &&
-            SherpaModel.isComplete(SherpaModel.dirFor(appContext, info.id), info.files)
+            SherpaModel.isComplete(SherpaModel.dirFor(appContext, info.id), info)
         capabilities.streaming = true
         return capabilities
     }
@@ -202,57 +235,63 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         null
     }
 
-    private fun ensureRecognizerLocked(): OfflineRecognizer {
+    private fun ensureRecognizerLocked(languageHint: String? = null) {
         val info = activeModelInfo()
             ?: throw ModelNotAvailableException()
         val dir = SherpaModel.dirFor(appContext, info.id)
-        if (!SherpaModel.isComplete(dir, info.files)) {
+        if (!SherpaModel.isComplete(dir, info)) {
             throw ModelNotAvailableException()
         }
-        if (loadedId == info.id) {
-            recognizer?.let {
-                return it
-            }
+        val language = if (info.modelType == SherpaModel.TYPE_SENSE_VOICE) {
+            SherpaModel.senseVoiceLanguage(info, languageHint)
         } else {
-            try {
-                recognizer?.release()
-            } catch (ignore: Exception) {
-            }
-            recognizer = null
-            loadedId = null
+            null
         }
+        val streaming = SherpaModel.isStreaming(info.modelType)
+        if (loadedId == info.id && loadedLanguage == language) {
+            if (streaming && onlineRecognizer != null) {
+                return
+            }
+            if (!streaming && recognizer != null) {
+                return
+            }
+        }
+        try {
+            recognizer?.release()
+        } catch (ignore: Exception) {
+        }
+        try {
+            onlineRecognizer?.release()
+        } catch (ignore: Exception) {
+        }
+        recognizer = null
+        onlineRecognizer = null
+        loadedId = null
+        loadedLanguage = null
         var last: Exception? = null
         for (provider in listOf("nnapi", "cpu")) {
             try {
-                val fresh = OfflineRecognizer(null, buildConfig(dir, info, provider))
-                recognizer = fresh
+                if (streaming) {
+                    onlineRecognizer = OnlineRecognizer(
+                        null,
+                        SherpaModel.buildOnlineConfig(dir, info, provider)
+                    )
+                } else {
+                    recognizer = OfflineRecognizer(
+                        null,
+                        SherpaModel.buildConfig(dir, info, provider, languageHint)
+                    )
+                }
                 loadedId = info.id
+                loadedLanguage = language
                 Log.i(TAG, "Sherpa provider=$provider — OK")
-                return fresh
+                return
             } catch (e: Exception) {
                 Log.w(TAG, "Sherpa provider '$provider' failed: ${e.message}")
                 last = e
             }
         }
         throw last ?: IllegalStateException("All Sherpa providers failed")
-    }
-
-    private fun buildConfig(dir: File, info: SherpaModelInfo, provider: String): OfflineRecognizerConfig {
-        val modelConfig = OfflineModelConfig(
-            transducer = OfflineTransducerModelConfig(
-                encoder = File(dir, info.files.getValue(SherpaModel.ROLE_ENCODER)).absolutePath,
-                decoder = File(dir, info.files.getValue(SherpaModel.ROLE_DECODER)).absolutePath,
-                joiner = File(dir, info.files.getValue(SherpaModel.ROLE_JOINER)).absolutePath
-            ),
-            tokens = File(dir, info.files.getValue(SherpaModel.ROLE_TOKENS)).absolutePath,
-            numThreads = 4,
-            provider = provider,
-            modelType = info.modelType
-        )
-        return OfflineRecognizerConfig(
-            featConfig = FeatureConfig(sampleRate = SAMPLE_RATE, featureDim = 80),
-            modelConfig = modelConfig
-        )
     }
 
     companion object {
