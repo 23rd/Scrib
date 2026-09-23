@@ -134,7 +134,7 @@ class SherpaPluginImpl : SherpaPlugin {
             title = stringResource(R.string.other_engines),
             expanded = expanded,
             onToggle = { expanded = !expanded },
-            top = 22.dp,
+            top = 8.dp,
         )
         if (!expanded) return
         if (rows.isEmpty() && !busy) {

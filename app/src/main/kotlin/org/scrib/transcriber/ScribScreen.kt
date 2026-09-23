@@ -337,8 +337,8 @@ internal fun SectionHeader(
 ) {
     val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, top = top, bottom = 10.dp)
-            .clip(RoundedCornerShape(8.dp)).clickable(onClick = onToggle)
+        Modifier.fillMaxWidth().padding(top = top, bottom = 8.dp)
+            .clip(RoundedCornerShape(18.dp)).clickable(onClick = onToggle)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -374,7 +374,7 @@ private fun CustomHeader(expanded: Boolean, onToggle: () -> Unit) {
         title = stringResource(R.string.custom_models),
         expanded = expanded,
         onToggle = onToggle,
-        top = 22.dp,
+        top = 8.dp,
     )
 }
 
