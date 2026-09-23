@@ -56,7 +56,7 @@ class SherpaPluginImpl : SherpaPlugin {
         val app = context.applicationContext
         val id = selectedId(app) ?: return false
         val info = SherpaModel.byId(app, id) ?: return false
-        return SherpaModel.isComplete(SherpaModel.dirFor(app, id), info.files)
+        return SherpaModel.isComplete(SherpaModel.dirFor(app, id), info)
     }
 
     override fun displayName(context: Context): String? {
@@ -92,7 +92,7 @@ class SherpaPluginImpl : SherpaPlugin {
     override fun modelRows(context: Context, activeId: String?): List<ModelRow> {
         val app = context.applicationContext
         return SherpaModel.list(app)
-            .filter { SherpaModel.isComplete(SherpaModel.dirFor(app, it.id), it.files) }
+            .filter { SherpaModel.isComplete(SherpaModel.dirFor(app, it.id), it) }
             .map { info ->
                 ModelRow(
                     id = info.id,
@@ -196,17 +196,41 @@ private fun AddSherpaModelDialog(
 ) {
     val context = LocalContext.current
     var name by remember { mutableStateOf("") }
-    var nemo by remember { mutableStateOf(false) }
+    var modelType by rememberSaveable { mutableStateOf(SherpaModel.TYPE_DEFAULT) }
     var typeTouched by remember { mutableStateOf(false) }
     var langs by remember { mutableStateOf("") }
     var parts by remember { mutableStateOf(mapOf<String, Uri>()) }
     var error by remember { mutableStateOf<String?>(null) }
-    // No reliable fingerprint exists inside the files — sherpa itself needs the flag — so the
-    // type is a filename hint until the user touches the switch.
-    fun guessType(fileName: String?) {
+
+    fun selectType(type: String) {
+        modelType = type
+        typeTouched = true
+        val selected = mutableMapOf<String, Uri>()
+        if (type == SherpaModel.TYPE_SENSE_VOICE) {
+            (parts[SherpaModel.ROLE_MODEL] ?: parts[SherpaModel.ROLE_ENCODER])?.let {
+                selected[SherpaModel.ROLE_MODEL] = it
+            }
+        } else {
+            (parts[SherpaModel.ROLE_ENCODER] ?: parts[SherpaModel.ROLE_MODEL])?.let {
+                selected[SherpaModel.ROLE_ENCODER] = it
+            }
+            parts[SherpaModel.ROLE_DECODER]?.let { selected[SherpaModel.ROLE_DECODER] = it }
+            parts[SherpaModel.ROLE_JOINER]?.let { selected[SherpaModel.ROLE_JOINER] = it }
+        }
+        parts[SherpaModel.ROLE_TOKENS]?.let { selected[SherpaModel.ROLE_TOKENS] = it }
+        parts = selected
+    }
+
+    fun guessType(fileName: String?, role: String?) {
         if (!typeTouched) {
             val hint = fileName?.lowercase() ?: ""
-            nemo = hint.contains("nemo") || hint.contains("gigaam") || hint.contains("parakeet")
+            modelType = when {
+                role == SherpaModel.ROLE_MODEL ||
+                    hint.contains("sensevoice") || hint.contains("sense-voice") -> SherpaModel.TYPE_SENSE_VOICE
+                hint.contains("streaming") || hint.contains("chunk-16-left") -> SherpaModel.TYPE_STREAMING_TRANSDUCER
+                hint.contains("nemo") || hint.contains("gigaam") || hint.contains("parakeet") -> SherpaModel.TYPE_NEMO
+                else -> SherpaModel.TYPE_DEFAULT
+            }
         }
     }
     // One launcher per slot; each remembers its own role.
@@ -214,12 +238,13 @@ private fun AddSherpaModelDialog(
     fun pick(role: String) = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         if (uri != null) {
             parts = parts + (role to uri)
-            guessType(queryDisplayName(context, uri))
+            guessType(queryDisplayName(context, uri), role)
         }
     }
     val pickEncoder = pick(SherpaModel.ROLE_ENCODER)
     val pickDecoder = pick(SherpaModel.ROLE_DECODER)
     val pickJoiner = pick(SherpaModel.ROLE_JOINER)
+    val pickModel = pick(SherpaModel.ROLE_MODEL)
     val pickTokens = pick(SherpaModel.ROLE_TOKENS)
 
     fun scanFolder(treeUri: Uri) {
@@ -228,7 +253,8 @@ private fun AddSherpaModelDialog(
             val treeId = DocumentsContract.getTreeDocumentId(treeUri)
             val children = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, treeId)
             val found = mutableMapOf<String, Uri>()
-            var encoderName: String? = null
+            var primaryName: String? = null
+            var primaryRole: String? = null
             resolver.query(
                 children,
                 arrayOf(
@@ -252,20 +278,22 @@ private fun AddSherpaModelDialog(
                         lower.endsWith(".onnx") && "encoder" in lower -> SherpaModel.ROLE_ENCODER
                         lower.endsWith(".onnx") && "decoder" in lower -> SherpaModel.ROLE_DECODER
                         lower.endsWith(".onnx") && ("joiner" in lower || "joint" in lower) -> SherpaModel.ROLE_JOINER
+                        lower.endsWith(".onnx") && ("model" in lower || "sensevoice" in lower || "sense-voice" in lower) -> SherpaModel.ROLE_MODEL
                         lower.endsWith(".txt") && "tokens" in lower -> SherpaModel.ROLE_TOKENS
                         else -> null
                     }
                     if (role != null && role !in found) {
                         found[role] = DocumentsContract.buildDocumentUriUsingTree(treeUri, docId)
-                        if (role == SherpaModel.ROLE_ENCODER) {
-                            encoderName = docName
+                        if (role == SherpaModel.ROLE_ENCODER || role == SherpaModel.ROLE_MODEL) {
+                            primaryName = docName
+                            primaryRole = role
                         }
                     }
                 }
             }
             if (found.isNotEmpty()) {
                 parts = parts + found
-                guessType(encoderName)
+                guessType(primaryName, primaryRole)
             }
         } catch (_: Exception) {
         }
@@ -275,18 +303,33 @@ private fun AddSherpaModelDialog(
             scanFolder(uri)
         }
     }
-    val pickers = mapOf(
-        SherpaModel.ROLE_ENCODER to pickEncoder,
-        SherpaModel.ROLE_DECODER to pickDecoder,
-        SherpaModel.ROLE_JOINER to pickJoiner,
-        SherpaModel.ROLE_TOKENS to pickTokens
-    )
-    val slotLabels = mapOf(
-        SherpaModel.ROLE_ENCODER to stringResource(R.string.sherpa_slot_encoder),
-        SherpaModel.ROLE_DECODER to stringResource(R.string.sherpa_slot_decoder),
-        SherpaModel.ROLE_JOINER to stringResource(R.string.sherpa_slot_joiner),
-        SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
-    )
+    val isSenseVoice = modelType == SherpaModel.TYPE_SENSE_VOICE
+    val pickers = if (isSenseVoice) {
+        mapOf(
+            SherpaModel.ROLE_MODEL to pickModel,
+            SherpaModel.ROLE_TOKENS to pickTokens
+        )
+    } else {
+        mapOf(
+            SherpaModel.ROLE_ENCODER to pickEncoder,
+            SherpaModel.ROLE_DECODER to pickDecoder,
+            SherpaModel.ROLE_JOINER to pickJoiner,
+            SherpaModel.ROLE_TOKENS to pickTokens
+        )
+    }
+    val slotLabels = if (isSenseVoice) {
+        mapOf(
+            SherpaModel.ROLE_MODEL to stringResource(R.string.sherpa_slot_model),
+            SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
+        )
+    } else {
+        mapOf(
+            SherpaModel.ROLE_ENCODER to stringResource(R.string.sherpa_slot_encoder),
+            SherpaModel.ROLE_DECODER to stringResource(R.string.sherpa_slot_decoder),
+            SherpaModel.ROLE_JOINER to stringResource(R.string.sherpa_slot_joiner),
+            SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
+        )
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.sherpa_add_title)) },
@@ -303,14 +346,24 @@ private fun AddSherpaModelDialog(
                     fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TypeOption(
-                    selected = !nemo,
+                    selected = modelType == SherpaModel.TYPE_DEFAULT,
                     label = stringResource(R.string.sherpa_type_default),
-                    onClick = { nemo = false; typeTouched = true }
+                    onClick = { selectType(SherpaModel.TYPE_DEFAULT) }
                 )
                 TypeOption(
-                    selected = nemo,
+                    selected = modelType == SherpaModel.TYPE_NEMO,
                     label = stringResource(R.string.sherpa_type_nemo),
-                    onClick = { nemo = true; typeTouched = true }
+                    onClick = { selectType(SherpaModel.TYPE_NEMO) }
+                )
+                TypeOption(
+                    selected = modelType == SherpaModel.TYPE_STREAMING_TRANSDUCER,
+                    label = stringResource(R.string.sherpa_type_streaming),
+                    onClick = { selectType(SherpaModel.TYPE_STREAMING_TRANSDUCER) }
+                )
+                TypeOption(
+                    selected = modelType == SherpaModel.TYPE_SENSE_VOICE,
+                    label = stringResource(R.string.sherpa_type_sense_voice),
+                    onClick = { selectType(SherpaModel.TYPE_SENSE_VOICE) }
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
@@ -370,10 +423,7 @@ private fun AddSherpaModelDialog(
                     error = context.getString(R.string.sherpa_need_name)
                     return@TextButton
                 }
-                val missing = listOf(
-                    SherpaModel.ROLE_ENCODER, SherpaModel.ROLE_DECODER,
-                    SherpaModel.ROLE_JOINER, SherpaModel.ROLE_TOKENS
-                ).filter { it !in parts }
+                val missing = SherpaModel.requiredRoles(modelType).filter { it !in parts }
                 if (missing.isNotEmpty()) {
                     error = context.getString(R.string.sherpa_need_files)
                     return@TextButton
@@ -385,7 +435,7 @@ private fun AddSherpaModelDialog(
                     .takeIf { it.isNotEmpty() }
                 onConfirm(
                     name.trim(),
-                    if (nemo) SherpaModel.TYPE_NEMO else SherpaModel.TYPE_DEFAULT,
+                    modelType,
                     parsed,
                     parts
                 )
