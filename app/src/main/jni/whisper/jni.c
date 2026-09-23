@@ -65,6 +65,8 @@ struct fgt_context {
     struct parakeet_context *parakeet;
 };
 
+#define FGT_WHISPER_N_TEXT_CTX 448
+
 static bool fgt_is_parakeet_model(const char *path) {
     FILE *file = fopen(path, "rb");
     if (file == NULL) {
