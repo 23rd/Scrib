@@ -44,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +86,7 @@ fun ScribScreen(
     onSelfTest: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
+    onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit,
     sherpaPlugin: SherpaPlugin?,
     recording: RecordingUi?,
     onStartRecording: () -> Unit,
@@ -103,6 +105,7 @@ fun ScribScreen(
     var showAdd by remember { mutableStateOf(false) }
     var showLanguages by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
+    var modelsExpanded by rememberSaveable { mutableStateOf(true) }
 
     val context = LocalContext.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -150,17 +153,19 @@ fun ScribScreen(
                 )
             }
             item { LanguageEntry { showLanguages = true } }
-            item { StandardHeader() }
-            items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
-            state.sherpaRow?.let { row ->
+            item { StandardHeader(expanded = modelsExpanded, onToggle = { modelsExpanded = !modelsExpanded }) }
+            if (modelsExpanded) {
+                items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
+            }
+            if (sherpaPlugin != null) {
                 item {
-                    sherpaPlugin?.SettingsBlocks(
-                        row = row,
-                        onDownload = actions.onDownload,
-                        onCancel = actions.onCancel,
+                    sherpaPlugin.SettingsBlocks(
+                        rows = state.sherpaRows,
+                        busy = state.sherpaBusy,
                         onUse = actions.onUse,
                         onDelete = actions.onDelete,
-                        onRequestDelete = { deleteTarget = it }
+                        onRequestDelete = { deleteTarget = it },
+                        onImportSherpa = onImportSherpa
                     )
                 }
             }
@@ -319,13 +324,17 @@ private fun PrivacyLine(textColor: Color, topBorder: Boolean) {
 }
 
 @Composable
-private fun StandardHeader() {
+private fun StandardHeader(expanded: Boolean, onToggle: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Row(
-        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 10.dp),
+        Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, bottom = 10.dp)
+            .clip(RoundedCornerShape(8.dp)).clickable(onClick = onToggle),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(stringResource(R.string.standard_models), fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(if (expanded) "▾" else "▸", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant)
+            Text(stringResource(R.string.standard_models), fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+        }
         Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
             listOf(5, 8, 11, 14).forEach { Box(Modifier.width(3.dp).height(it.dp).clip(RoundedCornerShape(1.dp)).background(cs.outline)) }
             Text(stringResource(R.string.size), fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurfaceVariant, modifier = Modifier.padding(start = 4.dp))

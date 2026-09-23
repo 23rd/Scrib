@@ -42,7 +42,8 @@ data class ScribUiState(
     val firstRun: Boolean,
     val activeName: String?,
     val standard: List<ModelRow>,
-    val sherpaRow: ModelRow?,
+    val sherpaRows: List<ModelRow>,
+    val sherpaBusy: Boolean,
     val custom: List<ModelRow>,
     val statusMsg: String,
     val statusError: Boolean,
@@ -86,9 +87,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     @Volatile private var vadPct = -1
     private var vadJob: Job? = null
 
-    private val extProgress = ConcurrentHashMap<String, Int>()
-    private val extJobs = ConcurrentHashMap<String, Job>()
-    private val extFailed = ConcurrentHashMap.newKeySet<String>()
+    @Volatile private var sherpaBusy = false
 
     private val ctx get() = getApplication<Application>()
     private fun str(id: Int, vararg args: Any): String = ctx.getString(id, *args)
@@ -131,18 +130,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         val activeFriendly = ModelManager.activeDisplayName(ctx)
-        val plugin = SherpaPlugins.plugin
-        val sherpaId = plugin?.modelId
-        val sherpaRow = plugin?.modelRow(
-            ctx, active,
-            progress = sherpaId?.let { extProgress[it] } ?: 0,
-            downloading = sherpaId != null && extJobs.containsKey(sherpaId),
-            failed = sherpaId != null && extFailed.contains(sherpaId)
-        )
-        val sherpaEmpty = sherpaRow == null || sherpaRow.state == RowState.NotDownloaded
+        val sherpaRows = SherpaPlugins.plugin?.modelRows(ctx, active) ?: emptyList()
         return ScribUiState(
-            firstRun = installed.isEmpty() && downloads.isEmpty() && extJobs.isEmpty() && sherpaEmpty,
-            activeName = activeFriendly, standard = standard, sherpaRow = sherpaRow, custom = custom,
+            firstRun = installed.isEmpty() && downloads.isEmpty() && sherpaRows.isEmpty() && !sherpaBusy,
+            activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
             dictionaryEnabled = Dictionary.isEnabled(ctx)
@@ -150,50 +141,38 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun download(fileName: String) {
-        val plugin = SherpaPlugins.plugin
-        if (plugin != null && fileName == plugin.modelId) {
-            startExternalDownload(plugin, fileName)
-            return
-        }
         val model = ModelCatalog.byFileName(fileName) ?: downloads[fileName]?.model ?: return
         startDownload(model)
     }
 
-    private fun startExternalDownload(plugin: SherpaPlugin, id: String) {
-        if (extJobs.containsKey(id)) {
+    fun importSherpa(
+        displayName: String,
+        modelType: String,
+        languages: List<String>?,
+        parts: Map<String, Uri>
+    ) {
+        val plugin = SherpaPlugins.plugin ?: return
+        if (sherpaBusy) {
             return
         }
-        extFailed.remove(id)
-        extProgress[id] = 0
+        sherpaBusy = true
+        statusMsg = ""; statusError = false
         push()
-        val job = viewModelScope.launch {
+        viewModelScope.launch {
             try {
-                withContext(Dispatchers.IO) {
-                    plugin.downloadModel(ctx, id,
-                        onProgress = { done, total ->
-                            val pct = if (total > 0) ((done * 100) / total).toInt() else -1
-                            if (extProgress[id] != pct) {
-                                extProgress[id] = pct
-                                push()
-                            }
-                        },
-                        isCancelled = { !isActive })
+                val id = withContext(Dispatchers.IO) {
+                    plugin.importModel(ctx, displayName, modelType, languages, parts)
                 }
-                extProgress.remove(id)
-                extJobs.remove(id)
-                push()
-            } catch (e: ModelManager.CancelledDownloadException) {
-                extProgress.remove(id)
-                extJobs.remove(id)
-                push()
+                if (ModelManager.activeFileName(ctx) == null) {
+                    ModelManager.setActive(ctx, id)
+                }
             } catch (e: Throwable) {
-                extProgress.remove(id)
-                extJobs.remove(id)
-                extFailed.add(id)
-                push()
+                statusMsg = e.message ?: ""
+                statusError = true
             }
+            sherpaBusy = false
+            push()
         }
-        extJobs[id] = job
     }
 
     private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false, statusLabel: String? = null) {
@@ -239,12 +218,6 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun cancel(fileName: String) {
-        if (extJobs.containsKey(fileName)) {
-            extJobs.remove(fileName)?.cancel()
-            extProgress.remove(fileName)
-            push()
-            return
-        }
         jobs.remove(fileName)?.cancel()
         downloads.remove(fileName)
         push()
@@ -313,7 +286,6 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     fun delete(fileName: String) {
         if (SherpaPlugins.plugin?.deleteModel(ctx, fileName) == true) {
-            extFailed.remove(fileName)
             push()
             return
         }

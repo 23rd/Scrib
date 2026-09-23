@@ -24,6 +24,9 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     @Volatile
     private var recognizer: OfflineRecognizer? = null
 
+    @Volatile
+    private var loadedId: String? = null
+
     override fun transcribe(
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
@@ -49,14 +52,21 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         }
     }
 
-    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
-        AudioStream(request, callback) { samples, sampleCount, _, _, _ ->
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream {
+        val language = activeLanguage()
+        return AudioStream(request, callback) { samples, sampleCount, _, _, _ ->
             val text = Dictionary.applyReplacements(
                 appContext, decodeWindow(copyWindow(samples, 0, sampleCount))
             )
             Log.d(TAG, "stream chunk: $sampleCount samples -> ${text.length} chars")
-            TranscribedSegment(text, LANGUAGE)
+            TranscribedSegment(text, language)
         }
+    }
+
+    private fun activeLanguage(): String? {
+        val id = ModelManager.activeFileName(appContext) ?: return null
+        return SherpaModel.byId(appContext, id)?.languages?.firstOrNull()
+    }
 
     override fun transcribeToSegments(
         audio: ParcelFileDescriptor,
@@ -161,20 +171,29 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             } catch (ignore: Exception) {
             }
             recognizer = null
+            loadedId = null
         }
     }
 
     override fun capabilities(): TranscriberCapabilities {
+        val info = activeModelInfo()
+        val languages = info?.languages
         val capabilities = TranscriberCapabilities()
         capabilities.contractVersion = TranscriptionEngine.CONTRACT_VERSION
         capabilities.engineId = ENGINE_ID
         capabilities.engineVersion = appVersion()
-        capabilities.supportedLanguages = LANGUAGES.toTypedArray()
-        capabilities.autoDetectLanguage = false
+        capabilities.supportedLanguages = languages?.toTypedArray()
+        capabilities.autoDetectLanguage = languages == null || languages.size != 1
         capabilities.cancellable = true
-        capabilities.modelReady = SherpaModel.isInstalled(appContext)
+        capabilities.modelReady = info != null &&
+            SherpaModel.isComplete(SherpaModel.dirFor(appContext, info.id), info.files)
         capabilities.streaming = true
         return capabilities
+    }
+
+    private fun activeModelInfo(): SherpaModelInfo? {
+        val id = ModelManager.activeFileName(appContext) ?: return null
+        return SherpaModel.byId(appContext, id)
     }
 
     private fun appVersion(): String? = try {
@@ -184,18 +203,30 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     }
 
     private fun ensureRecognizerLocked(): OfflineRecognizer {
-        recognizer?.let {
-            return it
-        }
-        if (!SherpaModel.isInstalled(appContext)) {
+        val info = activeModelInfo()
+            ?: throw ModelNotAvailableException()
+        val dir = SherpaModel.dirFor(appContext, info.id)
+        if (!SherpaModel.isComplete(dir, info.files)) {
             throw ModelNotAvailableException()
         }
-        val dir = SherpaModel.dir(appContext)
+        if (loadedId == info.id) {
+            recognizer?.let {
+                return it
+            }
+        } else {
+            try {
+                recognizer?.release()
+            } catch (ignore: Exception) {
+            }
+            recognizer = null
+            loadedId = null
+        }
         var last: Exception? = null
         for (provider in listOf("nnapi", "cpu")) {
             try {
-                val fresh = OfflineRecognizer(null, buildConfig(dir, provider))
+                val fresh = OfflineRecognizer(null, buildConfig(dir, info, provider))
                 recognizer = fresh
+                loadedId = info.id
                 Log.i(TAG, "Sherpa provider=$provider — OK")
                 return fresh
             } catch (e: Exception) {
@@ -206,17 +237,17 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         throw last ?: IllegalStateException("All Sherpa providers failed")
     }
 
-    private fun buildConfig(dir: File, provider: String): OfflineRecognizerConfig {
+    private fun buildConfig(dir: File, info: SherpaModelInfo, provider: String): OfflineRecognizerConfig {
         val modelConfig = OfflineModelConfig(
             transducer = OfflineTransducerModelConfig(
-                encoder = File(dir, SherpaModel.ENCODER).absolutePath,
-                decoder = File(dir, SherpaModel.DECODER).absolutePath,
-                joiner = File(dir, SherpaModel.JOINER).absolutePath
+                encoder = File(dir, info.files.getValue(SherpaModel.ROLE_ENCODER)).absolutePath,
+                decoder = File(dir, info.files.getValue(SherpaModel.ROLE_DECODER)).absolutePath,
+                joiner = File(dir, info.files.getValue(SherpaModel.ROLE_JOINER)).absolutePath
             ),
-            tokens = File(dir, SherpaModel.TOKENS).absolutePath,
+            tokens = File(dir, info.files.getValue(SherpaModel.ROLE_TOKENS)).absolutePath,
             numThreads = 4,
             provider = provider,
-            modelType = "nemo_transducer"
+            modelType = info.modelType
         )
         return OfflineRecognizerConfig(
             featConfig = FeatureConfig(sampleRate = SAMPLE_RATE, featureDim = 80),
@@ -228,9 +259,6 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         private const val TAG = "SherpaEngine"
 
         const val ENGINE_ID = "sherpa-onnx"
-        val LANGUAGES: List<String> = listOf("ru")
-
-        const val LANGUAGE = "ru"
 
         const val SAMPLE_RATE = 16000
 
@@ -242,6 +270,15 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         fun getInstance(context: Context): SherpaTranscriptionEngine {
             return instance ?: synchronized(this) {
                 instance ?: SherpaTranscriptionEngine(context.applicationContext).also { instance = it }
+            }
+        }
+
+        // Called when a model is deleted while loaded, so the dead files are never touched again.
+        fun forgetInstance(id: String) {
+            synchronized(this) {
+                if (instance?.loadedId == id) {
+                    instance?.releaseModel()
+                }
             }
         }
     }

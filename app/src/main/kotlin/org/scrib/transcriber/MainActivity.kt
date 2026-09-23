@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                         onSelfTest = vm::selfTest,
                         onPickLanguage = vm::setupForLanguage,
                         onSkipSilence = vm::setSkipSilence,
+                        onImportSherpa = vm::importSherpa,
                         sherpaPlugin = SherpaPlugins.plugin,
                         recording = recording,
                         onStartRecording = vm::startRecording,

@@ -1,12 +1,10 @@
 package org.scrib.transcriber
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.Composable
-import java.io.File
 
 interface SherpaPlugin {
-
-    val modelId: String
 
     fun selectedId(context: Context): String?
 
@@ -20,31 +18,26 @@ interface SherpaPlugin {
 
     fun deleteModel(context: Context, id: String): Boolean
 
-    fun downloadModel(
+    fun importModel(
         context: Context,
-        id: String,
-        onProgress: (downloaded: Long, total: Long) -> Unit,
-        isCancelled: () -> Boolean
-    )
+        displayName: String,
+        modelType: String,
+        languages: List<String>?,
+        parts: Map<String, Uri>
+    ): String
 
-    fun modelRow(
-        context: Context,
-        activeId: String?,
-        progress: Int,
-        downloading: Boolean,
-        failed: Boolean
-    ): ModelRow?
+    fun modelRows(context: Context, activeId: String?): List<ModelRow>
 
     fun selfTestNotice(context: Context): String?
 
     @Composable
     fun SettingsBlocks(
-        row: ModelRow,
-        onDownload: (String) -> Unit,
-        onCancel: (String) -> Unit,
+        rows: List<ModelRow>,
+        busy: Boolean,
         onUse: (String) -> Unit,
         onDelete: (String) -> Unit,
-        onRequestDelete: (String) -> Unit
+        onRequestDelete: (String) -> Unit,
+        onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit
     )
 }
 
