@@ -216,6 +216,7 @@ private fun AddSherpaModelDialog(
             }
             parts[SherpaModel.ROLE_DECODER]?.let { selected[SherpaModel.ROLE_DECODER] = it }
             parts[SherpaModel.ROLE_JOINER]?.let { selected[SherpaModel.ROLE_JOINER] = it }
+            parts[SherpaModel.ROLE_MERGED_DECODER]?.let { selected[SherpaModel.ROLE_MERGED_DECODER] = it }
         }
         parts[SherpaModel.ROLE_TOKENS]?.let { selected[SherpaModel.ROLE_TOKENS] = it }
         parts = selected
@@ -227,7 +228,10 @@ private fun AddSherpaModelDialog(
             modelType = when {
                 role == SherpaModel.ROLE_MODEL ||
                     hint.contains("sensevoice") || hint.contains("sense-voice") -> SherpaModel.TYPE_SENSE_VOICE
+                hint.contains("zipformer2") -> SherpaModel.TYPE_STREAMING_ZIPFORMER2
                 hint.contains("streaming") || hint.contains("chunk-16-left") -> SherpaModel.TYPE_STREAMING_TRANSDUCER
+                hint.contains("moonshine") || role == SherpaModel.ROLE_MERGED_DECODER -> SherpaModel.TYPE_MOONSHINE
+                hint.contains("canary") -> SherpaModel.TYPE_CANARY
                 hint.contains("nemo") || hint.contains("gigaam") || hint.contains("parakeet") -> SherpaModel.TYPE_NEMO
                 else -> SherpaModel.TYPE_DEFAULT
             }
@@ -244,6 +248,7 @@ private fun AddSherpaModelDialog(
     val pickEncoder = pick(SherpaModel.ROLE_ENCODER)
     val pickDecoder = pick(SherpaModel.ROLE_DECODER)
     val pickJoiner = pick(SherpaModel.ROLE_JOINER)
+    val pickMergedDecoder = pick(SherpaModel.ROLE_MERGED_DECODER)
     val pickModel = pick(SherpaModel.ROLE_MODEL)
     val pickTokens = pick(SherpaModel.ROLE_TOKENS)
 
@@ -252,6 +257,14 @@ private fun AddSherpaModelDialog(
             val resolver = context.contentResolver
             val treeId = DocumentsContract.getTreeDocumentId(treeUri)
             val children = DocumentsContract.buildChildDocumentsUriUsingTree(treeUri, treeId)
+            val folderName = resolver.query(
+                treeUri,
+                arrayOf(DocumentsContract.Document.COLUMN_DISPLAY_NAME),
+                null, null, null
+            )?.use { c ->
+                val nameIdx = c.getColumnIndex(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                if (nameIdx >= 0 && c.moveToFirst()) c.getString(nameIdx) else null
+            }
             val found = mutableMapOf<String, Uri>()
             var primaryName: String? = null
             var primaryRole: String? = null
@@ -274,11 +287,13 @@ private fun AddSherpaModelDialog(
                     val docName = c.getString(nameIdx) ?: continue
                     val docId = c.getString(idIdx) ?: continue
                     val lower = docName.lowercase()
+                    val isModelFile = lower.endsWith(".onnx") || lower.endsWith(".ort")
                     val role = when {
-                        lower.endsWith(".onnx") && "encoder" in lower -> SherpaModel.ROLE_ENCODER
-                        lower.endsWith(".onnx") && "decoder" in lower -> SherpaModel.ROLE_DECODER
-                        lower.endsWith(".onnx") && ("joiner" in lower || "joint" in lower) -> SherpaModel.ROLE_JOINER
-                        lower.endsWith(".onnx") && ("model" in lower || "sensevoice" in lower || "sense-voice" in lower) -> SherpaModel.ROLE_MODEL
+                        isModelFile && ("merged_decoder" in lower || "merged-decoder" in lower || "decoder_model_merged" in lower) -> SherpaModel.ROLE_MERGED_DECODER
+                        isModelFile && "encoder" in lower -> SherpaModel.ROLE_ENCODER
+                        isModelFile && "decoder" in lower -> SherpaModel.ROLE_DECODER
+                        isModelFile && ("joiner" in lower || "joint" in lower) -> SherpaModel.ROLE_JOINER
+                        isModelFile && ("model" in lower || "sensevoice" in lower || "sense-voice" in lower) -> SherpaModel.ROLE_MODEL
                         lower.endsWith(".txt") && "tokens" in lower -> SherpaModel.ROLE_TOKENS
                         else -> null
                     }
@@ -293,7 +308,22 @@ private fun AddSherpaModelDialog(
             }
             if (found.isNotEmpty()) {
                 parts = parts + found
-                guessType(primaryName, primaryRole)
+                if (!typeTouched && found.containsKey(SherpaModel.ROLE_MERGED_DECODER)) {
+                    modelType = SherpaModel.TYPE_MOONSHINE
+                } else if (!typeTouched &&
+                    found.containsKey(SherpaModel.ROLE_ENCODER) &&
+                    found.containsKey(SherpaModel.ROLE_DECODER) &&
+                    !found.containsKey(SherpaModel.ROLE_JOINER)
+                ) {
+                    modelType = SherpaModel.TYPE_CANARY
+                } else {
+                    val inferredRole = if (found.containsKey(SherpaModel.ROLE_MERGED_DECODER)) {
+                        SherpaModel.ROLE_MERGED_DECODER
+                    } else {
+                        primaryRole
+                    }
+                    guessType(folderName ?: primaryName, inferredRole)
+                }
             }
         } catch (_: Exception) {
         }
@@ -303,27 +333,44 @@ private fun AddSherpaModelDialog(
             scanFolder(uri)
         }
     }
-    val isSenseVoice = modelType == SherpaModel.TYPE_SENSE_VOICE
-    val pickers = if (isSenseVoice) {
-        mapOf(
+    val pickers = when {
+        modelType == SherpaModel.TYPE_SENSE_VOICE -> mapOf(
             SherpaModel.ROLE_MODEL to pickModel,
             SherpaModel.ROLE_TOKENS to pickTokens
         )
-    } else {
-        mapOf(
+        modelType == SherpaModel.TYPE_MOONSHINE -> mapOf(
+            SherpaModel.ROLE_ENCODER to pickEncoder,
+            SherpaModel.ROLE_MERGED_DECODER to pickMergedDecoder,
+            SherpaModel.ROLE_TOKENS to pickTokens
+        )
+        modelType == SherpaModel.TYPE_CANARY -> mapOf(
+            SherpaModel.ROLE_ENCODER to pickEncoder,
+            SherpaModel.ROLE_DECODER to pickDecoder,
+            SherpaModel.ROLE_TOKENS to pickTokens
+        )
+        else -> mapOf(
             SherpaModel.ROLE_ENCODER to pickEncoder,
             SherpaModel.ROLE_DECODER to pickDecoder,
             SherpaModel.ROLE_JOINER to pickJoiner,
             SherpaModel.ROLE_TOKENS to pickTokens
         )
     }
-    val slotLabels = if (isSenseVoice) {
-        mapOf(
+    val slotLabels = when {
+        modelType == SherpaModel.TYPE_SENSE_VOICE -> mapOf(
             SherpaModel.ROLE_MODEL to stringResource(R.string.sherpa_slot_model),
             SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
         )
-    } else {
-        mapOf(
+        modelType == SherpaModel.TYPE_MOONSHINE -> mapOf(
+            SherpaModel.ROLE_ENCODER to stringResource(R.string.sherpa_slot_encoder),
+            SherpaModel.ROLE_MERGED_DECODER to stringResource(R.string.sherpa_slot_merged_decoder),
+            SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
+        )
+        modelType == SherpaModel.TYPE_CANARY -> mapOf(
+            SherpaModel.ROLE_ENCODER to stringResource(R.string.sherpa_slot_encoder),
+            SherpaModel.ROLE_DECODER to stringResource(R.string.sherpa_slot_decoder),
+            SherpaModel.ROLE_TOKENS to stringResource(R.string.sherpa_slot_tokens)
+        )
+        else -> mapOf(
             SherpaModel.ROLE_ENCODER to stringResource(R.string.sherpa_slot_encoder),
             SherpaModel.ROLE_DECODER to stringResource(R.string.sherpa_slot_decoder),
             SherpaModel.ROLE_JOINER to stringResource(R.string.sherpa_slot_joiner),
@@ -361,9 +408,24 @@ private fun AddSherpaModelDialog(
                     onClick = { selectType(SherpaModel.TYPE_STREAMING_TRANSDUCER) }
                 )
                 TypeOption(
+                    selected = modelType == SherpaModel.TYPE_STREAMING_ZIPFORMER2,
+                    label = stringResource(R.string.sherpa_type_streaming_zipformer2),
+                    onClick = { selectType(SherpaModel.TYPE_STREAMING_ZIPFORMER2) }
+                )
+                TypeOption(
                     selected = modelType == SherpaModel.TYPE_SENSE_VOICE,
                     label = stringResource(R.string.sherpa_type_sense_voice),
                     onClick = { selectType(SherpaModel.TYPE_SENSE_VOICE) }
+                )
+                TypeOption(
+                    selected = modelType == SherpaModel.TYPE_MOONSHINE,
+                    label = stringResource(R.string.sherpa_type_moonshine),
+                    onClick = { selectType(SherpaModel.TYPE_MOONSHINE) }
+                )
+                TypeOption(
+                    selected = modelType == SherpaModel.TYPE_CANARY,
+                    label = stringResource(R.string.sherpa_type_canary),
+                    onClick = { selectType(SherpaModel.TYPE_CANARY) }
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
