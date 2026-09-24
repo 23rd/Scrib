@@ -20,6 +20,8 @@ object ModelCatalog {
     // never the active model — it is a small companion to whichever whisper model is chosen.
     const val VAD_FILE = "ggml-silero-v5.1.2.bin"
     const val VAD_URL = "https://huggingface.co/ggml-org/whisper-vad/resolve/main/$VAD_FILE"
+    const val SHERPA_VAD_FILE = "silero_vad.onnx"
+    const val SHERPA_VAD_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/$SHERPA_VAD_FILE"
 
     private fun standard(
         id: String,

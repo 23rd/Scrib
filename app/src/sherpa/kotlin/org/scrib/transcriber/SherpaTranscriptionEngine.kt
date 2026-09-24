@@ -5,6 +5,9 @@ import android.os.ParcelFileDescriptor
 import android.util.Log
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OnlineRecognizer
+import com.k2fsa.sherpa.onnx.SileroVadModelConfig
+import com.k2fsa.sherpa.onnx.Vad
+import com.k2fsa.sherpa.onnx.VadModelConfig
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.StreamRequest
@@ -116,6 +119,22 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         synchronized(nativeLock) {
             ensureRecognizerLocked(languageHint)
         }
+        val vadPath = ModelManager.sherpaVadModelPath(appContext)
+        return if (vadPath != null) {
+            transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, onProgress, onPartial)
+        } else {
+            transcribeWindows(samples, sampleCount, languageHint, cancellation, onProgress, onPartial)
+        }
+    }
+
+    private fun transcribeWindows(
+        samples: ByteBuffer,
+        sampleCount: Int,
+        languageHint: String?,
+        cancellation: CancellationToken,
+        onProgress: (Int) -> Unit,
+        onPartial: (String) -> Unit
+    ): List<TranscriptSegment> {
         val windows = (sampleCount + WINDOW_SAMPLES - 1) / WINDOW_SAMPLES
         val segments = ArrayList<TranscriptSegment>(windows)
         val cumulative = StringBuilder()
@@ -144,6 +163,86 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             throw CancelledException()
         }
         return segments
+    }
+
+    private fun transcribeWithVad(
+        samples: ByteBuffer,
+        sampleCount: Int,
+        vadPath: String,
+        languageHint: String?,
+        cancellation: CancellationToken,
+        onProgress: (Int) -> Unit,
+        onPartial: (String) -> Unit
+    ): List<TranscriptSegment> {
+        val vad = try {
+            Vad(
+                null,
+                VadModelConfig(
+                    sileroVadModelConfig = SileroVadModelConfig(model = vadPath),
+                    sampleRate = SAMPLE_RATE,
+                    numThreads = 1,
+                    provider = "cpu"
+                )
+            )
+        } catch (e: Throwable) {
+            Log.w(TAG, "Sherpa VAD could not load", e)
+            return transcribeWindows(samples, sampleCount, languageHint, cancellation, onProgress, onPartial)
+        }
+        val segments = ArrayList<TranscriptSegment>()
+        val speech = ArrayList<SpeechSpan>()
+        val cumulative = StringBuilder()
+        val input = samples.duplicate().order(ByteOrder.nativeOrder()).asFloatBuffer()
+        fun appendSegment(start: Int, samples: FloatArray) {
+            if (samples.isEmpty()) {
+                return
+            }
+            val text = Dictionary.applyReplacements(appContext, decodeWindow(samples, languageHint))
+            if (text.isEmpty()) {
+                return
+            }
+            val startMs = start.toLong() * 1000 / SAMPLE_RATE
+            val endMs = (start + samples.size).toLong() * 1000 / SAMPLE_RATE
+            segments.add(TranscriptSegment(startMs, endMs, if (segments.isEmpty()) text else " $text"))
+            speech.add(SpeechSpan(startMs, endMs))
+            if (cumulative.isNotEmpty()) {
+                cumulative.append(' ')
+            }
+            cumulative.append(text)
+            onPartial(cumulative.toString())
+        }
+        try {
+            var offset = 0
+            while (offset < sampleCount) {
+                if (cancellation.isCancelled) {
+                    throw CancelledException()
+                }
+                val length = minOf(VAD_WINDOW_SAMPLES, sampleCount - offset)
+                val chunk = FloatArray(length)
+                input.position(offset)
+                input.get(chunk)
+                vad.acceptWaveform(chunk)
+                while (!vad.empty()) {
+                    val segment = vad.front()
+                    appendSegment(segment.start, segment.samples)
+                    vad.pop()
+                }
+                offset += length
+                onProgress(((offset.toLong() * 100) / sampleCount).toInt())
+            }
+            vad.flush()
+            while (!vad.empty()) {
+                val segment = vad.front()
+                appendSegment(segment.start, segment.samples)
+                vad.pop()
+            }
+        } finally {
+            vad.release()
+        }
+        if (cancellation.isCancelled) {
+            throw CancelledException()
+        }
+        onProgress(100)
+        return markParagraphs(segments, speech)
     }
 
     private fun decodeWindow(samples: FloatArray, languageHint: String? = null): String {
@@ -242,10 +341,10 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         if (!SherpaModel.isComplete(dir, info)) {
             throw ModelNotAvailableException()
         }
-        val language = if (info.modelType == SherpaModel.TYPE_SENSE_VOICE) {
-            SherpaModel.senseVoiceLanguage(info, languageHint)
-        } else {
-            null
+        val language = when (info.modelType) {
+            SherpaModel.TYPE_SENSE_VOICE -> SherpaModel.senseVoiceLanguage(info, languageHint)
+            SherpaModel.TYPE_CANARY -> SherpaModel.canaryLanguage(info, languageHint)
+            else -> null
         }
         val streaming = SherpaModel.isStreaming(info.modelType)
         if (loadedId == info.id && loadedLanguage == language) {
@@ -302,6 +401,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         const val SAMPLE_RATE = 16000
 
         const val WINDOW_SAMPLES = SAMPLE_RATE * 30
+        const val VAD_WINDOW_SAMPLES = 512
 
         @Volatile
         private var instance: SherpaTranscriptionEngine? = null

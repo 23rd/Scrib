@@ -111,6 +111,16 @@ object ModelManager {
     fun setActive(context: Context, fileName: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putString(KEY_ACTIVE, fileName).apply()
+        if (skipSilence(context)) {
+            val installed = if (SherpaPlugins.plugin?.selectedId(context) != null) {
+                isSherpaVadInstalled(context)
+            } else {
+                isVadInstalled(context)
+            }
+            if (!installed) {
+                setSkipSilence(context, false)
+            }
+        }
     }
 
     fun delete(context: Context, fileName: String) {
@@ -142,6 +152,9 @@ object ModelManager {
     fun isVadInstalled(context: Context): Boolean =
         valid(fileFor(context, ModelCatalog.VAD_FILE), MIN_VALID_VAD_SIZE)
 
+    fun isSherpaVadInstalled(context: Context): Boolean =
+        valid(fileFor(context, ModelCatalog.SHERPA_VAD_FILE), MIN_VALID_VAD_SIZE)
+
     fun skipSilence(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_SKIP_SILENCE, false)
 
@@ -158,6 +171,27 @@ object ModelManager {
             return null
         }
         return fileFor(context, ModelCatalog.VAD_FILE).absolutePath
+    }
+
+    fun sherpaVadModelPath(context: Context): String? {
+        if (!skipSilence(context) || !isSherpaVadInstalled(context)) {
+            return null
+        }
+        return fileFor(context, ModelCatalog.SHERPA_VAD_FILE).absolutePath
+    }
+
+    @Synchronized
+    fun downloadSherpaVad(
+        context: Context,
+        onProgress: (downloaded: Long, total: Long) -> Unit,
+        isCancelled: () -> Boolean
+    ): File {
+        val dest = fileFor(context, ModelCatalog.SHERPA_VAD_FILE)
+        if (valid(dest, MIN_VALID_VAD_SIZE)) {
+            return dest
+        }
+        downloadUrl(ModelCatalog.SHERPA_VAD_URL, dest, onProgress, isCancelled, MIN_VALID_VAD_SIZE)
+        return dest
     }
 
     @Synchronized

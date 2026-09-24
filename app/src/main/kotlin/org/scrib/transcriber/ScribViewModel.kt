@@ -231,7 +231,13 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             ModelManager.setSkipSilence(ctx, false)
             push(); return
         }
-        if (ModelManager.isVadInstalled(ctx)) {
+        val sherpaActive = SherpaPlugins.plugin?.selectedId(ctx) != null
+        val installed = if (sherpaActive) {
+            ModelManager.isSherpaVadInstalled(ctx)
+        } else {
+            ModelManager.isVadInstalled(ctx)
+        }
+        if (installed) {
             ModelManager.setSkipSilence(ctx, true)
             push(); return
         }
@@ -241,15 +247,27 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         vadJob = viewModelScope.launch {
             try {
                 withContext(Dispatchers.IO) {
-                    ModelManager.downloadVad(ctx,
-                        onProgress = { done, total ->
-                            val pct = if (total > 0) ((done * 100) / total).toInt() else -1
-                            if (vadPct != pct) {
-                                vadPct = pct
-                                push()
-                            }
-                        },
-                        isCancelled = { !isActive })
+                    if (sherpaActive) {
+                        ModelManager.downloadSherpaVad(ctx,
+                            onProgress = { done, total ->
+                                val pct = if (total > 0) ((done * 100) / total).toInt() else -1
+                                if (vadPct != pct) {
+                                    vadPct = pct
+                                    push()
+                                }
+                            },
+                            isCancelled = { !isActive })
+                    } else {
+                        ModelManager.downloadVad(ctx,
+                            onProgress = { done, total ->
+                                val pct = if (total > 0) ((done * 100) / total).toInt() else -1
+                                if (vadPct != pct) {
+                                    vadPct = pct
+                                    push()
+                                }
+                            },
+                            isCancelled = { !isActive })
+                    }
                 }
                 ModelManager.setSkipSilence(ctx, true)
             } catch (e: ModelManager.CancelledDownloadException) {
