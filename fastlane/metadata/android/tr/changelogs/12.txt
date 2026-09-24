@@ -1,0 +1,3 @@
+• Eski streaming model türlerinin yanlış sınıflandırılması düzeltildi
+• Moonshine ve Canary modelleri için içe aktarma desteği eklendi
+• Sherpa VAD konuşma segmenti işlemesi eklendi

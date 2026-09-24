@@ -1,0 +1,3 @@
+• Fehlerhafte Klassifizierung alter Streaming-Modelltypen behoben
+• Importsupport für Moonshine- und Canary-Modelle hinzugefügt
+• Sherpa-VAD-Verarbeitung von Sprachsegmenten hinzugefügt

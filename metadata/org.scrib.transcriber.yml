@@ -116,7 +116,16 @@ Builds:
       - yes
     ndk: '27.2.12479018'
 
+  - versionName: '0.12'
+    versionCode: 12
+    commit: v0.12
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: '0.11'
-CurrentVersionCode: 11
+CurrentVersion: '0.12'
+CurrentVersionCode: 12

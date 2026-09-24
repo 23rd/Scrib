@@ -1,0 +1,3 @@
+• Verkeerde classificatie van legacy streaming-modeltypen gecorrigeerd
+• Importondersteuning voor Moonshine- en Canary-modellen toegevoegd
+• Sherpa-VAD-verwerking van spraaksegmenten toegevoegd
