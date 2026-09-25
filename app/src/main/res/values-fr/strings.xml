@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
     <string name="transcribing_pct">Transcription… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcription… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Total %1$s · décodage %2$s · inférence %3$s · audio %4$s · RTF %5$s · PSS %6$s · pic %7$s · RAM libre %8$s</string>
+    <string name="transcribe_stats_model">Modèle : %1$s</string>
+    <string name="transcribe_stats_mb">%1$d Mo</string>
+    <string name="transcribe_stats_gb">%1$.1f Go</string>
     <string name="eta_minutes">environ %1$d min restantes</string>
     <string name="eta_seconds">environ %1$d s restantes</string>
     <string name="transcribe_background_hint">Continue si vous quittez l\'application.</string>

@@ -20,6 +20,10 @@
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
     <string name="transcribing_pct">Transcribing… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribing… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Total %1$s · decode %2$s · inference %3$s · audio %4$s · RTF %5$s · PSS %6$s · peak %7$s · free RAM %8$s</string>
+    <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d MB</string>
+    <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="eta_minutes">about %1$d min left</string>
     <string name="eta_seconds">about %1$d sec left</string>
     <string name="transcribe_background_hint">Keeps running if you leave the app.</string>

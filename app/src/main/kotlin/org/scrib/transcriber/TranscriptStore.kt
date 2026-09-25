@@ -25,8 +25,18 @@ object TranscriptStore {
             }
             val json = JSONObject()
                 .put(NAME, transcript.fileName)
+                .put(MODEL, transcript.modelName)
                 .put(TEXT, transcript.text)
                 .put(SEGMENTS, segments)
+                .put(METRICS, JSONObject()
+                    .put(AUDIO_DURATION_MS, transcript.metrics.audioDurationMs)
+                    .put(DECODE_MS, transcript.metrics.decodeMs)
+                    .put(INFERENCE_MS, transcript.metrics.inferenceMs)
+                    .put(TOTAL_MS, transcript.metrics.totalMs)
+                    .put(PSS_MB, transcript.metrics.pssMb)
+                    .put(PEAK_PSS_MB, transcript.metrics.peakPssMb)
+                    .put(FREE_RAM_MB, transcript.metrics.freeRamMb)
+                )
             file(context).writeText(json.toString())
         } catch (e: Throwable) {
             Log.w(LOG_TAG, "Couldn't keep the transcript", e)
@@ -68,11 +78,22 @@ object TranscriptStore {
                 )
             )
         }
+        val metrics = json.optJSONObject(METRICS) ?: JSONObject()
         return TranscribeUi(
             fileName = json.optString(NAME),
             text = text,
             running = false,
             error = null,
+            modelName = json.optString(MODEL).takeIf { it.isNotBlank() },
+            metrics = TranscriptionMetrics(
+                audioDurationMs = metrics.optLong(AUDIO_DURATION_MS),
+                decodeMs = metrics.optLong(DECODE_MS),
+                inferenceMs = metrics.optLong(INFERENCE_MS),
+                totalMs = metrics.optLong(TOTAL_MS),
+                pssMb = metrics.optInt(PSS_MB),
+                peakPssMb = metrics.optInt(PEAK_PSS_MB),
+                freeRamMb = metrics.optInt(FREE_RAM_MB)
+            ),
             segments = segments,
             percent = 100
         )
@@ -81,8 +102,17 @@ object TranscriptStore {
     private fun file(context: Context) = File(context.filesDir, FILE_NAME)
 
     private const val NAME = "name"
+    private const val MODEL = "model"
     private const val TEXT = "text"
     private const val SEGMENTS = "segments"
+    private const val METRICS = "metrics"
+    private const val AUDIO_DURATION_MS = "audioDurationMs"
+    private const val DECODE_MS = "decodeMs"
+    private const val INFERENCE_MS = "inferenceMs"
+    private const val TOTAL_MS = "totalMs"
+    private const val PSS_MB = "pssMb"
+    private const val PEAK_PSS_MB = "peakPssMb"
+    private const val FREE_RAM_MB = "freeRamMb"
     private const val START = "start"
     private const val END = "end"
     private const val PARAGRAPH = "paragraph"

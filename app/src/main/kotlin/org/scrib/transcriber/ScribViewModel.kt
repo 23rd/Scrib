@@ -63,6 +63,8 @@ data class TranscribeUi(
     val running: Boolean,
     val error: String?,
     val sourceUri: Uri? = null,
+    val modelName: String? = null,
+    val metrics: TranscriptionMetrics = TranscriptionMetrics(),
     val segments: List<TranscriptSegment> = emptyList(),
     val format: TranscriptFormat = TranscriptFormat.TXT,
     // How far whisper is through the audio, or -1 while the file is still being decoded.

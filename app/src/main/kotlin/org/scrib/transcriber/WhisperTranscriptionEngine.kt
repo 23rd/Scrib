@@ -2,6 +2,7 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import com.whispercpp.whisper.WhisperAbortFlag
 import com.whispercpp.whisper.WhisperContext
 import org.opentranscribe.api.ErrorType
@@ -26,12 +27,17 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     ) {
         try {
             // The contract hands clients plain text; the timings stay in the app's own screen.
-            val segments = transcribeToSegments(audio, request?.languageHint, cancellation) { partial ->
-                try {
-                    callback.onTranscriptionProgress(partial)
-                } catch (ignore: Exception) {
+            val segments = transcribeToSegments(
+                audio,
+                request?.languageHint,
+                cancellation,
+                onPartial = { partial ->
+                    try {
+                        callback.onTranscriptionProgress(partial)
+                    } catch (ignore: Exception) {
+                    }
                 }
-            }
+            )
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
@@ -55,20 +61,48 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        onMetrics: (TranscriptionMetrics) -> Unit
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
+            val decodeStartedAt = SystemClock.elapsedRealtime()
             val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation)
+            val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
             if (pcm.sampleCount == 0) {
                 throw DecodeException("No audio decoded")
             }
-            return transcribePcm(pcm, languageHint, cancellation, onProgress, onPartial)
+            val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
+            onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+            val inferenceStartedAt = SystemClock.elapsedRealtime()
+            fun reportProgress(percent: Int) {
+                onProgress(percent)
+                onMetrics(
+                    TranscriptionMetrics(
+                        audioDurationMs = audioDurationMs,
+                        decodeMs = decodeMs,
+                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                    )
+                )
+            }
+            return try {
+                transcribePcm(
+                    pcm, languageHint, cancellation, ::reportProgress, onPartial
+                )
+            } finally {
+                onMetrics(
+                    TranscriptionMetrics(
+                        audioDurationMs = audioDurationMs,
+                        decodeMs = decodeMs,
+                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                    )
+                )
+            }
         } finally {
             try {
                 audio.close()

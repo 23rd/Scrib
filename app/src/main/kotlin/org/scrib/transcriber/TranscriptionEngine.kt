@@ -8,6 +8,20 @@ import org.opentranscribe.api.TranscriberCapabilities
 import org.opentranscribe.api.TranscriptionError
 import org.opentranscribe.api.TranscriptionRequest
 
+data class TranscriptionMetrics(
+    val audioDurationMs: Long = 0L,
+    val decodeMs: Long = 0L,
+    val inferenceMs: Long = 0L,
+    val totalMs: Long = 0L,
+    val pssMb: Int = 0,
+    val peakPssMb: Int = 0,
+    val freeRamMb: Int = 0
+) {
+    val hasData: Boolean get() = totalMs > 0L || audioDurationMs > 0L || inferenceMs > 0L
+    val rtf: Double?
+        get() = if (audioDurationMs > 0L) inferenceMs.toDouble() / audioDurationMs else null
+}
+
 interface TranscriptionEngine {
 
     fun transcribe(
@@ -22,7 +36,8 @@ interface TranscriptionEngine {
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit = {},
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        onMetrics: (TranscriptionMetrics) -> Unit = {}
     ): List<TranscriptSegment>
 
     // The caller starts the returned stream and feeds it PCM as it is captured.

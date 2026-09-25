@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Decodificando y transcribiendo en el dispositivo…</string>
     <string name="transcribing_pct">Transcribiendo… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribiendo… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Total %1$s · decodificación %2$s · inferencia %3$s · audio %4$s · RTF %5$s · PSS %6$s · pico %7$s · RAM libre %8$s</string>
+    <string name="transcribe_stats_model">Modelo: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d MB</string>
+    <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="eta_minutes">quedan unos %1$d min</string>
     <string name="eta_seconds">quedan unos %1$d s</string>
     <string name="transcribe_background_hint">Sigue en marcha si sales de la app.</string>

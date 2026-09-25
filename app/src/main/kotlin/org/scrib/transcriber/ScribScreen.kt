@@ -682,6 +682,10 @@ private fun TranscriptionDialog(
                         }
                     }
                 }
+                if (!t.running && t.error == null && t.metrics.hasData) {
+                    Spacer(Modifier.height(8.dp))
+                    StatsLine(t)
+                }
                 if (hasText) {
                     Spacer(Modifier.height(12.dp))
                     if (finished && t.segments.isNotEmpty()) {
@@ -713,6 +717,54 @@ private fun TranscriptionDialog(
     )
 }
 
+@Composable
+private fun StatsLine(t: TranscribeUi) {
+    if (!t.metrics.hasData) {
+        return
+    }
+    val metrics = t.metrics
+    val rtf = metrics.rtf?.let { String.format(Locale.ROOT, "%.2f", it) } ?: "—"
+    Column {
+        if (!t.modelName.isNullOrBlank()) {
+            Text(
+                text = stringResource(R.string.transcribe_stats_model, t.modelName),
+                fontSize = 11.5.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Text(
+            text = stringResource(
+                R.string.transcribe_stats_line,
+                elapsed(metrics.totalMs),
+                elapsedOrDash(metrics.decodeMs),
+                elapsedOrDash(metrics.inferenceMs),
+                elapsedOrDash(metrics.audioDurationMs),
+                rtf,
+                memoryText(metrics.pssMb),
+                memoryText(metrics.peakPssMb),
+                memoryText(metrics.freeRamMb)
+            ),
+            fontSize = 11.5.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 16.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun memoryText(megabytes: Int): String =
+    if (megabytes >= 1024) {
+        stringResource(R.string.transcribe_stats_gb, megabytes / 1024f)
+    } else {
+        stringResource(R.string.transcribe_stats_mb, megabytes)
+    }
+
+private fun elapsedOrDash(ms: Long): String = if (ms > 0L) elapsed(ms) else "—"
+
 // Whisper only starts reporting once decoding is done and the model is loaded, so the bar spins
 // until then rather than sitting at a misleading zero. The line underneath doubles as the promise
 // that walking away is safe — the run keeps going in the notification.
@@ -737,6 +789,10 @@ private fun RunProgress(t: TranscribeUi) {
                 },
                 fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = cs.primary
             )
+        }
+        if (t.metrics.hasData) {
+            Spacer(Modifier.height(6.dp))
+            StatsLine(t)
         }
         Spacer(Modifier.height(6.dp))
         Text(

@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
     <string name="transcribing_pct">Yazıya dökülüyor… %1$d%%</string>
     <string name="transcribing_pct_eta">Yazıya dökülüyor… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Toplam %1$s · çözme %2$s · çıkarım %3$s · ses %4$s · RTF %5$s · PSS %6$s · zirve %7$s · boş RAM %8$s</string>
+    <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d MB</string>
+    <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="eta_minutes">yaklaşık %1$d dk kaldı</string>
     <string name="eta_seconds">yaklaşık %1$d sn kaldı</string>
     <string name="transcribe_background_hint">Uygulamadan çıksanız da sürer.</string>

@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
     <string name="transcribing_pct">Transcriberen… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcriberen… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Totaal %1$s · decoderen %2$s · inferentie %3$s · audio %4$s · RTF %5$s · PSS %6$s · piek %7$s · vrij RAM %8$s</string>
+    <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d MB</string>
+    <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="eta_minutes">nog ongeveer %1$d min</string>
     <string name="eta_seconds">nog ongeveer %1$d sec</string>
     <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>

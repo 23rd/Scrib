@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
     <string name="transcribing_pct">Розпізнавання… %1$d%%</string>
     <string name="transcribing_pct_eta">Розпізнавання… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Усього %1$s · декодування %2$s · розпізнавання %3$s · аудіо %4$s · RTF %5$s · PSS %6$s · пік %7$s · вільна ОЗ %8$s</string>
+    <string name="transcribe_stats_model">Модель: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d МБ</string>
+    <string name="transcribe_stats_gb">%1$.1f ГБ</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

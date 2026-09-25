@@ -2,6 +2,7 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
+import android.os.SystemClock
 import android.util.Log
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OnlineRecognizer
@@ -39,12 +40,17 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         cancellation: CancellationToken
     ) {
         try {
-            val segments = transcribeToSegments(audio, request?.languageHint, cancellation) { partial ->
-                try {
-                    callback.onTranscriptionProgress(partial)
-                } catch (ignore: Exception) {
+            val segments = transcribeToSegments(
+                audio,
+                request?.languageHint,
+                cancellation,
+                onPartial = { partial ->
+                    try {
+                        callback.onTranscriptionProgress(partial)
+                    } catch (ignore: Exception) {
+                    }
                 }
-            }
+            )
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
@@ -76,26 +82,34 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        onMetrics: (TranscriptionMetrics) -> Unit
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
+            val decodeStartedAt = SystemClock.elapsedRealtime()
             val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation)
+            val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
             if (pcm.sampleCount == 0) {
                 throw DecodeException("No audio decoded")
             }
+            val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
+            onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
             return transcribePcm(
                 pcm.samples,
                 pcm.sampleCount,
                 languageHint,
                 cancellation,
                 onProgress,
-                onPartial
+                onPartial,
+                onMetrics,
+                audioDurationMs,
+                decodeMs
             )
         } finally {
             try {
@@ -111,19 +125,43 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        onMetrics: (TranscriptionMetrics) -> Unit,
+        audioDurationMs: Long,
+        decodeMs: Long
     ): List<TranscriptSegment> {
         if (cancellation.isCancelled) {
             throw CancelledException()
         }
-        synchronized(nativeLock) {
-            ensureRecognizerLocked(languageHint)
+        val inferenceStartedAt = SystemClock.elapsedRealtime()
+        fun reportProgress(percent: Int) {
+            onProgress(percent)
+            onMetrics(
+                TranscriptionMetrics(
+                    audioDurationMs = audioDurationMs,
+                    decodeMs = decodeMs,
+                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                )
+            )
         }
-        val vadPath = ModelManager.sherpaVadModelPath(appContext)
-        return if (vadPath != null) {
-            transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, onProgress, onPartial)
-        } else {
-            transcribeWindows(samples, sampleCount, languageHint, cancellation, onProgress, onPartial)
+        try {
+            synchronized(nativeLock) {
+                ensureRecognizerLocked(languageHint)
+            }
+            val vadPath = ModelManager.sherpaVadModelPath(appContext)
+            return if (vadPath != null) {
+                transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, ::reportProgress, onPartial)
+            } else {
+                transcribeWindows(samples, sampleCount, languageHint, cancellation, ::reportProgress, onPartial)
+            }
+        } finally {
+            onMetrics(
+                TranscriptionMetrics(
+                    audioDurationMs = audioDurationMs,
+                    decodeMs = decodeMs,
+                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                )
+            )
         }
     }
 

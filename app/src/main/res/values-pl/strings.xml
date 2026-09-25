@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>
     <string name="transcribing_pct">Transkrypcja… %1$d%%</string>
     <string name="transcribing_pct_eta">Transkrypcja… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Łącznie %1$s · dekodowanie %2$s · wnioskowanie %3$s · audio %4$s · RTF %5$s · PSS %6$s · szczyt %7$s · wolny RAM %8$s</string>
+    <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d MB</string>
+    <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="eta_minutes">pozostało około %1$d min</string>
     <string name="eta_seconds">pozostało około %1$d s</string>
     <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>

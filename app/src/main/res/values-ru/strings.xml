@@ -18,6 +18,10 @@
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>
     <string name="transcribing_pct">Распознавание… %1$d%%</string>
     <string name="transcribing_pct_eta">Распознавание… %1$d%% · %2$s</string>
+    <string name="transcribe_stats_line">Всего %1$s · декодирование %2$s · распознавание %3$s · аудио %4$s · RTF %5$s · PSS %6$s · пик %7$s · свободно %8$s</string>
+    <string name="transcribe_stats_model">Модель: %1$s</string>
+    <string name="transcribe_stats_mb">%1$d МБ</string>
+    <string name="transcribe_stats_gb">%1$.1f ГБ</string>
     <string name="eta_minutes">осталось около %1$d мин</string>
     <string name="eta_seconds">осталось около %1$d с</string>
     <string name="transcribe_background_hint">Продолжается, даже если выйти из приложения.</string>
