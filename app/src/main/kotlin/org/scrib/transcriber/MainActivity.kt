@@ -68,6 +68,7 @@ class MainActivity : ComponentActivity() {
                         onCancelBenchmark = vm::cancelBenchmark,
                         onPickLanguage = vm::setupForLanguage,
                         onSkipSilence = vm::setSkipSilence,
+                        onConfigureKeyboardLayouts = vm::setKeyboardLayouts,
                         onImportSherpa = vm::importSherpa,
                         sherpaPlugin = SherpaPlugins.plugin,
                         recording = recording,

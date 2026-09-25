@@ -67,13 +67,13 @@
     <string name="record_empty">Es wurde nichts aufgenommen.</string>
 
     <string name="vad_entry_title">Stille überspringen</string>
-    <string name="vad_entry_sub">Nur die Stellen mit Sprache transkribieren — Aufnahmen mit langen Pausen sind schneller fertig und Stille landet nicht mehr im Text. Bei durchgehender Sprache kein Gewinn. Einmaliger Download von 1 MB.</string>
+    <string name="vad_entry_sub">Schnellere Transkription ohne Stille. Einmaliger Download von 1 MB.</string>
     <string name="vad_entry_downloading">Sprachaktivitätserkennung wird geladen… %1$d%%</string>
     <string name="status_vad_failed">Sprachaktivitätserkennung konnte nicht geladen werden — prüfe deine Verbindung und versuch es erneut.</string>
 
     <string name="ime_label">Scrib Stimme</string>
     <string name="ime_entry_title">Sprachtastatur</string>
-    <string name="ime_entry_sub">Diktiere in jede App — schalte Scrib in der Tastaturliste des Systems ein</string>
+    <string name="ime_entry_sub">Diktiere in jede App</string>
     <string name="ime_ready">Tippe auf das Mikrofon und diktiere.</string>
     <string name="ime_listening">Ich höre zu… Text erscheint bei jeder Pause.</string>
     <string name="ime_finishing">Die letzten Worte werden transkribiert…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Löschen</string>
     <string name="ime_keyboard">Tastatur</string>
     <string name="ime_needs_model">Noch kein Sprachmodell — öffne Scrib und lade eines herunter.</string>
+    <string name="ime_layout_buttons_title">Tastaturlayout-Schaltflächen</string>
+    <string name="ime_layout_buttons_show">Layout-Schaltflächen anzeigen</string>
+    <string name="ime_layout_buttons_hint">Wähle aktivierte Tastaturlayouts. Die Reihenfolge der Auswahl ist die Reihenfolge der Schaltflächen. Deaktiviere dies, um eine allgemeine Tastaturschaltfläche zu behalten.</string>
+    <string name="ime_layout_buttons_empty">Keine aktivierten Tastaturlayouts gefunden. Aktiviere zuerst eine Tastatur in den Systemeinstellungen.</string>
+    <string name="ime_layout_buttons_open">Tastatureinstellungen öffnen</string>
+    <string name="ime_layout_buttons_clear">Auswahl löschen</string>
+    <string name="ime_layout_buttons_off">Eine allgemeine Tastaturschaltfläche</string>
+    <string name="ime_layout_buttons_none">Keine Layout-Schaltflächen</string>
+    <string name="ime_layout_buttons_on">Eigene Layout-Schaltflächen</string>
 
     <string name="models_explainer">Größere Modelle sind genauer, aber langsamer und größer beim Download. Modelle „nur Englisch“ sind kleiner und schneller; für andere Sprachen wähle Base oder größer — Tiny ist schwach.</string>
     <string name="standard_models">STANDARDMODELLE</string>

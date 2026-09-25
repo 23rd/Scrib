@@ -67,13 +67,13 @@
     <string name="record_empty">Hiçbir şey kaydedilmedi.</string>
 
     <string name="vad_entry_title">Sessizlikleri atla</string>
-    <string name="vad_entry_sub">Yalnızca konuşma içeren bölümler yazıya dökülür — uzun duraklamalı kayıtlar daha erken biter ve sessizlik metne sızmaz. Kesintisiz konuşmada kazanç yok. Tek seferlik 1 MB indirme.</string>
+    <string name="vad_entry_sub">Sessiz hâlde daha hızlı transkripsiyon. Tek seferlik 1 MB indirme.</string>
     <string name="vad_entry_downloading">Konuşma algılayıcı indiriliyor… %1$d%%</string>
     <string name="status_vad_failed">Konuşma algılayıcı indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
 
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
-    <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin — Scrib\'i sistem klavye listesinden açın</string>
+    <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin</string>
     <string name="ime_ready">Mikrofona dokunup dikte edin.</string>
     <string name="ime_listening">Dinliyor… metin her duraklamada beliriyor.</string>
     <string name="ime_finishing">Son sözler yazıya dökülüyor…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Sil</string>
     <string name="ime_keyboard">Klavye</string>
     <string name="ime_needs_model">Henüz konuşma modeli yok — Scrib\'i açıp bir tane indirin.</string>
+    <string name="ime_layout_buttons_title">Klavye düzeni düğmeleri</string>
+    <string name="ime_layout_buttons_show">Düzen düğmelerini göster</string>
+    <string name="ime_layout_buttons_hint">Etkin klavye düzenlerini seçin. Seçim sırası düğmelerin sırası olur. Tek bir genel klavye düğmesi bırakmak için kapatın.</string>
+    <string name="ime_layout_buttons_empty">Etkin klavye düzeni bulunamadı. Önce sistem ayarlarından bir klavye etkinleştirin.</string>
+    <string name="ime_layout_buttons_open">Klavye ayarlarını aç</string>
+    <string name="ime_layout_buttons_clear">Seçimi temizle</string>
+    <string name="ime_layout_buttons_off">Tek genel klavye düğmesi</string>
+    <string name="ime_layout_buttons_none">Düzen düğmesi yok</string>
+    <string name="ime_layout_buttons_on">Özel düzen düğmeleri</string>
 
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
     <string name="standard_models">STANDART MODELLER</string>

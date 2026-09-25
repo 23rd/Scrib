@@ -14,6 +14,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,6 +65,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -101,6 +103,7 @@ fun ScribScreen(
     onCancelBenchmark: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
+    onConfigureKeyboardLayouts: (Boolean, List<String>) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit,
     sherpaPlugin: SherpaPlugin?,
     recording: RecordingUi?,
@@ -120,6 +123,7 @@ fun ScribScreen(
     val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
     var showAdd by remember { mutableStateOf(false) }
     var showLanguages by remember { mutableStateOf(false) }
+    var showKeyboardLayouts by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var modelsExpanded by rememberSaveable { mutableStateOf(true) }
     var customExpanded by rememberSaveable { mutableStateOf(true) }
@@ -167,7 +171,7 @@ fun ScribScreen(
             if (!state.firstRun) {
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
-                item { KeyboardEntry() }
+                item { KeyboardEntry(state.keyboardLayouts) { showKeyboardLayouts = true } }
                 item { SkipSilenceEntry(state, onSkipSilence) }
                 item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
                 item {
@@ -269,6 +273,21 @@ fun ScribScreen(
     }
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
+    }
+    if (showKeyboardLayouts) {
+        KeyboardLayoutsDialog(
+            settings = state.keyboardLayouts,
+            onDismiss = { showKeyboardLayouts = false },
+            onSave = { enabled, keys ->
+                onConfigureKeyboardLayouts(enabled, keys)
+                showKeyboardLayouts = false
+            },
+            onOpenSystemSettings = {
+                runCatching {
+                    context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
+                }
+            }
+        )
     }
     if (showBenchmarks) {
         BenchmarkHistoryDialog(
@@ -989,16 +1008,16 @@ private fun LanguageEntry(onClick: () -> Unit) {
 // The voice keyboard is useless until it is switched on in the system's own keyboard list, and
 // nothing in the app can do that on the user's behalf.
 @Composable
-private fun KeyboardEntry() {
+private fun KeyboardEntry(settings: KeyboardLayoutSettings, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
-    val context = LocalContext.current
+    val layoutSubtitle = when {
+        !settings.enabled -> stringResource(R.string.ime_layout_buttons_off)
+        settings.options.none { it.selected } -> stringResource(R.string.ime_layout_buttons_none)
+        else -> stringResource(R.string.ime_layout_buttons_on)
+    }
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp)) {
-            runCatching {
-                context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
-            }
-        }
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
@@ -1007,7 +1026,10 @@ private fun KeyboardEntry() {
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.ime_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text(stringResource(R.string.ime_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+                Text(
+                    stringResource(R.string.ime_entry_sub) + " · " + layoutSubtitle,
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
             }
             Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
@@ -1264,6 +1286,148 @@ private fun BenchmarkMetric(label: String, value: String, modifier: Modifier = M
             )
         }
     }
+}
+
+@Composable
+private fun KeyboardLayoutsDialog(
+    settings: KeyboardLayoutSettings,
+    onDismiss: () -> Unit,
+    onSave: (Boolean, List<String>) -> Unit,
+    onOpenSystemSettings: () -> Unit
+) {
+    var enabled by remember(settings) { mutableStateOf(settings.enabled) }
+    var selectedKeys by remember(settings) {
+        mutableStateOf(settings.options.filter { it.selected }.map { it.key })
+    }
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.ime_layout_buttons_title)) },
+        text = {
+            Column {
+                Row(
+                    Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.ime_layout_buttons_show),
+                        modifier = Modifier.weight(1f),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = cs.onSurface
+                    )
+                    Switch(checked = enabled, onCheckedChange = { enabled = it })
+                }
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    stringResource(R.string.ime_layout_buttons_hint),
+                    fontSize = 12.5.sp,
+                    color = cs.onSurfaceVariant,
+                    lineHeight = 17.sp
+                )
+                Spacer(Modifier.height(10.dp))
+                if (settings.options.isEmpty()) {
+                    Text(
+                        stringResource(R.string.ime_layout_buttons_empty),
+                        fontSize = 13.sp,
+                        color = cs.onSurfaceVariant,
+                        lineHeight = 18.sp
+                    )
+                } else {
+                    Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                        settings.options.forEach { option ->
+                            val selected = selectedKeys.contains(option.key)
+                            val detail = buildString {
+                                append(option.imeLabel)
+                                if (option.languageTag.isNotBlank()) {
+                                    append(" · ")
+                                    append(option.languageTag)
+                                }
+                            }
+                            Surface(
+                                color = if (selected) cs.primaryContainer else cs.surface,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .selectable(
+                                        selected = selected,
+                                        role = Role.Checkbox,
+                                        onClick = {
+                                            selectedKeys = if (selected) {
+                                                selectedKeys - option.key
+                                            } else {
+                                                selectedKeys + option.key
+                                            }
+                                        }
+                                    )
+                            ) {
+                                Row(
+                                    Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        if (selected) "✓" else "",
+                                        modifier = Modifier.width(22.dp),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = cs.primary
+                                    )
+                                    Text(
+                                        option.shortLabel,
+                                        modifier = Modifier.width(48.dp),
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = if (selected) cs.primary else cs.onSurfaceVariant
+                                    )
+                                    Column(Modifier.weight(1f)) {
+                                        Text(
+                                            option.label,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = cs.onSurface,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            detail,
+                                            fontSize = 11.5.sp,
+                                            color = cs.onSurfaceVariant,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                    if (selected) {
+                                        Text(
+                                            (selectedKeys.indexOf(option.key) + 1).toString(),
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = cs.primary
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    TextButton(
+                        onClick = { selectedKeys = emptyList() },
+                        enabled = selectedKeys.isNotEmpty(),
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(stringResource(R.string.ime_layout_buttons_clear), fontSize = 12.sp)
+                    }
+                }
+                TextButton(onClick = onOpenSystemSettings) {
+                    Text(stringResource(R.string.ime_layout_buttons_open), fontSize = 12.sp)
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onSave(enabled, selectedKeys) }) {
+                Text(stringResource(R.string.action_save))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
+    )
 }
 
 @Composable

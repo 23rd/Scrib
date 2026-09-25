@@ -9,6 +9,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.graphics.Typeface
 import android.inputmethodservice.InputMethodService
 import android.os.Build
 import android.os.Handler
@@ -21,6 +22,8 @@ import android.view.WindowInsetsController
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import org.opentranscribe.api.ErrorType
@@ -56,6 +59,7 @@ class ScribInputMethodService : InputMethodService() {
     private var session = 0
 
     private var notice: String? = null
+    private var keyboardTargetsCache: List<KeyboardLayoutTarget>? = null
 
     private companion object {
         const val LINGER_AFTER_STOP_MS = 250L
@@ -65,6 +69,7 @@ class ScribInputMethodService : InputMethodService() {
         val fresh = DictationView(this)
         fresh.onRecord = { act() }
         fresh.onKeyboard = { leave() }
+        fresh.onKeyboardLayout = { target -> leave(target) }
         fresh.onBackspace = { sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL) }
         view = fresh
         return fresh
@@ -75,6 +80,7 @@ class ScribInputMethodService : InputMethodService() {
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         notice = null
+        keyboardTargetsCache = null
         render()
     }
 
@@ -88,6 +94,8 @@ class ScribInputMethodService : InputMethodService() {
 
     override fun onWindowShown() {
         super.onWindowShown()
+        keyboardTargetsCache = null
+        render()
         paintSystemKeys()
     }
 
@@ -218,6 +226,29 @@ class ScribInputMethodService : InputMethodService() {
         keyboard()
     }
 
+    @Suppress("DEPRECATION")
+    private fun leave(target: KeyboardLayoutTarget) {
+        abandon()
+        keyboardTargetsCache = null
+        val current = keyboardTargets().firstOrNull { it.key == target.key }
+        if (current == null) {
+            keyboard()
+            return
+        }
+        val switched = if (Build.VERSION.SDK_INT >= 28) {
+            runCatching { switchInputMethod(current.imeId, current.subtype) }.isSuccess
+        } else {
+            val token = window?.window?.attributes?.token
+            val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            token != null && manager != null && runCatching {
+                manager.setInputMethodAndSubtype(token, current.imeId, current.subtype)
+            }.isSuccess
+        }
+        if (!switched) {
+            keyboard()
+        }
+    }
+
     // Nothing here may leave the user in a voice keyboard with no way to type.
     private fun keyboard() {
         if (Build.VERSION.SDK_INT >= 28) {
@@ -328,8 +359,14 @@ class ScribInputMethodService : InputMethodService() {
             alert = notice != null || blocker != Blocker.None,
             listening = stage == Stage.Listening,
             enabled = stage != Stage.Finishing,
-            modelName = ModelManager.activeDisplayName(this)
+            modelName = ModelManager.activeDisplayName(this),
+            keyboardTargets = keyboardTargets()
         )
+    }
+
+    private fun keyboardTargets(): List<KeyboardLayoutTarget> {
+        keyboardTargetsCache?.let { return it }
+        return KeyboardLayouts.targets(this).also { keyboardTargetsCache = it }
     }
 }
 
@@ -339,6 +376,7 @@ class ScribInputMethodService : InputMethodService() {
 
     var onRecord: () -> Unit = {}
     var onKeyboard: () -> Unit = {}
+    var onKeyboardLayout: (KeyboardLayoutTarget) -> Unit = {}
     var onBackspace: () -> Unit = {}
 
     private val status = TextView(context)
@@ -347,10 +385,14 @@ class ScribInputMethodService : InputMethodService() {
     private val record = RoundKey(context, filled = true)
     private val keyboard = RoundKey(context, filled = false)
     private val backspace = RoundKey(context, filled = false)
+    private val layoutScroller = HorizontalScrollView(context)
+    private val layoutKeys = LinearLayout(context)
+    private val controlRow = FrameLayout(context)
 
     private val alertColor = color(R.color.ime_alert)
     private val quietColor = color(R.color.ime_on_surface_variant)
     private val basePadding = dp(24)
+    private var targetKeys: List<String>? = null
 
     init {
         orientation = VERTICAL
@@ -386,21 +428,31 @@ class ScribInputMethodService : InputMethodService() {
         record.glyph = RoundKey.Glyph.Mic
         record.setOnClickListener { onRecord() }
 
-        val keys = LinearLayout(context)
-        keys.orientation = HORIZONTAL
-        keys.gravity = Gravity.CENTER
-        keys.addView(keyboard, LayoutParams(dp(46), dp(46)))
-        keys.addView(record, LayoutParams(dp(64), dp(64)).apply {
-            leftMargin = dp(32)
-            rightMargin = dp(32)
-        })
-        keys.addView(backspace, LayoutParams(dp(46), dp(46)))
-        addView(keys, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+        layoutKeys.orientation = HORIZONTAL
+        layoutKeys.gravity = Gravity.CENTER
+        layoutScroller.apply {
+            isHorizontalScrollBarEnabled = false
+            isFillViewport = true
+            overScrollMode = View.OVER_SCROLL_NEVER
+            addView(layoutKeys, FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+        }
+        addView(controlRow, LayoutParams(LayoutParams.MATCH_PARENT, dp(64)).apply {
             topMargin = dp(16)
         })
+        controlRow.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            sizeLanguageScroller()
+        }
+        updateKeyboardKeys(emptyList())
     }
 
-    fun render(message: String, alert: Boolean, listening: Boolean, enabled: Boolean, modelName: String?) {
+    fun render(
+        message: String,
+        alert: Boolean,
+        listening: Boolean,
+        enabled: Boolean,
+        modelName: String?,
+        keyboardTargets: List<KeyboardLayoutTarget>
+    ) {
         status.text = message
         status.setTextColor(if (alert) alertColor else quietColor)
         model.text = modelName ?: ""
@@ -410,6 +462,65 @@ class ScribInputMethodService : InputMethodService() {
         record.isEnabled = enabled
         record.alpha = if (enabled) 1f else 0.45f
         meter.alpha = if (listening) 1f else 0.4f
+        updateKeyboardKeys(keyboardTargets)
+    }
+
+    private fun updateKeyboardKeys(targets: List<KeyboardLayoutTarget>) {
+        val nextKeys = targets.map { it.key }
+        if (nextKeys == targetKeys) {
+            return
+        }
+        targetKeys = nextKeys
+        val customLayouts = targets.isNotEmpty()
+        controlRow.removeAllViews()
+        layoutKeys.removeAllViews()
+        layoutScroller.scrollTo(0, 0)
+        if (customLayouts) {
+            layoutScroller.visibility = VISIBLE
+            layoutKeys.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+            targets.forEach { target ->
+                val key = RoundKey(context, filled = false)
+                key.label = target.shortLabel
+                key.contentDescription = target.label + " · " + target.imeLabel
+                key.setOnClickListener { onKeyboardLayout(target) }
+                layoutKeys.addView(key, LayoutParams(dp(58), dp(46)))
+            }
+            controlRow.addView(
+                layoutScroller,
+                FrameLayout.LayoutParams(
+                    0,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    Gravity.START or Gravity.CENTER_VERTICAL
+                )
+            )
+            controlRow.post { sizeLanguageScroller() }
+        } else {
+            layoutScroller.visibility = GONE
+            controlRow.addView(
+                keyboard,
+                FrameLayout.LayoutParams(dp(46), dp(46), Gravity.START or Gravity.CENTER_VERTICAL)
+            )
+        }
+        controlRow.addView(
+            record,
+            FrameLayout.LayoutParams(dp(64), dp(64), Gravity.CENTER)
+        )
+        controlRow.addView(
+            backspace,
+            FrameLayout.LayoutParams(dp(46), dp(46), Gravity.END or Gravity.CENTER_VERTICAL)
+        )
+    }
+
+    private fun sizeLanguageScroller() {
+        if (layoutScroller.visibility != VISIBLE || controlRow.width <= 0) {
+            return
+        }
+        val params = layoutScroller.layoutParams as? FrameLayout.LayoutParams ?: return
+        val width = controlRow.width / 2 - dp(48)
+        if (width > 0 && params.width != width) {
+            params.width = width
+            layoutScroller.layoutParams = params
+        }
     }
 
     fun push(level: Float) = meter.push(level)
@@ -443,6 +554,12 @@ private class RoundKey(context: Context, private val filled: Boolean) : View(con
     enum class Glyph { Mic, Stop, Keyboard, Backspace }
 
     var glyph = Glyph.Mic
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    var label: String? = null
         set(value) {
             field = value
             invalidate()
@@ -501,6 +618,15 @@ private class RoundKey(context: Context, private val filled: Boolean) : View(con
         canvas.drawCircle(cx, cy, size / 2f, paint)
         paint.color = markColor
         paint.alpha = 255
+        val text = label
+        if (!text.isNullOrBlank()) {
+            paint.style = Paint.Style.FILL
+            paint.textAlign = Paint.Align.CENTER
+            paint.typeface = Typeface.DEFAULT_BOLD
+            paint.textSize = size * 0.25f
+            canvas.drawText(text, cx, cy - (paint.ascent() + paint.descent()) / 2f, paint)
+            return
+        }
         when (glyph) {
             Glyph.Mic -> drawMic(canvas, cx, cy, size)
             Glyph.Stop -> drawStop(canvas, cx, cy, size)

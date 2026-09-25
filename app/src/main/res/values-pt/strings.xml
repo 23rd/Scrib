@@ -67,13 +67,13 @@
     <string name="record_empty">Nada foi gravado.</string>
 
     <string name="vad_entry_title">Pular os silêncios</string>
-    <string name="vad_entry_sub">Transcreva só as partes com fala — gravações com pausas longas terminam antes e o silêncio deixa de entrar no texto. Sem ganho em fala contínua. Download único de 1 MB.</string>
+    <string name="vad_entry_sub">Transcrição mais rápida sem silêncio. Download único de 1 MB.</string>
     <string name="vad_entry_downloading">Baixando o detector de fala… %1$d%%</string>
     <string name="status_vad_failed">Não foi possível baixar o detector de fala — verifique sua conexão e tente de novo.</string>
 
     <string name="ime_label">Scrib Voz</string>
     <string name="ime_entry_title">Teclado de voz</string>
-    <string name="ime_entry_sub">Dite em qualquer app — ative o Scrib na lista de teclados do sistema</string>
+    <string name="ime_entry_sub">Dite em qualquer app</string>
     <string name="ime_ready">Toque no microfone e dite.</string>
     <string name="ime_listening">Ouvindo… o texto aparece a cada pausa.</string>
     <string name="ime_finishing">Transcrevendo as últimas palavras…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Apagar</string>
     <string name="ime_keyboard">Teclado</string>
     <string name="ime_needs_model">Ainda não há modelo de voz — abra o Scrib e baixe um.</string>
+    <string name="ime_layout_buttons_title">Botões de layout</string>
+    <string name="ime_layout_buttons_show">Mostrar botões de layout</string>
+    <string name="ime_layout_buttons_hint">Escolha os layouts ativados. A ordem de seleção será a ordem dos botões. Desative para manter apenas um botão genérico de teclado.</string>
+    <string name="ime_layout_buttons_empty">Nenhum layout ativado encontrado. Ative um teclado nas configurações do sistema primeiro.</string>
+    <string name="ime_layout_buttons_open">Abrir configurações do teclado</string>
+    <string name="ime_layout_buttons_clear">Limpar seleção</string>
+    <string name="ime_layout_buttons_off">Um botão genérico de teclado</string>
+    <string name="ime_layout_buttons_none">Nenhum botão de layout</string>
+    <string name="ime_layout_buttons_on">Botões de layout personalizados</string>
 
     <string name="models_explainer">Modelos maiores são mais precisos, mas mais lentos e pesados para baixar. Os modelos «apenas inglês» são menores e mais rápidos; para outros idiomas escolha Base ou maior — Tiny é fraco.</string>
     <string name="standard_models">MODELOS PADRÃO</string>

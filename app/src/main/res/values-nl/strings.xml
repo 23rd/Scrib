@@ -67,13 +67,13 @@
     <string name="record_empty">Er is niets opgenomen.</string>
 
     <string name="vad_entry_title">Stiltes overslaan</string>
-    <string name="vad_entry_sub">Transcribeer alleen de delen met spraak — opnames met lange pauzes zijn eerder klaar en stilte belandt niet meer in de tekst. Geen winst bij onafgebroken spraak. Eenmalige download van 1 MB.</string>
+    <string name="vad_entry_sub">Snellere transcriptie zonder stilte. Eenmalige download van 1 MB.</string>
     <string name="vad_entry_downloading">Spraakdetector downloaden… %1$d%%</string>
     <string name="status_vad_failed">Spraakdetector kon niet worden gedownload — controleer je verbinding en probeer het opnieuw.</string>
 
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
-    <string name="ime_entry_sub">Dicteer in elke app — zet Scrib aan in de toetsenbordlijst van het systeem</string>
+    <string name="ime_entry_sub">Dicteer in elke app</string>
     <string name="ime_ready">Tik op de microfoon en dicteer.</string>
     <string name="ime_listening">Luisteren… tekst verschijnt bij elke pauze.</string>
     <string name="ime_finishing">Laatste woorden worden getranscribeerd…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Wissen</string>
     <string name="ime_keyboard">Toetsenbord</string>
     <string name="ime_needs_model">Nog geen spraakmodel — open Scrib en download er een.</string>
+    <string name="ime_layout_buttons_title">Toetsenbordlayoutknoppen</string>
+    <string name="ime_layout_buttons_show">Layoutknoppen tonen</string>
+    <string name="ime_layout_buttons_hint">Kies ingeschakelde toetsenbordlayouts. De selectievolgorde wordt de volgorde van de knoppen. Schakel dit uit om één algemene toetsenbordknop te behouden.</string>
+    <string name="ime_layout_buttons_empty">Geen ingeschakelde layouts gevonden. Schakel eerst een toetsenbord in de systeeminstellingen in.</string>
+    <string name="ime_layout_buttons_open">Toetsenbordinstellingen openen</string>
+    <string name="ime_layout_buttons_clear">Selectie wissen</string>
+    <string name="ime_layout_buttons_off">Eén algemene toetsenbordknop</string>
+    <string name="ime_layout_buttons_none">Geen layoutknoppen</string>
+    <string name="ime_layout_buttons_on">Eigen layoutknoppen</string>
 
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
     <string name="standard_models">STANDAARDMODELLEN</string>

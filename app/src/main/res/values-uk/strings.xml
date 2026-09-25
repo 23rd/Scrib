@@ -67,13 +67,13 @@
     <string name="record_empty">Нічого не записано.</string>
 
     <string name="vad_entry_title">Пропускати тишу</string>
-    <string name="vad_entry_sub">Розшифровувати лише ті місця, де є мовлення — записи з довгими паузами завершуються швидше, а тиша перестає потрапляти в текст. На безперервному мовленні виграшу немає. Разове завантаження 1 МБ.</string>
+    <string name="vad_entry_sub">Швидке розпізнавання без тиші. Разове завантаження 1 МБ.</string>
     <string name="vad_entry_downloading">Завантаження детектора мовлення… %1$d%%</string>
     <string name="status_vad_failed">Не вдалося завантажити детектор мовлення — перевірте з’єднання й спробуйте ще раз.</string>
 
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
-    <string name="ime_entry_sub">Диктуйте в будь-якому застосунку — увімкніть Scrib у системному списку клавіатур</string>
+    <string name="ime_entry_sub">Диктуйте в будь-якому застосунку</string>
     <string name="ime_ready">Натисніть мікрофон і диктуйте.</string>
     <string name="ime_listening">Слухаю… текст з’являється на кожній паузі.</string>
     <string name="ime_finishing">Розпізнаю останні слова…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Видалити</string>
     <string name="ime_keyboard">Клавіатура</string>
     <string name="ime_needs_model">Моделі ще немає — відкрийте Scrib і завантажте її.</string>
+    <string name="ime_layout_buttons_title">Кнопки розкладок</string>
+    <string name="ime_layout_buttons_show">Показувати кнопки розкладок</string>
+    <string name="ime_layout_buttons_hint">Виберіть увімкнені розкладки. Порядок вибору — порядок кнопок. Вимкніть, щоб залишити одну звичайну кнопку клавіатури.</string>
+    <string name="ime_layout_buttons_empty">Увімкнених розкладок не знайдено. Спершу увімкніть клавіатуру в налаштуваннях системи.</string>
+    <string name="ime_layout_buttons_open">Відкрити налаштування клавіатур</string>
+    <string name="ime_layout_buttons_clear">Очистити вибір</string>
+    <string name="ime_layout_buttons_off">Одна звичайна кнопка клавіатури</string>
+    <string name="ime_layout_buttons_none">Немає кнопок розкладок</string>
+    <string name="ime_layout_buttons_on">Власні кнопки розкладок</string>
 
     <string name="models_explainer">Більші моделі точніші, але повільніші й більші для завантаження. Моделі «лише англійська» менші й швидші; для інших мов беріть Base або більшу — Tiny слабенька.</string>
     <string name="standard_models">СТАНДАРТНІ МОДЕЛІ</string>

@@ -67,13 +67,13 @@
     <string name="record_empty">Rien n\'a été enregistré.</string>
 
     <string name="vad_entry_title">Ignorer les silences</string>
-    <string name="vad_entry_sub">Ne transcrire que les passages contenant de la parole — les enregistrements avec de longues pauses se terminent plus vite et les silences ne se glissent plus dans le texte. Aucun gain sur une parole continue. Téléchargement unique de 1 Mo.</string>
+    <string name="vad_entry_sub">Transcription plus rapide, sans silence. Téléchargement unique de 1 Mo.</string>
     <string name="vad_entry_downloading">Téléchargement du détecteur de parole… %1$d%%</string>
     <string name="status_vad_failed">Impossible de télécharger le détecteur de parole — vérifiez votre connexion et réessayez.</string>
 
     <string name="ime_label">Scrib Voix</string>
     <string name="ime_entry_title">Clavier vocal</string>
-    <string name="ime_entry_sub">Dictez dans n\'importe quelle appli — activez Scrib dans la liste des claviers du système</string>
+    <string name="ime_entry_sub">Dictez dans n\'importe quelle appli</string>
     <string name="ime_ready">Appuyez sur le micro et dictez.</string>
     <string name="ime_listening">À l\'écoute… le texte apparaît à chaque pause.</string>
     <string name="ime_finishing">Transcription des derniers mots…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Supprimer</string>
     <string name="ime_keyboard">Clavier</string>
     <string name="ime_needs_model">Aucun modèle vocal — ouvrez Scrib et téléchargez-en un.</string>
+    <string name="ime_layout_buttons_title">Boutons de disposition</string>
+    <string name="ime_layout_buttons_show">Afficher les boutons de disposition</string>
+    <string name="ime_layout_buttons_hint">Choisissez les dispositions activées. Leur ordre de sélection définit l’ordre des boutons. Désactivez cette option pour garder un bouton clavier générique.</string>
+    <string name="ime_layout_buttons_empty">Aucune disposition activée trouvée. Activez d’abord un clavier dans les paramètres système.</string>
+    <string name="ime_layout_buttons_open">Ouvrir les paramètres clavier</string>
+    <string name="ime_layout_buttons_clear">Effacer la sélection</string>
+    <string name="ime_layout_buttons_off">Un bouton clavier générique</string>
+    <string name="ime_layout_buttons_none">Aucun bouton de disposition</string>
+    <string name="ime_layout_buttons_on">Boutons de disposition personnalisés</string>
 
     <string name="models_explainer">Les modèles plus grands sont plus précis mais plus lents et plus lourds à télécharger. Les modèles « anglais uniquement » sont plus petits et rapides ; pour les autres langues, choisissez Base ou plus grand — Tiny est faible.</string>
     <string name="standard_models">MODÈLES STANDARD</string>

@@ -67,13 +67,13 @@
     <string name="record_empty">Nic nie nagrano.</string>
 
     <string name="vad_entry_title">Pomijaj ciszę</string>
-    <string name="vad_entry_sub">Transkrybuj tylko fragmenty z mową — nagrania z długimi pauzami kończą się szybciej, a cisza przestaje trafiać do tekstu. Brak zysku przy ciągłej mowie. Jednorazowe pobranie 1 MB.</string>
+    <string name="vad_entry_sub">Szybsza transkrypcja bez ciszy. Jednorazowe pobranie 1 MB.</string>
     <string name="vad_entry_downloading">Pobieranie detektora mowy… %1$d%%</string>
     <string name="status_vad_failed">Nie udało się pobrać detektora mowy — sprawdź połączenie i spróbuj ponownie.</string>
 
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
-    <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji — włącz Scrib na systemowej liście klawiatur</string>
+    <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji</string>
     <string name="ime_ready">Dotknij mikrofonu i dyktuj.</string>
     <string name="ime_listening">Słucham… tekst pojawia się przy każdej pauzie.</string>
     <string name="ime_finishing">Transkrypcja ostatnich słów…</string>
@@ -81,6 +81,15 @@
     <string name="ime_backspace">Usuń</string>
     <string name="ime_keyboard">Klawiatura</string>
     <string name="ime_needs_model">Brak modelu mowy — otwórz Scrib i pobierz jeden.</string>
+    <string name="ime_layout_buttons_title">Przyciski układów</string>
+    <string name="ime_layout_buttons_show">Pokaż przyciski układów</string>
+    <string name="ime_layout_buttons_hint">Wybierz włączone układy. Kolejność wyboru będzie kolejnością przycisków. Wyłącz tę opcję, aby pozostawić jeden ogólny przycisk klawiatury.</string>
+    <string name="ime_layout_buttons_empty">Nie znaleziono włączonych układów. Najpierw włącz klawiaturę w ustawieniach systemu.</string>
+    <string name="ime_layout_buttons_open">Otwórz ustawienia klawiatury</string>
+    <string name="ime_layout_buttons_clear">Wyczyść wybór</string>
+    <string name="ime_layout_buttons_off">Jeden ogólny przycisk klawiatury</string>
+    <string name="ime_layout_buttons_none">Brak przycisków układów</string>
+    <string name="ime_layout_buttons_on">Własne przyciski układów</string>
 
     <string name="models_explainer">Większe modele są dokładniejsze, ale wolniejsze i większe do pobrania. Modele «tylko angielski» są mniejsze i szybsze; dla innych języków wybierz Base lub większy — Tiny jest słaby.</string>
     <string name="standard_models">MODELE STANDARDOWE</string>

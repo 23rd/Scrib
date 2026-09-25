@@ -49,6 +49,7 @@ data class ScribUiState(
     val statusMsg: String,
     val statusError: Boolean,
     val skipSilence: Boolean,
+    val keyboardLayouts: KeyboardLayoutSettings,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
     val dictionaryEnabled: Boolean,
@@ -93,6 +94,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     @Volatile private var vadPct = -1
     @Volatile private var benchmarkBatch = BenchmarkBatchState()
     private var vadJob: Job? = null
+    private var keyboardLayouts: KeyboardLayoutSettings? = null
 
     @Volatile private var sherpaBusy = false
 
@@ -143,6 +145,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
+            keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
             benchmarkRuns = BenchmarkStore.load(ctx),
             benchmarkBatch = benchmarkBatch,
@@ -299,6 +302,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         push()
     }
 
+    fun setKeyboardLayouts(enabled: Boolean, keys: List<String>) {
+        KeyboardLayouts.save(ctx, enabled, keys)
+        keyboardLayouts = KeyboardLayouts.settings(ctx)
+        push()
+    }
+
     fun setupForLanguage(language: LanguageOption) {
         if (BenchmarkBatchGate.isActive) return
         val f = language.recommendedFileName
@@ -329,6 +338,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun refresh() {
+        keyboardLayouts = KeyboardLayouts.settings(ctx)
         push()
     }
 

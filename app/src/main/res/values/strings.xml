@@ -69,13 +69,13 @@
     <string name="record_empty">Nothing was recorded.</string>
 
     <string name="vad_entry_title">Skip silence</string>
-    <string name="vad_entry_sub">Transcribe only the parts that hold speech — recordings with long pauses finish sooner and silence stops leaking into the text. No gain on non-stop speech. One-off 1 MB download.</string>
+    <string name="vad_entry_sub">Faster transcriptions without silence. One-off 1 MB download.</string>
     <string name="vad_entry_downloading">Downloading the speech detector… %1$d%%</string>
     <string name="status_vad_failed">Couldn\'t download the speech detector — check your connection and try again.</string>
 
     <string name="ime_label">Scrib Voice</string>
     <string name="ime_entry_title">Voice keyboard</string>
-    <string name="ime_entry_sub">Dictate into any app — switch Scrib on in the system keyboard list</string>
+    <string name="ime_entry_sub">Dictate into any app</string>
     <string name="ime_ready">Tap the microphone to dictate.</string>
     <string name="ime_listening">Listening… text appears at every pause.</string>
     <string name="ime_finishing">Transcribing the last words…</string>
@@ -83,6 +83,15 @@
     <string name="ime_backspace">Backspace</string>
     <string name="ime_keyboard">Keyboard</string>
     <string name="ime_needs_model">No speech model yet — open Scrib and download one.</string>
+    <string name="ime_layout_buttons_title">Keyboard layout buttons</string>
+    <string name="ime_layout_buttons_show">Show layout buttons</string>
+    <string name="ime_layout_buttons_hint">Choose enabled keyboard layouts. Their order is the order of the buttons. Turn this off to keep one generic keyboard button.</string>
+    <string name="ime_layout_buttons_empty">No enabled keyboard layouts were found. Enable a keyboard in system settings first.</string>
+    <string name="ime_layout_buttons_open">Open keyboard settings</string>
+    <string name="ime_layout_buttons_clear">Clear selected</string>
+    <string name="ime_layout_buttons_off">One generic keyboard button</string>
+    <string name="ime_layout_buttons_none">No layout buttons</string>
+    <string name="ime_layout_buttons_on">Custom layout buttons</string>
 
     <string name="models_explainer">Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.</string>
     <string name="standard_models">STANDARD MODELS</string>
