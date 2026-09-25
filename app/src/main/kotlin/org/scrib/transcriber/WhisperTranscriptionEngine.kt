@@ -79,6 +79,9 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             }
             val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
             onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+            var modelLoadMs = 0L
+            var modelPssMb = 0
+            var modelMemoryDeltaMb = 0
             val inferenceStartedAt = SystemClock.elapsedRealtime()
             fun reportProgress(percent: Int) {
                 onProgress(percent)
@@ -86,20 +89,36 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                     TranscriptionMetrics(
                         audioDurationMs = audioDurationMs,
                         decodeMs = decodeMs,
-                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                        modelLoadMs = modelLoadMs,
+                        modelPssMb = modelPssMb,
+                        modelMemoryDeltaMb = modelMemoryDeltaMb
                     )
                 )
             }
             return try {
                 transcribePcm(
-                    pcm, languageHint, cancellation, ::reportProgress, onPartial
+                    pcm,
+                    languageHint,
+                    cancellation,
+                    ::reportProgress,
+                    onPartial,
+                    onModelLoad = { metrics ->
+                        modelLoadMs = metrics.modelLoadMs
+                        modelPssMb = metrics.modelPssMb
+                        modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
+                        onMetrics(metrics)
+                    }
                 )
             } finally {
                 onMetrics(
                     TranscriptionMetrics(
                         audioDurationMs = audioDurationMs,
                         decodeMs = decodeMs,
-                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                        modelLoadMs = modelLoadMs,
+                        modelPssMb = modelPssMb,
+                        modelMemoryDeltaMb = modelMemoryDeltaMb
                     )
                 )
             }
@@ -116,7 +135,8 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        onModelLoad: (TranscriptionMetrics) -> Unit
     ): List<TranscriptSegment> {
         val abortFlag = WhisperAbortFlag()
         cancellation.onCancel { abortFlag.cancel() }
@@ -125,7 +145,19 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                 throw CancelledException()
             }
             val language = if (languageHint.isNullOrEmpty()) null else languageHint
+            val activePath = ModelManager.activeModelFile(appContext)?.absolutePath
+            val alreadyLoaded = whisper != null && loadedPath == activePath
+            val beforeLoad = processMemory(appContext)
+            val loadStartedAt = SystemClock.elapsedRealtime()
             val context = whisperContext()
+            val afterLoad = processMemory(appContext)
+            onModelLoad(
+                TranscriptionMetrics(
+                    modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - loadStartedAt,
+                    modelPssMb = afterLoad.pssMb,
+                    modelMemoryDeltaMb = if (alreadyLoaded) 0 else maxOf(0, afterLoad.pssMb - beforeLoad.pssMb)
+                )
+            )
             val window = context.audioWindowSamples
             if (window > 0 && pcm.sampleCount > window) {
                 throw DecodeException(

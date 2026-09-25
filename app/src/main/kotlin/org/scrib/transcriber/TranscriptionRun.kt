@@ -1,9 +1,7 @@
 package org.scrib.transcriber
 
-import android.app.ActivityManager
 import android.content.Context
 import android.net.Uri
-import android.os.Debug
 import android.os.SystemClock
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +56,9 @@ object TranscriptionRun {
             var audioDurationMs = 0L
             var decodeMs = 0L
             var inferenceMs = 0L
+            var modelLoadMs = 0L
+            var modelPssMb = 0
+            var modelMemoryDeltaMb = 0
             var inferenceStartedAt = 0L
             var peakPssMb = initialMemory.pssMb
             var currentPssMb = initialMemory.pssMb
@@ -79,6 +80,9 @@ object TranscriptionRun {
                     audioDurationMs = audioDurationMs,
                     decodeMs = decodeMs,
                     inferenceMs = liveInferenceMs,
+                    modelLoadMs = modelLoadMs,
+                    modelPssMb = modelPssMb,
+                    modelMemoryDeltaMb = modelMemoryDeltaMb,
                     totalMs = now - startedAt,
                     pssMb = currentPssMb,
                     peakPssMb = peakPssMb,
@@ -121,6 +125,15 @@ object TranscriptionRun {
                             }
                             if (metrics.inferenceMs > 0L) {
                                 inferenceMs = metrics.inferenceMs
+                            }
+                            if (metrics.modelLoadMs > 0L) {
+                                modelLoadMs = metrics.modelLoadMs
+                            }
+                            if (metrics.modelPssMb > 0) {
+                                modelPssMb = metrics.modelPssMb
+                            }
+                            if (metrics.modelMemoryDeltaMb > 0) {
+                                modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
                             }
                         }
                         publishMetrics()
@@ -193,23 +206,6 @@ object TranscriptionRun {
     fun setFormat(format: TranscriptFormat) {
         _state.update { it?.copy(format = format) }
     }
-}
-
-private data class ProcessMemory(
-    val pssMb: Int,
-    val freeRamMb: Int
-)
-
-private fun processMemory(context: Context): ProcessMemory {
-    val activityManager = context.getSystemService(ActivityManager::class.java)
-    val systemMemory = ActivityManager.MemoryInfo()
-    activityManager?.getMemoryInfo(systemMemory)
-    val processMemory = Debug.MemoryInfo()
-    Debug.getMemoryInfo(processMemory)
-    return ProcessMemory(
-        pssMb = (processMemory.totalPss / 1024L).toInt(),
-        freeRamMb = (systemMemory.availMem / (1024L * 1024L)).toInt()
-    )
 }
 
 private const val METRICS_INTERVAL_MS = 500L

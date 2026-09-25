@@ -18,14 +18,15 @@
     <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
     <string name="transcribing_pct">Transcription… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcription… %1$d%% · %2$s</string>
-    <string name="transcribe_stats_line">Total %1$s · décodage %2$s · inférence %3$s · audio %4$s · RTF %5$s · PSS %6$s · pic %7$s · RAM libre %8$s</string>
+    <string name="transcribe_stats_line">Total %1$s · décodage %2$s · chargement %3$s · inférence %4$s · audio %5$s · RTF %6$s · PSS %7$s · pic %8$s · RAM libre %9$s</string>
     <string name="transcribe_stats_model">Modèle : %1$s</string>
+    <string name="transcribe_stats_model_memory">PSS du modèle %1$s · delta de chargement %2$s</string>
     <string name="transcribe_stats_mb">%1$d Mo</string>
     <string name="transcribe_stats_gb">%1$.1f Go</string>
     <string name="benchmark_history">Historique des tests</string>
     <string name="benchmark_history_empty">Aucune transcription terminée pour le moment.</string>
     <string name="benchmark_latest">Dernier : %1$s · RTF %2$s · pic %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · pic PSS %2$s · RAM libre %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · chargement %2$s · pic PSS %3$s · RAM libre %4$s · PSS du modèle %5$s · delta du modèle %6$s</string>
     <string name="eta_minutes">environ %1$d min restantes</string>
     <string name="eta_seconds">environ %1$d s restantes</string>
     <string name="transcribe_background_hint">Continue si vous quittez l\'application.</string>

@@ -18,14 +18,15 @@
     <string name="decoding_transcribing">Decodificando y transcribiendo en el dispositivo…</string>
     <string name="transcribing_pct">Transcribiendo… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribiendo… %1$d%% · %2$s</string>
-    <string name="transcribe_stats_line">Total %1$s · decodificación %2$s · inferencia %3$s · audio %4$s · RTF %5$s · PSS %6$s · pico %7$s · RAM libre %8$s</string>
+    <string name="transcribe_stats_line">Total %1$s · decodificación %2$s · carga %3$s · inferencia %4$s · audio %5$s · RTF %6$s · PSS %7$s · pico %8$s · RAM libre %9$s</string>
     <string name="transcribe_stats_model">Modelo: %1$s</string>
+    <string name="transcribe_stats_model_memory">PSS del modelo %1$s · delta de carga %2$s</string>
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Historial de benchmarks</string>
     <string name="benchmark_history_empty">Aún no hay transcripciones completadas.</string>
     <string name="benchmark_latest">Último: %1$s · RTF %2$s · pico %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · pico PSS %2$s · RAM libre %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · carga %2$s · pico PSS %3$s · RAM libre %4$s · PSS del modelo %5$s · delta del modelo %6$s</string>
     <string name="eta_minutes">quedan unos %1$d min</string>
     <string name="eta_seconds">quedan unos %1$d s</string>
     <string name="transcribe_background_hint">Sigue en marcha si sales de la app.</string>

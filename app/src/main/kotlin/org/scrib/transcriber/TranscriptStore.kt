@@ -32,6 +32,9 @@ object TranscriptStore {
                     .put(AUDIO_DURATION_MS, transcript.metrics.audioDurationMs)
                     .put(DECODE_MS, transcript.metrics.decodeMs)
                     .put(INFERENCE_MS, transcript.metrics.inferenceMs)
+                    .put(MODEL_LOAD_MS, transcript.metrics.modelLoadMs)
+                    .put(MODEL_PSS_MB, transcript.metrics.modelPssMb)
+                    .put(MODEL_MEMORY_DELTA_MB, transcript.metrics.modelMemoryDeltaMb)
                     .put(TOTAL_MS, transcript.metrics.totalMs)
                     .put(PSS_MB, transcript.metrics.pssMb)
                     .put(PEAK_PSS_MB, transcript.metrics.peakPssMb)
@@ -89,6 +92,9 @@ object TranscriptStore {
                 audioDurationMs = metrics.optLong(AUDIO_DURATION_MS),
                 decodeMs = metrics.optLong(DECODE_MS),
                 inferenceMs = metrics.optLong(INFERENCE_MS),
+                modelLoadMs = metrics.optLong(MODEL_LOAD_MS),
+                modelPssMb = metrics.optInt(MODEL_PSS_MB),
+                modelMemoryDeltaMb = metrics.optInt(MODEL_MEMORY_DELTA_MB),
                 totalMs = metrics.optLong(TOTAL_MS),
                 pssMb = metrics.optInt(PSS_MB),
                 peakPssMb = metrics.optInt(PEAK_PSS_MB),
@@ -109,6 +115,9 @@ object TranscriptStore {
     private const val AUDIO_DURATION_MS = "audioDurationMs"
     private const val DECODE_MS = "decodeMs"
     private const val INFERENCE_MS = "inferenceMs"
+    private const val MODEL_LOAD_MS = "modelLoadMs"
+    private const val MODEL_PSS_MB = "modelPssMb"
+    private const val MODEL_MEMORY_DELTA_MB = "modelMemoryDeltaMb"
     private const val TOTAL_MS = "totalMs"
     private const val PSS_MB = "pssMb"
     private const val PEAK_PSS_MB = "peakPssMb"

@@ -747,6 +747,7 @@ private fun StatsLine(t: TranscribeUi) {
                 R.string.transcribe_stats_line,
                 elapsed(metrics.totalMs),
                 elapsedOrDash(metrics.decodeMs),
+                elapsed(metrics.modelLoadMs),
                 elapsedOrDash(metrics.inferenceMs),
                 elapsedOrDash(metrics.audioDurationMs),
                 rtf,
@@ -760,6 +761,19 @@ private fun StatsLine(t: TranscribeUi) {
             maxLines = 3,
             overflow = TextOverflow.Ellipsis
         )
+        if (metrics.modelPssMb > 0) {
+            Text(
+                text = stringResource(
+                    R.string.transcribe_stats_model_memory,
+                    memoryText(metrics.modelPssMb),
+                    memoryText(metrics.modelMemoryDeltaMb)
+                ),
+                fontSize = 11.5.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -770,6 +784,9 @@ private fun memoryText(megabytes: Int): String =
     } else {
         stringResource(R.string.transcribe_stats_mb, megabytes)
     }
+
+@Composable
+private fun memoryOrDash(megabytes: Int): String = if (megabytes > 0) memoryText(megabytes) else "—"
 
 private fun elapsedOrDash(ms: Long): String = if (ms > 0L) elapsed(ms) else "—"
 
@@ -1008,8 +1025,11 @@ private fun BenchmarkHistoryDialog(runs: List<BenchmarkRun>, onDismiss: () -> Un
                                 stringResource(
                                     R.string.benchmark_row_stats,
                                     rtfText(run.metrics),
+                                    elapsed(run.metrics.modelLoadMs),
                                     memoryText(run.metrics.peakPssMb),
-                                    memoryText(run.metrics.freeRamMb)
+                                    memoryText(run.metrics.freeRamMb),
+                                    memoryOrDash(run.metrics.modelPssMb),
+                                    memoryOrDash(run.metrics.modelMemoryDeltaMb)
                                 ),
                                 fontSize = 12.sp,
                                 color = cs.onSurfaceVariant,

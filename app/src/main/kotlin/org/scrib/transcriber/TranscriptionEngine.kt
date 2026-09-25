@@ -12,12 +12,15 @@ data class TranscriptionMetrics(
     val audioDurationMs: Long = 0L,
     val decodeMs: Long = 0L,
     val inferenceMs: Long = 0L,
+    val modelLoadMs: Long = 0L,
+    val modelPssMb: Int = 0,
+    val modelMemoryDeltaMb: Int = 0,
     val totalMs: Long = 0L,
     val pssMb: Int = 0,
     val peakPssMb: Int = 0,
     val freeRamMb: Int = 0
 ) {
-    val hasData: Boolean get() = totalMs > 0L || audioDurationMs > 0L || inferenceMs > 0L
+    val hasData: Boolean get() = totalMs > 0L || audioDurationMs > 0L || inferenceMs > 0L || modelLoadMs > 0L
     val rtf: Double?
         get() = if (audioDurationMs > 0L) inferenceMs.toDouble() / audioDurationMs else null
 }

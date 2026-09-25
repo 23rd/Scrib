@@ -134,20 +134,39 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             throw CancelledException()
         }
         val inferenceStartedAt = SystemClock.elapsedRealtime()
+        var modelLoadMs = 0L
+        var modelPssMb = 0
+        var modelMemoryDeltaMb = 0
         fun reportProgress(percent: Int) {
             onProgress(percent)
             onMetrics(
                 TranscriptionMetrics(
                     audioDurationMs = audioDurationMs,
                     decodeMs = decodeMs,
-                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                    modelLoadMs = modelLoadMs,
+                    modelPssMb = modelPssMb,
+                    modelMemoryDeltaMb = modelMemoryDeltaMb
                 )
             )
         }
         try {
-            synchronized(nativeLock) {
+            val beforeLoad = processMemory(appContext)
+            val modelLoadStartedAt = SystemClock.elapsedRealtime()
+            val alreadyLoaded = synchronized(nativeLock) {
                 ensureRecognizerLocked(languageHint)
             }
+            val afterLoad = processMemory(appContext)
+            modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - modelLoadStartedAt
+            modelPssMb = afterLoad.pssMb
+            modelMemoryDeltaMb = if (alreadyLoaded) 0 else maxOf(0, afterLoad.pssMb - beforeLoad.pssMb)
+            onMetrics(
+                TranscriptionMetrics(
+                    modelLoadMs = modelLoadMs,
+                    modelPssMb = modelPssMb,
+                    modelMemoryDeltaMb = modelMemoryDeltaMb
+                )
+            )
             val vadPath = ModelManager.sherpaVadModelPath(appContext)
             return if (vadPath != null) {
                 transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, ::reportProgress, onPartial)
@@ -159,7 +178,10 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 TranscriptionMetrics(
                     audioDurationMs = audioDurationMs,
                     decodeMs = decodeMs,
-                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt
+                    inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                    modelLoadMs = modelLoadMs,
+                    modelPssMb = modelPssMb,
+                    modelMemoryDeltaMb = modelMemoryDeltaMb
                 )
             )
         }
@@ -372,7 +394,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         null
     }
 
-    private fun ensureRecognizerLocked(languageHint: String? = null) {
+    private fun ensureRecognizerLocked(languageHint: String? = null): Boolean {
         val info = activeModelInfo()
             ?: throw ModelNotAvailableException()
         val dir = SherpaModel.dirFor(appContext, info.id)
@@ -387,10 +409,10 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         val streaming = SherpaModel.isStreaming(info.modelType)
         if (loadedId == info.id && loadedLanguage == language) {
             if (streaming && onlineRecognizer != null) {
-                return
+                return true
             }
             if (!streaming && recognizer != null) {
-                return
+                return true
             }
         }
         try {
@@ -422,7 +444,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 loadedId = info.id
                 loadedLanguage = language
                 Log.i(TAG, "Sherpa provider=$provider — OK")
-                return
+                return false
             } catch (e: Exception) {
                 Log.w(TAG, "Sherpa provider '$provider' failed: ${e.message}")
                 last = e

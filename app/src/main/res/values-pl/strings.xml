@@ -18,14 +18,15 @@
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>
     <string name="transcribing_pct">Transkrypcja… %1$d%%</string>
     <string name="transcribing_pct_eta">Transkrypcja… %1$d%% · %2$s</string>
-    <string name="transcribe_stats_line">Łącznie %1$s · dekodowanie %2$s · wnioskowanie %3$s · audio %4$s · RTF %5$s · PSS %6$s · szczyt %7$s · wolny RAM %8$s</string>
+    <string name="transcribe_stats_line">Łącznie %1$s · dekodowanie %2$s · ładowanie %3$s · wnioskowanie %4$s · audio %5$s · RTF %6$s · PSS %7$s · szczyt %8$s · wolny RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_model_memory">PSS modelu %1$s · przyrost ładowania %2$s</string>
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Historia testów</string>
     <string name="benchmark_history_empty">Nie ma jeszcze ukończonych transkrypcji.</string>
     <string name="benchmark_latest">Najnowszy: %1$s · RTF %2$s · szczyt %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · szczyt PSS %2$s · wolny RAM %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · ładowanie %2$s · szczyt PSS %3$s · wolny RAM %4$s · PSS modelu %5$s · przyrost modelu %6$s</string>
     <string name="eta_minutes">pozostało około %1$d min</string>
     <string name="eta_seconds">pozostało około %1$d s</string>
     <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>

@@ -18,14 +18,15 @@
     <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
     <string name="transcribing_pct">Розпізнавання… %1$d%%</string>
     <string name="transcribing_pct_eta">Розпізнавання… %1$d%% · %2$s</string>
-    <string name="transcribe_stats_line">Усього %1$s · декодування %2$s · розпізнавання %3$s · аудіо %4$s · RTF %5$s · PSS %6$s · пік %7$s · вільна ОЗ %8$s</string>
+    <string name="transcribe_stats_line">Усього %1$s · декодування %2$s · завантаження %3$s · розпізнавання %4$s · аудіо %5$s · RTF %6$s · PSS %7$s · пік %8$s · вільна ОЗ %9$s</string>
     <string name="transcribe_stats_model">Модель: %1$s</string>
+    <string name="transcribe_stats_model_memory">PSS моделі %1$s · приріст завантаження %2$s</string>
     <string name="transcribe_stats_mb">%1$d МБ</string>
     <string name="transcribe_stats_gb">%1$.1f ГБ</string>
     <string name="benchmark_history">Історія замірів</string>
     <string name="benchmark_history_empty">Завершених розпізнавань ще немає.</string>
     <string name="benchmark_latest">Останній: %1$s · RTF %2$s · пік %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · пік PSS %2$s · вільна ОЗ %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · завантаження %2$s · пік PSS %3$s · вільна ОЗ %4$s · PSS моделі %5$s · приріст моделі %6$s</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

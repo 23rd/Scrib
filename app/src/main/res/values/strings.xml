@@ -20,14 +20,15 @@
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
     <string name="transcribing_pct">Transcribing… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribing… %1$d%% · %2$s</string>
-    <string name="transcribe_stats_line">Total %1$s · decode %2$s · inference %3$s · audio %4$s · RTF %5$s · PSS %6$s · peak %7$s · free RAM %8$s</string>
+    <string name="transcribe_stats_line">Total %1$s · decode %2$s · load %3$s · inference %4$s · audio %5$s · RTF %6$s · PSS %7$s · peak %8$s · free RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
+    <string name="transcribe_stats_model_memory">Model PSS %1$s · load delta %2$s</string>
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Benchmark history</string>
     <string name="benchmark_history_empty">No completed transcription runs yet.</string>
     <string name="benchmark_latest">Latest: %1$s · RTF %2$s · peak %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · peak PSS %2$s · free RAM %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · load %2$s · peak PSS %3$s · free RAM %4$s · model PSS %5$s · model delta %6$s</string>
     <string name="eta_minutes">about %1$d min left</string>
     <string name="eta_seconds">about %1$d sec left</string>
     <string name="transcribe_background_hint">Keeps running if you leave the app.</string>
