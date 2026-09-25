@@ -36,6 +36,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -60,6 +62,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -156,7 +159,15 @@ fun ScribScreen(
                 item { KeyboardEntry() }
                 item { SkipSilenceEntry(state, onSkipSilence) }
                 item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
-                item { BenchmarkEntry(benchmarkRuns) { showBenchmarks = true } }
+                item {
+                    BenchmarkEntry(benchmarkRuns) {
+                        if (BenchmarkStore.isFullscreen(context)) {
+                            context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
+                        } else {
+                            showBenchmarks = true
+                        }
+                    }
+                }
             }
             item {
                 Text(
@@ -222,7 +233,15 @@ fun ScribScreen(
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
     }
     if (showBenchmarks) {
-        BenchmarkHistoryDialog(benchmarkRuns, onDismiss = { showBenchmarks = false })
+        BenchmarkHistoryDialog(
+            benchmarkRuns,
+            onDismiss = { showBenchmarks = false },
+            onOpenFullscreen = {
+                showBenchmarks = false
+                BenchmarkStore.setFullscreen(context, true)
+                context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
+            }
+        )
     }
     recording?.let { r ->
         RecordingDialog(r, onStop = onStopRecording, onCancel = onCancelRecording)
@@ -994,64 +1013,156 @@ private fun BenchmarkEntry(runs: List<BenchmarkRun>, onClick: () -> Unit) {
 }
 
 @Composable
-private fun BenchmarkHistoryDialog(runs: List<BenchmarkRun>, onDismiss: () -> Unit) {
+private fun BenchmarkHistoryDialog(
+    runs: List<BenchmarkRun>,
+    onDismiss: () -> Unit,
+    onOpenFullscreen: () -> Unit
+) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.benchmark_history)) },
+        containerColor = cs.background,
+        tonalElevation = 0.dp,
+        title = {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.benchmark_history), modifier = Modifier.weight(1f))
+                IconButton(onClick = onOpenFullscreen) {
+                    Icon(
+                        painterResource(R.drawable.ic_fullscreen),
+                        contentDescription = stringResource(R.string.benchmark_fullscreen),
+                        tint = cs.primary
+                    )
+                }
+            }
+        },
         text = {
             if (runs.isEmpty()) {
                 Text(stringResource(R.string.benchmark_history_empty), fontSize = 13.sp, color = cs.onSurfaceVariant)
             } else {
-                Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState())) {
-                    runs.forEachIndexed { index, run ->
-                        Column(Modifier.fillMaxWidth().padding(vertical = 9.dp)) {
-                            Text(
-                                run.modelName ?: "—",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = cs.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                run.fileName,
-                                fontSize = 11.5.sp,
-                                color = cs.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                stringResource(
-                                    R.string.benchmark_row_stats,
-                                    rtfText(run.metrics),
-                                    elapsed(run.metrics.modelLoadMs),
-                                    memoryText(run.metrics.peakPssMb),
-                                    memoryText(run.metrics.freeRamMb),
-                                    memoryOrDash(run.metrics.modelPssMb),
-                                    memoryOrDash(run.metrics.modelMemoryDeltaMb)
-                                ),
-                                fontSize = 12.sp,
-                                color = cs.onSurfaceVariant,
-                                lineHeight = 17.sp,
-                                modifier = Modifier.padding(top = 3.dp)
-                            )
-                            Text(
-                                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(run.timestampMs)),
-                                fontSize = 10.5.sp,
-                                color = cs.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 3.dp)
-                            )
-                        }
-                        if (index < runs.lastIndex) {
-                            Spacer(Modifier.height(1.dp))
-                        }
+                Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    runs.forEach { run ->
+                        BenchmarkRunCard(run, Modifier.padding(bottom = 8.dp))
                     }
                 }
             }
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
     )
+}
+
+@Composable
+internal fun BenchmarkRunCard(run: BenchmarkRun, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer,
+        shape = RoundedCornerShape(14.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        run.modelName ?: "—",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = cs.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        run.fileName,
+                        fontSize = 11.sp,
+                        color = cs.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Text(
+                    DateFormat.getDateInstance(DateFormat.SHORT).format(Date(run.timestampMs)),
+                    fontSize = 10.sp,
+                    color = cs.onSurfaceVariant,
+                    maxLines = 1
+                )
+            }
+            Spacer(Modifier.height(10.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_rtf),
+                    rtfText(run.metrics),
+                    Modifier.weight(1f)
+                )
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_load),
+                    elapsed(run.metrics.modelLoadMs),
+                    Modifier.weight(1f)
+                )
+            }
+            Spacer(Modifier.height(6.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_model_pss),
+                    memoryOrDash(run.metrics.modelPssMb),
+                    Modifier.weight(1f)
+                )
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_peak),
+                    memoryOrDash(run.metrics.peakPssMb),
+                    Modifier.weight(1f)
+                )
+            }
+            Spacer(Modifier.height(6.dp))
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_model_delta),
+                    memoryOrDash(run.metrics.modelMemoryDeltaMb),
+                    Modifier.weight(1f)
+                )
+                BenchmarkMetric(
+                    stringResource(R.string.benchmark_column_free),
+                    memoryOrDash(run.metrics.freeRamMb),
+                    Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BenchmarkMetric(label: String, value: String, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surface,
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier
+    ) {
+        Column(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
+            Text(
+                label,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                color = cs.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                value,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = cs.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
 }
 
 @Composable

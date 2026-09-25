@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Benchmarkgeschiedenis</string>
+    <string name="benchmark_fullscreen">Volledig scherm</string>
+    <string name="benchmark_dialog">Venster</string>
     <string name="benchmark_history_empty">Nog geen voltooide transcripties.</string>
     <string name="benchmark_latest">Laatste: %1$s · RTF %2$s · piek %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · laden %2$s · PSS-piek %3$s · vrij RAM %4$s · model-PSS %5$s · model-delta %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Laden</string>
+    <string name="benchmark_column_model_pss">Model-PSS</string>
+    <string name="benchmark_column_model_delta">Modeldelta</string>
+    <string name="benchmark_column_peak">Piek</string>
+    <string name="benchmark_column_free">Vrij</string>
     <string name="eta_minutes">nog ongeveer %1$d min</string>
     <string name="eta_seconds">nog ongeveer %1$d sec</string>
     <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>

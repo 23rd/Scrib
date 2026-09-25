@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Historia testów</string>
+    <string name="benchmark_fullscreen">Pełny ekran</string>
+    <string name="benchmark_dialog">Okno</string>
     <string name="benchmark_history_empty">Nie ma jeszcze ukończonych transkrypcji.</string>
     <string name="benchmark_latest">Najnowszy: %1$s · RTF %2$s · szczyt %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · ładowanie %2$s · szczyt PSS %3$s · wolny RAM %4$s · PSS modelu %5$s · przyrost modelu %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Ładowanie</string>
+    <string name="benchmark_column_model_pss">PSS modelu</string>
+    <string name="benchmark_column_model_delta">Przyrost modelu</string>
+    <string name="benchmark_column_peak">Szczyt</string>
+    <string name="benchmark_column_free">Wolne</string>
     <string name="eta_minutes">pozostało około %1$d min</string>
     <string name="eta_seconds">pozostało około %1$d s</string>
     <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>

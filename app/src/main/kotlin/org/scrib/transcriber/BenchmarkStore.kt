@@ -17,11 +17,21 @@ data class BenchmarkRun(
 
 object BenchmarkStore {
     private const val FILE_NAME = "benchmark-history.json"
+    private const val PREFS = "benchmark-view"
+    private const val KEY_FULLSCREEN = "fullscreen"
     private const val MAX_RUNS = 100
     private const val LOG_TAG = "BenchmarkStore"
 
     private val _revisions = MutableStateFlow(0L)
     val revisions: StateFlow<Long> = _revisions
+
+    fun isFullscreen(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_FULLSCREEN, false)
+
+    fun setFullscreen(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_FULLSCREEN, enabled).apply()
+    }
 
     @Synchronized
     fun record(context: Context, run: BenchmarkRun) {

@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d МБ</string>
     <string name="transcribe_stats_gb">%1$.1f ГБ</string>
     <string name="benchmark_history">История замеров</string>
+    <string name="benchmark_fullscreen">Во весь экран</string>
+    <string name="benchmark_dialog">Окно</string>
     <string name="benchmark_history_empty">Завершённых запусков пока нет.</string>
     <string name="benchmark_latest">Последний: %1$s · RTF %2$s · пик %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · загрузка %2$s · пик PSS %3$s · свободно %4$s · PSS модели %5$s · прирост модели %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Загрузка</string>
+    <string name="benchmark_column_model_pss">PSS модели</string>
+    <string name="benchmark_column_model_delta">Прирост модели</string>
+    <string name="benchmark_column_peak">Пик</string>
+    <string name="benchmark_column_free">Свободно</string>
     <string name="eta_minutes">осталось около %1$d мин</string>
     <string name="eta_seconds">осталось около %1$d с</string>
     <string name="transcribe_background_hint">Продолжается, даже если выйти из приложения.</string>

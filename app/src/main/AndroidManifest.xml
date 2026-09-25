@@ -47,6 +47,11 @@
             android:exported="false"
             android:theme="@style/Theme.Scrib"/>
 
+        <activity
+            android:name=".BenchmarkHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Scrib"/>
+
         <service
             android:name=".TranscriptionService"
             android:exported="true">

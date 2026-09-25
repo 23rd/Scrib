@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d МБ</string>
     <string name="transcribe_stats_gb">%1$.1f ГБ</string>
     <string name="benchmark_history">Історія замірів</string>
+    <string name="benchmark_fullscreen">На весь екран</string>
+    <string name="benchmark_dialog">Вікно</string>
     <string name="benchmark_history_empty">Завершених розпізнавань ще немає.</string>
     <string name="benchmark_latest">Останній: %1$s · RTF %2$s · пік %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · завантаження %2$s · пік PSS %3$s · вільна ОЗ %4$s · PSS моделі %5$s · приріст моделі %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Завантаження</string>
+    <string name="benchmark_column_model_pss">PSS моделі</string>
+    <string name="benchmark_column_model_delta">Приріст моделі</string>
+    <string name="benchmark_column_peak">Пік</string>
+    <string name="benchmark_column_free">Вільна ОЗ</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

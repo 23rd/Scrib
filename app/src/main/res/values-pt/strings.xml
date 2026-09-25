@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Histórico de benchmarks</string>
+    <string name="benchmark_fullscreen">Tela cheia</string>
+    <string name="benchmark_dialog">Dialogo</string>
     <string name="benchmark_history_empty">Ainda não há transcrições concluídas.</string>
     <string name="benchmark_latest">Mais recente: %1$s · RTF %2$s · pico %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · carregamento %2$s · pico PSS %3$s · RAM livre %4$s · PSS do modelo %5$s · delta do modelo %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Carregamento</string>
+    <string name="benchmark_column_model_pss">PSS do modelo</string>
+    <string name="benchmark_column_model_delta">Delta do modelo</string>
+    <string name="benchmark_column_peak">Pico</string>
+    <string name="benchmark_column_free">Livre</string>
     <string name="eta_minutes">faltam cerca de %1$d min</string>
     <string name="eta_seconds">faltam cerca de %1$d s</string>
     <string name="transcribe_background_hint">Continua mesmo se você sair do app.</string>

@@ -26,9 +26,16 @@
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Benchmark history</string>
+    <string name="benchmark_fullscreen">Full screen</string>
+    <string name="benchmark_dialog">Dialog</string>
     <string name="benchmark_history_empty">No completed transcription runs yet.</string>
     <string name="benchmark_latest">Latest: %1$s · RTF %2$s · peak %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · load %2$s · peak PSS %3$s · free RAM %4$s · model PSS %5$s · model delta %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Load</string>
+    <string name="benchmark_column_model_pss">Model PSS</string>
+    <string name="benchmark_column_model_delta">Model delta</string>
+    <string name="benchmark_column_peak">Peak</string>
+    <string name="benchmark_column_free">Free RAM</string>
     <string name="eta_minutes">about %1$d min left</string>
     <string name="eta_seconds">about %1$d sec left</string>
     <string name="transcribe_background_hint">Keeps running if you leave the app.</string>

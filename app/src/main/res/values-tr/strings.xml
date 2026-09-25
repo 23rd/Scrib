@@ -24,9 +24,16 @@
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
     <string name="benchmark_history">Benchmark geçmişi</string>
+    <string name="benchmark_fullscreen">Tam ekran</string>
+    <string name="benchmark_dialog">Pencere</string>
     <string name="benchmark_history_empty">Henüz tamamlanmış yazıya dökme yok.</string>
     <string name="benchmark_latest">Son: %1$s · RTF %2$s · zirve %3$s</string>
-    <string name="benchmark_row_stats">RTF %1$s · yükleme %2$s · PSS zirvesi %3$s · boş RAM %4$s · model PSS %5$s · model farkı %6$s</string>
+    <string name="benchmark_column_rtf">RTF</string>
+    <string name="benchmark_column_load">Yükleme</string>
+    <string name="benchmark_column_model_pss">Model PSS</string>
+    <string name="benchmark_column_model_delta">Model farkı</string>
+    <string name="benchmark_column_peak">Zirve</string>
+    <string name="benchmark_column_free">Boş</string>
     <string name="eta_minutes">yaklaşık %1$d dk kaldı</string>
     <string name="eta_seconds">yaklaşık %1$d sn kaldı</string>
     <string name="transcribe_background_hint">Uygulamadan çıksanız da sürer.</string>
