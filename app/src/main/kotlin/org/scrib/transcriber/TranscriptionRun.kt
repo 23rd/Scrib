@@ -39,6 +39,7 @@ object TranscriptionRun {
         }
         val app = context.applicationContext
         val cancellation = CancellationToken()
+        val modelName = ModelManager.activeDisplayName(app)
         token = cancellation
         TranscriptStore.clear(app)
         _state.value = TranscribeUi(
@@ -47,7 +48,7 @@ object TranscriptionRun {
             running = true,
             error = null,
             sourceUri = source,
-            modelName = ModelManager.activeDisplayName(app)
+            modelName = modelName
         )
         TranscriptionForegroundService.start(app)
         scope.launch {
@@ -136,6 +137,17 @@ object TranscriptionRun {
                         )
                     }
                     publishMetrics()
+                    _state.value?.metrics?.let { metrics ->
+                        BenchmarkStore.record(
+                            app,
+                            BenchmarkRun(
+                                timestampMs = System.currentTimeMillis(),
+                                modelName = modelName,
+                                fileName = name,
+                                metrics = metrics
+                            )
+                        )
+                    }
                     if (segments.isNotEmpty()) {
                         _state.value?.let { TranscriptStore.save(app, it) }
                     }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,7 +51,8 @@ data class ScribUiState(
     val skipSilence: Boolean,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
-    val dictionaryEnabled: Boolean
+    val dictionaryEnabled: Boolean,
+    val benchmarkRuns: List<BenchmarkRun>
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -138,7 +140,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
-            dictionaryEnabled = Dictionary.isEnabled(ctx)
+            dictionaryEnabled = Dictionary.isEnabled(ctx),
+            benchmarkRuns = BenchmarkStore.load(ctx)
         )
     }
 
@@ -381,6 +384,9 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         TranscriptionRun.restore(ctx)
+        viewModelScope.launch {
+            BenchmarkStore.revisions.collect { push() }
+        }
     }
 
     fun transcribeFile(uri: Uri, displayName: String?) {

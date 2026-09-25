@@ -68,6 +68,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.text.DateFormat
+import java.util.Date
 import java.util.Locale
 import kotlin.math.sqrt
 
@@ -105,6 +107,7 @@ fun ScribScreen(
     onDismissTranscription: () -> Unit,
     onSaveTranscript: (Uri) -> Unit,
     onTranscriptFormat: (TranscriptFormat) -> Unit,
+    benchmarkRuns: List<BenchmarkRun>,
     onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
@@ -114,6 +117,7 @@ fun ScribScreen(
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var modelsExpanded by rememberSaveable { mutableStateOf(true) }
     var customExpanded by rememberSaveable { mutableStateOf(true) }
+    var showBenchmarks by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -152,6 +156,7 @@ fun ScribScreen(
                 item { KeyboardEntry() }
                 item { SkipSilenceEntry(state, onSkipSilence) }
                 item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
+                item { BenchmarkEntry(benchmarkRuns) { showBenchmarks = true } }
             }
             item {
                 Text(
@@ -215,6 +220,9 @@ fun ScribScreen(
     }
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
+    }
+    if (showBenchmarks) {
+        BenchmarkHistoryDialog(benchmarkRuns, onDismiss = { showBenchmarks = false })
     }
     recording?.let { r ->
         RecordingDialog(r, onStop = onStopRecording, onCancel = onCancelRecording)
@@ -723,7 +731,7 @@ private fun StatsLine(t: TranscribeUi) {
         return
     }
     val metrics = t.metrics
-    val rtf = metrics.rtf?.let { String.format(Locale.ROOT, "%.2f", it) } ?: "—"
+    val rtf = rtfText(metrics)
     Column {
         if (!t.modelName.isNullOrBlank()) {
             Text(
@@ -764,6 +772,9 @@ private fun memoryText(megabytes: Int): String =
     }
 
 private fun elapsedOrDash(ms: Long): String = if (ms > 0L) elapsed(ms) else "—"
+
+private fun rtfText(metrics: TranscriptionMetrics): String =
+    metrics.rtf?.let { String.format(Locale.ROOT, "%.2f", it) } ?: "—"
 
 // Whisper only starts reporting once decoding is done and the model is loaded, so the bar spins
 // until then rather than sitting at a misleading zero. The line underneath doubles as the promise
@@ -929,6 +940,98 @@ private fun DictionaryEntry(enabled: Boolean, onClick: () -> Unit) {
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
         }
     }
+}
+
+@Composable
+private fun BenchmarkEntry(runs: List<BenchmarkRun>, onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    val latest = runs.firstOrNull()
+    val subtitle = if (latest == null) {
+        stringResource(R.string.benchmark_history_empty)
+    } else {
+        stringResource(
+            R.string.benchmark_latest,
+            latest.modelName ?: "—",
+            rtfText(latest.metrics),
+            memoryText(latest.metrics.peakPssMb)
+        )
+    }
+    Surface(
+        color = cs.surfaceContainer,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("↗", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.benchmark_history), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(subtitle, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+            }
+            Spacer(Modifier.width(16.dp))
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun BenchmarkHistoryDialog(runs: List<BenchmarkRun>, onDismiss: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.benchmark_history)) },
+        text = {
+            if (runs.isEmpty()) {
+                Text(stringResource(R.string.benchmark_history_empty), fontSize = 13.sp, color = cs.onSurfaceVariant)
+            } else {
+                Column(Modifier.heightIn(max = 440.dp).verticalScroll(rememberScrollState())) {
+                    runs.forEachIndexed { index, run ->
+                        Column(Modifier.fillMaxWidth().padding(vertical = 9.dp)) {
+                            Text(
+                                run.modelName ?: "—",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = cs.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                run.fileName,
+                                fontSize = 11.5.sp,
+                                color = cs.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                stringResource(
+                                    R.string.benchmark_row_stats,
+                                    rtfText(run.metrics),
+                                    memoryText(run.metrics.peakPssMb),
+                                    memoryText(run.metrics.freeRamMb)
+                                ),
+                                fontSize = 12.sp,
+                                color = cs.onSurfaceVariant,
+                                lineHeight = 17.sp,
+                                modifier = Modifier.padding(top = 3.dp)
+                            )
+                            Text(
+                                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(run.timestampMs)),
+                                fontSize = 10.5.sp,
+                                color = cs.onSurfaceVariant,
+                                modifier = Modifier.padding(top = 3.dp)
+                            )
+                        }
+                        if (index < runs.lastIndex) {
+                            Spacer(Modifier.height(1.dp))
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
+    )
 }
 
 @Composable

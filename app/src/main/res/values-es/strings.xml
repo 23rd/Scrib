@@ -22,6 +22,10 @@
     <string name="transcribe_stats_model">Modelo: %1$s</string>
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
+    <string name="benchmark_history">Historial de benchmarks</string>
+    <string name="benchmark_history_empty">Aún no hay transcripciones completadas.</string>
+    <string name="benchmark_latest">Último: %1$s · RTF %2$s · pico %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · pico PSS %2$s · RAM libre %3$s</string>
     <string name="eta_minutes">quedan unos %1$d min</string>
     <string name="eta_seconds">quedan unos %1$d s</string>
     <string name="transcribe_background_hint">Sigue en marcha si sales de la app.</string>

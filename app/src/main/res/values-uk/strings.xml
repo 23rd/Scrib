@@ -22,6 +22,10 @@
     <string name="transcribe_stats_model">Модель: %1$s</string>
     <string name="transcribe_stats_mb">%1$d МБ</string>
     <string name="transcribe_stats_gb">%1$.1f ГБ</string>
+    <string name="benchmark_history">Історія замірів</string>
+    <string name="benchmark_history_empty">Завершених розпізнавань ще немає.</string>
+    <string name="benchmark_latest">Останній: %1$s · RTF %2$s · пік %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · пік PSS %2$s · вільна ОЗ %3$s</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

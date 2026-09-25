@@ -22,6 +22,10 @@
     <string name="transcribe_stats_model">Model: %1$s</string>
     <string name="transcribe_stats_mb">%1$d MB</string>
     <string name="transcribe_stats_gb">%1$.1f GB</string>
+    <string name="benchmark_history">Benchmarkgeschiedenis</string>
+    <string name="benchmark_history_empty">Nog geen voltooide transcripties.</string>
+    <string name="benchmark_latest">Laatste: %1$s · RTF %2$s · piek %3$s</string>
+    <string name="benchmark_row_stats">RTF %1$s · PSS-piek %2$s · vrij RAM %3$s</string>
     <string name="eta_minutes">nog ongeveer %1$d min</string>
     <string name="eta_seconds">nog ongeveer %1$d sec</string>
     <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>

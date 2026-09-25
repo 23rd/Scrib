@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
                         onDismissTranscription = vm::dismissTranscription,
                         onSaveTranscript = vm::saveTranscript,
                         onTranscriptFormat = vm::setTranscriptFormat,
+                        benchmarkRuns = state.benchmarkRuns,
                         onAbout = { showAbout = true }
                     )
                 }
