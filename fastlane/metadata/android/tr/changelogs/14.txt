@@ -1,0 +1,1 @@
+• Sherpa çalışma zamanı indirilirken yayın derlemesindeki hata düzeltildi

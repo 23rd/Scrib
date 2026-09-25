@@ -1,0 +1,1 @@
+• Fixed release build failing to fetch the sherpa runtime

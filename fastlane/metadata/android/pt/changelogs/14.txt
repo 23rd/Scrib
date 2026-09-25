@@ -1,0 +1,1 @@
+• Corrigida falha de compilação da versão ao baixar o runtime do Sherpa

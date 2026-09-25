@@ -1,0 +1,1 @@
+• Correction de l’échec de compilation de la version au chargement de Sherpa
