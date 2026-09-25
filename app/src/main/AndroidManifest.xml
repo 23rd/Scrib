@@ -48,6 +48,11 @@
             android:exported="false"
             android:foregroundServiceType="dataSync"/>
 
+        <service
+            android:name=".SherpaValidationService"
+            android:exported="false"
+            android:process=":sherpa_validation"/>
+
         <activity
             android:name=".DictionaryActivity"
             android:exported="false"

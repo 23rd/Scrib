@@ -55,7 +55,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
         } catch (e: ModelNotAvailableException) {
-            callback.onTranscriptionError(transcriptionError(ErrorType.MODEL_NOT_AVAILABLE))
+            callback.onTranscriptionError(transcriptionError(ErrorType.MODEL_NOT_AVAILABLE, e.message))
         } catch (e: DecodeException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.DECODE_FAILED, e.message))
         } catch (e: Throwable) {
@@ -399,7 +399,12 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             ?: throw ModelNotAvailableException()
         val dir = SherpaModel.dirFor(appContext, info.id)
         if (!SherpaModel.isComplete(dir, info)) {
-            throw ModelNotAvailableException()
+            throw ModelNotAvailableException("Sherpa model files are incomplete")
+        }
+        try {
+            SherpaModel.validateMetadata(dir, info)
+        } catch (e: IllegalArgumentException) {
+            throw ModelNotAvailableException(e.message)
         }
         val language = when (info.modelType) {
             SherpaModel.TYPE_SENSE_VOICE -> SherpaModel.senseVoiceLanguage(info, languageHint)

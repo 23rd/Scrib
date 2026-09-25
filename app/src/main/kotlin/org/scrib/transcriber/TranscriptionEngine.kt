@@ -78,7 +78,7 @@ interface TranscriptionEngine {
 
 class CancelledException : RuntimeException()
 
-class ModelNotAvailableException : RuntimeException()
+class ModelNotAvailableException(message: String? = null) : RuntimeException(message)
 
 class DecodeException(message: String) : RuntimeException(message)
 

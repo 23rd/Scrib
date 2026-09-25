@@ -2,7 +2,7 @@
 <resources>
     <string name="other_engines">SHERPA-MODELLEN</string>
     <string name="status_selftest_whisper_only">De zelftest werkt alleen met Whisper-modellen — schakel over naar een model om het te controleren.</string>
-    <string name="sherpa_empty_hint">Voeg een transducer- of SenseVoice-model toe.</string>
+    <string name="sherpa_empty_hint">Voeg een ondersteund sherpa-onnx-ASR-model toe.</string>
     <string name="add_sherpa">Sherpa-model toevoegen…</string>
     <string name="sherpa_add_title">Nieuw sherpa-model</string>
     <string name="sherpa_name_label">Naam</string>
@@ -14,6 +14,12 @@
     <string name="sherpa_type_sense_voice">SenseVoice (model + tokens)</string>
     <string name="sherpa_type_moonshine">Moonshine (encoder + samengevoegde decoder)</string>
     <string name="sherpa_type_canary">Canary (encoder + decoder)</string>
+    <string name="sherpa_type_dolphin">Dolphin CTC (model + tokens)</string>
+    <string name="sherpa_type_omnilingual">Omnilingual ASR CTC (model + tokens)</string>
+    <string name="sherpa_type_nemo_ctc">NeMo CTC (model + tokens)</string>
+    <string name="sherpa_type_zipformer_ctc">Zipformer CTC (model + tokens)</string>
+    <string name="sherpa_type_fire_red_aed">FireRed ASR AED (encoder + decoder)</string>
+    <string name="sherpa_type_fire_red_ctc">FireRed ASR CTC (model + tokens)</string>
     <string name="sherpa_langs_label">Talen, optioneel</string>
     <string name="sherpa_langs_hint">ru, en</string>
     <string name="sherpa_slot_model">Model — *.onnx</string>
@@ -26,5 +32,15 @@
     <string name="sherpa_folder_button">In map zoeken…</string>
     <string name="sherpa_need_name">Voer een naam in</string>
     <string name="sherpa_need_files">Kies alle bestanden voor dit modeltype</string>
+    <string name="sherpa_need_type">Kies het gedetecteerde modeltype</string>
+    <string name="sherpa_detected">Gedetecteerd: %1$s ✓</string>
+    <string name="sherpa_change">Wijzigen</string>
+    <string name="sherpa_choose_type">Kiezen</string>
+    <string name="sherpa_choose_detected">Welk modeltype is dit?</string>
+    <string name="sherpa_detection_ambiguous">Meerdere modeltypen komen overeen met deze bestanden. Kies er een.</string>
+    <string name="sherpa_folder_unknown">Geen ondersteund modeltype komt overeen met deze bestanden</string>
+    <string name="sherpa_folder_failed">De geselecteerde map kon niet worden gelezen</string>
+    <string name="sherpa_scanning">Map controleren…</string>
+    <string name="sherpa_import_failed">Importeren mislukt: %1$s</string>
     <string name="sherpa_add_confirm">Toevoegen</string>
 </resources>

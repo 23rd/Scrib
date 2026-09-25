@@ -2,7 +2,7 @@
 <resources>
     <string name="other_engines">SHERPA MODELLERİ</string>
     <string name="status_selftest_whisper_only">Seri testi yalnızca Whisper modellerinde çalışır — kontrol etmek için bir modele geçin.</string>
-    <string name="sherpa_empty_hint">Transdüser veya SenseVoice modeli ekleyin.</string>
+    <string name="sherpa_empty_hint">Desteklenen bir sherpa-onnx ASR modeli ekleyin.</string>
     <string name="add_sherpa">Sherpa modeli ekle…</string>
     <string name="sherpa_add_title">Yeni sherpa modeli</string>
     <string name="sherpa_name_label">Ad</string>
@@ -14,6 +14,12 @@
     <string name="sherpa_type_sense_voice">SenseVoice (model + tokens)</string>
     <string name="sherpa_type_moonshine">Moonshine (encoder + birleşik decoder)</string>
     <string name="sherpa_type_canary">Canary (encoder + decoder)</string>
+    <string name="sherpa_type_dolphin">Dolphin CTC (model + tokens)</string>
+    <string name="sherpa_type_omnilingual">Omnilingual ASR CTC (model + tokens)</string>
+    <string name="sherpa_type_nemo_ctc">NeMo CTC (model + tokens)</string>
+    <string name="sherpa_type_zipformer_ctc">Zipformer CTC (model + tokens)</string>
+    <string name="sherpa_type_fire_red_aed">FireRed ASR AED (encoder + decoder)</string>
+    <string name="sherpa_type_fire_red_ctc">FireRed ASR CTC (model + tokens)</string>
     <string name="sherpa_langs_label">Diller, isteğe bağlı</string>
     <string name="sherpa_langs_hint">ru, en</string>
     <string name="sherpa_slot_model">Model — *.onnx</string>
@@ -26,5 +32,15 @@
     <string name="sherpa_folder_button">Klasörde ara…</string>
     <string name="sherpa_need_name">Bir ad girin</string>
     <string name="sherpa_need_files">Bu model türü için tüm dosyaları seçin</string>
+    <string name="sherpa_need_type">Algılanan model türünü seçin</string>
+    <string name="sherpa_detected">Algılandı: %1$s ✓</string>
+    <string name="sherpa_change">Değiştir</string>
+    <string name="sherpa_choose_type">Seç</string>
+    <string name="sherpa_choose_detected">Bu hangi model türü?</string>
+    <string name="sherpa_detection_ambiguous">Bu dosyalarla birden fazla model türü eşleşiyor. Birini seçin.</string>
+    <string name="sherpa_folder_unknown">Bu dosyalarla eşleşen desteklenen bir model türü yok</string>
+    <string name="sherpa_folder_failed">Seçilen klasör okunamadı</string>
+    <string name="sherpa_scanning">Klasör taranıyor…</string>
+    <string name="sherpa_import_failed">İçe aktarma başarısız: %1$s</string>
     <string name="sherpa_add_confirm">Ekle</string>
 </resources>

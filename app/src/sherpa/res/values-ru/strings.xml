@@ -2,7 +2,7 @@
 <resources>
     <string name="other_engines">SHERPA-МОДЕЛИ</string>
     <string name="status_selftest_whisper_only">Самопроверка работает только на Whisper-моделях — переключитесь на одну из них.</string>
-    <string name="sherpa_empty_hint">Добавьте transducer- или SenseVoice-модель.</string>
+    <string name="sherpa_empty_hint">Добавьте поддерживаемую ASR-модель sherpa-onnx.</string>
     <string name="add_sherpa">Добавить sherpa-модель…</string>
     <string name="sherpa_add_title">Новая sherpa-модель</string>
     <string name="sherpa_name_label">Название</string>
@@ -14,6 +14,12 @@
     <string name="sherpa_type_sense_voice">SenseVoice (модель + tokens)</string>
     <string name="sherpa_type_moonshine">Moonshine (encoder + merged decoder)</string>
     <string name="sherpa_type_canary">Canary (encoder + decoder)</string>
+    <string name="sherpa_type_dolphin">Dolphin CTC (модель + tokens)</string>
+    <string name="sherpa_type_omnilingual">Omnilingual ASR CTC (модель + tokens)</string>
+    <string name="sherpa_type_nemo_ctc">NeMo CTC (модель + tokens)</string>
+    <string name="sherpa_type_zipformer_ctc">Zipformer CTC (модель + tokens)</string>
+    <string name="sherpa_type_fire_red_aed">FireRed ASR AED (encoder + decoder)</string>
+    <string name="sherpa_type_fire_red_ctc">FireRed ASR CTC (модель + tokens)</string>
     <string name="sherpa_langs_label">Языки, необязательно</string>
     <string name="sherpa_langs_hint">ru, en</string>
     <string name="sherpa_slot_model">Модель — *.onnx</string>
@@ -26,5 +32,15 @@
     <string name="sherpa_folder_button">Найти в папке…</string>
     <string name="sherpa_need_name">Введите название</string>
     <string name="sherpa_need_files">Выберите все файлы для этого типа модели</string>
+    <string name="sherpa_need_type">Выберите обнаруженный тип модели</string>
+    <string name="sherpa_detected">Обнаружено: %1$s ✓</string>
+    <string name="sherpa_change">Изменить</string>
+    <string name="sherpa_choose_type">Выбрать</string>
+    <string name="sherpa_choose_detected">Какой это тип модели?</string>
+    <string name="sherpa_detection_ambiguous">Файлы подходят нескольким типам моделей. Выберите один.</string>
+    <string name="sherpa_folder_unknown">Ни один поддерживаемый тип модели не подходит к этим файлам</string>
+    <string name="sherpa_folder_failed">Не удалось прочитать выбранную папку</string>
+    <string name="sherpa_scanning">Сканирование папки…</string>
+    <string name="sherpa_import_failed">Ошибка импорта: %1$s</string>
     <string name="sherpa_add_confirm">Добавить</string>
 </resources>

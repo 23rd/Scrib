@@ -18,7 +18,7 @@ interface SherpaPlugin {
 
     fun deleteModel(context: Context, id: String): Boolean
 
-    fun importModel(
+    suspend fun importModel(
         context: Context,
         displayName: String,
         modelType: String,
@@ -37,7 +37,7 @@ interface SherpaPlugin {
         onUse: (String) -> Unit,
         onDelete: (String) -> Unit,
         onRequestDelete: (String) -> Unit,
-        onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit
+        onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit
     )
 }
 

@@ -104,7 +104,7 @@ fun ScribScreen(
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
     onConfigureKeyboardLayouts: (Boolean, List<String>) -> Unit,
-    onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit,
+    onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
     sherpaPlugin: SherpaPlugin?,
     recording: RecordingUi?,
     onStartRecording: () -> Unit,

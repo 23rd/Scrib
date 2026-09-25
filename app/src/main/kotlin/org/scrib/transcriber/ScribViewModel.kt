@@ -162,17 +162,27 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         displayName: String,
         modelType: String,
         languages: List<String>?,
-        parts: Map<String, Uri>
+        parts: Map<String, Uri>,
+        completed: (Throwable?) -> Unit = {}
     ) {
-        if (BenchmarkBatchGate.isActive) return
-        val plugin = SherpaPlugins.plugin ?: return
+        if (BenchmarkBatchGate.isActive) {
+            completed(IllegalStateException("Benchmark is active"))
+            return
+        }
+        val plugin = SherpaPlugins.plugin
+        if (plugin == null) {
+            completed(IllegalStateException("Sherpa support is unavailable"))
+            return
+        }
         if (sherpaBusy) {
+            completed(IllegalStateException("Another model import is already running"))
             return
         }
         sherpaBusy = true
         statusMsg = ""; statusError = false
         push()
         viewModelScope.launch {
+            var failure: Throwable? = null
             try {
                 val id = withContext(Dispatchers.IO) {
                     plugin.importModel(ctx, displayName, modelType, languages, parts)
@@ -181,10 +191,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                     ModelManager.setActive(ctx, id)
                 }
             } catch (e: Throwable) {
-                statusMsg = e.message ?: ""
+                failure = e
+                statusMsg = e.message ?: "Sherpa import failed"
                 statusError = true
             }
             sherpaBusy = false
+            completed(failure)
             push()
         }
     }
