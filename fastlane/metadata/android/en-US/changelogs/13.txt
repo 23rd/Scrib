@@ -1,0 +1,8 @@
+• Added live transcription performance metrics
+• Added persistent benchmark history and comparison
+• Added model load and memory metrics
+• Improved benchmark history UI
+• Added benchmark metric guide and timestamps
+• Added batch runner and history actions
+• Improved voice keyboard settings and copy
+• Added detection and import of Sherpa model families

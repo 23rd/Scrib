@@ -1,0 +1,8 @@
+• Aggiunte metriche di prestazioni della trascrizione live
+• Aggiunti cronologia persistente dei benchmark e confronto
+• Aggiunte metriche di caricamento e memoria dei modelli
+• Migliorata interfaccia della cronologia benchmark
+• Aggiunti guida alle metriche e orari dei benchmark
+• Aggiunti esecutore batch e azioni della cronologia
+• Migliorate impostazioni e testi della tastiera vocale
+• Aggiunti rilevamento e importazione delle famiglie Sherpa

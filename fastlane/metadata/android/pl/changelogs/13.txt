@@ -1,0 +1,8 @@
+• Dodano metryki wydajności transkrypcji na żywo
+• Dodano trwałą historię benchmarków i porównanie
+• Dodano metryki ładowania modeli i pamięci
+• Ulepszono interfejs historii benchmarków
+• Dodano przewodnik metryk i znaczniki czasu
+• Dodano runner wsadowy i akcje historii
+• Ulepszono ustawienia i teksty klawiatury głosowej
+• Dodano wykrywanie i import rodzin modeli Sherpa

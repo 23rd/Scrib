@@ -1,0 +1,8 @@
+• Canlı transkripsiyon performans metrikleri eklendi
+• Kalıcı benchmark geçmişi ve karşılaştırma eklendi
+• Model yükleme ve bellek metrikleri eklendi
+• Benchmark geçmişi arayüzü iyileştirildi
+• Benchmark metrikleri rehberi ve çalışma zamanları eklendi
+• Toplu çalıştırıcı ve geçmiş eylemleri eklendi
+• Ses klavyesi ayarları ve metinleri iyileştirildi
+• Sherpa model aileleri algılama ve içe aktarma desteği eklendi

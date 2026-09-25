@@ -1,0 +1,8 @@
+• Ajout de métriques de transcription en direct
+• Ajout de l’historique persistant des benchmarks et de comparaison
+• Ajout de métriques de chargement et de mémoire des modèles
+• Amélioration de l’interface de l’historique des benchmarks
+• Ajout d’un guide des métriques et des horodatages
+• Ajout d’un exécuteur par lots et d’actions sur l’historique
+• Amélioration des réglages et textes du clavier vocal
+• Ajout de la détection et de l’import des familles Sherpa

@@ -1,0 +1,8 @@
+• Live-transcriptieprestatiemetingen toegevoegd
+• Persistente benchmarkgeschiedenis en vergelijking toegevoegd
+• Model-laad- en geheugenmetingen toegevoegd
+• Benchmarkgeschiedenis-interface verbeterd
+• Benchmarkmetriekgids en tijdstempels toegevoegd
+• Batchrunner en geschiedenisacties toegevoegd
+• Instellingen en teksten van voice keyboard verbeterd
+• Detectie en import van Sherpa-modelfamilies toegevoegd

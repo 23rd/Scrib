@@ -1,0 +1,8 @@
+• Adicionadas métricas de desempenho da transcrição ao vivo
+• Adicionados histórico persistente de benchmarks e comparação
+• Adicionadas métricas de carregamento e memória dos modelos
+• Melhorada a interface do histórico de benchmarks
+• Adicionados guia de métricas e horários das execuções
+• Adicionados executor em lote e ações de histórico
+• Melhoradas configurações e textos do teclado por voz
+• Adicionadas detecção e importação de famílias Sherpa

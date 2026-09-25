@@ -1,0 +1,8 @@
+• Live-Transkriptions-Leistungsmessungen hinzugefügt
+• Persistente Benchmark-Historie und Vergleich hinzugefügt
+• Modell-Lade- und Speichermessungen hinzugefügt
+• Benchmark-Historie-Oberfläche verbessert
+• Benchmark-Metrik-Leitfaden und Zeitangaben hinzugefügt
+• Batch-Runner und Historienaktionen hinzugefügt
+• Voice-Keyboard-Einstellungen und Texte verbessert
+• Erkennung und Import von Sherpa-Modellfamilien hinzugefügt
