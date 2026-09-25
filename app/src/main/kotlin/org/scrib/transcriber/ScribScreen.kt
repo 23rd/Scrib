@@ -97,6 +97,8 @@ fun ScribScreen(
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
     onSelfTest: () -> Unit,
+    onBenchmarkFile: (Uri, String?) -> Unit,
+    onCancelBenchmark: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>) -> Unit,
@@ -130,6 +132,14 @@ fun ScribScreen(
     val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onTranscribeFile(uri, queryDisplayName(context, uri))
     }
+    val benchmarkPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            onBenchmarkFile(uri, queryDisplayName(context, uri))
+        }
+    }
     // Already granted, and the contract answers without showing anything; a refusal is reported by
     // the recording attempt itself.
     val microphone = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -138,7 +148,7 @@ fun ScribScreen(
     // Asked for at the first run, where the shade is about to become the only place the progress
     // shows. A refusal costs the notification, not the run.
     val notifications = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
-    val started = transcription != null
+    val started = transcription != null && !state.benchmarkBatch.running
     LaunchedEffect(started) {
         if (started && android.os.Build.VERSION.SDK_INT >= 33) {
             notifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -218,10 +228,37 @@ fun ScribScreen(
                 item { StatusBox(state.statusMsg, state.statusError) }
             }
             item {
-                Box(Modifier.fillMaxWidth().padding(top = 22.dp), contentAlignment = Alignment.Center) {
+                Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
                     TextButton(onClick = onSelfTest) {
                         Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
                     }
+                }
+            }
+            item {
+                BenchmarkBatchControl(
+                    state = state.benchmarkBatch,
+                    enabled = state.benchmarkModelCount > 0 &&
+                        !state.benchmarkBatch.running &&
+                        transcription == null && recording == null,
+                    onClick = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
+                    onCancel = onCancelBenchmark
+                )
+            }
+            val batch = state.benchmarkBatch
+            if (batch.total > 0 && !batch.running &&
+                (batch.completed > 0 || batch.failed > 0 || batch.cancelled)) {
+                item {
+                    val text = when {
+                        batch.cancelled -> stringResource(R.string.benchmark_batch_cancelled, batch.completed, batch.total)
+                        batch.failed > 0 -> stringResource(
+                            R.string.benchmark_batch_partial,
+                            batch.completed - batch.failed,
+                            batch.total,
+                            batch.failed
+                        )
+                        else -> stringResource(R.string.benchmark_batch_done, batch.completed, batch.total)
+                    }
+                    StatusBox(text, batch.cancelled || batch.failed > 0)
                 }
             }
         }
@@ -247,11 +284,13 @@ fun ScribScreen(
     recording?.let { r ->
         RecordingDialog(r, onStop = onStopRecording, onCancel = onCancelRecording)
     }
-    transcription?.let { t ->
+    if (transcription != null && !state.benchmarkBatch.running) {
+        transcription?.let { t ->
         TranscriptionDialog(
             t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
             onSave = onSaveTranscript, onFormat = onTranscriptFormat
         )
+        }
     }
     deleteTarget?.let { target ->
         val context = LocalContext.current
@@ -635,6 +674,58 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ) {
             Text(stringResource(R.string.transcribe_audio_file), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
+        }
+    }
+}
+
+@Composable
+private fun BenchmarkBatchControl(
+    state: BenchmarkBatchState,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    onCancel: () -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    if (state.running) {
+        Column(Modifier.fillMaxWidth().padding(top = 8.dp)) {
+            Text(
+                stringResource(
+                    R.string.benchmark_batch_running,
+                    (state.completed + 1).coerceAtMost(state.total),
+                    state.total,
+                    state.currentModel.orEmpty()
+                ),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = cs.onSurfaceVariant
+            )
+            LinearProgressIndicator(
+                progress = {
+                    if (state.total > 0) state.completed.toFloat() / state.total else 0f
+                },
+                modifier = Modifier.fillMaxWidth().padding(top = 6.dp).clip(RoundedCornerShape(3.dp)),
+                color = cs.primary,
+                trackColor = cs.outlineVariant
+            )
+            TextButton(
+                onClick = onCancel,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(stringResource(R.string.action_cancel), fontSize = 12.sp, color = cs.onSurfaceVariant)
+            }
+        }
+    } else {
+        TextButton(
+            enabled = enabled,
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+        ) {
+            Text(
+                stringResource(R.string.benchmark_all_models),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = cs.onSurfaceVariant
+            )
         }
     }
 }

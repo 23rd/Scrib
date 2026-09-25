@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Pantalla completa</string>
     <string name="benchmark_dialog">Diálogo</string>
     <string name="benchmark_history_empty">Aún no hay transcripciones completadas.</string>
+    <string name="benchmark_export_json">Exportar JSON</string>
+    <string name="benchmark_clear_history">Borrar historial</string>
+    <string name="benchmark_clear_title">¿Borrar el historial de benchmarks?</string>
+    <string name="benchmark_clear_message">Esto elimina permanentemente todos los resultados de benchmark guardados de este dispositivo.</string>
+    <string name="benchmark_exported">Historial de benchmarks exportado.</string>
+    <string name="benchmark_export_failed">No se pudo exportar el historial de benchmarks.</string>
+    <string name="benchmark_clear_failed">No se pudo borrar el historial de benchmarks.</string>
     <string name="benchmark_latest">Último: %1$s · RTF %2$s · pico %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Carga</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Delta del modelo: memoria adicional utilizada tras cargar el modelo.</string>
     <string name="benchmark_info_peak">Pico: uso máximo de memoria durante la ejecución.</string>
     <string name="benchmark_info_free">RAM libre: memoria disponible en el dispositivo al terminar.</string>
+    <string name="benchmark_all_models">Evaluar todos los modelos descargados</string>
+    <string name="benchmark_batch_running">Evaluando %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Evaluación completada: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Evaluación completada: aciertos %1$d/%2$d, fallos %3$d.</string>
+    <string name="benchmark_batch_cancelled">Evaluación cancelada: completados %1$d/%2$d.</string>
     <string name="eta_minutes">quedan unos %1$d min</string>
     <string name="eta_seconds">quedan unos %1$d s</string>
     <string name="transcribe_background_hint">Sigue en marcha si sales de la app.</string>

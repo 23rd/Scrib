@@ -39,6 +39,13 @@ class TranscriptionService : Service() {
                 }
                 return null
             }
+            if (BenchmarkBatchGate.isActive) {
+                try {
+                    audio.close()
+                } catch (ignore: Exception) {
+                }
+                return null
+            }
             val cancellation = CancellationToken()
             executor.execute {
                 TranscriptionEngine.get(applicationContext).transcribe(audio, request, callback, cancellation)
@@ -54,7 +61,7 @@ class TranscriptionService : Service() {
             request: StreamRequest?,
             callback: ITranscriptionCallback?
         ): ITranscriptionStream? {
-            if (callback == null) {
+            if (callback == null || BenchmarkBatchGate.isActive) {
                 return null
             }
             val stream = TranscriptionEngine.get(applicationContext).openStream(request, callback)

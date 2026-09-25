@@ -49,6 +49,29 @@ object BenchmarkStore {
     }
 
     @Synchronized
+    fun clear(context: Context): Boolean {
+        val file = file(context)
+        if (!file.exists()) {
+            return true
+        }
+        return try {
+            if (!file.delete()) {
+                Log.w(LOG_TAG, "Couldn't clear benchmark history")
+                false
+            } else {
+                _revisions.value += 1
+                true
+            }
+        } catch (e: Throwable) {
+            Log.w(LOG_TAG, "Couldn't clear benchmark history", e)
+            false
+        }
+    }
+
+    @Synchronized
+    fun exportJson(context: Context): String = serialize(load(context))
+
+    @Synchronized
     fun load(context: Context): List<BenchmarkRun> {
         val file = file(context)
         if (!file.exists()) {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 // Exists for as long as a run does, and for nothing else: a foreground service is what tells the
@@ -28,8 +29,10 @@ class TranscriptionForegroundService : Service() {
         createChannel()
         goForeground(notification(TranscriptionRun.state.value))
         scope.launch {
-            TranscriptionRun.state.collect { state ->
-                if (state == null || !state.running) {
+            combine(TranscriptionRun.state, BenchmarkBatchGate.active) { state, batchActive ->
+                state to batchActive
+            }.collect { (state, batchActive) ->
+                if (!batchActive && (state == null || !state.running)) {
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 } else {

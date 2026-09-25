@@ -124,6 +124,7 @@ class ScribInputMethodService : InputMethodService() {
     }
 
     private fun act() {
+        if (BenchmarkBatchGate.isActive) return
         when (blocker()) {
             // An input method cannot ask for a permission itself, so the app is opened to do it.
             Blocker.Microphone -> openApp(requestMicrophone = true)
@@ -137,6 +138,7 @@ class ScribInputMethodService : InputMethodService() {
     }
 
     private fun listen() {
+        if (BenchmarkBatchGate.isActive) return
         val id = session
         notice = null
         inserted = ""

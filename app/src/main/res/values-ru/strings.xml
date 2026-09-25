@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Во весь экран</string>
     <string name="benchmark_dialog">Окно</string>
     <string name="benchmark_history_empty">Завершённых запусков пока нет.</string>
+    <string name="benchmark_export_json">Экспорт JSON</string>
+    <string name="benchmark_clear_history">Очистить историю</string>
+    <string name="benchmark_clear_title">Очистить историю замеров?</string>
+    <string name="benchmark_clear_message">Все сохранённые результаты замеров будут безвозвратно удалены с этого устройства.</string>
+    <string name="benchmark_exported">История замеров экспортирована.</string>
+    <string name="benchmark_export_failed">Не удалось экспортировать историю замеров.</string>
+    <string name="benchmark_clear_failed">Не удалось очистить историю замеров.</string>
     <string name="benchmark_latest">Последний: %1$s · RTF %2$s · пик %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Загрузка</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Прирост модели: дополнительная память после загрузки модели.</string>
     <string name="benchmark_info_peak">Пик: максимальное использование памяти во время запуска.</string>
     <string name="benchmark_info_free">Свободно: объём памяти, доступный на устройстве после запуска.</string>
+    <string name="benchmark_all_models">Проверить все скачанные модели</string>
+    <string name="benchmark_batch_running">Проверка %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Проверка завершена: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Проверка завершена: успешно %1$d/%2$d, ошибок %3$d.</string>
+    <string name="benchmark_batch_cancelled">Проверка отменена: завершено %1$d/%2$d.</string>
     <string name="eta_minutes">осталось около %1$d мин</string>
     <string name="eta_seconds">осталось около %1$d с</string>
     <string name="transcribe_background_hint">Продолжается, даже если выйти из приложения.</string>

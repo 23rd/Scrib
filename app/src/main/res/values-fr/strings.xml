@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Plein écran</string>
     <string name="benchmark_dialog">Dialogue</string>
     <string name="benchmark_history_empty">Aucune transcription terminée pour le moment.</string>
+    <string name="benchmark_export_json">Exporter le JSON</string>
+    <string name="benchmark_clear_history">Effacer l’historique</string>
+    <string name="benchmark_clear_title">Effacer l’historique des tests ?</string>
+    <string name="benchmark_clear_message">Cette action supprime définitivement de cet appareil tous les résultats de test enregistrés.</string>
+    <string name="benchmark_exported">Historique des tests exporté.</string>
+    <string name="benchmark_export_failed">Impossible d’exporter l’historique des tests.</string>
+    <string name="benchmark_clear_failed">Impossible d’effacer l’historique des tests.</string>
     <string name="benchmark_latest">Dernier : %1$s · RTF %2$s · pic %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Chargement</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Delta du modèle : mémoire supplémentaire utilisée après le chargement du modèle.</string>
     <string name="benchmark_info_peak">Pic : utilisation maximale de la mémoire pendant l’exécution.</string>
     <string name="benchmark_info_free">RAM libre : mémoire disponible sur l’appareil à la fin de l’exécution.</string>
+    <string name="benchmark_all_models">Évaluer tous les modèles téléchargés</string>
+    <string name="benchmark_batch_running">Évaluation %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Évaluation terminée : %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Évaluation terminée : réussites %1$d/%2$d, échecs %3$d.</string>
+    <string name="benchmark_batch_cancelled">Évaluation annulée : terminés %1$d/%2$d.</string>
     <string name="eta_minutes">environ %1$d min restantes</string>
     <string name="eta_seconds">environ %1$d s restantes</string>
     <string name="transcribe_background_hint">Continue si vous quittez l\'application.</string>

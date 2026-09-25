@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Tela cheia</string>
     <string name="benchmark_dialog">Dialogo</string>
     <string name="benchmark_history_empty">Ainda não há transcrições concluídas.</string>
+    <string name="benchmark_export_json">Exportar JSON</string>
+    <string name="benchmark_clear_history">Limpar histórico</string>
+    <string name="benchmark_clear_title">Limpar histórico de benchmarks?</string>
+    <string name="benchmark_clear_message">Isto elimina permanentemente todos os resultados de benchmark guardados neste dispositivo.</string>
+    <string name="benchmark_exported">Histórico de benchmarks exportado.</string>
+    <string name="benchmark_export_failed">Não foi possível exportar o histórico de benchmarks.</string>
+    <string name="benchmark_clear_failed">Não foi possível limpar o histórico de benchmarks.</string>
     <string name="benchmark_latest">Mais recente: %1$s · RTF %2$s · pico %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Carregamento</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Delta do modelo: memória adicional usada após carregar o modelo.</string>
     <string name="benchmark_info_peak">Pico: uso máximo de memória durante a execução.</string>
     <string name="benchmark_info_free">RAM livre: memória disponível no dispositivo quando a execução termina.</string>
+    <string name="benchmark_all_models">Fazer benchmark de todos os modelos baixados</string>
+    <string name="benchmark_batch_running">Benchmark %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Benchmark concluído: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Benchmark concluído: sucessos %1$d/%2$d, falhas %3$d.</string>
+    <string name="benchmark_batch_cancelled">Benchmark cancelado: concluídos %1$d/%2$d.</string>
     <string name="eta_minutes">faltam cerca de %1$d min</string>
     <string name="eta_seconds">faltam cerca de %1$d s</string>
     <string name="transcribe_background_hint">Continua mesmo se você sair do app.</string>

@@ -29,6 +29,13 @@
     <string name="benchmark_fullscreen">Full screen</string>
     <string name="benchmark_dialog">Dialog</string>
     <string name="benchmark_history_empty">No completed transcription runs yet.</string>
+    <string name="benchmark_export_json">Export JSON</string>
+    <string name="benchmark_clear_history">Clear history</string>
+    <string name="benchmark_clear_title">Clear benchmark history?</string>
+    <string name="benchmark_clear_message">This permanently deletes all saved benchmark results from this device.</string>
+    <string name="benchmark_exported">Benchmark history exported.</string>
+    <string name="benchmark_export_failed">Couldn\'t export benchmark history.</string>
+    <string name="benchmark_clear_failed">Couldn\'t clear benchmark history.</string>
     <string name="benchmark_latest">Latest: %1$s · RTF %2$s · peak %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Load</string>
@@ -44,6 +51,11 @@
     <string name="benchmark_info_model_delta">Model delta: additional memory used after loading the model.</string>
     <string name="benchmark_info_peak">Peak: highest memory usage during the run.</string>
     <string name="benchmark_info_free">Free RAM: memory available on the device after the run.</string>
+    <string name="benchmark_all_models">Benchmark all downloaded models</string>
+    <string name="benchmark_batch_running">Benchmarking %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Benchmark finished: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Benchmark finished: successes %1$d/%2$d, failures %3$d.</string>
+    <string name="benchmark_batch_cancelled">Benchmark cancelled: completed %1$d/%2$d.</string>
     <string name="eta_minutes">about %1$d min left</string>
     <string name="eta_seconds">about %1$d sec left</string>
     <string name="transcribe_background_hint">Keeps running if you leave the app.</string>

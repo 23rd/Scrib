@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">На весь екран</string>
     <string name="benchmark_dialog">Вікно</string>
     <string name="benchmark_history_empty">Завершених розпізнавань ще немає.</string>
+    <string name="benchmark_export_json">Експорт JSON</string>
+    <string name="benchmark_clear_history">Очистити історію</string>
+    <string name="benchmark_clear_title">Очистити історію замірів?</string>
+    <string name="benchmark_clear_message">Усі збережені результати замірів буде безповоротно видалено з цього пристрою.</string>
+    <string name="benchmark_exported">Історію замірів експортовано.</string>
+    <string name="benchmark_export_failed">Не вдалося експортувати історію замірів.</string>
+    <string name="benchmark_clear_failed">Не вдалося очистити історію замірів.</string>
     <string name="benchmark_latest">Останній: %1$s · RTF %2$s · пік %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Завантаження</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Приріст моделі: додаткова пам’ять після завантаження моделі.</string>
     <string name="benchmark_info_peak">Пік: максимальне використання пам’яті під час запуску.</string>
     <string name="benchmark_info_free">Вільна ОЗ: пам’ять, доступна на пристрої після завершення.</string>
+    <string name="benchmark_all_models">Перевірити всі завантажені моделі</string>
+    <string name="benchmark_batch_running">Перевірка %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Перевірку завершено: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Перевірку завершено: успішно %1$d/%2$d, помилок %3$d.</string>
+    <string name="benchmark_batch_cancelled">Перевірку скасовано: завершено %1$d/%2$d.</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

@@ -1,9 +1,13 @@
 package org.scrib.transcriber
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,20 +45,59 @@ class BenchmarkHistoryActivity : ComponentActivity() {
         val activity = this
         setContent {
             ScribTheme {
-                val runs = remember { BenchmarkStore.load(activity) }
-                BenchmarkHistoryScreen(runs, onDialog = {
-                    BenchmarkStore.setFullscreen(activity, false)
-                    activity.finish()
-                })
+                val revision by BenchmarkStore.revisions.collectAsState()
+                val runs = remember(revision) { BenchmarkStore.load(activity) }
+                val exportLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.CreateDocument("application/json")
+                ) { uri ->
+                    if (uri != null) {
+                        try {
+                            contentResolver.openOutputStream(uri)?.bufferedWriter()?.use {
+                                it.write(BenchmarkStore.exportJson(activity))
+                            } ?: throw RuntimeException("cannot write")
+                            toast(getString(R.string.benchmark_exported))
+                        } catch (e: Throwable) {
+                            toast(getString(R.string.benchmark_export_failed))
+                        }
+                    }
+                }
+                BenchmarkHistoryScreen(
+                    runs = runs,
+                    onExport = { exportLauncher.launch(HISTORY_FILE_NAME) },
+                    onClear = {
+                        BenchmarkStore.clear(activity).also { cleared ->
+                            if (!cleared) {
+                                toast(getString(R.string.benchmark_clear_failed))
+                            }
+                        }
+                    },
+                    onDialog = {
+                        BenchmarkStore.setFullscreen(activity, false)
+                        activity.finish()
+                    }
+                )
             }
         }
+    }
+
+    private fun toast(message: String) =
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+    private companion object {
+        const val HISTORY_FILE_NAME = "scrib-benchmark-history.json"
     }
 }
 
 @Composable
-private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Unit) {
+private fun BenchmarkHistoryScreen(
+    runs: List<BenchmarkRun>,
+    onExport: () -> Unit,
+    onClear: () -> Boolean,
+    onDialog: () -> Unit
+) {
     val cs = MaterialTheme.colorScheme
     var showInfo by rememberSaveable { mutableStateOf(false) }
+    var showClearConfirmation by rememberSaveable { mutableStateOf(false) }
     Column(
         Modifier.fillMaxSize()
             .background(cs.background)
@@ -87,6 +131,20 @@ private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Uni
                 )
             }
         }
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
+        ) {
+            TextButton(onClick = onExport, enabled = runs.isNotEmpty()) {
+                Text(stringResource(R.string.benchmark_export_json))
+            }
+            TextButton(
+                onClick = { showClearConfirmation = true },
+                enabled = runs.isNotEmpty()
+            ) {
+                Text(stringResource(R.string.benchmark_clear_history), color = cs.error)
+            }
+        }
         if (runs.isEmpty()) {
             Text(
                 stringResource(R.string.benchmark_history_empty),
@@ -99,6 +157,27 @@ private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Uni
                 BenchmarkRunCard(run, Modifier.padding(bottom = 10.dp))
             }
         }
+    }
+    if (showClearConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirmation = false },
+            title = { Text(stringResource(R.string.benchmark_clear_title)) },
+            text = { Text(stringResource(R.string.benchmark_clear_message)) },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirmation = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (onClear()) {
+                        showClearConfirmation = false
+                    }
+                }) {
+                    Text(stringResource(R.string.benchmark_clear_history), color = cs.error)
+                }
+            }
+        )
     }
     if (showInfo) {
         BenchmarkMetricsInfoDialog(onDismiss = { showInfo = false })

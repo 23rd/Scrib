@@ -52,7 +52,9 @@ data class ScribUiState(
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
     val dictionaryEnabled: Boolean,
-    val benchmarkRuns: List<BenchmarkRun>
+    val benchmarkRuns: List<BenchmarkRun>,
+    val benchmarkBatch: BenchmarkBatchState,
+    val benchmarkModelCount: Int
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -89,6 +91,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     @Volatile private var statusMsg = ""
     @Volatile private var statusError = false
     @Volatile private var vadPct = -1
+    @Volatile private var benchmarkBatch = BenchmarkBatchState()
     private var vadJob: Job? = null
 
     @Volatile private var sherpaBusy = false
@@ -141,7 +144,9 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
             dictionaryEnabled = Dictionary.isEnabled(ctx),
-            benchmarkRuns = BenchmarkStore.load(ctx)
+            benchmarkRuns = BenchmarkStore.load(ctx),
+            benchmarkBatch = benchmarkBatch,
+            benchmarkModelCount = installed.size + sherpaRows.size
         )
     }
 
@@ -156,6 +161,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         languages: List<String>?,
         parts: Map<String, Uri>
     ) {
+        if (BenchmarkBatchGate.isActive) return
         val plugin = SherpaPlugins.plugin ?: return
         if (sherpaBusy) {
             return
@@ -181,6 +187,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false, statusLabel: String? = null) {
+        if (BenchmarkBatchGate.isActive) return
         val f = model.fileName
         if (downloads.containsKey(f)) return
         failed.remove(f)
@@ -231,6 +238,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     // Skipping silence needs a model of its own, fetched the first time it is asked for. The
     // setting only goes on once that has landed, so it can never point at a model that isn't there.
     fun setSkipSilence(enabled: Boolean) {
+        if (BenchmarkBatchGate.isActive) return
         if (!enabled) {
             vadJob?.cancel(); vadJob = null; vadPct = -1
             ModelManager.setSkipSilence(ctx, false)
@@ -285,12 +293,14 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun activate(fileName: String) {
+        if (BenchmarkBatchGate.isActive) return
         ModelManager.setActive(ctx, fileName)
         statusMsg = ""; statusError = false
         push()
     }
 
     fun setupForLanguage(language: LanguageOption) {
+        if (BenchmarkBatchGate.isActive) return
         val f = language.recommendedFileName
         val model = ModelCatalog.byFileName(f) ?: return
         val langName = str(language.nameRes)
@@ -308,6 +318,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun delete(fileName: String) {
+        if (BenchmarkBatchGate.isActive) return
         if (SherpaPlugins.plugin?.deleteModel(ctx, fileName) == true) {
             push()
             return
@@ -322,6 +333,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun addCustom(url: String) {
+        if (BenchmarkBatchGate.isActive) return
         val model = try {
             ModelManager.customModelFromUrl(url)
         } catch (e: Exception) {
@@ -333,6 +345,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun importModel(uri: Uri, suggestedName: String?) {
+        if (BenchmarkBatchGate.isActive) return
         statusMsg = str(R.string.status_importing); statusError = false; push()
         viewModelScope.launch {
             try {
@@ -346,6 +359,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun selfTest() {
+        if (BenchmarkBatchGate.isActive) return
         SherpaPlugins.plugin?.selfTestNotice(ctx)?.let {
             statusMsg = it
             statusError = false; push(); return
@@ -387,10 +401,24 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             BenchmarkStore.revisions.collect { push() }
         }
+        viewModelScope.launch {
+            BenchmarkRunner.state.collect {
+                benchmarkBatch = it
+                push()
+            }
+        }
     }
 
     fun transcribeFile(uri: Uri, displayName: String?) {
         TranscriptionRun.start(ctx, uri, displayName ?: "audio", source = uri)
+    }
+
+    fun benchmarkFile(uri: Uri, displayName: String?) {
+        BenchmarkRunner.start(ctx, uri, displayName ?: "audio")
+    }
+
+    fun cancelBenchmark() {
+        BenchmarkRunner.cancel()
     }
 
     fun setTranscriptFormat(format: TranscriptFormat) {
@@ -442,7 +470,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     private var recordFile: File? = null
 
     fun startRecording() {
-        if (_recording.value != null || TranscriptionRun.running) return
+        if (_recording.value != null || TranscriptionRun.running || BenchmarkBatchGate.isActive) return
         if (ctx.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             toast(R.string.record_denied); return
         }

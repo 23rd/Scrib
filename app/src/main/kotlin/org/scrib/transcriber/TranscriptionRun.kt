@@ -11,7 +11,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
+
+enum class TranscriptionRunResult {
+    SUCCESS,
+    FAILED,
+    CANCELLED,
+    REJECTED
+}
 
 // A run outlives the screen that started it. The work sits on a process-wide scope rather than in
 // the view model, so leaving the app neither cancels it nor drops the text already recognised, and
@@ -31,15 +39,44 @@ object TranscriptionRun {
 
     // A recording has no place in the user's storage to point the save dialog at, and its file is
     // the app's own — hence source stays null there and onFinished cleans the file up.
-    fun start(context: Context, uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}) {
-        if (token != null) {
-            return
-        }
+    fun start(context: Context, uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}): Boolean =
+        startInternal(context, uri, name, source, { onFinished() }, persistTranscript = true, allowBatch = false)
+
+    fun startForBenchmark(
+        context: Context,
+        uri: Uri,
+        name: String,
+        source: Uri?,
+        onFinished: (TranscriptionRunResult) -> Unit
+    ): Boolean = startInternal(
+        context,
+        uri,
+        name,
+        source,
+        onFinished,
+        persistTranscript = false,
+        allowBatch = true
+    )
+
+    private fun startInternal(
+        context: Context,
+        uri: Uri,
+        name: String,
+        source: Uri?,
+        onFinished: (TranscriptionRunResult) -> Unit,
+        persistTranscript: Boolean,
+        allowBatch: Boolean
+    ): Boolean {
         val app = context.applicationContext
         val cancellation = CancellationToken()
+        synchronized(this) {
+            if (token != null || (BenchmarkBatchGate.isActive && !allowBatch)) {
+                return false
+            }
+            token = cancellation
+        }
         val modelName = ModelManager.activeDisplayName(app)
-        token = cancellation
-        TranscriptStore.clear(app)
+        if (persistTranscript) TranscriptStore.clear(app)
         _state.value = TranscribeUi(
             fileName = name,
             text = "",
@@ -101,6 +138,7 @@ object TranscriptionRun {
                     delay(METRICS_INTERVAL_MS)
                 }
             }
+            var result = TranscriptionRunResult.FAILED
             try {
                 val pfd = app.contentResolver.openFileDescriptor(uri, "r")
                     ?: throw RuntimeException(app.getString(R.string.transcribe_cant_open))
@@ -142,6 +180,7 @@ object TranscriptionRun {
                 val text = segments.format(TranscriptFormat.TXT)
                 if (cancellation.isCancelled) {
                     _state.value = null
+                    result = TranscriptionRunResult.CANCELLED
                 } else {
                     _state.update {
                         it?.copy(
@@ -161,14 +200,17 @@ object TranscriptionRun {
                             )
                         )
                     }
-                    if (segments.isNotEmpty()) {
+                    if (persistTranscript && segments.isNotEmpty()) {
                         _state.value?.let { TranscriptStore.save(app, it) }
                     }
+                    result = TranscriptionRunResult.SUCCESS
                 }
             } catch (e: Throwable) {
                 if (cancellation.isCancelled) {
                     _state.value = null
+                    result = TranscriptionRunResult.CANCELLED
                 } else {
+                    result = TranscriptionRunResult.FAILED
                     _state.update {
                         it?.copy(
                             running = false, etaMs = null,
@@ -178,11 +220,14 @@ object TranscriptionRun {
                     publishMetrics()
                 }
             } finally {
-                metricsJob.cancel()
-                token = null
-                onFinished()
+                metricsJob.cancelAndJoin()
+                synchronized(this@TranscriptionRun) {
+                    if (token === cancellation) token = null
+                }
+                onFinished(result)
             }
         }
+        return true
     }
 
     fun restore(context: Context) {
@@ -198,8 +243,17 @@ object TranscriptionRun {
         _state.value = null
     }
 
+    fun cancelForBenchmark() {
+        token?.cancel()
+        _state.value = null
+    }
+
     fun dismiss(context: Context) {
         TranscriptStore.clear(context.applicationContext)
+        _state.value = null
+    }
+
+    fun clearState() {
         _state.value = null
     }
 

@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Pełny ekran</string>
     <string name="benchmark_dialog">Okno</string>
     <string name="benchmark_history_empty">Nie ma jeszcze ukończonych transkrypcji.</string>
+    <string name="benchmark_export_json">Eksportuj JSON</string>
+    <string name="benchmark_clear_history">Wyczyść historię</string>
+    <string name="benchmark_clear_title">Wyczyścić historię testów?</string>
+    <string name="benchmark_clear_message">To trwale usunie wszystkie zapisane wyniki testów z tego urządzenia.</string>
+    <string name="benchmark_exported">Historia testów wyeksportowana.</string>
+    <string name="benchmark_export_failed">Nie udało się wyeksportować historii testów.</string>
+    <string name="benchmark_clear_failed">Nie udało się wyczyścić historii testów.</string>
     <string name="benchmark_latest">Najnowszy: %1$s · RTF %2$s · szczyt %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Ładowanie</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Przyrost modelu: dodatkowa pamięć użyta po wczytaniu modelu.</string>
     <string name="benchmark_info_peak">Szczyt: największe zużycie pamięci podczas przebiegu.</string>
     <string name="benchmark_info_free">Wolny RAM: pamięć dostępna w urządzeniu po zakończeniu.</string>
+    <string name="benchmark_all_models">Przetestuj wszystkie pobrane modele</string>
+    <string name="benchmark_batch_running">Testowanie %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Testowanie zakończone: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Testowanie zakończone: powodzenia %1$d/%2$d, błędy %3$d.</string>
+    <string name="benchmark_batch_cancelled">Testowanie anulowane: ukończono %1$d/%2$d.</string>
     <string name="eta_minutes">pozostało około %1$d min</string>
     <string name="eta_seconds">pozostało około %1$d s</string>
     <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>

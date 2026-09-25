@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Vollbild</string>
     <string name="benchmark_dialog">Dialog</string>
     <string name="benchmark_history_empty">Noch keine abgeschlossenen Transkriptionen.</string>
+    <string name="benchmark_export_json">JSON exportieren</string>
+    <string name="benchmark_clear_history">Verlauf löschen</string>
+    <string name="benchmark_clear_title">Benchmark-Verlauf löschen?</string>
+    <string name="benchmark_clear_message">Dadurch werden alle gespeicherten Benchmark-Ergebnisse endgültig von diesem Gerät gelöscht.</string>
+    <string name="benchmark_exported">Benchmark-Verlauf exportiert.</string>
+    <string name="benchmark_export_failed">Benchmark-Verlauf konnte nicht exportiert werden.</string>
+    <string name="benchmark_clear_failed">Benchmark-Verlauf konnte nicht gelöscht werden.</string>
     <string name="benchmark_latest">Zuletzt: %1$s · RTF %2$s · Spitze %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Laden</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Modell-Delta: zusätzlicher Speicher nach dem Laden des Modells.</string>
     <string name="benchmark_info_peak">Spitze: höchste Speichernutzung während des Laufs.</string>
     <string name="benchmark_info_free">Freier RAM: nach dem Lauf auf dem Gerät verfügbarer Speicher.</string>
+    <string name="benchmark_all_models">Alle heruntergeladenen Modelle benchmarken</string>
+    <string name="benchmark_batch_running">Benchmark %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Benchmark abgeschlossen: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Benchmark abgeschlossen: Erfolge %1$d/%2$d, Fehler %3$d.</string>
+    <string name="benchmark_batch_cancelled">Benchmark abgebrochen: abgeschlossen %1$d/%2$d.</string>
     <string name="eta_minutes">noch etwa %1$d Min.</string>
     <string name="eta_seconds">noch etwa %1$d Sek.</string>
     <string name="transcribe_background_hint">Läuft weiter, wenn du die App verlässt.</string>

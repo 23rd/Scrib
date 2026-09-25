@@ -98,6 +98,10 @@ object ModelManager {
         }
     }
 
+    internal fun clearStoredActiveSelection(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY_ACTIVE).apply()
+    }
+
     fun hasActiveModel(context: Context): Boolean {
         val plugin = SherpaPlugins.plugin
         if (plugin?.selectedId(context) != null) {

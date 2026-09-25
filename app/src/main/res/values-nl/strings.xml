@@ -27,6 +27,13 @@
     <string name="benchmark_fullscreen">Volledig scherm</string>
     <string name="benchmark_dialog">Venster</string>
     <string name="benchmark_history_empty">Nog geen voltooide transcripties.</string>
+    <string name="benchmark_export_json">JSON exporteren</string>
+    <string name="benchmark_clear_history">Geschiedenis wissen</string>
+    <string name="benchmark_clear_title">Benchmarkgeschiedenis wissen?</string>
+    <string name="benchmark_clear_message">Hiermee worden alle opgeslagen benchmarkresultaten definitief van dit apparaat verwijderd.</string>
+    <string name="benchmark_exported">Benchmarkgeschiedenis geëxporteerd.</string>
+    <string name="benchmark_export_failed">Kan benchmarkgeschiedenis niet exporteren.</string>
+    <string name="benchmark_clear_failed">Kan benchmarkgeschiedenis niet wissen.</string>
     <string name="benchmark_latest">Laatste: %1$s · RTF %2$s · piek %3$s</string>
     <string name="benchmark_column_rtf">RTF</string>
     <string name="benchmark_column_load">Laden</string>
@@ -42,6 +49,11 @@
     <string name="benchmark_info_model_delta">Modeldelta: extra geheugen dat na het laden van het model wordt gebruikt.</string>
     <string name="benchmark_info_peak">Piek: hoogste geheugengebruik tijdens de run.</string>
     <string name="benchmark_info_free">Vrij RAM: geheugen dat op het apparaat beschikbaar is na de run.</string>
+    <string name="benchmark_all_models">Alle gedownloade modellen benchmarken</string>
+    <string name="benchmark_batch_running">Benchmark %1$d/%2$d · %3$s</string>
+    <string name="benchmark_batch_done">Benchmark voltooid: %1$d/%2$d.</string>
+    <string name="benchmark_batch_partial">Benchmark voltooid: geslaagd %1$d/%2$d, mislukt %3$d.</string>
+    <string name="benchmark_batch_cancelled">Benchmark geannuleerd: voltooid %1$d/%2$d.</string>
     <string name="eta_minutes">nog ongeveer %1$d min</string>
     <string name="eta_seconds">nog ongeveer %1$d sec</string>
     <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>

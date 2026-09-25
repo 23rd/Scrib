@@ -64,6 +64,8 @@ class MainActivity : ComponentActivity() {
                         onAddUrl = vm::addCustom,
                         onImport = vm::importModel,
                         onSelfTest = vm::selfTest,
+                        onBenchmarkFile = vm::benchmarkFile,
+                        onCancelBenchmark = vm::cancelBenchmark,
                         onPickLanguage = vm::setupForLanguage,
                         onSkipSilence = vm::setSkipSilence,
                         onImportSherpa = vm::importSherpa,
