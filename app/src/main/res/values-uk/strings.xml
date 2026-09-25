@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Приріст моделі</string>
     <string name="benchmark_column_peak">Пік</string>
     <string name="benchmark_column_free">Вільна ОЗ</string>
+    <string name="benchmark_info">Інформація про метрики</string>
+    <string name="benchmark_info_title">Що означають метрики?</string>
+    <string name="benchmark_info_rtf">Коефіцієнт реального часу: час обробки, поділений на тривалість аудіо. Менше — швидше.</string>
+    <string name="benchmark_info_load">Завантаження: час завантаження мовної моделі в пам’ять.</string>
+    <string name="benchmark_info_model_pss">PSS моделі (Proportional Set Size): пам’ять, яку процес використовує для завантаженої моделі.</string>
+    <string name="benchmark_info_model_delta">Приріст моделі: додаткова пам’ять після завантаження моделі.</string>
+    <string name="benchmark_info_peak">Пік: максимальне використання пам’яті під час запуску.</string>
+    <string name="benchmark_info_free">Вільна ОЗ: пам’ять, доступна на пристрої після завершення.</string>
     <string name="eta_minutes">залишилося близько %1$d хв</string>
     <string name="eta_seconds">залишилося близько %1$d с</string>
     <string name="transcribe_background_hint">Триває, навіть якщо вийти із застосунку.</string>

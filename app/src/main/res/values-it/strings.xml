@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Delta modello</string>
     <string name="benchmark_column_peak">Picco</string>
     <string name="benchmark_column_free">Libera</string>
+    <string name="benchmark_info">Informazioni sulle metriche</string>
+    <string name="benchmark_info_title">Cosa significano le metriche?</string>
+    <string name="benchmark_info_rtf">Fattore tempo reale: tempo di elaborazione diviso per la durata dell’audio. Più basso è più veloce.</string>
+    <string name="benchmark_info_load">Caricamento: tempo necessario per caricare il modello vocale in memoria.</string>
+    <string name="benchmark_info_model_pss">PSS del modello (dimensione proporzionale dell’insieme): memoria usata dal processo per il modello caricato.</string>
+    <string name="benchmark_info_model_delta">Delta del modello: memoria aggiuntiva utilizzata dopo il caricamento del modello.</string>
+    <string name="benchmark_info_peak">Picco: uso massimo della memoria durante l’esecuzione.</string>
+    <string name="benchmark_info_free">RAM libera: memoria disponibile sul dispositivo al termine.</string>
     <string name="eta_minutes">circa %1$d min rimanenti</string>
     <string name="eta_seconds">circa %1$d s rimanenti</string>
     <string name="transcribe_background_hint">Continua anche se esci dall\'app.</string>

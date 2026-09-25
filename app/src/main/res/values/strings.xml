@@ -36,6 +36,14 @@
     <string name="benchmark_column_model_delta">Model delta</string>
     <string name="benchmark_column_peak">Peak</string>
     <string name="benchmark_column_free">Free RAM</string>
+    <string name="benchmark_info">Metric information</string>
+    <string name="benchmark_info_title">What do the metrics mean?</string>
+    <string name="benchmark_info_rtf">Real-time factor: processing time divided by audio duration. Lower is faster.</string>
+    <string name="benchmark_info_load">Model load: time spent loading the speech model into memory.</string>
+    <string name="benchmark_info_model_pss">Model PSS (proportional set size): memory used by the process for the loaded model.</string>
+    <string name="benchmark_info_model_delta">Model delta: additional memory used after loading the model.</string>
+    <string name="benchmark_info_peak">Peak: highest memory usage during the run.</string>
+    <string name="benchmark_info_free">Free RAM: memory available on the device after the run.</string>
     <string name="eta_minutes">about %1$d min left</string>
     <string name="eta_seconds">about %1$d sec left</string>
     <string name="transcribe_background_hint">Keeps running if you leave the app.</string>

@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Modell-Delta</string>
     <string name="benchmark_column_peak">Spitze</string>
     <string name="benchmark_column_free">Frei</string>
+    <string name="benchmark_info">Metrik-Informationen</string>
+    <string name="benchmark_info_title">Was bedeuten die Messwerte?</string>
+    <string name="benchmark_info_rtf">Echtzeitfaktor: Verarbeitungszeit geteilt durch Audioauflänge. Niedriger ist schneller.</string>
+    <string name="benchmark_info_load">Laden: Zeit zum Laden des Sprachmodells in den Speicher.</string>
+    <string name="benchmark_info_model_pss">PSS des Modells (Proportional Set Size): Speicher, den der Prozess für das geladene Modell verwendet.</string>
+    <string name="benchmark_info_model_delta">Modell-Delta: zusätzlicher Speicher nach dem Laden des Modells.</string>
+    <string name="benchmark_info_peak">Spitze: höchste Speichernutzung während des Laufs.</string>
+    <string name="benchmark_info_free">Freier RAM: nach dem Lauf auf dem Gerät verfügbarer Speicher.</string>
     <string name="eta_minutes">noch etwa %1$d Min.</string>
     <string name="eta_seconds">noch etwa %1$d Sek.</string>
     <string name="transcribe_background_hint">Läuft weiter, wenn du die App verlässt.</string>

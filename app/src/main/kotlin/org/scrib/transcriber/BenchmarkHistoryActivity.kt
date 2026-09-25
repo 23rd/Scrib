@@ -8,16 +8,24 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -45,6 +53,7 @@ class BenchmarkHistoryActivity : ComponentActivity() {
 @Composable
 private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Unit) {
     val cs = MaterialTheme.colorScheme
+    var showInfo by rememberSaveable { mutableStateOf(false) }
     Column(
         Modifier.fillMaxSize()
             .background(cs.background)
@@ -63,6 +72,13 @@ private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Uni
                 fontWeight = FontWeight.Bold,
                 color = cs.onBackground
             )
+            IconButton(onClick = { showInfo = true }) {
+                Icon(
+                    painterResource(R.drawable.ic_info),
+                    contentDescription = stringResource(R.string.benchmark_info),
+                    tint = cs.primary
+                )
+            }
             IconButton(onClick = onDialog) {
                 Icon(
                     painterResource(R.drawable.ic_fullscreen_exit),
@@ -83,5 +99,77 @@ private fun BenchmarkHistoryScreen(runs: List<BenchmarkRun>, onDialog: () -> Uni
                 BenchmarkRunCard(run, Modifier.padding(bottom = 10.dp))
             }
         }
+    }
+    if (showInfo) {
+        BenchmarkMetricsInfoDialog(onDismiss = { showInfo = false })
+    }
+}
+
+@Composable
+private fun BenchmarkMetricsInfoDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.benchmark_info_title)) },
+        text = {
+            Column(
+                Modifier
+                    .heightIn(max = 460.dp)
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 4.dp)
+            ) {
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_rtf),
+                    stringResource(R.string.benchmark_info_rtf)
+                )
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_load),
+                    stringResource(R.string.benchmark_info_load)
+                )
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_model_pss),
+                    stringResource(R.string.benchmark_info_model_pss)
+                )
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_model_delta),
+                    stringResource(R.string.benchmark_info_model_delta)
+                )
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_peak),
+                    stringResource(R.string.benchmark_info_peak)
+                )
+                BenchmarkMetricInfoRow(
+                    stringResource(R.string.benchmark_column_free),
+                    stringResource(R.string.benchmark_info_free)
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.action_close))
+            }
+        }
+    )
+}
+
+@Composable
+private fun BenchmarkMetricInfoRow(label: String, description: String) {
+    val cs = MaterialTheme.colorScheme
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 5.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(
+            label,
+            modifier = Modifier.width(108.dp),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = cs.primary
+        )
+        Text(
+            description,
+            fontSize = 12.sp,
+            lineHeight = 17.sp,
+            color = cs.onSurfaceVariant
+        )
     }
 }

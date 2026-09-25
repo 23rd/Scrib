@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Przyrost modelu</string>
     <string name="benchmark_column_peak">Szczyt</string>
     <string name="benchmark_column_free">Wolne</string>
+    <string name="benchmark_info">Informacje o metrykach</string>
+    <string name="benchmark_info_title">Co oznaczają metryki?</string>
+    <string name="benchmark_info_rtf">Współczynnik czasu rzeczywistego: czas przetwarzania podzielony przez długość nagrania. Mniejsza wartość oznacza szybsze działanie.</string>
+    <string name="benchmark_info_load">Ładowanie: czas wczytywania modelu mowy do pamięci.</string>
+    <string name="benchmark_info_model_pss">PSS modelu (proportional set size): pamięć używana przez proces dla wczytanego modelu.</string>
+    <string name="benchmark_info_model_delta">Przyrost modelu: dodatkowa pamięć użyta po wczytaniu modelu.</string>
+    <string name="benchmark_info_peak">Szczyt: największe zużycie pamięci podczas przebiegu.</string>
+    <string name="benchmark_info_free">Wolny RAM: pamięć dostępna w urządzeniu po zakończeniu.</string>
     <string name="eta_minutes">pozostało około %1$d min</string>
     <string name="eta_seconds">pozostało około %1$d s</string>
     <string name="transcribe_background_hint">Działa dalej po wyjściu z aplikacji.</string>

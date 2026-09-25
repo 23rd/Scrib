@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import android.text.format.DateUtils
 import android.webkit.MimeTypeMap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -1078,7 +1079,7 @@ internal fun BenchmarkRunCard(run: BenchmarkRun, modifier: Modifier = Modifier) 
                     )
                 }
                 Text(
-                    DateFormat.getDateInstance(DateFormat.SHORT).format(Date(run.timestampMs)),
+                    benchmarkTimestamp(run.timestampMs),
                     fontSize = 10.sp,
                     color = cs.onSurfaceVariant,
                     maxLines = 1
@@ -1133,6 +1134,15 @@ internal fun BenchmarkRunCard(run: BenchmarkRun, modifier: Modifier = Modifier) 
                 )
             }
         }
+    }
+}
+
+private fun benchmarkTimestamp(timestampMs: Long): String {
+    val date = Date(timestampMs)
+    return if (DateUtils.isToday(timestampMs)) {
+        DateFormat.getTimeInstance(DateFormat.SHORT).format(date)
+    } else {
+        DateFormat.getDateInstance(DateFormat.SHORT).format(date)
     }
 }
 

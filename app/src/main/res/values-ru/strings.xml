@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Прирост модели</string>
     <string name="benchmark_column_peak">Пик</string>
     <string name="benchmark_column_free">Свободно</string>
+    <string name="benchmark_info">Информация о метриках</string>
+    <string name="benchmark_info_title">Что означают метрики?</string>
+    <string name="benchmark_info_rtf">Коэффициент реального времени: время обработки, делённое на длительность аудио. Меньше — быстрее.</string>
+    <string name="benchmark_info_load">Загрузка: время загрузки речевой модели в память.</string>
+    <string name="benchmark_info_model_pss">PSS модели (Proportional Set Size): память, которую процесс использует для загруженной модели.</string>
+    <string name="benchmark_info_model_delta">Прирост модели: дополнительная память после загрузки модели.</string>
+    <string name="benchmark_info_peak">Пик: максимальное использование памяти во время запуска.</string>
+    <string name="benchmark_info_free">Свободно: объём памяти, доступный на устройстве после запуска.</string>
     <string name="eta_minutes">осталось около %1$d мин</string>
     <string name="eta_seconds">осталось около %1$d с</string>
     <string name="transcribe_background_hint">Продолжается, даже если выйти из приложения.</string>

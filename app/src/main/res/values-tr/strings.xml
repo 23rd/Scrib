@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Model farkı</string>
     <string name="benchmark_column_peak">Zirve</string>
     <string name="benchmark_column_free">Boş</string>
+    <string name="benchmark_info">Metrik bilgisi</string>
+    <string name="benchmark_info_title">Metrikler ne anlama geliyor?</string>
+    <string name="benchmark_info_rtf">Gerçek zamanlı faktör: işlem süresinin ses süresine bölümü. Düşük değer daha hızlıdır.</string>
+    <string name="benchmark_info_load">Yükleme: konuşma modelini belleğe yükleme süresi.</string>
+    <string name="benchmark_info_model_pss">Model PSS (proportional set size): işlenen model için sürecin kullandığı bellek.</string>
+    <string name="benchmark_info_model_delta">Model farkı: model yüklendikten sonra kullanılan ek bellek.</string>
+    <string name="benchmark_info_peak">Zirve: çalışma sırasındaki en yüksek bellek kullanımı.</string>
+    <string name="benchmark_info_free">Boş RAM: çalışma bittikten sonra cihazda kullanılabilir bellek.</string>
     <string name="eta_minutes">yaklaşık %1$d dk kaldı</string>
     <string name="eta_seconds">yaklaşık %1$d sn kaldı</string>
     <string name="transcribe_background_hint">Uygulamadan çıksanız da sürer.</string>

@@ -34,6 +34,14 @@
     <string name="benchmark_column_model_delta">Modeldelta</string>
     <string name="benchmark_column_peak">Piek</string>
     <string name="benchmark_column_free">Vrij</string>
+    <string name="benchmark_info">Metricainformatie</string>
+    <string name="benchmark_info_title">Wat betekenen de metrieken?</string>
+    <string name="benchmark_info_rtf">Realtimefactor: verwerkingstijd gedeeld door audiodelduur. Lager is sneller.</string>
+    <string name="benchmark_info_load">Laden: tijd die nodig is om het spraakmodel in het geheugen te laden.</string>
+    <string name="benchmark_info_model_pss">Model-PSS (proportional set size): geheugen dat het proces voor het geladen model gebruikt.</string>
+    <string name="benchmark_info_model_delta">Modeldelta: extra geheugen dat na het laden van het model wordt gebruikt.</string>
+    <string name="benchmark_info_peak">Piek: hoogste geheugengebruik tijdens de run.</string>
+    <string name="benchmark_info_free">Vrij RAM: geheugen dat op het apparaat beschikbaar is na de run.</string>
     <string name="eta_minutes">nog ongeveer %1$d min</string>
     <string name="eta_seconds">nog ongeveer %1$d sec</string>
     <string name="transcribe_background_hint">Gaat door als je de app verlaat.</string>
