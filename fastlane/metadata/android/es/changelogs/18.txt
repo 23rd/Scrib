@@ -1,0 +1,2 @@
+• Corregida permanencia en memoria de los modelos sustituidos
+• Corregida detección de exportaciones Zipformer de streaming como offline

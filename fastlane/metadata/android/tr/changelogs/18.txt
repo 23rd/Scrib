@@ -1,0 +1,2 @@
+• Değiştirilen modellerin bellekte kalması düzeltildi
+• Streaming Zipformer dışa aktarımlarının offline olarak algılanması düzeltildi
