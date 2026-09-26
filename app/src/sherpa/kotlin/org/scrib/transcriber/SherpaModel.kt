@@ -858,24 +858,36 @@ object SherpaModel {
 
     private fun externalDataReferences(file: File): Set<String> {
         if (!file.isFile) return emptySet()
+        val length = file.length()
+        if (length == 0L) return emptySet()
+        val head = readOnnxHead(file, ONNX_METADATA_SCAN_BYTES)
+        val tail = readOnnxTail(file)
+        val chunks = listOfNotNull(head, tail).distinct()
+        if (chunks.isEmpty()) return emptySet()
         val references = mutableSetOf<String>()
-        val pattern = Regex("[A-Za-z0-9][A-Za-z0-9._+\\-/]{0,511}\\.(?:data|weights)", RegexOption.IGNORE_CASE)
-        var tail = ""
-        file.inputStream().buffered().use { input ->
-            val buffer = ByteArray(64 * 1024)
-            while (true) {
-                val count = input.read(buffer)
-                if (count < 0) break
-                val text = tail + String(buffer, 0, count, Charsets.US_ASCII)
-                pattern.findAll(text).forEach { references += it.value }
-                tail = text.takeLast(512)
-            }
+        val pattern = Regex("[A-Za-z0-9][A-Za-z0-9._+\\-/]{0,511}\\.(?:data|weights|onnx_data)", RegexOption.IGNORE_CASE)
+        for (data in chunks) {
+            val text = String(data, Charsets.US_ASCII)
+            pattern.findAll(text).forEach { references += it.value }
         }
         return references.filter { reference ->
             reference.endsWith(".data", ignoreCase = true) ||
                 reference.endsWith(".weights", ignoreCase = true) ||
                 reference.endsWith(".onnx_data", ignoreCase = true)
         }.toSet()
+    }
+
+    private fun readOnnxHead(file: File, maxBytes: Long): ByteArray? {
+        if (!file.isFile || file.length() == 0L) return null
+        val count = minOf(maxBytes, file.length()).toInt()
+        val data = ByteArray(count)
+        return runCatching {
+            RandomAccessFile(file, "r").use { fileInput ->
+                fileInput.seek(0L)
+                fileInput.readFully(data)
+            }
+            data
+        }.getOrNull()
     }
 
     private fun readOnnxTail(file: File): ByteArray? {
