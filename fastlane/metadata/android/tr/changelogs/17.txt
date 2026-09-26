@@ -1,0 +1,1 @@
+• Parakeet'in tepe bellek kullanımının kayıt süresine bağlı olması düzeltildi

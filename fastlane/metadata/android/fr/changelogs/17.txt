@@ -1,0 +1,1 @@
+• Correction du pic de mémoire de Parakeet selon la durée de l'enregistrement

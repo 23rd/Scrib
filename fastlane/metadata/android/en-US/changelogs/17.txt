@@ -1,0 +1,1 @@
+• Fixed Parakeet peak memory growing with recording length

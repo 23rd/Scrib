@@ -1,0 +1,1 @@
+• Naprawiono szczytowe zużycie pamięci przez Parakeet zależne od długości nagrania

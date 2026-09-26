@@ -1,0 +1,1 @@
+• Corretto il picco di memoria di Parakeet in base alla durata della registrazione

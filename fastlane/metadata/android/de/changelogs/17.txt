@@ -1,0 +1,1 @@
+• Speicherverbrauch von Parakeet abhängig von Aufnahmelänge behoben
