@@ -168,7 +168,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 )
             )
             val vadPath = ModelManager.sherpaVadModelPath(appContext)
-            return if (vadPath != null) {
+            return if (vadPath != null && sampleCount > WINDOW_SAMPLES) {
                 transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, ::reportProgress, onPartial)
             } else {
                 transcribeWindows(samples, sampleCount, languageHint, cancellation, ::reportProgress, onPartial)
