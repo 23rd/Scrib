@@ -202,10 +202,6 @@ object BenchmarkRunner {
         }
 
     private fun releaseEngines(context: Context) {
-        val app = context.applicationContext
-        runCatching { TranscriptionEngine.releaseWhisperInstance() }
-        SherpaPlugins.plugin?.let { plugin ->
-            runCatching { plugin.engine(app).releaseModel() }
-        }
+        TranscriptionEngine.releaseAll(context.applicationContext)
     }
 }

@@ -58,9 +58,10 @@ interface TranscriptionEngine {
         @Volatile
         private var whisper: TranscriptionEngine? = null
 
-        @Synchronized
-        fun releaseWhisperInstance() {
+        fun releaseAll(context: Context) {
+            val app = context.applicationContext
             whisper?.releaseModel()
+            runCatching { SherpaPlugins.plugin?.engine(app)?.releaseModel() }
         }
 
         fun get(context: Context): TranscriptionEngine {

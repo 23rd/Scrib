@@ -318,8 +318,14 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     fun activate(fileName: String) {
         if (BenchmarkBatchGate.isActive) return
         ModelManager.setActive(ctx, fileName)
+        releaseSwitchedAwayModel()
         statusMsg = ""; statusError = false
         push()
+    }
+
+    // Releasing blocks behind a running transcription, so it cannot happen on the main thread.
+    private fun releaseSwitchedAwayModel() {
+        viewModelScope.launch(Dispatchers.IO) { TranscriptionEngine.releaseAll(ctx) }
     }
 
     fun setKeyboardLayouts(enabled: Boolean, keys: List<String>) {
@@ -335,6 +341,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         val langName = str(language.nameRes)
         if (ModelManager.installedFileNames(ctx).contains(f)) {
             ModelManager.setActive(ctx, f)
+            releaseSwitchedAwayModel()
             statusMsg = str(R.string.status_lang_ready_active, langName, model.displayName)
             statusError = false
             push()
