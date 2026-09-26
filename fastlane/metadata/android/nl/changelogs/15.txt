@@ -1,0 +1,2 @@
+• Begrenzing van Sherpa-external-data-scan toegevoegd
+• Vertraging van korte transcripties door Sherpa-VAD gecorrigeerd

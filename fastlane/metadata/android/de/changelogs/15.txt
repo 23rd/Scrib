@@ -1,0 +1,2 @@
+• Begrenzung des Sherpa-External-Data-Scans hinzugefügt
+• Verlangsamung kurzer Transkriptionen durch Sherpa-VAD behoben

@@ -1,0 +1,2 @@
+• Sherpa harici veri taramasına sınırlama eklendi
+• Sherpa VAD'nin kısa dosya transkripsiyonunu yavaşlatması düzeltildi

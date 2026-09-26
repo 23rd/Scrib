@@ -1,0 +1,2 @@
+• Added bounding of Sherpa external-data scan
+• Fixed Sherpa VAD slowing short-file transcription

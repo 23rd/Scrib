@@ -1,0 +1,2 @@
+• Dodano ograniczenie skanowania danych zewnętrznych Sherpa
+• Naprawiono spowolnienie transkrypcji krótkich plików przez VAD Sherpa
