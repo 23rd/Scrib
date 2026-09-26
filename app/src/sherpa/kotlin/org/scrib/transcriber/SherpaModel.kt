@@ -210,7 +210,10 @@ object SherpaModel {
         val candidates = exact.ifEmpty { matching.map { it.first } }
         if (candidates.isEmpty()) return Detection.Unknown
         if (candidates.size == 1) return Detection.Detected(candidates.single())
+        // The name the user gave settles it when it can; failing that the file names do, since a
+        // streaming export says so in "chunk-16-left-128" and nowhere else.
         val narrowed = narrowTypes(candidates, hint)
+            ?: narrowTypes(candidates, fileNames.joinToString(" "))
         return if (narrowed != null) Detection.Detected(narrowed) else Detection.Ambiguous(candidates)
     }
 
