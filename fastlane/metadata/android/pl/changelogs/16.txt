@@ -1,0 +1,2 @@
+• Naprawiono zacięcie VAD Sherpa na długich nagraniach
+• Dodano przełącznik metryk wydajności transkrypcji na żywo

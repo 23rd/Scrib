@@ -1,0 +1,2 @@
+• Correction du blocage du VAD Sherpa sur les longs enregistrements
+• Ajout d'un interrupteur pour les métriques de transcription en direct

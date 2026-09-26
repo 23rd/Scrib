@@ -1,0 +1,2 @@
+• Verlangsamung von Sherpa-VAD bei langen Aufnahmen behoben
+• Schalter für Live-Transkriptions-Leistungsmessungen hinzugefügt

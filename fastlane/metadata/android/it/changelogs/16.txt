@@ -1,0 +1,2 @@
+• Corretto lo stallo del VAD Sherpa su registrazioni lunghe
+• Aggiunto interruttore per le metriche di prestazioni della trascrizione live
