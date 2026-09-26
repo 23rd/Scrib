@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Geen spraak herkend.</string>
     <string name="transcribe_cant_open">Kan het bestand niet openen</string>
     <string name="transcribe_failed">Transcriptie mislukt</string>
-    <string name="transcribe_model_window">Dit model transcribeert maximaal %1$d seconden per keer — deze opname is langer.</string>
 
     <string name="about_back">Terug</string>
     <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>

@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Nie rozpoznano mowy.</string>
     <string name="transcribe_cant_open">Nie można otworzyć pliku</string>
     <string name="transcribe_failed">Błąd transkrypcji</string>
-    <string name="transcribe_model_window">Ten model transkrybuje maksymalnie %1$d sekund naraz — to nagranie jest dłuższe.</string>
 
     <string name="about_back">Wstecz</string>
     <string name="about_tagline">Mowa na tekst na urządzeniu. Twój dźwięk nigdy nie opuszcza telefonu.</string>

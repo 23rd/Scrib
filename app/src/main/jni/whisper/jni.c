@@ -263,6 +263,16 @@ Java_com_whispercpp_whisper_WhisperLib_00024Companion_audioWindowSamples(
     return parakeet_n_audio_ctx(context->parakeet) * PARAKEET_HOP_LENGTH;
 }
 
+// Whether this loaded context decodes through parakeet, without reading the model file again.
+JNIEXPORT jboolean JNICALL
+Java_com_whispercpp_whisper_WhisperLib_00024Companion_isParakeetContext(
+        JNIEnv *env, jobject thiz, jlong context_ptr) {
+    UNUSED(env);
+    UNUSED(thiz);
+    struct fgt_context *context = (struct fgt_context *) context_ptr;
+    return (context != NULL && context->parakeet != NULL) ? JNI_TRUE : JNI_FALSE;
+}
+
 JNIEXPORT jboolean JNICALL
 Java_com_whispercpp_whisper_WhisperLib_00024Companion_isParakeetModel(
         JNIEnv *env, jobject thiz, jstring model_path_str) {

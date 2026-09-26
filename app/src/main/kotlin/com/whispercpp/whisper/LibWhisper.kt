@@ -53,6 +53,8 @@ class WhisperContext private constructor(private var ptr: Long) {
 
     val audioWindowSamples: Int = WhisperLib.audioWindowSamples(ptr)
 
+    val isParakeet: Boolean = WhisperLib.isParakeetContext(ptr)
+
     // Whisper C++ requires that a context is not accessed from more than one thread
     // at a time; the callers here are already serialized, and this enforces it too.
     @Synchronized
@@ -244,6 +246,7 @@ private class WhisperLib {
         external fun initContext(modelPath: String): Long
         external fun freeContext(contextPtr: Long)
         external fun audioWindowSamples(contextPtr: Long): Int
+        external fun isParakeetContext(contextPtr: Long): Boolean
         external fun isParakeetModel(modelPath: String): Boolean
         external fun fullTranscribe(contextPtr: Long, numThreads: Int, audioData: FloatArray, language: String, segmentCallback: WhisperSegmentCallback?, abortFlagPtr: Long)
         external fun fullTranscribeDirect(contextPtr: Long, numThreads: Int, audioBuffer: ByteBuffer, sampleCount: Int, language: String, prompt: String, suppressNonSpeech: Boolean, vadModelPath: String, segmentCallback: WhisperSegmentCallback?, progressCallback: WhisperProgressCallback?, abortFlagPtr: Long)

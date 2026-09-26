@@ -191,7 +191,6 @@
     <string name="transcribe_no_speech">No speech recognized.</string>
     <string name="transcribe_cant_open">Can\'t open the file</string>
     <string name="transcribe_failed">Transcription failed</string>
-    <string name="transcribe_model_window">This model transcribes up to %1$d seconds at a time — this recording is longer.</string>
 
     <string name="about_back">Back</string>
     <string name="about_tagline">On-device speech-to-text. Your audio never leaves your phone.</string>

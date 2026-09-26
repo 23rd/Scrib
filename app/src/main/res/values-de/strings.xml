@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Keine Sprache erkannt.</string>
     <string name="transcribe_cant_open">Datei kann nicht geöffnet werden</string>
     <string name="transcribe_failed">Transkription fehlgeschlagen</string>
-    <string name="transcribe_model_window">Dieses Modell transkribiert höchstens %1$d Sekunden am Stück — diese Aufnahme ist länger.</string>
 
     <string name="about_back">Zurück</string>
     <string name="about_tagline">Sprache-zu-Text auf dem Gerät. Dein Audio verlässt das Telefon nie.</string>

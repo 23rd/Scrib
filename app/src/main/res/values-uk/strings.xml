@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Мовлення не розпізнано.</string>
     <string name="transcribe_cant_open">Не вдалося відкрити файл</string>
     <string name="transcribe_failed">Помилка розпізнавання</string>
-    <string name="transcribe_model_window">Ця модель розпізнає не більше %1$d секунд за раз — запис довший.</string>
 
     <string name="about_back">Назад</string>
     <string name="about_tagline">Розпізнавання мовлення на пристрої. Ваше аудіо ніколи не залишає телефон.</string>

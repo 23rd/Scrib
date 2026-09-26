@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Речь не распознана.</string>
     <string name="transcribe_cant_open">Не удалось открыть файл</string>
     <string name="transcribe_failed">Ошибка распознавания</string>
-    <string name="transcribe_model_window">Эта модель распознаёт не больше %1$d секунд за раз — запись длиннее.</string>
 
     <string name="about_back">Назад</string>
     <string name="about_tagline">Распознавание речи на устройстве. Ваше аудио не покидает телефон.</string>

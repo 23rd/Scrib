@@ -5,11 +5,14 @@ import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import com.whispercpp.whisper.WhisperAbortFlag
 import com.whispercpp.whisper.WhisperContext
+import com.whispercpp.whisper.WhisperTranscription
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
 import org.opentranscribe.api.TranscriptionRequest
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class WhisperTranscriptionEngine(private val appContext: Context) : TranscriptionEngine {
 
@@ -158,11 +161,9 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                     modelMemoryDeltaMb = if (alreadyLoaded) 0 else maxOf(0, afterLoad.pssMb - beforeLoad.pssMb)
                 )
             )
-            val window = context.audioWindowSamples
-            if (window > 0 && pcm.sampleCount > window) {
-                throw DecodeException(
-                    appContext.getString(R.string.transcribe_model_window, window / SAMPLE_RATE)
-                )
+            val window = modelWindowSamples(context)
+            if (window in 1 until pcm.sampleCount) {
+                return transcribeWindows(context, pcm, window, language, abortFlag, cancellation, onProgress, onPartial)
             }
             val result = context.transcribeBuffer(
                 pcm.samples, pcm.sampleCount, language, abortFlag,
@@ -173,13 +174,77 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            val segments = result.segments
-                .filter { it.text.isNotBlank() }
-                .map { TranscriptSegment(it.startMs, it.endMs, Dictionary.applyReplacements(appContext, it.text)) }
-            return markParagraphs(segments, result.speech.map { SpeechSpan(it.startMs, it.endMs) })
+            return markParagraphs(segmentsOf(result), result.speech.map { SpeechSpan(it.startMs, it.endMs) })
         } finally {
             abortFlag.close()
         }
+    }
+
+    private fun segmentsOf(result: WhisperTranscription): List<TranscriptSegment> =
+        result.segments
+            .filter { it.text.isNotBlank() }
+            .map { TranscriptSegment(it.startMs, it.endMs, Dictionary.applyReplacements(appContext, it.text)) }
+
+    // Parakeet builds one encoder graph for the whole recording, costing memory in proportion to the
+    // audio, so the audio is cut into windows here. Whisper chunks its own and is left alone.
+    private fun modelWindowSamples(context: WhisperContext): Int {
+        if (!context.isParakeet) {
+            return 0
+        }
+        val declared = context.audioWindowSamples
+        return if (declared > 0) minOf(declared, WINDOW_SAMPLES) else WINDOW_SAMPLES
+    }
+
+    private fun transcribeWindows(
+        context: WhisperContext,
+        pcm: DecodedAudio,
+        window: Int,
+        language: String?,
+        abortFlag: WhisperAbortFlag,
+        cancellation: CancellationToken,
+        onProgress: (Int) -> Unit,
+        onPartial: (String) -> Unit
+    ): List<TranscriptSegment> {
+        val windows = (pcm.sampleCount + window - 1) / window
+        val segments = ArrayList<TranscriptSegment>(windows)
+        val cumulative = StringBuilder()
+        for (i in 0 until windows) {
+            if (cancellation.isCancelled) {
+                throw CancelledException()
+            }
+            val offset = i * window
+            val length = minOf(window, pcm.sampleCount - offset)
+            val startMs = offset.toLong() * 1000L / SAMPLE_RATE
+            // The VAD model is a whisper one, and parakeet has no use for it.
+            val result = context.transcribeBuffer(
+                windowOf(pcm.samples, offset, length), length, language, abortFlag,
+                vadModelPath = null,
+                onProgress = { percent -> onProgress((i * 100 + percent) / windows) }
+            )
+            if (cancellation.isCancelled) {
+                throw CancelledException()
+            }
+            var added = false
+            for (segment in segmentsOf(result)) {
+                // The join between windows rides on the segment, so the text reads as one.
+                val text = if (segments.isEmpty()) segment.text else " ${segment.text}"
+                segments.add(segment.copy(startMs = startMs + segment.startMs, endMs = startMs + segment.endMs, text = text))
+                cumulative.append(text)
+                added = true
+            }
+            if (added) {
+                onPartial(cumulative.toString())
+            }
+        }
+        return markParagraphs(segments, emptyList())
+    }
+
+    // Native code reads the buffer from its base address, so the view has to begin at the offset.
+    private fun windowOf(samples: ByteBuffer, offset: Int, length: Int): ByteBuffer {
+        val view = samples.duplicate().order(ByteOrder.nativeOrder())
+        view.position(offset)
+        view.limit(offset + length)
+        return view.slice().order(ByteOrder.nativeOrder())
     }
 
     @Synchronized
@@ -253,5 +318,8 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         const val PARAKEET_ENGINE_ID = "parakeet.cpp"
 
         const val SAMPLE_RATE = 16000
+
+        // The length parakeet's encoders are trained on.
+        const val WINDOW_SAMPLES = SAMPLE_RATE * 30
     }
 }

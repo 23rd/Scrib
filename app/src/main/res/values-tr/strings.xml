@@ -188,7 +188,6 @@
     <string name="transcribe_no_speech">Konuşma algılanmadı.</string>
     <string name="transcribe_cant_open">Dosya açılamıyor</string>
     <string name="transcribe_failed">Yazıya dökme başarısız</string>
-    <string name="transcribe_model_window">Bu model bir seferde en çok %1$d saniye yazıya döker — bu kayıt daha uzun.</string>
 
     <string name="about_back">Geri</string>
     <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
