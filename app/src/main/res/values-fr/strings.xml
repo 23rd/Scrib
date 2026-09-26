@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Téléchargement du détecteur de parole… %1$d%%</string>
     <string name="status_vad_failed">Impossible de télécharger le détecteur de parole — vérifiez votre connexion et réessayez.</string>
 
+    <string name="live_stats_entry_title">Statistiques en direct</string>
+    <string name="live_stats_entry_sub">Affiche la vitesse et la mémoire pendant la transcription.</string>
+    <string name="live_stats_entry_on">En direct — les chiffres évoluent pendant la transcription</string>
+
     <string name="ime_label">Scrib Voix</string>
     <string name="ime_entry_title">Clavier vocal</string>
     <string name="ime_entry_sub">Dictez dans n\'importe quelle appli</string>

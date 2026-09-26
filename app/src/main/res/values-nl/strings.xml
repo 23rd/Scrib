@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Spraakdetector downloaden… %1$d%%</string>
     <string name="status_vad_failed">Spraakdetector kon niet worden gedownload — controleer je verbinding en probeer het opnieuw.</string>
 
+    <string name="live_stats_entry_title">Live prestatiestatistieken</string>
+    <string name="live_stats_entry_sub">Toont snelheid en geheugen tijdens het transcriberen.</string>
+    <string name="live_stats_entry_on">Live — de cijfers lopen mee met de taak</string>
+
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
     <string name="ime_entry_sub">Dicteer in elke app</string>

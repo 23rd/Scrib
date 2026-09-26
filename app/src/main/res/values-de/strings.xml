@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Sprachaktivitätserkennung wird geladen… %1$d%%</string>
     <string name="status_vad_failed">Sprachaktivitätserkennung konnte nicht geladen werden — prüfe deine Verbindung und versuch es erneut.</string>
 
+    <string name="live_stats_entry_title">Live-Leistungsstatistik</string>
+    <string name="live_stats_entry_sub">Zeigt Tempo und Speicher beim Transkribieren.</string>
+    <string name="live_stats_entry_on">Live — Zahlen aktualisieren sich im Lauf</string>
+
     <string name="ime_label">Scrib Stimme</string>
     <string name="ime_entry_title">Sprachtastatur</string>
     <string name="ime_entry_sub">Diktiere in jede App</string>

@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Pobieranie detektora mowy… %1$d%%</string>
     <string name="status_vad_failed">Nie udało się pobrać detektora mowy — sprawdź połączenie i spróbuj ponownie.</string>
 
+    <string name="live_stats_entry_title">Statystyki na żywo</string>
+    <string name="live_stats_entry_sub">Pokazuje szybkość i pamięć podczas transkrypcji.</string>
+    <string name="live_stats_entry_on">Na żywo — wartości aktualizują się w trakcie</string>
+
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
     <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji</string>

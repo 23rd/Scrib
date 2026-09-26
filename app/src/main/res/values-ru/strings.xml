@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Загрузка детектора речи… %1$d%%</string>
     <string name="status_vad_failed">Не удалось скачать детектор речи — проверьте соединение и попробуйте снова.</string>
 
+    <string name="live_stats_entry_title">Статистика в реальном времени</string>
+    <string name="live_stats_entry_sub">Показывает скорость и память при расшифровке.</string>
+    <string name="live_stats_entry_on">В реальном времени — значения обновляются по ходу дела</string>
+
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосовая клавиатура</string>
     <string name="ime_entry_sub">Диктуйте в любом приложении</string>

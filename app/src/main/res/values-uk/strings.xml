@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Завантаження детектора мовлення… %1$d%%</string>
     <string name="status_vad_failed">Не вдалося завантажити детектор мовлення — перевірте з’єднання й спробуйте ще раз.</string>
 
+    <string name="live_stats_entry_title">Статистика наживо</string>
+    <string name="live_stats_entry_sub">Показує швидкість і пам’ять під час транскрибування.</string>
+    <string name="live_stats_entry_on">Наживо — значення оновлюються під час розпізнавання</string>
+
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
     <string name="ime_entry_sub">Диктуйте в будь-якому застосунку</string>

@@ -73,6 +73,10 @@
     <string name="vad_entry_downloading">Downloading the speech detector… %1$d%%</string>
     <string name="status_vad_failed">Couldn\'t download the speech detector — check your connection and try again.</string>
 
+    <string name="live_stats_entry_title">Live performance stats</string>
+    <string name="live_stats_entry_sub">Shows speed and memory while transcribing.</string>
+    <string name="live_stats_entry_on">Live — figures update as the run goes</string>
+
     <string name="ime_label">Scrib Voice</string>
     <string name="ime_entry_title">Voice keyboard</string>
     <string name="ime_entry_sub">Dictate into any app</string>

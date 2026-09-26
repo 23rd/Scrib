@@ -49,6 +49,7 @@ data class ScribUiState(
     val statusMsg: String,
     val statusError: Boolean,
     val skipSilence: Boolean,
+    val liveStats: Boolean,
     val keyboardLayouts: KeyboardLayoutSettings,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
@@ -145,6 +146,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
+            liveStats = ModelManager.liveStats(ctx),
             keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
             benchmarkRuns = BenchmarkStore.load(ctx),
@@ -305,6 +307,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             vadPct = -1; vadJob = null
             push()
         }
+    }
+
+    fun setLiveStats(enabled: Boolean) {
+        if (BenchmarkBatchGate.isActive) return
+        ModelManager.setLiveStats(ctx, enabled)
+        push()
     }
 
     fun activate(fileName: String) {

@@ -270,6 +270,10 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             cumulative.append(text)
             onPartial(cumulative.toString())
         }
+        // The detector consumes 512 samples at a time, so a naive report here fires once every 32 ms
+        // of audio — tens of thousands of times on a long recording, each one waking the metrics
+        // sampler and the UI for a percent that has not moved. Only the changes are worth a callback.
+        var reportedPercent = -1
         try {
             var offset = 0
             while (offset < sampleCount) {
@@ -287,7 +291,11 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                     vad.pop()
                 }
                 offset += length
-                onProgress(((offset.toLong() * 100) / sampleCount).toInt())
+                val percent = ((offset.toLong() * 100) / sampleCount).toInt()
+                if (percent != reportedPercent) {
+                    reportedPercent = percent
+                    onProgress(percent)
+                }
             }
             vad.flush()
             while (!vad.empty()) {

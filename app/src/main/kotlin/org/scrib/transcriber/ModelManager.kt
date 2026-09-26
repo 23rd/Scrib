@@ -12,6 +12,7 @@ object ModelManager {
     private const val PREFS = "models"
     private const val KEY_ACTIVE = "activeModelFile"
     private const val KEY_SKIP_SILENCE = "skipSilence"
+    private const val KEY_LIVE_STATS = "liveStats"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
 
     // The VAD model is a fraction of the size of even the smallest whisper one, so it cannot be
@@ -165,6 +166,17 @@ object ModelManager {
     fun setSkipSilence(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_SKIP_SILENCE, enabled).apply()
+    }
+
+    // Sampling the process means two binder calls into system_server, so it costs real time on a
+    // phone with little memory to spare. On by default — the figures are the whole point of the
+    // benchmark history — but switchable, so its weight on a run can be measured by turning it off.
+    fun liveStats(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LIVE_STATS, true)
+
+    fun setLiveStats(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_LIVE_STATS, enabled).apply()
     }
 
     // The path to hand whisper, or null when silence is to be decoded along with everything else.

@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Descargando el detector de voz… %1$d%%</string>
     <string name="status_vad_failed">No se pudo descargar el detector de voz — revisa tu conexión e inténtalo de nuevo.</string>
 
+    <string name="live_stats_entry_title">Estadísticas en vivo</string>
+    <string name="live_stats_entry_sub">Muestra velocidad y memoria al transcribir.</string>
+    <string name="live_stats_entry_on">En vivo — las cifras se actualizan durante el proceso</string>
+
     <string name="ime_label">Scrib Voz</string>
     <string name="ime_entry_title">Teclado de voz</string>
     <string name="ime_entry_sub">Dicta en cualquier app</string>

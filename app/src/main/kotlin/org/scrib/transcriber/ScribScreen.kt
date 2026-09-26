@@ -103,6 +103,7 @@ fun ScribScreen(
     onCancelBenchmark: () -> Unit,
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
+    onLiveStats: (Boolean) -> Unit,
     onConfigureKeyboardLayouts: (Boolean, List<String>) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
     sherpaPlugin: SherpaPlugin?,
@@ -173,6 +174,7 @@ fun ScribScreen(
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
                 item { KeyboardEntry(state.keyboardLayouts) { showKeyboardLayouts = true } }
                 item { SkipSilenceEntry(state, onSkipSilence) }
+                item { LiveStatsEntry(state.liveStats, onLiveStats) }
                 item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
                 item {
                     BenchmarkEntry(benchmarkRuns) {
@@ -1064,6 +1066,37 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             }
             Spacer(Modifier.width(8.dp))
             Switch(checked = state.skipSilence, enabled = !busy, onCheckedChange = { onToggle(it) })
+        }
+    }
+}
+
+// Reading the process's own memory is a trip into the system server, twice a second, while the
+// model is loaded and the phone is already the tightest it will be. It buys the live speed and
+// memory figures, so it stays on by default — but it is the one moving part a user may want to
+// weigh against the run, and a phone with little to spare may rather not pay for it at all.
+@Composable
+private fun LiveStatsEntry(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .clickableRow(RoundedCornerShape(16.dp)) { onToggle(!enabled) }
+    ) {
+        Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("📈", fontSize = 18.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.live_stats_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(
+                    if (enabled) stringResource(R.string.live_stats_entry_on)
+                    else stringResource(R.string.live_stats_entry_sub),
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Switch(checked = enabled, onCheckedChange = { onToggle(it) })
         }
     }
 }

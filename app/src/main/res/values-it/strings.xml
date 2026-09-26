@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Download del rilevatore vocale… %1$d%%</string>
     <string name="status_vad_failed">Impossibile scaricare il rilevatore vocale — controlla la connessione e riprova.</string>
 
+    <string name="live_stats_entry_title">Statistiche in tempo reale</string>
+    <string name="live_stats_entry_sub">Mostra velocità e memoria durante la trascrizione.</string>
+    <string name="live_stats_entry_on">In tempo reale — le cifre si aggiornano durante l’elaborazione</string>
+
     <string name="ime_label">Scrib Voce</string>
     <string name="ime_entry_title">Tastiera vocale</string>
     <string name="ime_entry_sub">Detta in qualsiasi app</string>

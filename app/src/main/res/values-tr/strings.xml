@@ -71,6 +71,10 @@
     <string name="vad_entry_downloading">Konuşma algılayıcı indiriliyor… %1$d%%</string>
     <string name="status_vad_failed">Konuşma algılayıcı indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
 
+    <string name="live_stats_entry_title">Canlı performans istatistikleri</string>
+    <string name="live_stats_entry_sub">Yazıya dökme sırasında hız ve belleği gösterir.</string>
+    <string name="live_stats_entry_on">Canlı — değerler işlem boyunca güncellenir</string>
+
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
     <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin</string>

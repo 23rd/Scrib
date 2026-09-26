@@ -88,6 +88,7 @@ object TranscriptionRun {
         TranscriptionForegroundService.start(app)
         scope.launch {
             val eta = EtaClock()
+            val liveStats = ModelManager.liveStats(app)
             val initialMemory = processMemory(app)
             val startedAt = SystemClock.elapsedRealtime()
             var audioDurationMs = 0L
@@ -132,11 +133,16 @@ object TranscriptionRun {
                 _state.update { it?.copy(metrics = metrics) }
             }
 
-            val metricsJob = launch {
+            // Sampling every tick is what makes the figures live, and it is the only thing in the run
+            // that reaches outside the process. With the setting off the run keeps its timings and
+            // takes a single reading when it ends, so the result and the history still have numbers.
+            val metricsJob = if (liveStats) launch {
                 while (isActive) {
                     publishMetrics()
                     delay(METRICS_INTERVAL_MS)
                 }
+            } else {
+                null
             }
             var result = TranscriptionRunResult.FAILED
             try {
@@ -144,10 +150,12 @@ object TranscriptionRun {
                     ?: throw RuntimeException(app.getString(R.string.transcribe_cant_open))
                 val segments = TranscriptionEngine.get(app).transcribeToSegments(
                     pfd, "", cancellation,
+                    // Percent and ETA are cheap state writes. The figures are not re-read here: the
+                    // ticker above already republishes them twice a second, and sampling the process
+                    // once per progress tick doubles that cost for nothing a person can see.
                     onProgress = { pct ->
                         val left = eta.mark(pct)
                         _state.update { it?.copy(percent = pct, etaMs = left) }
-                        publishMetrics()
                     },
                     onPartial = { partial -> _state.update { it?.copy(text = partial) } },
                     onMetrics = { metrics ->
@@ -174,7 +182,6 @@ object TranscriptionRun {
                                 modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
                             }
                         }
-                        publishMetrics()
                     }
                 )
                 val text = segments.format(TranscriptFormat.TXT)
@@ -220,7 +227,7 @@ object TranscriptionRun {
                     publishMetrics()
                 }
             } finally {
-                metricsJob.cancelAndJoin()
+                metricsJob?.cancelAndJoin()
                 synchronized(this@TranscriptionRun) {
                     if (token === cancellation) token = null
                 }
