@@ -65,7 +65,7 @@ jobs:
 
       - run: ./gradlew :app:assembleRelease -Pabis=arm64-v8a,armeabi-v7a,x86_64,x86 -PwithSherpa
 
-      - name: Sign the extended APK
+      - name: Sign Scrib Max
         env:
           KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
           KEYSTORE_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
@@ -73,10 +73,10 @@ jobs:
           tools="$ANDROID_HOME/build-tools/35.0.0"
           printf '%s' "$KEYSTORE_B64" | base64 -d > release.jks
           "$tools/zipalign" -f -P 16 4 \
-            app/build/outputs/apk/release/app-release-unsigned.apk aligned-sherpa.apk
+            app/build/outputs/apk/release/app-release-unsigned.apk aligned-max.apk
           "$tools/apksigner" sign --ks release.jks --ks-key-alias scrib \
-            --ks-pass env:KEYSTORE_PASS --out Scrib-sherpa.apk aligned-sherpa.apk
-          "$tools/apksigner" verify Scrib-sherpa.apk
+            --ks-pass env:KEYSTORE_PASS --out Scrib-Max.apk aligned-max.apk
+          "$tools/apksigner" verify Scrib-Max.apk
           rm release.jks
 
       - name: Update the latest release
@@ -85,11 +85,11 @@ jobs:
         run: |
           git push --force origin HEAD:refs/tags/latest
           title="Scrib $VERSION"
-          notes="$(printf 'Version %s · %s · arm64-v8a, armeabi-v7a, x86_64, x86.\nScrib.apk is the lean build; Scrib-sherpa.apk adds the optional sherpa backend.\nSigned with its own key — cannot update an F-Droid install.' \
+          notes="$(printf 'Version %s · %s · arm64-v8a, armeabi-v7a, x86_64, x86.\n\n**Scrib.apk** is the lean build, the same one F-Droid ships.\n**Scrib-Max.apk** is the extended build: every model family the sherpa runtime adds on top of Whisper — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — for a much larger download. The two have separate application ids, so they install side by side and neither replaces the other.\n\nBoth are signed with their own key, so neither can update an F-Droid install.' \
             "$VERSION" "$(date -u +%Y-%m-%d)")"
           if gh release view latest >/dev/null 2>&1; then
             gh release edit latest --title "$title" --notes "$notes"
-            gh release upload latest Scrib.apk Scrib-sherpa.apk --clobber
+            gh release upload latest Scrib.apk Scrib-Max.apk --clobber
           else
-            gh release create latest Scrib.apk Scrib-sherpa.apk --title "$title" --notes "$notes"
+            gh release create latest Scrib.apk Scrib-Max.apk --title "$title" --notes "$notes"
           fi

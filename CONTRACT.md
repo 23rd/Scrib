@@ -5,8 +5,15 @@ stream** — to any installed **on-device transcription app** and get text back,
 leaving the device.
 
 The namespace `org.opentranscribe.api` deliberately belongs to no single application, so that
-implementing the contract does not mean adopting another project's brand. This app
-(`org.scrib.transcriber`) is one implementation; Forkgram is one client.
+implementing the contract does not mean adopting another project's brand. This repository builds two
+apps that both implement it — the lean `org.scrib.transcriber` and the extended
+`org.scrib.transcriber.max` — and Forkgram is one client.
+
+A user who has both installed will find **two** implementations in `queryIntentServices()`. That is
+expected, not a bug: they are separately installable apps with different model support, and the
+`Security` note under [Discovery](#discovery) is what makes it safe. Show both, let the user pick.
+`getCapabilities()` is the way to tell them apart — a client that wants a specific model family can
+match on it instead of hardcoding a package name.
 
 Contract version: **2**
 

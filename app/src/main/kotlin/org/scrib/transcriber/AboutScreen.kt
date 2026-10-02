@@ -37,7 +37,7 @@ fun AboutScreen(onBack: () -> Unit) {
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 8.dp)
         ) {
-            Text("Scrib", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground)
+            Text(stringResource(R.string.app_name), fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground)
             Text(
                 stringResource(R.string.about_tagline),
                 fontSize = 14.sp, color = cs.onSurfaceVariant, lineHeight = 20.sp,

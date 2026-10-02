@@ -6,6 +6,8 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 // the remaining architectures into the single universal APK it attaches to a GitHub release.
 def abis = (findProperty('abis') ?: 'arm64-v8a').toString().split(',').toList()
 
+def max = project.hasProperty('withSherpa')
+
 android {
     namespace 'org.scrib.transcriber'
     compileSdk 35
@@ -13,11 +15,13 @@ android {
     ndkVersion '27.2.12479018'
 
     defaultConfig {
-        applicationId 'org.scrib.transcriber'
+        applicationId max ? 'org.scrib.transcriber.max' : 'org.scrib.transcriber'
         minSdk 26
         targetSdk 35
         versionCode 18
         versionName '0.18'
+
+        resValue 'string', 'app_name', max ? 'Scrib Max' : 'Scrib'
 
         ndk {
             abiFilters.addAll(abis)
@@ -58,6 +62,7 @@ android {
         }
         debug {
             applicationIdSuffix '.debug'
+            resValue 'string', 'app_name', max ? 'Scrib Max Debug' : 'Scrib Debug'
         }
     }
 

@@ -25,6 +25,25 @@ import a `.bin` from your device.
 
 Models are downloaded separately and are not bundled in the app.
 
+## Two builds
+
+Scrib ships in two flavours from this one repository. They differ in what they
+can run and in how much they weigh — not in what they promise you.
+
+- **Scrib** (`org.scrib.transcriber`) is the lean build, the one F-Droid ships.
+  Whisper models only, small installer, nothing but model downloads over the
+  network.
+- **Scrib Max** (`org.scrib.transcriber.max`) is the extended build, attached to
+  each [GitHub release](https://github.com/23rd/Scrib/releases/tag/latest). It
+  adds every model family the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+  runtime covers on top of Whisper — SenseVoice, Canary, streaming Zipformer,
+  Parakeet, Moonshine, Dolphin, FireRed — and the installer grows to about
+  150 MB.
+
+The two have separate application ids, so they install side by side and neither
+replaces the other. Both still transcribe on device; Max simply runs more kinds
+of model.
+
 ## For developers
 
 Any app can use Scrib as an offline transcriber through the open **Open
@@ -46,10 +65,22 @@ cd scrib
 
 Requirements: Android SDK 35, NDK 27, CMake. `minSdk` 26, `arm64-v8a`.
 
+Scrib Max is the same build plus `-PwithSherpa`, which pulls in the extra sources
+and the sherpa runtime AAR:
+
+```
+scripts/download-sherpa-onnx.sh
+./gradlew :app:assembleRelease -PwithSherpa
+```
+
+Omit the flag and you get the lean Scrib that F-Droid builds.
+
 ## Privacy
 
 Transcription runs 100% on device. Your voice messages never leave your phone.
 The only network access is downloading a speech model you pick, over HTTPS.
+This holds for Scrib Max as well — the extra model families are larger, but they
+still run locally.
 
 ## License
 

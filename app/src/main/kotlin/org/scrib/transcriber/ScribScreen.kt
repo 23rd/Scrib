@@ -338,7 +338,7 @@ private fun AppBar(onAbout: () -> Unit) {
             Bar(13.dp, cs.primary, 0.6f)
         }
         Spacer(Modifier.width(9.dp))
-        Text("Scrib", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground, letterSpacing = (-0.6).sp)
+        Text(stringResource(R.string.app_name), fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground, letterSpacing = (-0.6).sp)
         Spacer(Modifier.weight(1f))
         TextButton(onClick = onAbout) {
             Text(stringResource(R.string.about), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
