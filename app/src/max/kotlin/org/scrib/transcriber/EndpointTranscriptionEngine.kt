@@ -54,14 +54,10 @@ class EndpointTranscriptionEngine(
         }
     }
 
-    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream {
-        val language = request?.languageHint?.takeIf { it.isNotEmpty() }
-        return AudioStream(request, callback) { samples, sampleCount, _, prompt, _ ->
-            val wav = WavWriter.encode(samples, sampleCount, SAMPLE_RATE)
-            val text = post(wav, language, null, prompt)
-            TranscribedSegment(Dictionary.applyReplacements(appContext, text), language)
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
+        AudioStream(request, callback) { _, _, _, _, _ ->
+            throw UnsupportedOperationException(UNSUPPORTED_STREAM)
         }
-    }
 
     override fun transcribeToSegments(
         audio: ParcelFileDescriptor,
@@ -145,16 +141,11 @@ class EndpointTranscriptionEngine(
         capabilities.contractVersion = TranscriptionEngine.CONTRACT_VERSION
         capabilities.engineId = ENGINE_ID
         capabilities.engineVersion = ENGINE_VERSION
-        capabilities.streaming = true
+        capabilities.streaming = false
         return capabilities
     }
 
-    private fun post(
-        wav: ByteArray,
-        languageHint: String?,
-        cancellation: CancellationToken?,
-        prompt: String? = null
-    ): String {
+    private fun post(wav: ByteArray, languageHint: String?, cancellation: CancellationToken): String {
         val boundary = "----ScribBoundary${UUID.randomUUID().toString().replace("-", "")}"
         val connection = open()
 
@@ -171,15 +162,12 @@ class EndpointTranscriptionEngine(
                 if (!languageHint.isNullOrEmpty()) {
                     writeField(out, boundary, "language", languageHint)
                 }
-                if (!prompt.isNullOrBlank()) {
-                    writeField(out, boundary, "prompt", prompt)
-                }
                 writeFile(out, boundary, "file", wav)
                 out.write("--$boundary--\r\n".toByteArray())
                 out.flush()
             }
 
-            if (cancellation?.isCancelled == true) {
+            if (cancellation.isCancelled) {
                 throw CancelledException()
             }
 
@@ -273,6 +261,8 @@ class EndpointTranscriptionEngine(
 
         const val USER_AGENT = "Scrib"
 
+        const val UNSUPPORTED_STREAM =
+            "This endpoint transcribes whole recordings; it cannot stream. Pick an on-device model for live text."
     }
 }
 
