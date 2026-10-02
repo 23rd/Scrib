@@ -395,7 +395,8 @@ object Dictionary {
                 )
                 pattern.replace(acc, to)
             }
-            result.replace(Regex(" {2,}"), " ").trim()
+            val core = result.replace(Regex(" {2,}"), " ").trim()
+            text.takeWhile { it.isWhitespace() } + core + text.takeLastWhile { it.isWhitespace() }
         } catch (e: Exception) {
             Log.w(TAG, "applyReplacements failed: ${e.message}")
             text
