@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">Про програму</string>
-
     <string name="active_model">АКТИВНА МОДЕЛЬ</string>
     <string name="ready_to_transcribe">Готова до розпізнавання</string>
     <string name="no_active_model">Немає активної моделі</string>
     <string name="pick_model_hint">Виберіть модель нижче й торкніться «Вибрати».</string>
     <string name="privacy_full">Аудіо розпізнається повністю на вашому телефоні. Нічого не завантажується — застосунок виходить у мережу лише щоб завантажити модель.</string>
     <string name="privacy_short" formatted="false">Працює на 100% на пристрої. Ваші голосові ніколи не залишають телефон.</string>
-
     <string name="setup_transcription">Налаштування розпізнавання</string>
     <string name="nudge_body">Ще немає моделі мовлення. Завантажте одну — Base хороший баланс: невеликий розмір, пристойна точність, працює будь-якою мовою.</string>
     <string name="download_named_size">Завантажити %1$s · ≈%2$d МБ</string>
-
     <string name="record_and_transcribe">Записати й розпізнати</string>
     <string name="transcribe_audio_file">Розпізнати аудіофайл</string>
     <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
@@ -45,8 +42,8 @@
     <string name="benchmark_info_title">Що означають метрики?</string>
     <string name="benchmark_info_rtf">Коефіцієнт реального часу: час обробки, поділений на тривалість аудіо. Менше — швидше.</string>
     <string name="benchmark_info_load">Завантаження: час завантаження мовної моделі в пам’ять.</string>
-    <string name="benchmark_info_model_pss">PSS моделі (Proportional Set Size): пам’ять, яку процес використовує для завантаженої моделі.</string>
-    <string name="benchmark_info_model_delta">Приріст моделі: додаткова пам’ять після завантаження моделі.</string>
+    <string name="benchmark_info_model_pss">Model PSS (пропорційний розмір набору): скільки процес займає під модель після завершення запуску — модель, відображена з диска, потрапляє в пам\'ять лише під час читання, тому раніший замір її занижує.</string>
+    <string name="benchmark_info_model_delta">Дельта моделі: скільки додала модель, від початку запуску до його кінця.</string>
     <string name="benchmark_info_peak">Пік: максимальне використання пам’яті під час запуску.</string>
     <string name="benchmark_info_free">Вільна ОЗ: пам’ять, доступна на пристрої після завершення.</string>
     <string name="benchmark_all_models">Перевірити всі завантажені моделі</string>
@@ -65,16 +62,14 @@
     <string name="record_denied">Для запису потрібен доступ до мікрофона.</string>
     <string name="record_failed">Не вдалося почати запис — можливо, мікрофон зайнятий іншим застосунком.</string>
     <string name="record_empty">Нічого не записано.</string>
-
     <string name="vad_entry_title">Пропускати тишу</string>
     <string name="vad_entry_sub">Швидке розпізнавання без тиші. Разове завантаження 1 МБ.</string>
     <string name="vad_entry_downloading">Завантаження детектора мовлення… %1$d%%</string>
+    <string name="vad_entry_unsupported">Ця модель читає запис повністю і не потребує детектора.</string>
     <string name="status_vad_failed">Не вдалося завантажити детектор мовлення — перевірте з’єднання й спробуйте ще раз.</string>
-
     <string name="live_stats_entry_title">Статистика наживо</string>
     <string name="live_stats_entry_sub">Показує швидкість і пам’ять під час транскрибування.</string>
     <string name="live_stats_entry_on">Наживо — значення оновлюються під час розпізнавання</string>
-
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
     <string name="ime_entry_sub">Диктуйте в будь-якому застосунку</string>
@@ -94,13 +89,11 @@
     <string name="ime_layout_buttons_off">Одна звичайна кнопка клавіатури</string>
     <string name="ime_layout_buttons_none">Немає кнопок розкладок</string>
     <string name="ime_layout_buttons_on">Власні кнопки розкладок</string>
-
     <string name="models_explainer">Більші моделі точніші, але повільніші й більші для завантаження. Моделі «лише англійська» менші й швидші; для інших мов беріть Base або більшу — Tiny слабенька.</string>
     <string name="standard_models">СТАНДАРТНІ МОДЕЛІ</string>
     <string name="size">розмір</string>
     <string name="custom_models">ВЛАСНІ МОДЕЛІ</string>
     <string name="custom_empty">Додайте власну GGML-модель за прямим посиланням або імпортуйте .bin із цього пристрою.</string>
-
     <string name="badge_multilingual">багатомовна</string>
     <string name="badge_english_only">лише англійська</string>
     <string name="badge_custom">власна</string>
@@ -109,7 +102,6 @@
     <string name="active_pill">✓ АКТИВНА</string>
     <string name="row_download_failed">Помилка завантаження — перевірте з’єднання.</string>
     <string name="downloading_pct">Завантаження %1$d%%</string>
-
     <string name="action_download">Завантажити</string>
     <string name="action_retry">Повторити</string>
     <string name="action_cancel">Скасувати</string>
@@ -123,21 +115,16 @@
     <string name="action_save_ext">Зберегти .%1$s</string>
     <string name="transcript_saved">Текст збережено.</string>
     <string name="transcript_save_failed">Не вдалося зберегти текст.</string>
-
     <string name="add_from_hf">Додати модель із HuggingFace…</string>
     <string name="import_bin">Імпортувати .bin із пристрою…</string>
     <string name="run_self_test">Самоперевірка на тестовому кліпі</string>
-
     <string name="delete_model_q">Видалити модель?</string>
-
     <string name="lang_entry_title">Знайти модель для вашої мови</string>
     <string name="lang_entry_sub">Виберіть мову — Scrib завантажить потрібну модель</string>
     <string name="your_language">Ваша мова</string>
     <string name="lang_dialog_hint">Одна багатомовна модель охоплює ~99 мов — це вибирає відповідний розмір і завантажує.</string>
-
     <string name="hf_dialog_title">Модель із HuggingFace</string>
     <string name="hf_dialog_body">Вставте пряме посилання на .bin ggml-модель (будь-яку, сумісну з whisper.cpp).</string>
-
     <string name="lang_english">Англійська</string>
     <string name="lang_spanish">Іспанська</string>
     <string name="lang_german">Німецька</string>
@@ -154,11 +141,9 @@
     <string name="lang_japanese">Японська</string>
     <string name="lang_korean">Корейська</string>
     <string name="lang_hindi">Гінді</string>
-
     <string name="note_english_base">Лише англійська · Base</string>
     <string name="note_multi_base">Багатомовна · Base</string>
     <string name="note_multi_small">Багатомовна · Small — точніше</string>
-
     <string name="status_download_failed_named">Не вдалося завантажити %1$s — перевірте з’єднання й торкніться «Повторити».</string>
     <string name="status_ready_active">%1$s готова й активна.</string>
     <string name="status_lang_ready_active">%1$s: %2$s готова й активна.</string>
@@ -174,7 +159,6 @@
     <string name="status_running_selftest">Запуск самоперевірки…</string>
     <string name="status_selftest_ok">Самоперевірка ✓ — %1$s</string>
     <string name="status_selftest_failed">Самоперевірка не вдалася: %1$s</string>
-
     <string name="dict_entry_title">Заміни слів</string>
     <string name="dict_entry_sub">Виправляйте слова, які розпізнаються невірно: дископ → десктоп</string>
     <string name="dict_entry_on">Увімкнено — діє на результати</string>
@@ -188,7 +172,6 @@
     <string name="transcribe_no_speech">Мовлення не розпізнано.</string>
     <string name="transcribe_cant_open">Не вдалося відкрити файл</string>
     <string name="transcribe_failed">Помилка розпізнавання</string>
-
     <string name="about_back">Назад</string>
     <string name="about_tagline">Розпізнавання мовлення на пристрої. Ваше аудіо ніколи не залишає телефон.</string>
     <string name="about_two_ways">Два способи використовувати Scrib</string>

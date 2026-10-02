@@ -1046,10 +1046,11 @@ private fun KeyboardEntry(settings: KeyboardLayoutSettings, onClick: () -> Unit)
 private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
     val cs = MaterialTheme.colorScheme
     val busy = state.vadProgress >= 0
+    val usable = state.vadSupported
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
-            .clickableRow(RoundedCornerShape(16.dp)) { if (!busy) onToggle(!state.skipSilence) }
+            .clickableRow(RoundedCornerShape(16.dp)) { if (!busy && usable) onToggle(!state.skipSilence) }
     ) {
         Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
@@ -1057,15 +1058,18 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.vad_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(R.string.vad_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (usable) cs.onSurface else cs.onSurfaceVariant)
                 Text(
-                    if (busy) stringResource(R.string.vad_entry_downloading, state.vadProgress)
-                    else stringResource(R.string.vad_entry_sub),
+                    when {
+                        !usable -> stringResource(R.string.vad_entry_unsupported)
+                        busy -> stringResource(R.string.vad_entry_downloading, state.vadProgress)
+                        else -> stringResource(R.string.vad_entry_sub)
+                    },
                     fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
                 )
             }
             Spacer(Modifier.width(8.dp))
-            Switch(checked = state.skipSilence, enabled = !busy, onCheckedChange = { onToggle(it) })
+            Switch(checked = state.skipSilence && usable, enabled = !busy && usable, onCheckedChange = { onToggle(it) })
         }
     }
 }

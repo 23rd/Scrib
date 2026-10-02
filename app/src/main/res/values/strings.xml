@@ -71,6 +71,7 @@
     <string name="vad_entry_title">Skip silence</string>
     <string name="vad_entry_sub">Faster transcriptions without silence. One-off 1 MB download.</string>
     <string name="vad_entry_downloading">Downloading the speech detector… %1$d%%</string>
+    <string name="vad_entry_unsupported">This model reads the whole recording and needs no detector.</string>
     <string name="status_vad_failed">Couldn\'t download the speech detector — check your connection and try again.</string>
 
     <string name="live_stats_entry_title">Live performance stats</string>

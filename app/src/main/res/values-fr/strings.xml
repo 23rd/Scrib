@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">À propos</string>
-
     <string name="active_model">MODÈLE ACTIF</string>
     <string name="ready_to_transcribe">Prêt à transcrire</string>
     <string name="no_active_model">Aucun modèle actif</string>
     <string name="pick_model_hint">Choisissez un modèle ci-dessous et touchez « Utiliser ».</string>
     <string name="privacy_full">L\'audio est transcrit entièrement sur votre téléphone. Rien n\'est envoyé — l\'appli se connecte uniquement pour télécharger un modèle.</string>
     <string name="privacy_short" formatted="false">Fonctionne à 100% sur l\'appareil. Vos messages vocaux ne quittent jamais le téléphone.</string>
-
     <string name="setup_transcription">Configurer la transcription</string>
     <string name="nudge_body">Pas encore de modèle vocal. Téléchargez-en un — Base est un bon compromis : petit téléchargement, précision correcte, fonctionne dans toutes les langues.</string>
     <string name="download_named_size">Télécharger %1$s · ≈%2$d Mo</string>
-
     <string name="record_and_transcribe">Enregistrer et transcrire</string>
     <string name="transcribe_audio_file">Transcrire un fichier audio</string>
     <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
@@ -45,8 +42,8 @@
     <string name="benchmark_info_title">Que signifient les mesures ?</string>
     <string name="benchmark_info_rtf">Facteur temps réel : temps de traitement divisé par la durée de l’audio. Plus il est bas, plus c’est rapide.</string>
     <string name="benchmark_info_load">Chargement : temps nécessaire pour charger le modèle vocal en mémoire.</string>
-    <string name="benchmark_info_model_pss">PSS du modèle (taille proportionnelle de l’ensemble) : mémoire utilisée par le processus pour le modèle chargé.</string>
-    <string name="benchmark_info_model_delta">Delta du modèle : mémoire supplémentaire utilisée après le chargement du modèle.</string>
+    <string name="benchmark_info_model_pss">Model PSS (taille proportionnelle) : ce que le processus occupe pour le modèle à la fin de l\'exécution — un modèle chargé depuis le disque n\'atteint la mémoire qu\'à la lecture, une mesure antérieure le sous-estime.</string>
+    <string name="benchmark_info_model_delta">Delta du modèle : ce qu\'a apporté le modèle, du début à la fin de l\'exécution.</string>
     <string name="benchmark_info_peak">Pic : utilisation maximale de la mémoire pendant l’exécution.</string>
     <string name="benchmark_info_free">RAM libre : mémoire disponible sur l’appareil à la fin de l’exécution.</string>
     <string name="benchmark_all_models">Évaluer tous les modèles téléchargés</string>
@@ -65,16 +62,14 @@
     <string name="record_denied">L\'accès au micro est nécessaire pour enregistrer.</string>
     <string name="record_failed">Impossible de démarrer l\'enregistrement — une autre application utilise peut-être le micro.</string>
     <string name="record_empty">Rien n\'a été enregistré.</string>
-
     <string name="vad_entry_title">Ignorer les silences</string>
     <string name="vad_entry_sub">Transcription plus rapide, sans silence. Téléchargement unique de 1 Mo.</string>
     <string name="vad_entry_downloading">Téléchargement du détecteur de parole… %1$d%%</string>
+    <string name="vad_entry_unsupported">Ce modèle lit tout l\'enregistrement et n\'a pas besoin de détecteur.</string>
     <string name="status_vad_failed">Impossible de télécharger le détecteur de parole — vérifiez votre connexion et réessayez.</string>
-
     <string name="live_stats_entry_title">Statistiques en direct</string>
     <string name="live_stats_entry_sub">Affiche la vitesse et la mémoire pendant la transcription.</string>
     <string name="live_stats_entry_on">En direct — les chiffres évoluent pendant la transcription</string>
-
     <string name="ime_label">Scrib Voix</string>
     <string name="ime_entry_title">Clavier vocal</string>
     <string name="ime_entry_sub">Dictez dans n\'importe quelle appli</string>
@@ -94,13 +89,11 @@
     <string name="ime_layout_buttons_off">Un bouton clavier générique</string>
     <string name="ime_layout_buttons_none">Aucun bouton de disposition</string>
     <string name="ime_layout_buttons_on">Boutons de disposition personnalisés</string>
-
     <string name="models_explainer">Les modèles plus grands sont plus précis mais plus lents et plus lourds à télécharger. Les modèles « anglais uniquement » sont plus petits et rapides ; pour les autres langues, choisissez Base ou plus grand — Tiny est faible.</string>
     <string name="standard_models">MODÈLES STANDARD</string>
     <string name="size">taille</string>
     <string name="custom_models">MODÈLES PERSONNELS</string>
     <string name="custom_empty">Ajoutez votre propre modèle GGML par lien direct ou importez un .bin depuis cet appareil.</string>
-
     <string name="badge_multilingual">multilingue</string>
     <string name="badge_english_only">anglais uniquement</string>
     <string name="badge_custom">perso</string>
@@ -109,7 +102,6 @@
     <string name="active_pill">✓ ACTIF</string>
     <string name="row_download_failed">Échec du téléchargement — vérifiez votre connexion.</string>
     <string name="downloading_pct">Téléchargement %1$d%%</string>
-
     <string name="action_download">Télécharger</string>
     <string name="action_retry">Réessayer</string>
     <string name="action_cancel">Annuler</string>
@@ -123,21 +115,16 @@
     <string name="action_save_ext">Enregistrer en .%1$s</string>
     <string name="transcript_saved">Transcription enregistrée.</string>
     <string name="transcript_save_failed">Impossible d\'enregistrer la transcription.</string>
-
     <string name="add_from_hf">Ajouter un modèle depuis HuggingFace…</string>
     <string name="import_bin">Importer un .bin depuis l\'appareil…</string>
     <string name="run_self_test">Autotest sur un extrait d\'exemple</string>
-
     <string name="delete_model_q">Supprimer le modèle ?</string>
-
     <string name="lang_entry_title">Trouver un modèle pour votre langue</string>
     <string name="lang_entry_sub">Choisissez une langue — Scrib télécharge le bon modèle</string>
     <string name="your_language">Votre langue</string>
     <string name="lang_dialog_hint">Un modèle multilingue couvre ~99 langues — ceci choisit une bonne taille et la télécharge.</string>
-
     <string name="hf_dialog_title">Modèle depuis HuggingFace</string>
     <string name="hf_dialog_body">Collez un lien direct vers un modèle ggml .bin (tout modèle compatible whisper.cpp).</string>
-
     <string name="lang_english">Anglais</string>
     <string name="lang_spanish">Espagnol</string>
     <string name="lang_german">Allemand</string>
@@ -154,11 +141,9 @@
     <string name="lang_japanese">Japonais</string>
     <string name="lang_korean">Coréen</string>
     <string name="lang_hindi">Hindi</string>
-
     <string name="note_english_base">Anglais uniquement · Base</string>
     <string name="note_multi_base">Multilingue · Base</string>
     <string name="note_multi_small">Multilingue · Small — plus précis</string>
-
     <string name="status_download_failed_named">Échec du téléchargement de %1$s — vérifiez votre connexion et touchez « Réessayer ».</string>
     <string name="status_ready_active">%1$s est prêt et actif.</string>
     <string name="status_lang_ready_active">%1$s : %2$s est prêt et actif.</string>
@@ -174,7 +159,6 @@
     <string name="status_running_selftest">Autotest en cours…</string>
     <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
     <string name="status_selftest_failed">Échec de l\'autotest : %1$s</string>
-
     <string name="dict_entry_title">Remplacements de mots</string>
     <string name="dict_entry_sub">Corrigez les mots mal reconnus, p. ex. дископ → десктоп</string>
     <string name="dict_entry_on">Activé — appliqué aux résultats</string>
@@ -188,7 +172,6 @@
     <string name="transcribe_no_speech">Aucune parole reconnue.</string>
     <string name="transcribe_cant_open">Impossible d\'ouvrir le fichier</string>
     <string name="transcribe_failed">Échec de la transcription</string>
-
     <string name="about_back">Retour</string>
     <string name="about_tagline">Reconnaissance vocale sur l\'appareil. Votre audio ne quitte jamais le téléphone.</string>
     <string name="about_two_ways">Deux façons d\'utiliser Scrib</string>

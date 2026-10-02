@@ -2,6 +2,7 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.net.Uri
+import com.whispercpp.whisper.WhisperContext
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -194,6 +195,18 @@ object ModelManager {
             return null
         }
         return fileFor(context, ModelCatalog.SHERPA_VAD_FILE).absolutePath
+    }
+
+    fun activeModelUsesVad(context: Context): Boolean {
+        if (SherpaPlugins.plugin?.selectedId(context) != null) {
+            return true
+        }
+        val model = activeModelFile(context) ?: return true
+        return try {
+            !WhisperContext.isParakeetModel(model.absolutePath)
+        } catch (ignore: Throwable) {
+            true
+        }
     }
 
     @Synchronized

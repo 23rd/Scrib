@@ -49,6 +49,7 @@ data class ScribUiState(
     val statusMsg: String,
     val statusError: Boolean,
     val skipSilence: Boolean,
+    val vadSupported: Boolean,
     val liveStats: Boolean,
     val keyboardLayouts: KeyboardLayoutSettings,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
@@ -146,6 +147,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
+            vadSupported = ModelManager.activeModelUsesVad(ctx),
             liveStats = ModelManager.liveStats(ctx),
             keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
@@ -256,6 +258,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     // setting only goes on once that has landed, so it can never point at a model that isn't there.
     fun setSkipSilence(enabled: Boolean) {
         if (BenchmarkBatchGate.isActive) return
+        if (enabled && !ModelManager.activeModelUsesVad(ctx)) return
         if (!enabled) {
             vadJob?.cancel(); vadJob = null; vadPct = -1
             ModelManager.setSkipSilence(ctx, false)

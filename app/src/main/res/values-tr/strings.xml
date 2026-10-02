@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">Hakkında</string>
-
     <string name="active_model">ETKİN MODEL</string>
     <string name="ready_to_transcribe">Yazıya dökmeye hazır</string>
     <string name="no_active_model">Etkin model yok</string>
     <string name="pick_model_hint">Aşağıdan bir model seçip «Kullan» düğmesine dokunun.</string>
     <string name="privacy_full">Ses tamamen telefonunuzda yazıya dökülür. Hiçbir şey yüklenmez — uygulama yalnızca model indirmek için çevrimiçi olur.</string>
     <string name="privacy_short" formatted="false">%100 cihazda çalışır. Sesli mesajlarınız telefonu asla terk etmez.</string>
-
     <string name="setup_transcription">Yazıya dökmeyi ayarla</string>
     <string name="nudge_body">Henüz konuşma modeli yok. Bir tane indirin — Base dengeli bir seçim: küçük indirme, iyi doğruluk, her dilde çalışır.</string>
     <string name="download_named_size">%1$s indir · ≈%2$d MB</string>
-
     <string name="record_and_transcribe">Kaydet ve yazıya dök</string>
     <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
@@ -45,8 +42,8 @@
     <string name="benchmark_info_title">Metrikler ne anlama geliyor?</string>
     <string name="benchmark_info_rtf">Gerçek zamanlı faktör: işlem süresinin ses süresine bölümü. Düşük değer daha hızlıdır.</string>
     <string name="benchmark_info_load">Yükleme: konuşma modelini belleğe yükleme süresi.</string>
-    <string name="benchmark_info_model_pss">Model PSS (proportional set size): işlenen model için sürecin kullandığı bellek.</string>
-    <string name="benchmark_info_model_delta">Model farkı: model yüklendikten sonra kullanılan ek bellek.</string>
+    <string name="benchmark_info_model_pss">Model PSS (orantılı küme boyutu): çalışma bittiğinde sürecin model için ayırdığı bellek — diskten eşlenen model yalnızca okunurken belleğe gelir, bu yüzden önceki bir ölçüm onu küçük gösterir.</string>
+    <string name="benchmark_info_model_delta">Model farkı: modelin eklediği bellek, çalışmanın başından sonuna kadar.</string>
     <string name="benchmark_info_peak">Zirve: çalışma sırasındaki en yüksek bellek kullanımı.</string>
     <string name="benchmark_info_free">Boş RAM: çalışma bittikten sonra cihazda kullanılabilir bellek.</string>
     <string name="benchmark_all_models">İndirilen tüm modelleri benchmarkla</string>
@@ -65,16 +62,14 @@
     <string name="record_denied">Kayıt için mikrofon erişimi gerekiyor.</string>
     <string name="record_failed">Kayıt başlatılamadı — mikrofonu başka bir uygulama kullanıyor olabilir.</string>
     <string name="record_empty">Hiçbir şey kaydedilmedi.</string>
-
     <string name="vad_entry_title">Sessizlikleri atla</string>
     <string name="vad_entry_sub">Sessiz hâlde daha hızlı transkripsiyon. Tek seferlik 1 MB indirme.</string>
     <string name="vad_entry_downloading">Konuşma algılayıcı indiriliyor… %1$d%%</string>
+    <string name="vad_entry_unsupported">Bu model tüm kaydı okur ve dedektöre gerek duymaz.</string>
     <string name="status_vad_failed">Konuşma algılayıcı indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
-
     <string name="live_stats_entry_title">Canlı performans istatistikleri</string>
     <string name="live_stats_entry_sub">Yazıya dökme sırasında hız ve belleği gösterir.</string>
     <string name="live_stats_entry_on">Canlı — değerler işlem boyunca güncellenir</string>
-
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
     <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin</string>
@@ -94,13 +89,11 @@
     <string name="ime_layout_buttons_off">Tek genel klavye düğmesi</string>
     <string name="ime_layout_buttons_none">Düzen düğmesi yok</string>
     <string name="ime_layout_buttons_on">Özel düzen düğmeleri</string>
-
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
     <string name="standard_models">STANDART MODELLER</string>
     <string name="size">boyut</string>
     <string name="custom_models">ÖZEL MODELLER</string>
     <string name="custom_empty">Kendi GGML modelinizi doğrudan bağlantıyla ekleyin veya bu cihazdan bir .bin içe aktarın.</string>
-
     <string name="badge_multilingual">çok dilli</string>
     <string name="badge_english_only">yalnızca İngilizce</string>
     <string name="badge_custom">özel</string>
@@ -109,7 +102,6 @@
     <string name="active_pill">✓ ETKİN</string>
     <string name="row_download_failed">İndirme başarısız — bağlantınızı kontrol edin.</string>
     <string name="downloading_pct">İndiriliyor %1$d%%</string>
-
     <string name="action_download">İndir</string>
     <string name="action_retry">Yeniden dene</string>
     <string name="action_cancel">İptal</string>
@@ -123,21 +115,16 @@
     <string name="action_save_ext">.%1$s olarak kaydet</string>
     <string name="transcript_saved">Metin kaydedildi.</string>
     <string name="transcript_save_failed">Metin kaydedilemedi.</string>
-
     <string name="add_from_hf">HuggingFace üzerinden model ekle…</string>
     <string name="import_bin">Cihazdan .bin içe aktar…</string>
     <string name="run_self_test">Örnek klip üzerinde otomatik test</string>
-
     <string name="delete_model_q">Model silinsin mi?</string>
-
     <string name="lang_entry_title">Diliniz için bir model bulun</string>
     <string name="lang_entry_sub">Bir dil seçin — Scrib doğru modeli indirir</string>
     <string name="your_language">Diliniz</string>
     <string name="lang_dialog_hint">Tek bir çok dilli model ~99 dili kapsar — bu, iyi bir boyut seçip indirir.</string>
-
     <string name="hf_dialog_title">HuggingFace modeli</string>
     <string name="hf_dialog_body">.bin ggml modeline doğrudan bir bağlantı yapıştırın (whisper.cpp ile uyumlu herhangi biri).</string>
-
     <string name="lang_english">İngilizce</string>
     <string name="lang_spanish">İspanyolca</string>
     <string name="lang_german">Almanca</string>
@@ -154,11 +141,9 @@
     <string name="lang_japanese">Japonca</string>
     <string name="lang_korean">Korece</string>
     <string name="lang_hindi">Hintçe</string>
-
     <string name="note_english_base">Yalnızca İngilizce · Base</string>
     <string name="note_multi_base">Çok dilli · Base</string>
     <string name="note_multi_small">Çok dilli · Small — daha doğru</string>
-
     <string name="status_download_failed_named">%1$s indirilemedi — bağlantınızı kontrol edip yeniden deneyin.</string>
     <string name="status_ready_active">%1$s hazır ve etkin.</string>
     <string name="status_lang_ready_active">%1$s: %2$s hazır ve etkin.</string>
@@ -174,7 +159,6 @@
     <string name="status_running_selftest">Otomatik test çalışıyor…</string>
     <string name="status_selftest_ok">Otomatik test ✓ — %1$s</string>
     <string name="status_selftest_failed">Otomatik test başarısız: %1$s</string>
-
     <string name="dict_entry_title">Sözcük değiştirmeler</string>
     <string name="dict_entry_sub">Yanlış tanınan sözcükleri düzelt, örn. дископ → десктоп</string>
     <string name="dict_entry_on">Açık — sonuçlara uygulanır</string>
@@ -188,7 +172,6 @@
     <string name="transcribe_no_speech">Konuşma algılanmadı.</string>
     <string name="transcribe_cant_open">Dosya açılamıyor</string>
     <string name="transcribe_failed">Yazıya dökme başarısız</string>
-
     <string name="about_back">Geri</string>
     <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
     <string name="about_two_ways">Scrib\'i kullanmanın iki yolu</string>

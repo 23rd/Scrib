@@ -274,14 +274,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         return capabilities
     }
 
-    private fun activeModelIsParakeet(): Boolean {
-        val model = ModelManager.activeModelFile(appContext) ?: return false
-        return try {
-            WhisperContext.isParakeetModel(model.absolutePath)
-        } catch (ignore: Throwable) {
-            false
-        }
-    }
+    private fun activeModelIsParakeet(): Boolean = !ModelManager.activeModelUsesVad(appContext)
 
     private fun languages(): Array<String>? = try {
         WhisperContext.supportedLanguages().toTypedArray()

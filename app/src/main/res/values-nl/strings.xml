@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">Over</string>
-
     <string name="active_model">ACTIEF MODEL</string>
     <string name="ready_to_transcribe">Klaar om te transcriberen</string>
     <string name="no_active_model">Geen actief model</string>
     <string name="pick_model_hint">Kies hieronder een model en tik op «Gebruiken».</string>
     <string name="privacy_full">Audio wordt volledig op je telefoon getranscribeerd. Er wordt niets geüpload — de app gaat alleen online om een model te downloaden.</string>
     <string name="privacy_short" formatted="false">Draait 100% op het apparaat. Je spraakberichten verlaten nooit de telefoon.</string>
-
     <string name="setup_transcription">Transcriptie instellen</string>
     <string name="nudge_body">Nog geen spraakmodel. Download er een — Base is een goede balans: kleine download, degelijke nauwkeurigheid, werkt in elke taal.</string>
     <string name="download_named_size">%1$s downloaden · ≈%2$d MB</string>
-
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
@@ -45,8 +42,8 @@
     <string name="benchmark_info_title">Wat betekenen de metrieken?</string>
     <string name="benchmark_info_rtf">Realtimefactor: verwerkingstijd gedeeld door audiodelduur. Lager is sneller.</string>
     <string name="benchmark_info_load">Laden: tijd die nodig is om het spraakmodel in het geheugen te laden.</string>
-    <string name="benchmark_info_model_pss">Model-PSS (proportional set size): geheugen dat het proces voor het geladen model gebruikt.</string>
-    <string name="benchmark_info_model_delta">Modeldelta: extra geheugen dat na het laden van het model wordt gebruikt.</string>
+    <string name="benchmark_info_model_pss">Model PSS (proportionele setgrootte): wat het proces aan het einde van de run voor het model vasthoudt — een model dat van schijf is gemapt komt pas bij het lezen in het geheugen, dus een eerdere meting onderschat het.</string>
+    <string name="benchmark_info_model_delta">Modeldelta: wat het model toevoegde, van vóór de run tot het einde ervan.</string>
     <string name="benchmark_info_peak">Piek: hoogste geheugengebruik tijdens de run.</string>
     <string name="benchmark_info_free">Vrij RAM: geheugen dat op het apparaat beschikbaar is na de run.</string>
     <string name="benchmark_all_models">Alle gedownloade modellen benchmarken</string>
@@ -65,16 +62,14 @@
     <string name="record_denied">Toegang tot de microfoon is nodig om op te nemen.</string>
     <string name="record_failed">Opnemen kon niet starten — misschien gebruikt een andere app de microfoon.</string>
     <string name="record_empty">Er is niets opgenomen.</string>
-
     <string name="vad_entry_title">Stiltes overslaan</string>
     <string name="vad_entry_sub">Snellere transcriptie zonder stilte. Eenmalige download van 1 MB.</string>
     <string name="vad_entry_downloading">Spraakdetector downloaden… %1$d%%</string>
+    <string name="vad_entry_unsupported">Dit model leest de hele opname en heeft geen detector nodig.</string>
     <string name="status_vad_failed">Spraakdetector kon niet worden gedownload — controleer je verbinding en probeer het opnieuw.</string>
-
     <string name="live_stats_entry_title">Live prestatiestatistieken</string>
     <string name="live_stats_entry_sub">Toont snelheid en geheugen tijdens het transcriberen.</string>
     <string name="live_stats_entry_on">Live — de cijfers lopen mee met de taak</string>
-
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
     <string name="ime_entry_sub">Dicteer in elke app</string>
@@ -94,13 +89,11 @@
     <string name="ime_layout_buttons_off">Eén algemene toetsenbordknop</string>
     <string name="ime_layout_buttons_none">Geen layoutknoppen</string>
     <string name="ime_layout_buttons_on">Eigen layoutknoppen</string>
-
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
     <string name="standard_models">STANDAARDMODELLEN</string>
     <string name="size">grootte</string>
     <string name="custom_models">EIGEN MODELLEN</string>
     <string name="custom_empty">Voeg je eigen GGML-model toe via een directe link of importeer een .bin van dit apparaat.</string>
-
     <string name="badge_multilingual">meertalig</string>
     <string name="badge_english_only">alleen Engels</string>
     <string name="badge_custom">eigen</string>
@@ -109,7 +102,6 @@
     <string name="active_pill">✓ ACTIEF</string>
     <string name="row_download_failed">Download mislukt — controleer je verbinding.</string>
     <string name="downloading_pct">Downloaden %1$d%%</string>
-
     <string name="action_download">Downloaden</string>
     <string name="action_retry">Opnieuw</string>
     <string name="action_cancel">Annuleren</string>
@@ -123,21 +115,16 @@
     <string name="action_save_ext">Als .%1$s opslaan</string>
     <string name="transcript_saved">Transcriptie opgeslagen.</string>
     <string name="transcript_save_failed">Transcriptie kon niet worden opgeslagen.</string>
-
     <string name="add_from_hf">Model van HuggingFace toevoegen…</string>
     <string name="import_bin">.bin van apparaat importeren…</string>
     <string name="run_self_test">Zelftest met voorbeeldclip</string>
-
     <string name="delete_model_q">Model verwijderen?</string>
-
     <string name="lang_entry_title">Vind een model voor je taal</string>
     <string name="lang_entry_sub">Kies een taal — Scrib downloadt het juiste model</string>
     <string name="your_language">Je taal</string>
     <string name="lang_dialog_hint">Eén meertalig model dekt ~99 talen — dit kiest een goede grootte en downloadt die.</string>
-
     <string name="hf_dialog_title">Model van HuggingFace</string>
     <string name="hf_dialog_body">Plak een directe link naar een ggml .bin-model (elk whisper.cpp-compatibel model).</string>
-
     <string name="lang_english">Engels</string>
     <string name="lang_spanish">Spaans</string>
     <string name="lang_german">Duits</string>
@@ -154,11 +141,9 @@
     <string name="lang_japanese">Japans</string>
     <string name="lang_korean">Koreaans</string>
     <string name="lang_hindi">Hindi</string>
-
     <string name="note_english_base">Alleen Engels · Base</string>
     <string name="note_multi_base">Meertalig · Base</string>
     <string name="note_multi_small">Meertalig · Small — nauwkeuriger</string>
-
     <string name="status_download_failed_named">%1$s kon niet worden gedownload — controleer je verbinding en tik op «Opnieuw».</string>
     <string name="status_ready_active">%1$s is klaar en actief.</string>
     <string name="status_lang_ready_active">%1$s: %2$s is klaar en actief.</string>
@@ -174,7 +159,6 @@
     <string name="status_running_selftest">Zelftest wordt uitgevoerd…</string>
     <string name="status_selftest_ok">Zelftest ✓ — %1$s</string>
     <string name="status_selftest_failed">Zelftest mislukt: %1$s</string>
-
     <string name="dict_entry_title">Woordvervangingen</string>
     <string name="dict_entry_sub">Corrigeer woorden die verkeerd worden herkend, bijv. дископ → десктоп</string>
     <string name="dict_entry_on">Aan — toegepast op resultaten</string>
@@ -188,7 +172,6 @@
     <string name="transcribe_no_speech">Geen spraak herkend.</string>
     <string name="transcribe_cant_open">Kan het bestand niet openen</string>
     <string name="transcribe_failed">Transcriptie mislukt</string>
-
     <string name="about_back">Terug</string>
     <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>
     <string name="about_two_ways">Twee manieren om Scrib te gebruiken</string>

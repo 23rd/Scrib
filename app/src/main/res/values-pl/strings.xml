@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="about">O aplikacji</string>
-
     <string name="active_model">AKTYWNY MODEL</string>
     <string name="ready_to_transcribe">Gotowy do transkrypcji</string>
     <string name="no_active_model">Brak aktywnego modelu</string>
     <string name="pick_model_hint">Wybierz model poniżej i dotknij «Użyj».</string>
     <string name="privacy_full">Dźwięk jest transkrybowany w całości na Twoim telefonie. Nic nie jest wysyłane — aplikacja łączy się z siecią tylko po to, by pobrać model.</string>
     <string name="privacy_short" formatted="false">Działa w 100% na urządzeniu. Twoje wiadomości głosowe nigdy nie opuszczają telefonu.</string>
-
     <string name="setup_transcription">Skonfiguruj transkrypcję</string>
     <string name="nudge_body">Brak jeszcze modelu mowy. Pobierz jeden — Base to dobry kompromis: mały rozmiar, solidna dokładność, działa w każdym języku.</string>
     <string name="download_named_size">Pobierz %1$s · ≈%2$d MB</string>
-
     <string name="record_and_transcribe">Nagraj i transkrybuj</string>
     <string name="transcribe_audio_file">Transkrybuj plik audio</string>
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>
@@ -45,8 +42,8 @@
     <string name="benchmark_info_title">Co oznaczają metryki?</string>
     <string name="benchmark_info_rtf">Współczynnik czasu rzeczywistego: czas przetwarzania podzielony przez długość nagrania. Mniejsza wartość oznacza szybsze działanie.</string>
     <string name="benchmark_info_load">Ładowanie: czas wczytywania modelu mowy do pamięci.</string>
-    <string name="benchmark_info_model_pss">PSS modelu (proportional set size): pamięć używana przez proces dla wczytanego modelu.</string>
-    <string name="benchmark_info_model_delta">Przyrost modelu: dodatkowa pamięć użyta po wczytaniu modelu.</string>
+    <string name="benchmark_info_model_pss">Model PSS (proporcjonalny rozmiar zbioru): ile proces zajmuje na modelu po zakończeniu przebiegu — model mapowany z dysku trafia do pamięci dopiero przy odczycie, więc wcześniejszy pomiar go zaniża.</string>
+    <string name="benchmark_info_model_delta">Delta modelu: ile model dodał, od przed przebiegu do jego końca.</string>
     <string name="benchmark_info_peak">Szczyt: największe zużycie pamięci podczas przebiegu.</string>
     <string name="benchmark_info_free">Wolny RAM: pamięć dostępna w urządzeniu po zakończeniu.</string>
     <string name="benchmark_all_models">Przetestuj wszystkie pobrane modele</string>
@@ -65,16 +62,14 @@
     <string name="record_denied">Do nagrywania potrzebny jest dostęp do mikrofonu.</string>
     <string name="record_failed">Nie udało się rozpocząć nagrywania — mikrofon może być zajęty przez inną aplikację.</string>
     <string name="record_empty">Nic nie nagrano.</string>
-
     <string name="vad_entry_title">Pomijaj ciszę</string>
     <string name="vad_entry_sub">Szybsza transkrypcja bez ciszy. Jednorazowe pobranie 1 MB.</string>
     <string name="vad_entry_downloading">Pobieranie detektora mowy… %1$d%%</string>
+    <string name="vad_entry_unsupported">Ten model czyta całe nagranie i nie potrzebuje detektora.</string>
     <string name="status_vad_failed">Nie udało się pobrać detektora mowy — sprawdź połączenie i spróbuj ponownie.</string>
-
     <string name="live_stats_entry_title">Statystyki na żywo</string>
     <string name="live_stats_entry_sub">Pokazuje szybkość i pamięć podczas transkrypcji.</string>
     <string name="live_stats_entry_on">Na żywo — wartości aktualizują się w trakcie</string>
-
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
     <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji</string>
@@ -94,13 +89,11 @@
     <string name="ime_layout_buttons_off">Jeden ogólny przycisk klawiatury</string>
     <string name="ime_layout_buttons_none">Brak przycisków układów</string>
     <string name="ime_layout_buttons_on">Własne przyciski układów</string>
-
     <string name="models_explainer">Większe modele są dokładniejsze, ale wolniejsze i większe do pobrania. Modele «tylko angielski» są mniejsze i szybsze; dla innych języków wybierz Base lub większy — Tiny jest słaby.</string>
     <string name="standard_models">MODELE STANDARDOWE</string>
     <string name="size">rozmiar</string>
     <string name="custom_models">WŁASNE MODELE</string>
     <string name="custom_empty">Dodaj własny model GGML przez bezpośredni link lub zaimportuj .bin z tego urządzenia.</string>
-
     <string name="badge_multilingual">wielojęzyczny</string>
     <string name="badge_english_only">tylko angielski</string>
     <string name="badge_custom">własny</string>
@@ -109,7 +102,6 @@
     <string name="active_pill">✓ AKTYWNY</string>
     <string name="row_download_failed">Błąd pobierania — sprawdź połączenie.</string>
     <string name="downloading_pct">Pobieranie %1$d%%</string>
-
     <string name="action_download">Pobierz</string>
     <string name="action_retry">Ponów</string>
     <string name="action_cancel">Anuluj</string>
@@ -123,21 +115,16 @@
     <string name="action_save_ext">Zapisz .%1$s</string>
     <string name="transcript_saved">Zapisano transkrypcję.</string>
     <string name="transcript_save_failed">Nie udało się zapisać transkrypcji.</string>
-
     <string name="add_from_hf">Dodaj model z HuggingFace…</string>
     <string name="import_bin">Importuj .bin z urządzenia…</string>
     <string name="run_self_test">Autotest na przykładowym klipie</string>
-
     <string name="delete_model_q">Usunąć model?</string>
-
     <string name="lang_entry_title">Znajdź model dla swojego języka</string>
     <string name="lang_entry_sub">Wybierz język — Scrib pobierze właściwy model</string>
     <string name="your_language">Twój język</string>
     <string name="lang_dialog_hint">Jeden wielojęzyczny model obejmuje ~99 języków — to wybiera odpowiedni rozmiar i go pobiera.</string>
-
     <string name="hf_dialog_title">Model z HuggingFace</string>
     <string name="hf_dialog_body">Wklej bezpośredni link do modelu ggml .bin (dowolnego zgodnego z whisper.cpp).</string>
-
     <string name="lang_english">Angielski</string>
     <string name="lang_spanish">Hiszpański</string>
     <string name="lang_german">Niemiecki</string>
@@ -154,11 +141,9 @@
     <string name="lang_japanese">Japoński</string>
     <string name="lang_korean">Koreański</string>
     <string name="lang_hindi">Hindi</string>
-
     <string name="note_english_base">Tylko angielski · Base</string>
     <string name="note_multi_base">Wielojęzyczny · Base</string>
     <string name="note_multi_small">Wielojęzyczny · Small — dokładniejszy</string>
-
     <string name="status_download_failed_named">Nie udało się pobrać %1$s — sprawdź połączenie i dotknij «Ponów».</string>
     <string name="status_ready_active">%1$s jest gotowy i aktywny.</string>
     <string name="status_lang_ready_active">%1$s: %2$s jest gotowy i aktywny.</string>
@@ -174,7 +159,6 @@
     <string name="status_running_selftest">Uruchamianie autotestu…</string>
     <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
     <string name="status_selftest_failed">Autotest nie powiódł się: %1$s</string>
-
     <string name="dict_entry_title">Zamiany słów</string>
     <string name="dict_entry_sub">Poprawiaj słowa błędnie rozpoznawane, np. дископ → десктоп</string>
     <string name="dict_entry_on">Włączone — dotyczy wyników</string>
@@ -188,7 +172,6 @@
     <string name="transcribe_no_speech">Nie rozpoznano mowy.</string>
     <string name="transcribe_cant_open">Nie można otworzyć pliku</string>
     <string name="transcribe_failed">Błąd transkrypcji</string>
-
     <string name="about_back">Wstecz</string>
     <string name="about_tagline">Mowa na tekst na urządzeniu. Twój dźwięk nigdy nie opuszcza telefonu.</string>
     <string name="about_two_ways">Dwa sposoby korzystania ze Scrib</string>
