@@ -565,7 +565,7 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
     val cs = MaterialTheme.colorScheme
     when (row.state) {
         RowState.NotDownloaded -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Chip("↓ " + stringResource(R.string.action_download), cs.primaryContainer, cs.onPrimaryContainer) { actions.onDownload(row.id) }
+            Chip(stringResource(R.string.action_download), cs.primaryContainer, cs.onPrimaryContainer) { actions.onDownload(row.id) }
         }
         RowState.Failed -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Chip(stringResource(R.string.action_retry), cs.errorContainer, cs.onErrorContainer) { actions.onDownload(row.id) }
