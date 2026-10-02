@@ -141,7 +141,7 @@
 
     <string name="hf_dialog_title">Model from HuggingFace</string>
     <string name="hf_dialog_body">Paste a direct link to a .bin ggml model (any whisper.cpp-compatible model).</string>
-    <string name="hf_placeholder">https://huggingface.co/…/ggml-….bin</string>
+    <string name="hf_placeholder" translatable="false">https://huggingface.co/…/ggml-….bin</string>
 
     <string name="lang_english">English</string>
     <string name="lang_spanish">Spanish</string>
