@@ -124,6 +124,7 @@ object ModelManager {
     fun isAvailable(context: Context): Boolean = hasActiveModel(context)
 
     fun setActive(context: Context, fileName: String) {
+        EndpointPlugins.plugin?.let { if (it.isActive(context)) it.setActive(context, false) }
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putString(KEY_ACTIVE, fileName).apply()
         if (skipSilence(context)) {
