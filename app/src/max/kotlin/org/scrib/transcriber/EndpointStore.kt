@@ -16,7 +16,17 @@ data class EndpointSettings(
     val name: String = ""
 ) {
     val isComplete: Boolean
-        get() = baseUrl.isNotBlank() && apiKey.isNotBlank() && model.isNotBlank()
+        get() {
+            if (baseUrl.isBlank() || model.isBlank()) {
+                return false
+            }
+            if (provider == EndpointProvider.CLOUDFLARE &&
+                (baseUrl.startsWith("http://") || baseUrl.startsWith("https://"))
+            ) {
+                return true
+            }
+            return apiKey.isNotBlank()
+        }
 
     val normalizedBaseUrl: String
         get() {
@@ -44,18 +54,25 @@ data class EndpointSettings(
     val transcriptionsUrl: String get() = "$normalizedBaseUrl/audio/transcriptions"
 
     val accountId: String
-        get() = baseUrl.trim()
-            .substringAfterLast("/accounts/")
-            .substringBefore('/')
-            .trim()
+        get() {
+            val trimmed = baseUrl.trim()
+            if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+                return trimmed
+            }
+            return trimmed.substringAfterLast("/accounts/").substringBefore('/').trim()
+        }
 
     val display: String
         get() = name.ifBlank { defaultHost }
 
     val defaultHost: String
-        get() = when (provider) {
-            EndpointProvider.CLOUDFLARE -> if (accountId.length > 8) accountId.take(8) else accountId
-            EndpointProvider.OPENAI -> host
+        get() = when {
+            provider == EndpointProvider.OPENAI -> host
+            accountId.startsWith("http") -> accountId
+                .substringAfter("://")
+                .substringBefore('/')
+                .removePrefix("www.")
+            else -> if (accountId.length > 8) accountId.take(8) else accountId
         }
 
     fun maskAccount(): String =

@@ -177,8 +177,9 @@ class EndpointTranscriptionEngine(
 
         for (word in words) {
             val gap = if (previousEnd < 0L) 0L else word.startMs - previousEnd
+            val tooLong = builder.isNotEmpty() && word.startMs - lineStart >= MAX_SEGMENT_MS
             val wouldRunOver = builder.isNotEmpty() && builder.length + word.word.length + 1 > MAX_LINE_CHARS
-            if (builder.isNotEmpty() && (gap >= SEGMENT_GAP_MS || wouldRunOver)) {
+            if (builder.isNotEmpty() && (gap >= SEGMENT_GAP_MS || tooLong || wouldRunOver)) {
                 flush()
             }
             if (builder.isEmpty()) {
@@ -209,6 +210,8 @@ class EndpointTranscriptionEngine(
         const val SEGMENT_GAP_MS = 700L
 
         const val MAX_LINE_CHARS = 84
+
+        const val MAX_SEGMENT_MS = 6000L
 
     }
 }

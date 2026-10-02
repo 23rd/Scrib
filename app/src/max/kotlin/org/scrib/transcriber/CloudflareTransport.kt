@@ -42,15 +42,25 @@ class CloudflareTransport : EndpointTransport {
         cancellation: CancellationToken?
     ): Transcript {
         val account = settings.accountId
-        if (!ACCOUNT_ID.matches(account)) {
+        val customBase = if (account.startsWith("http://") || account.startsWith("https://")) {
+            account.trimEnd('/')
+        } else {
+            null
+        }
+        if (customBase == null && !ACCOUNT_ID.matches(account)) {
             throw EndpointException(
-                "A Cloudflare account id is 32 hex characters, like ${settings.maskAccount()}"
+                "A Cloudflare account id is 32 hex characters, like ${settings.maskAccount()} — " +
+                    "or give the address of your own Worker."
             )
         }
         val model = settings.model.ifBlank { CLOUDFLARE_WHISPER_MODELS.first() }
         val language = if (languageHint.isNullOrEmpty()) "" else
             "&language=" + java.net.URLEncoder.encode(languageHint, "UTF-8")
-        val url = "https://api.cloudflare.com/client/v4/accounts/$account/ai/run/$model$language"
+        val url = if (customBase != null) {
+            "$customBase/client/v4/accounts/x/ai/run/$model$language"
+        } else {
+            "https://api.cloudflare.com/client/v4/accounts/$account/ai/run/$model$language"
+        }
 
         val connection = EndpointHttp.open(url, settings.apiKey)
         try {
