@@ -1,1 +1,1 @@
-• Naprawiono błąd kompilacji wydania podczas pobierania środowiska Sherpa
+• Brak zmian w lekkiej wersji F-Droid — to wydanie dotyczy tylko Scrib Max

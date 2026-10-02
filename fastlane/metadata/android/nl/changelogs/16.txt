@@ -1,2 +1,1 @@
-• Vastlopen van Sherpa-VAD bij lange opnames gecorrigeerd
 • Schakelaar voor live-transcriptieprestatiemetingen toegevoegd

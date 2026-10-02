@@ -1,2 +1,1 @@
 • Naprawiono pozostawanie w pamięci modeli zastąpionych
-• Naprawiono wykrywanie eksportów streaming Zipformer jako offline

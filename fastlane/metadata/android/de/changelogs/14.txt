@@ -1,1 +1,1 @@
-• Fehlerhafte Release-Erstellung beim Laden der Sherpa-Laufzeit behoben
+• Keine Änderungen an der schlanken F-Droid-Version — dieses Release betraf nur Scrib Max

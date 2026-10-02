@@ -5,4 +5,3 @@
 • Ajout d’un guide des métriques et des horodatages
 • Ajout d’un exécuteur par lots et d’actions sur l’historique
 • Amélioration des réglages et textes du clavier vocal
-• Ajout de la détection et de l’import des familles Sherpa

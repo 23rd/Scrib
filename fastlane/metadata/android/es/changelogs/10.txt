@@ -1,5 +1,4 @@
 • Añadida la importación y exportación del diccionario
-• Añadida la importación de modelos sherpa desde el selector de archivos
 • Añadidas secciones de modelos plegables
 • Añadida la indicación del modelo activo en el teclado de voz
 • Añadido el soporte de modelos Parakeet

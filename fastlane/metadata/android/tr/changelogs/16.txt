@@ -1,2 +1,1 @@
-• Sherpa VAD'nin uzun kayıtlarda takılması düzeltildi
 • Canlı transkripsiyon performans metrikleri anahtarı eklendi

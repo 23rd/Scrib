@@ -1,1 +1,1 @@
-• Sherpa çalışma zamanı indirilirken yayın derlemesindeki hata düzeltildi
+• Hafif F-Droid sürümünde değişiklik yok — bu sürüm yalnızca Scrib Max'ı etkiliyor

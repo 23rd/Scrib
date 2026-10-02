@@ -1,2 +1,1 @@
-• Corrigida travamento do VAD da Sherpa em gravações longas
 • Adicionado interruptor de métricas de desempenho da transcrição ao vivo

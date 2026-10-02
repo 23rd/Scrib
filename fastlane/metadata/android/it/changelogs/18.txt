@@ -1,2 +1,1 @@
 • Corretta permanenza in memoria dei modelli sostituiti
-• Corretto il riconoscimento delle esportazioni Zipformer streaming come offline

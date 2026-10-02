@@ -5,4 +5,3 @@
 • Added benchmark metric guide and timestamps
 • Added batch runner and history actions
 • Improved voice keyboard settings and copy
-• Added detection and import of Sherpa model families

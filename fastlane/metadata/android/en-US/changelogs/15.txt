@@ -1,2 +1,1 @@
-• Added bounding of Sherpa external-data scan
-• Fixed Sherpa VAD slowing short-file transcription
+• No changes to the lean F-Droid build — this release only touched Scrib Max

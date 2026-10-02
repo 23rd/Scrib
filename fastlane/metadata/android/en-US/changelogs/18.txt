@@ -1,2 +1,1 @@
 • Fixed switched-away models staying resident in memory
-• Fixed streaming Zipformer exports detected as offline ones

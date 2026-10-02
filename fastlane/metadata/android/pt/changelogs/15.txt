@@ -1,2 +1,1 @@
-• Adicionada limitação da varredura de dados externos da Sherpa
-• Corrigida lentidão do VAD da Sherpa na transcrição de arquivos curtos
+• Sem alterações na versão leve do F-Droid — este lançamento afeta apenas o Scrib Max

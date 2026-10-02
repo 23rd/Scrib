@@ -1,1 +1,1 @@
-• Fixed release build failing to fetch the sherpa runtime
+• No changes to the lean F-Droid build — this release only touched Scrib Max

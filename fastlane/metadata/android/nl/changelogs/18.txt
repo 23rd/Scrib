@@ -1,2 +1,1 @@
 • Vastblijven van vervangen modellen in het geheugen gecorrigeerd
-• Herkenning van streaming-Zipformer-exports als offline gecorrigeerd

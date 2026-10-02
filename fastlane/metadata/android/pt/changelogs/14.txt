@@ -1,1 +1,1 @@
-• Corrigida falha de compilação da versão ao baixar o runtime do Sherpa
+• Sem alterações na versão leve do F-Droid — este lançamento afeta apenas o Scrib Max

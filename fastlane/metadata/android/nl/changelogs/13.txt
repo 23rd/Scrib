@@ -5,4 +5,3 @@
 • Benchmarkmetriekgids en tijdstempels toegevoegd
 • Batchrunner en geschiedenisacties toegevoegd
 • Instellingen en teksten van voice keyboard verbeterd
-• Detectie en import van Sherpa-modelfamilies toegevoegd

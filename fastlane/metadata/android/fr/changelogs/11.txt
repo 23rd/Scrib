@@ -1,4 +1,1 @@
-• Ajout de la validation par rôle et de la configuration d’exécution des modèles sherpa
-• Ajout des traductions des types de modèles sherpa
-• Ajout de la reconnaissance à l’exécution des modèles SenseVoice et Zipformer streaming
-• Ajout de la sélection des modèles SenseVoice et Zipformer streaming
+• L’écran « À propos » affiche maintenant la vraie version de l’appli

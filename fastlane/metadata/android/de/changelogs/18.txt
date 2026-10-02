@@ -1,2 +1,1 @@
 • Verbleib nicht mehr genutzter Modelle im Arbeitsspeicher behoben
-• Als Offline erkannte Streaming-Zipformer-Exporte behoben

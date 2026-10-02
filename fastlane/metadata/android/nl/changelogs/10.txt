@@ -1,5 +1,4 @@
 • Importeren en exporteren van het woordenboek toegevoegd
-• Importeren van sherpa-modellen via de bestandskiezer toegevoegd
 • Inklapbare modelsecties toegevoegd
 • Weergave van het actieve model in het spraaktoetsenbord toegevoegd
 • Ondersteuning voor Parakeet-modellen toegevoegd

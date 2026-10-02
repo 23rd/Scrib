@@ -8,7 +8,7 @@ Scrib'i kullanmanın iki yolu
 
 Modeller
 
-Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.
+Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın. Bu F-Droid sürümü yalnızca Whisper modellerini tanır. Diğer aileler — SenseVoice, streaming Zipformer, Moonshine, Canary, Dolphin, FireRed — sherpa çalışma zamanını gerektirir ve GitHub'daki Scrib Max'ta bulunur.
 
 Geliştiriciler için
 

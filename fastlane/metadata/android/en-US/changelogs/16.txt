@@ -1,2 +1,1 @@
-• Fixed Sherpa VAD stalling on long recordings
 • Added switch for live performance stats

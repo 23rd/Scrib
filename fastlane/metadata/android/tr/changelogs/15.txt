@@ -1,2 +1,1 @@
-• Sherpa harici veri taramasına sınırlama eklendi
-• Sherpa VAD'nin kısa dosya transkripsiyonunu yavaşlatması düzeltildi
+• Hafif F-Droid sürümünde değişiklik yok — bu sürüm yalnızca Scrib Max'ı etkiliyor

@@ -5,4 +5,3 @@
 • Añadida guía de métricas y marcas de tiempo
 • Añadidos ejecutor por lotes y acciones de historial
 • Mejorados los ajustes y textos del teclado por voz
-• Añadida detección e importación de familias de modelos Sherpa

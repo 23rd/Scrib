@@ -1,3 +1,1 @@
-• Fehlerhafte Klassifizierung alter Streaming-Modelltypen behoben
-• Importsupport für Moonshine- und Canary-Modelle hinzugefügt
-• Sherpa-VAD-Verarbeitung von Sprachsegmenten hinzugefügt
+• Keine Änderungen an der schlanken F-Droid-Version — dieses Release betraf nur Scrib Max

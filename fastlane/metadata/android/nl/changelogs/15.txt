@@ -1,2 +1,1 @@
-• Begrenzing van Sherpa-external-data-scan toegevoegd
-• Vertraging van korte transcripties door Sherpa-VAD gecorrigeerd
+• Geen wijzigingen voor de lichte F-Droid-versie — deze release betreft alleen Scrib Max

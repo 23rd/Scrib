@@ -8,7 +8,7 @@ Zwei Wege, Scrib zu nutzen
 
 Modelle
 
-Scrib transkribiert mit offenen Whisper-Sprachmodellen. Lade eins auf dem Hauptbildschirm herunter oder wähle deine Sprache, und Scrib holt ein passendes. Größere Modelle sind genauer; behalte mehrere und wechsle jederzeit.
+Scrib transkribiert mit offenen Whisper-Sprachmodellen. Lade eins auf dem Hauptbildschirm herunter oder wähle deine Sprache, und Scrib holt ein passendes. Größere Modelle sind genauer; behalte mehrere und wechsle jederzeit. Diese F-Droid-Version erkennt nur Whisper-Modelle. Die übrigen Familien — SenseVoice, Streaming Zipformer, Moonshine, Canary, Dolphin, FireRed — brauchen die Sherpa-Laufzeit und stecken in Scrib Max auf GitHub.
 
 Für Entwickler
 

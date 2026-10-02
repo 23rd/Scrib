@@ -1,1 +1,1 @@
-• Fout in release-build bij het ophalen van Sherpa-runtime opgelost
+• Geen wijzigingen voor de lichte F-Droid-versie — deze release betreft alleen Scrib Max
