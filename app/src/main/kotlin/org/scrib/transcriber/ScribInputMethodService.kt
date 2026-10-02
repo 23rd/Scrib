@@ -271,6 +271,9 @@ class ScribInputMethodService : InputMethodService() {
             main.post { if (id == session) insert(value) }
         }
 
+        override fun onTranscriptionSegment(startMs: Long, endMs: Long, text: String?) {
+        }
+
         override fun onTranscriptionResult(text: String?) {
             val value = text ?: ""
             main.post {

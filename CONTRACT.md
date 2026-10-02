@@ -15,7 +15,7 @@ expected, not a bug: they are separately installable apps with different model s
 `getCapabilities()` is the way to tell them apart — a client that wants a specific model family can
 match on it instead of hardcoding a package name.
 
-Contract version: **2**
+Contract version: **3**
 
 ## Why this exists
 
@@ -76,6 +76,7 @@ interface ITranscriptionStream {
 oneway interface ITranscriptionCallback {
     void onTranscriptionProgress(String text);
     void onTranscriptionResult(String text);
+    void onTranscriptionSegment(long startMs, long endMs, String text);
     void onTranscriptionError(in TranscriptionError error);
 }
 ```
@@ -86,6 +87,11 @@ reports through the callback. Exactly one terminal callback is delivered per req
 
 `onTranscriptionProgress` carries the **cumulative** text recognised so far, not a delta. It is
 optional: an implementation that cannot stream simply never calls it.
+
+`onTranscriptionSegment` carries one timed utterance, with `startMs`/`endMs` measured from the
+beginning of the audio; it is what a client needs to render subtitles. It is optional and sent just
+before the terminal result: an implementation that has no timings simply never calls it, and a
+version ≤2 client never implements it, so the calls are silently dropped.
 
 ## Live audio
 
@@ -172,6 +178,10 @@ when it runs out of bytes. Therefore:
 Version 2 added `openStream`, `ITranscriptionStream`, `StreamRequest` and
 `TranscriberCapabilities.streaming` by those rules: a version 1 client keeps working against a
 version 2 service untouched, and a version 2 client falls back to files when `streaming` is false.
+
+Version 3 appended `onTranscriptionSegment` to the callback — the only change — so a version ≤2
+client keeps working against a version 3 service untouched (the calls are dropped), and only a
+client that wants timed segments has to implement the new method.
 
 Bump `contractVersion` whenever anything is appended.
 

@@ -39,6 +39,7 @@ class EndpointTranscriptionEngine(
                     }
                 }
             )
+            callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))

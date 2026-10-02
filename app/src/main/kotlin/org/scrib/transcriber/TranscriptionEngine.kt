@@ -53,7 +53,7 @@ interface TranscriptionEngine {
     fun capabilities(): TranscriberCapabilities
 
     companion object {
-        const val CONTRACT_VERSION = 2
+        const val CONTRACT_VERSION = 3
 
         @Volatile
         private var whisper: TranscriptionEngine? = null
@@ -90,4 +90,19 @@ fun transcriptionError(type: Byte, message: String? = null): TranscriptionError 
     error.type = type
     error.message = message
     return error
+}
+
+// One timed callback per decoded segment, so clients can show subtitles. Sent right before the
+// terminal result; a client built against an older contract simply never receives them.
+fun ITranscriptionCallback.emitSegments(segments: List<TranscriptSegment>) {
+    for (segment in segments) {
+        val text = segment.text.trim()
+        if (text.isEmpty()) {
+            continue
+        }
+        try {
+            onTranscriptionSegment(segment.startMs, segment.endMs, text)
+        } catch (ignore: Exception) {
+        }
+    }
 }

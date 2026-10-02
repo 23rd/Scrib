@@ -29,7 +29,6 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
         cancellation: CancellationToken
     ) {
         try {
-            // The contract hands clients plain text; the timings stay in the app's own screen.
             val segments = transcribeToSegments(
                 audio,
                 request?.languageHint,
@@ -41,6 +40,7 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
                     }
                 }
             )
+            callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))

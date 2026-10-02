@@ -51,6 +51,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                     }
                 }
             )
+            callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
             callback.onTranscriptionError(transcriptionError(ErrorType.CANCELLED))
