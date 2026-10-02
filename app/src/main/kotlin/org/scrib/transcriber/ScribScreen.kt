@@ -107,6 +107,8 @@ fun ScribScreen(
     onConfigureKeyboardLayouts: (Boolean, List<String>) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
     sherpaPlugin: SherpaPlugin?,
+    endpointPlugin: EndpointPlugin?,
+    onEndpointChanged: () -> Unit,
     recording: RecordingUi?,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
@@ -210,6 +212,9 @@ fun ScribScreen(
                     )
                 }
             }
+            if (endpointPlugin != null) {
+                item { endpointPlugin.SettingsBlocks(onChanged = onEndpointChanged) }
+            }
             item { CustomHeader(expanded = customExpanded, onToggle = { customExpanded = !customExpanded }) }
             if (customExpanded) {
                 if (state.custom.isEmpty()) {
@@ -303,7 +308,7 @@ fun ScribScreen(
         )
     }
     recording?.let { r ->
-        RecordingDialog(r, onStop = onStopRecording, onCancel = onCancelRecording)
+        RecordingDialog(r, remoteHost = state.remoteHost, onStop = onStopRecording, onCancel = onCancelRecording)
     }
     if (transcription != null && !state.benchmarkBatch.running) {
         transcription?.let { t ->
@@ -368,7 +373,7 @@ private fun StatusCard(state: ScribUiState) {
                 Text(stringResource(R.string.no_active_model), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(R.string.pick_model_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
             }
-            PrivacyLine(cs.onSurfaceVariant, topBorder = true)
+            PrivacyLine(cs.onSurfaceVariant, topBorder = true, remoteHost = state.remoteHost)
         }
     }
 }
@@ -396,20 +401,25 @@ private fun NudgeCard(state: ScribUiState, actions: Actions) {
                     )
                 }
             }
-            PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), topBorder = false)
+            PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), topBorder = false, remoteHost = null)
         }
     }
 }
 
 @Composable
-private fun PrivacyLine(textColor: Color, topBorder: Boolean) {
+private fun PrivacyLine(textColor: Color, topBorder: Boolean, remoteHost: String?) {
+    val text = when {
+        remoteHost != null -> stringResource(R.string.privacy_remote, remoteHost)
+        topBorder -> stringResource(R.string.privacy_full)
+        else -> stringResource(R.string.privacy_short)
+    }
     Row(
         Modifier.fillMaxWidth().padding(top = if (topBorder) 13.dp else 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text("🔒", fontSize = 14.sp)
+        Text(if (remoteHost != null) "☁️" else "🔒", fontSize = 14.sp)
         Text(
-            stringResource(if (topBorder) R.string.privacy_full else R.string.privacy_short),
+            text,
             fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = textColor, lineHeight = 17.sp
         )
     }
@@ -633,7 +643,7 @@ private fun RecordButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun RecordingDialog(r: RecordingUi, onStop: () -> Unit, onCancel: () -> Unit) {
+private fun RecordingDialog(r: RecordingUi, remoteHost: String?, onStop: () -> Unit, onCancel: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         // Neither a tap outside nor Back may drop a take by accident: the two buttons are the way out.
@@ -648,7 +658,10 @@ private fun RecordingDialog(r: RecordingUi, onStop: () -> Unit, onCancel: () -> 
                 Spacer(Modifier.height(14.dp))
                 LevelMeter(r.levels)
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.record_hint), fontSize = 12.5.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp)
+                Text(
+                    stringResource(if (remoteHost != null) R.string.record_hint_remote else R.string.record_hint),
+                    fontSize = 12.5.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp
+                )
             }
         },
         confirmButton = { TextButton(onClick = onStop) { Text(stringResource(R.string.action_stop)) } },
