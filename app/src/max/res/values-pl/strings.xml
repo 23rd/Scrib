@@ -13,6 +13,12 @@
     <string name="endpoint_dialog_hint">Dowolny serwer obsługujący API audio OpenAI: twój lub hostowany. Adres może być samą nazwą hosta; /v1 zostanie dodane automatycznie.</string>
     <string name="endpoint_url">Adres serwera</string>
     <string name="endpoint_key">Klucz API</string>
+    <string name="endpoint_provider">Usługa</string>
+    <string name="endpoint_provider_openai">Zgodne z OpenAI</string>
+    <string name="endpoint_provider_cloudflare">Cloudflare Workers AI</string>
+    <string name="endpoint_account">ID konta</string>
+    <string name="endpoint_account_hint">32-znakowy identyfikator z pulpitu Cloudflare</string>
+    <string name="endpoint_token">Token API</string>
     <string name="endpoint_name">Nazwa, opcjonalnie</string>
     <string name="endpoint_name_hint">Wyświetlana na karcie modelu i w klawiaturze głosowej. Puste pole oznacza użycie domeny.</string>
     <string name="endpoint_model">Model</string>

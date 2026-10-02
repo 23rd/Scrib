@@ -13,6 +13,12 @@
     <string name="endpoint_dialog_hint">OpenAI ses API\'sini konuşan her sunucu: kendinizinki ya da barındırılan bir tane. Adres yalnızca sunucu adı olabilir; /v1 sizin için eklenir.</string>
     <string name="endpoint_url">Sunucu adresi</string>
     <string name="endpoint_key">API anahtarı</string>
+    <string name="endpoint_provider">Hizmet</string>
+    <string name="endpoint_provider_openai">OpenAI uyumlu</string>
+    <string name="endpoint_provider_cloudflare">Cloudflare Workers AI</string>
+    <string name="endpoint_account">Hesap kimliği</string>
+    <string name="endpoint_account_hint">Cloudflare panosundaki 32 karakterlik kimlik</string>
+    <string name="endpoint_token">API jetonu</string>
     <string name="endpoint_name">Ad, isteğe bağlı</string>
     <string name="endpoint_name_hint">Model kartında ve sesli klavyede görünür. Alan adını kullanmak için boş bırakın.</string>
     <string name="endpoint_model">Model</string>

@@ -13,6 +13,12 @@
     <string name="endpoint_dialog_hint">Elke server die de OpenAI-audio-API spreekt: je eigen of een gehoste. Het adres mag alleen de host zijn; /v1 wordt er automatisch bijgezet.</string>
     <string name="endpoint_url">Serveradres</string>
     <string name="endpoint_key">API-sleutel</string>
+    <string name="endpoint_provider">Dienst</string>
+    <string name="endpoint_provider_openai">OpenAI-compatibel</string>
+    <string name="endpoint_provider_cloudflare">Cloudflare Workers AI</string>
+    <string name="endpoint_account">Account-ID</string>
+    <string name="endpoint_account_hint">De ID van 32 tekens uit het Cloudflare-dashboard</string>
+    <string name="endpoint_token">API-token</string>
     <string name="endpoint_name">Naam, optioneel</string>
     <string name="endpoint_name_hint">Wordt getoond op de modelkaart en in het spraaktoetsenbord. Laat leeg om het domein te gebruiken.</string>
     <string name="endpoint_model">Model</string>

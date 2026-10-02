@@ -9,11 +9,6 @@ import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.StreamRequest
 import org.opentranscribe.api.TranscriberCapabilities
 import org.opentranscribe.api.TranscriptionRequest
-import java.io.BufferedInputStream
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
-import java.util.UUID
 
 class EndpointTranscriptionEngine(
     private val appContext: Context,
@@ -22,7 +17,9 @@ class EndpointTranscriptionEngine(
 
     fun matches(other: EndpointSettings): Boolean =
         other.apiKey == settings.apiKey && other.model == settings.model &&
-            other.normalizedBaseUrl == settings.normalizedBaseUrl
+            other.provider == settings.provider && other.normalizedBaseUrl == settings.normalizedBaseUrl
+
+    private val transport: EndpointTransport get() = settings.transport
 
     override fun transcribe(
         audio: ParcelFileDescriptor,
@@ -58,8 +55,8 @@ class EndpointTranscriptionEngine(
         val language = request?.languageHint?.takeIf { it.isNotEmpty() }
         return AudioStream(request, callback) { samples, sampleCount, _, prompt, _ ->
             val wav = WavWriter.encode(samples, sampleCount, SAMPLE_RATE)
-            val text = post(wav, language, null, prompt)
-            TranscribedSegment(Dictionary.applyReplacements(appContext, text), language)
+            val transcript = transport.transcribe(settings, wav, language, prompt, null)
+            TranscribedSegment(Dictionary.applyReplacements(appContext, transcript.text), language)
         }
     }
 
@@ -105,7 +102,7 @@ class EndpointTranscriptionEngine(
             }
 
             onProgress(20)
-            val text = post(wav, languageHint, cancellation)
+            val transcript = transport.transcribe(settings, wav, languageHint, null, cancellation)
             val elapsedMs = SystemClock.elapsedRealtime() - startedAt
             onProgress(100)
             onMetrics(
@@ -117,18 +114,11 @@ class EndpointTranscriptionEngine(
                 )
             )
 
-            val trimmed = text.trim()
+            val trimmed = transcript.text.trim()
             if (trimmed.isEmpty()) {
                 return emptyList()
             }
-            return listOf(
-                TranscriptSegment(
-                    startMs = 0L,
-                    endMs = audioDurationMs,
-                    text = trimmed,
-                    startsParagraph = true
-                )
-            )
+            return segments(transcript, audioDurationMs)
         } finally {
             try {
                 audio.close()
@@ -149,115 +139,62 @@ class EndpointTranscriptionEngine(
         return capabilities
     }
 
-    private fun post(
-        wav: ByteArray,
-        languageHint: String?,
-        cancellation: CancellationToken?,
-        prompt: String? = null
-    ): String {
-        val boundary = "----ScribBoundary${UUID.randomUUID().toString().replace("-", "")}"
-        val connection = open()
+    private fun segments(transcript: Transcript, audioDurationMs: Long): List<TranscriptSegment> {
+        val text = transcript.text.trim()
+        val words = transcript.words
+        if (words.isEmpty()) {
+            return listOf(
+                TranscriptSegment(
+                    startMs = 0L,
+                    endMs = audioDurationMs,
+                    text = text,
+                    startsParagraph = true
+                )
+            )
+        }
 
-        try {
-            connection.requestMethod = "POST"
-            connection.doOutput = true
-            connection.setRequestProperty("Authorization", "Bearer ${settings.apiKey}")
-            connection.setRequestProperty("Accept", "application/json")
-            connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-            connection.setChunkedStreamingMode(0)
+        val segments = ArrayList<TranscriptSegment>()
+        var lineStart = -1L
+        var lineEnd = -1L
+        var builder = StringBuilder()
+        var previousEnd = -1L
 
-            connection.outputStream.use { out ->
-                writeField(out, boundary, "model", settings.model)
-                if (!languageHint.isNullOrEmpty()) {
-                    writeField(out, boundary, "language", languageHint)
-                }
-                if (!prompt.isNullOrBlank()) {
-                    writeField(out, boundary, "prompt", prompt)
-                }
-                writeFile(out, boundary, "file", wav)
-                out.write("--$boundary--\r\n".toByteArray())
-                out.flush()
+        fun flush() {
+            if (builder.isEmpty()) {
+                return
             }
+            segments.add(
+                TranscriptSegment(
+                    startMs = lineStart,
+                    endMs = lineEnd,
+                    text = builder.toString(),
+                    startsParagraph = previousEnd < 0L
+                )
+            )
+            builder = StringBuilder()
+            previousEnd = lineEnd
+        }
 
-            if (cancellation?.isCancelled == true) {
-                throw CancelledException()
+        for (word in words) {
+            val gap = if (previousEnd < 0L) 0L else word.startMs - previousEnd
+            val wouldRunOver = builder.isNotEmpty() && builder.length + word.word.length + 1 > MAX_LINE_CHARS
+            if (builder.isNotEmpty() && (gap >= SEGMENT_GAP_MS || wouldRunOver)) {
+                flush()
             }
-
-            val status = connection.responseCode
-            if (status !in 200..299) {
-                throw failure(connection, status)
+            if (builder.isEmpty()) {
+                lineStart = word.startMs
             }
-
-            val body = BufferedInputStream(connection.inputStream).use { it.readBytes() }
-            return parse(body)
-        } catch (e: CancelledException) {
-            throw e
-        } catch (e: EndpointException) {
-            throw e
-        } catch (e: IOException) {
-            throw EndpointException("Cannot reach ${settings.host}: ${e.message ?: "connection failed"}")
-        } finally {
-            connection.disconnect()
+            if (builder.isNotEmpty()) {
+                builder.append(' ')
+            }
+            builder.append(word.word)
+            lineEnd = word.endMs
         }
-    }
+        flush()
 
-    private fun open(): HttpURLConnection {
-        val connection = URL(settings.transcriptionsUrl).openConnection() as HttpURLConnection
-        connection.connectTimeout = CONNECT_TIMEOUT_MS
-        connection.readTimeout = READ_TIMEOUT_MS
-        connection.instanceFollowRedirects = true
-        connection.useCaches = false
-        connection.setRequestProperty("User-Agent", USER_AGENT)
-        return connection
-    }
-
-    private fun failure(connection: HttpURLConnection, status: Int): EndpointException {
-        val body = runCatching {
-            connection.errorStream?.use { String(it.readBytes()) } ?: ""
-        }.getOrDefault("")
-        val detail = runCatching {
-            JSONObject(body).optString("error").ifEmpty { JSONObject(body).optString("detail") }
-        }.getOrDefault("")
-        val shown = detail.ifEmpty { body.take(ERROR_BODY_CHARS).trim() }
-        val message = when (status) {
-            401, 403 -> "The server rejected the API key (HTTP $status). $shown"
-            404 -> "No transcriptions endpoint at ${settings.transcriptionsUrl} (HTTP 404)."
-            413 -> "The recording is too large for this server (HTTP 413)."
-            in 500..599 -> "The server failed (HTTP $status). $shown"
-            else -> "The server returned HTTP $status. $shown"
+        return segments.ifEmpty {
+            listOf(TranscriptSegment(0L, audioDurationMs, text, startsParagraph = true))
         }
-        return EndpointException(message)
-    }
-
-    private fun preview(body: ByteArray): String =
-        String(body, 0, minOf(ERROR_BODY_CHARS, body.size)).trim()
-
-    private fun parse(body: ByteArray): String {
-        val text = try {
-            JSONObject(String(body)).optString("text")
-        } catch (e: Exception) {
-            throw EndpointException("Unreadable answer: ${preview(body)}")
-        }
-        if (text.isEmpty() && body.isNotEmpty()) {
-            throw EndpointException("The server returned no text: ${preview(body)}")
-        }
-        return text
-    }
-
-    private fun writeField(out: java.io.OutputStream, boundary: String, name: String, value: String) {
-        out.write(
-            ("--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n")
-                .toByteArray()
-        )
-    }
-
-    private fun writeFile(out: java.io.OutputStream, boundary: String, name: String, wav: ByteArray) {
-        out.write(
-            ("--$boundary\r\nContent-Disposition: form-data; name=\"$name\"; filename=\"audio.wav\"\r\n" +
-                "Content-Type: audio/wav\r\n\r\n").toByteArray()
-        )
-        out.write(wav)
-        out.write("\r\n".toByteArray())
     }
 
     private companion object {
@@ -266,12 +203,12 @@ class EndpointTranscriptionEngine(
         const val ENGINE_ID = "openai-compatible-endpoint"
         const val ENGINE_VERSION = "1"
 
-        const val CONNECT_TIMEOUT_MS = 20_000
+
         const val READ_TIMEOUT_MS = 600_000
 
-        const val ERROR_BODY_CHARS = 200
+        const val SEGMENT_GAP_MS = 700L
 
-        const val USER_AGENT = "Scrib"
+        const val MAX_LINE_CHARS = 84
 
     }
 }

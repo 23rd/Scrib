@@ -294,12 +294,15 @@ private fun EndpointDialog(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var provider by rememberSaveable { mutableStateOf(initial.provider) }
     var url by rememberSaveable { mutableStateOf(initial.baseUrl) }
     var key by rememberSaveable { mutableStateOf(initial.apiKey) }
     var model by rememberSaveable { mutableStateOf(initial.model) }
     var name by rememberSaveable { mutableStateOf(initial.name) }
+    val cloudflare = provider == EndpointProvider.CLOUDFLARE
     var modelOptions by remember { mutableStateOf<List<String>>(emptyList()) }
     var menuOpen by remember { mutableStateOf(false) }
+    var providerOpen by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
 
@@ -314,7 +317,7 @@ private fun EndpointDialog(
     }
 
     fun save(): EndpointSettings? = try {
-        val settings = EndpointSettings.parse(url, key, model, name)
+        val settings = EndpointSettings.parse(url, key, model, name, provider)
         EndpointStore.save(context, settings)
         settings
     } catch (e: IllegalArgumentException) {
@@ -334,10 +337,50 @@ private fun EndpointDialog(
                     stringResource(R.string.endpoint_dialog_hint),
                     fontSize = 12.5.sp, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                ExposedDropdownMenuBox(
+                    expanded = providerOpen,
+                    onExpandedChange = { providerOpen = !providerOpen }
+                ) {
+                    OutlinedTextField(
+                        value = stringResource(provider.labelRes()),
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text(stringResource(R.string.endpoint_provider)) },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = providerOpen) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    )
+                    ExposedDropdownMenu(expanded = providerOpen, onDismissRequest = { providerOpen = false }) {
+                        EndpointProvider.entries.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(option.labelRes())) },
+                                onClick = {
+                                    provider = option
+                                    providerOpen = false
+                                    model = if (option == EndpointProvider.CLOUDFLARE) {
+                                        CLOUDFLARE_WHISPER_MODELS.first()
+                                    } else {
+                                        EndpointSettings.DEFAULT_MODEL
+                                    }
+                                }
+                            )
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = url,
                     onValueChange = { url = it },
-                    label = { Text(stringResource(R.string.endpoint_url)) },
+                    label = {
+                        Text(
+                            stringResource(
+                                if (cloudflare) R.string.endpoint_account else R.string.endpoint_url
+                            )
+                        )
+                    },
+                    supportingText = if (cloudflare) {
+                        { Text(stringResource(R.string.endpoint_account_hint)) }
+                    } else {
+                        null
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -352,7 +395,13 @@ private fun EndpointDialog(
                 OutlinedTextField(
                     value = key,
                     onValueChange = { key = it },
-                    label = { Text(stringResource(R.string.endpoint_key)) },
+                    label = {
+                        Text(
+                            stringResource(
+                                if (cloudflare) R.string.endpoint_token else R.string.endpoint_key
+                            )
+                        )
+                    },
                     singleLine = true,
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
@@ -393,6 +442,15 @@ private fun EndpointDialog(
                         enabled = !busy,
                         onClick = {
                             val settings = save() ?: return@TextButton
+                            val known = settings.transport.modelOptions(settings)
+                            if (known.isNotEmpty()) {
+                                modelOptions = known
+                                if (model.isBlank() || model !in known) {
+                                    model = known.first()
+                                }
+                                status = context.getString(R.string.endpoint_models_found, known.size) to false
+                                return@TextButton
+                            }
                             busy = true
                             status = null
                             scope.launch {
@@ -429,15 +487,17 @@ private fun EndpointDialog(
                         strokeWidth = 2.dp
                     )
                 }
-                TextButton(
-                    enabled = !busy,
-                    onClick = {
-                        val settings = save()
-                        if (settings != null) {
-                            run { testEndpoint(context, settings) }
+                if (!cloudflare) {
+                    TextButton(
+                        enabled = !busy,
+                        onClick = {
+                            val settings = save()
+                            if (settings != null) {
+                                run { testEndpoint(context, settings) }
+                            }
                         }
-                    }
-                ) { Text(stringResource(R.string.endpoint_test), fontSize = 13.sp) }
+                    ) { Text(stringResource(R.string.endpoint_test), fontSize = 13.sp) }
+                }
                 TextButton(
                     enabled = !busy,
                     onClick = {
@@ -462,4 +522,8 @@ private fun EndpointDialog(
             }
         }
     )
+}
+private fun EndpointProvider.labelRes(): Int = when (this) {
+    EndpointProvider.OPENAI -> R.string.endpoint_provider_openai
+    EndpointProvider.CLOUDFLARE -> R.string.endpoint_provider_cloudflare
 }

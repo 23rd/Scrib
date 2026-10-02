@@ -13,6 +13,12 @@
     <string name="endpoint_dialog_hint">Будь-який сервер, що говорить з audio API OpenAI: ваш або розміщений. Адреса може бути лише іменем хоста; /v1 додасться сам.</string>
     <string name="endpoint_url">Адреса сервера</string>
     <string name="endpoint_key">Ключ API</string>
+    <string name="endpoint_provider">Сервіс</string>
+    <string name="endpoint_provider_openai">OpenAI-сумісний</string>
+    <string name="endpoint_provider_cloudflare">Cloudflare Workers AI</string>
+    <string name="endpoint_account">ID облікового запису</string>
+    <string name="endpoint_account_hint">32-символьний ідентифікатор із панелі Cloudflare</string>
+    <string name="endpoint_token">Токен API</string>
     <string name="endpoint_name">Назва, необов\'язково</string>
     <string name="endpoint_name_hint">Показується на картці моделі та в голосовій клавіатурі. Порожньо — буде домен.</string>
     <string name="endpoint_model">Модель</string>

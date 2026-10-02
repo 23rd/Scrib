@@ -3,10 +3,16 @@ package org.scrib.transcriber
 import android.content.Context
 import android.content.SharedPreferences
 
+enum class EndpointProvider {
+    OPENAI,
+    CLOUDFLARE
+}
+
 data class EndpointSettings(
     val baseUrl: String,
     val apiKey: String,
     val model: String,
+    val provider: EndpointProvider = EndpointProvider.OPENAI,
     val name: String = ""
 ) {
     val isComplete: Boolean
@@ -37,22 +43,56 @@ data class EndpointSettings(
 
     val transcriptionsUrl: String get() = "$normalizedBaseUrl/audio/transcriptions"
 
+    val accountId: String
+        get() = baseUrl.trim()
+            .substringAfterLast("/accounts/")
+            .substringBefore('/')
+            .trim()
+
     val display: String
-        get() = name.ifBlank { host }
+        get() = name.ifBlank { defaultHost }
+
+    val defaultHost: String
+        get() = when (provider) {
+            EndpointProvider.CLOUDFLARE -> if (accountId.length > 8) accountId.take(8) else accountId
+            EndpointProvider.OPENAI -> host
+        }
+
+    fun maskAccount(): String =
+        if (accountId.length > 8) "${accountId.take(4)}…${accountId.takeLast(4)}" else accountId
+
+    val transport: EndpointTransport
+        get() = when (provider) {
+            EndpointProvider.CLOUDFLARE -> CloudflareTransport()
+            EndpointProvider.OPENAI -> OpenAiTransport()
+        }
 
     companion object {
         const val DEFAULT_MODEL = "whisper-1"
 
-        fun parse(baseUrl: String, apiKey: String, model: String, name: String = ""): EndpointSettings {
+        fun parse(
+            baseUrl: String,
+            apiKey: String,
+            model: String,
+            name: String = "",
+            provider: EndpointProvider = EndpointProvider.OPENAI
+        ): EndpointSettings {
             val settings = EndpointSettings(
                 baseUrl = baseUrl.trim(),
                 name = name.trim(),
                 apiKey = apiKey.trim(),
-                model = model.trim().ifEmpty { DEFAULT_MODEL }
+                model = model.trim(),
+                provider = provider
             )
+            if (provider == EndpointProvider.CLOUDFLARE) {
+                require(settings.accountId.isNotEmpty()) { "Enter the Cloudflare account id" }
+                return settings.copy(
+                    model = settings.model.ifEmpty { CLOUDFLARE_WHISPER_MODELS.first() }
+                )
+            }
             require(settings.normalizedBaseUrl.isNotEmpty()) { "Enter the server address" }
             require(settings.normalizedBaseUrl.startsWith("http")) { "The address must start with http" }
-            return settings
+            return settings.copy(model = settings.model.ifEmpty { DEFAULT_MODEL })
         }
     }
 }
@@ -65,6 +105,7 @@ object EndpointStore {
     private const val KEY_API_KEY = "apiKey"
     private const val KEY_MODEL = "model"
     private const val KEY_NAME = "name"
+    private const val KEY_PROVIDER = "provider"
     private const val KEY_ACTIVE = "active"
 
     fun settings(context: Context): EndpointSettings {
@@ -73,7 +114,12 @@ object EndpointStore {
             baseUrl = prefs.getString(KEY_BASE_URL, "").orEmpty(),
             apiKey = prefs.getString(KEY_API_KEY, "").orEmpty(),
             model = prefs.getString(KEY_MODEL, EndpointSettings.DEFAULT_MODEL).orEmpty(),
-            name = prefs.getString(KEY_NAME, "").orEmpty()
+            name = prefs.getString(KEY_NAME, "").orEmpty(),
+            provider = runCatching {
+                EndpointProvider.valueOf(
+                    prefs.getString(KEY_PROVIDER, EndpointProvider.OPENAI.name).orEmpty()
+                )
+            }.getOrDefault(EndpointProvider.OPENAI)
         )
     }
 
@@ -98,6 +144,7 @@ object EndpointStore {
             .putString(KEY_API_KEY, settings.apiKey)
             .putString(KEY_MODEL, settings.model)
             .putString(KEY_NAME, settings.name)
+            .putString(KEY_PROVIDER, settings.provider.name)
             .apply()
     }
 

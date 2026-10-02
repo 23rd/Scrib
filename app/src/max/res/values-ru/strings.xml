@@ -13,6 +13,12 @@
     <string name="endpoint_dialog_hint">Любой сервер с OpenAI-совместимым аудио-API: свой или размещённый. Адрес можно указать без схемы — /v1 добавится сам.</string>
     <string name="endpoint_url">Адрес сервера</string>
     <string name="endpoint_key">API-ключ</string>
+    <string name="endpoint_provider">Сервис</string>
+    <string name="endpoint_provider_openai">OpenAI-совместимый</string>
+    <string name="endpoint_provider_cloudflare">Cloudflare Workers AI</string>
+    <string name="endpoint_account">Account ID</string>
+    <string name="endpoint_account_hint">32 символа из панели Cloudflare</string>
+    <string name="endpoint_token">API-токен</string>
     <string name="endpoint_name">Имя, необязательно</string>
     <string name="endpoint_name_hint">Показывается на карточке модели и в голосовой клавиатуре. Пусто — будет домен.</string>
     <string name="endpoint_model">Модель</string>
