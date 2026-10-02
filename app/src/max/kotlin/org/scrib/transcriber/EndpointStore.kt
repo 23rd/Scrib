@@ -6,7 +6,8 @@ import android.content.SharedPreferences
 data class EndpointSettings(
     val baseUrl: String,
     val apiKey: String,
-    val model: String
+    val model: String,
+    val name: String = ""
 ) {
     val isComplete: Boolean
         get() = baseUrl.isNotBlank() && apiKey.isNotBlank() && model.isNotBlank()
@@ -36,12 +37,16 @@ data class EndpointSettings(
 
     val transcriptionsUrl: String get() = "$normalizedBaseUrl/audio/transcriptions"
 
+    val display: String
+        get() = name.ifBlank { host }
+
     companion object {
         const val DEFAULT_MODEL = "whisper-1"
 
-        fun parse(baseUrl: String, apiKey: String, model: String): EndpointSettings {
+        fun parse(baseUrl: String, apiKey: String, model: String, name: String = ""): EndpointSettings {
             val settings = EndpointSettings(
                 baseUrl = baseUrl.trim(),
+                name = name.trim(),
                 apiKey = apiKey.trim(),
                 model = model.trim().ifEmpty { DEFAULT_MODEL }
             )
@@ -59,6 +64,7 @@ object EndpointStore {
     private const val KEY_BASE_URL = "baseUrl"
     private const val KEY_API_KEY = "apiKey"
     private const val KEY_MODEL = "model"
+    private const val KEY_NAME = "name"
     private const val KEY_ACTIVE = "active"
 
     fun settings(context: Context): EndpointSettings {
@@ -66,7 +72,8 @@ object EndpointStore {
         return EndpointSettings(
             baseUrl = prefs.getString(KEY_BASE_URL, "").orEmpty(),
             apiKey = prefs.getString(KEY_API_KEY, "").orEmpty(),
-            model = prefs.getString(KEY_MODEL, EndpointSettings.DEFAULT_MODEL).orEmpty()
+            model = prefs.getString(KEY_MODEL, EndpointSettings.DEFAULT_MODEL).orEmpty(),
+            name = prefs.getString(KEY_NAME, "").orEmpty()
         )
     }
 
@@ -90,6 +97,7 @@ object EndpointStore {
             .putString(KEY_BASE_URL, settings.baseUrl)
             .putString(KEY_API_KEY, settings.apiKey)
             .putString(KEY_MODEL, settings.model)
+            .putString(KEY_NAME, settings.name)
             .apply()
     }
 
@@ -99,5 +107,6 @@ object EndpointStore {
             .remove(KEY_BASE_URL)
             .remove(KEY_API_KEY)
             .remove(KEY_MODEL)
+            .remove(KEY_NAME)
             .putBoolean(KEY_ACTIVE, false)
 }

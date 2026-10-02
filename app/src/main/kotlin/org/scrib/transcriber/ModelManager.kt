@@ -86,7 +86,7 @@ object ModelManager {
 
     fun activeDisplayName(context: Context): String? {
         EndpointPlugins.plugin?.takeIf { it.isActive(context) }?.let {
-            return it.host(context)
+            return it.displayName(context)
         }
         SherpaPlugins.plugin?.displayName(context)?.let {
             return it

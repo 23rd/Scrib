@@ -13,6 +13,8 @@
     <string name="endpoint_dialog_hint">Любой сервер с OpenAI-совместимым аудио-API: свой или размещённый. Адрес можно указать без схемы — /v1 добавится сам.</string>
     <string name="endpoint_url">Адрес сервера</string>
     <string name="endpoint_key">API-ключ</string>
+    <string name="endpoint_name">Имя, необязательно</string>
+    <string name="endpoint_name_hint">Показывается на карточке модели и в голосовой клавиатуре. Пусто — будет домен.</string>
     <string name="endpoint_model">Модель</string>
     <string name="endpoint_fetch">Загрузить модели</string>
     <string name="endpoint_test">Проверить</string>

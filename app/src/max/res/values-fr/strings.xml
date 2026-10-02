@@ -13,6 +13,8 @@
     <string name="endpoint_dialog_hint">Tout serveur parlant l\'API audio OpenAI : le vôtre ou un service hébergé. L\'adresse peut être un simple hôte ; /v1 est ajouté automatiquement.</string>
     <string name="endpoint_url">Adresse du serveur</string>
     <string name="endpoint_key">Clé d\'API</string>
+    <string name="endpoint_name">Nom, facultatif</string>
+    <string name="endpoint_name_hint">Affiché sur la fiche du modèle et dans le clavier vocal. Laissez vide pour utiliser le domaine.</string>
     <string name="endpoint_model">Modèle</string>
     <string name="endpoint_fetch">Récupérer les modèles</string>
     <string name="endpoint_test">Tester</string>

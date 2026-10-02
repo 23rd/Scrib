@@ -113,6 +113,9 @@ class EndpointPluginImpl : EndpointPlugin {
 
     override fun host(context: Context): String = EndpointStore.settings(context.applicationContext).host
 
+    override fun displayName(context: Context): String =
+        EndpointStore.settings(context.applicationContext).display
+
     override fun modelName(context: Context): String = EndpointStore.settings(context.applicationContext).model
 
     override fun setActive(context: Context, active: Boolean) {
@@ -191,7 +194,7 @@ class EndpointPluginImpl : EndpointPlugin {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = if (configured) stored.host else stringResource(R.string.endpoint_setup),
+                        text = if (configured) stored.display else stringResource(R.string.endpoint_setup),
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (active) cs.onPrimaryContainer else cs.onSurface,
@@ -294,6 +297,7 @@ private fun EndpointDialog(
     var url by rememberSaveable { mutableStateOf(initial.baseUrl) }
     var key by rememberSaveable { mutableStateOf(initial.apiKey) }
     var model by rememberSaveable { mutableStateOf(initial.model) }
+    var name by rememberSaveable { mutableStateOf(initial.name) }
     var modelOptions by remember { mutableStateOf<List<String>>(emptyList()) }
     var menuOpen by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
@@ -310,7 +314,7 @@ private fun EndpointDialog(
     }
 
     fun save(): EndpointSettings? = try {
-        val settings = EndpointSettings.parse(url, key, model)
+        val settings = EndpointSettings.parse(url, key, model, name)
         EndpointStore.save(context, settings)
         settings
     } catch (e: IllegalArgumentException) {
@@ -334,6 +338,14 @@ private fun EndpointDialog(
                     value = url,
                     onValueChange = { url = it },
                     label = { Text(stringResource(R.string.endpoint_url)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.endpoint_name)) },
+                    supportingText = { Text(stringResource(R.string.endpoint_name_hint)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )

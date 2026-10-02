@@ -13,6 +13,8 @@
     <string name="endpoint_dialog_hint">OpenAI ses API\'sini konuşan her sunucu: kendinizinki ya da barındırılan bir tane. Adres yalnızca sunucu adı olabilir; /v1 sizin için eklenir.</string>
     <string name="endpoint_url">Sunucu adresi</string>
     <string name="endpoint_key">API anahtarı</string>
+    <string name="endpoint_name">Ad, isteğe bağlı</string>
+    <string name="endpoint_name_hint">Model kartında ve sesli klavyede görünür. Alan adını kullanmak için boş bırakın.</string>
     <string name="endpoint_model">Model</string>
     <string name="endpoint_fetch">Modelleri getir</string>
     <string name="endpoint_test">Sına</string>

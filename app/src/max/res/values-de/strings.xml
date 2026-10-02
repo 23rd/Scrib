@@ -13,6 +13,8 @@
     <string name="endpoint_dialog_hint">Jeder Server mit OpenAI-Audio-API: deiner eigene oder ein gehosteter. Die Adresse darf ein reiner Host sein; /v1 wird ergänzt.</string>
     <string name="endpoint_url">Serveradresse</string>
     <string name="endpoint_key">API-Schlüssel</string>
+    <string name="endpoint_name">Name, optional</string>
+    <string name="endpoint_name_hint">Wird auf der Modellkarte und in der Tastatur angezeigt. Leer lassen, um die Domain zu verwenden.</string>
     <string name="endpoint_model">Modell</string>
     <string name="endpoint_fetch">Modelle laden</string>
     <string name="endpoint_test">Testen</string>

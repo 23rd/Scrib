@@ -13,6 +13,8 @@ interface EndpointPlugin {
 
     fun host(context: Context): String
 
+    fun displayName(context: Context): String
+
     fun modelName(context: Context): String
 
     fun setActive(context: Context, active: Boolean)
