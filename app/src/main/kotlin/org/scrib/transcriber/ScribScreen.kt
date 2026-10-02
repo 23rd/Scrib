@@ -575,6 +575,7 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
                 Text(stringResource(R.string.downloading_pct, row.progress), fontSize = 12.5.sp, fontWeight = FontWeight.Bold, color = cs.primary, modifier = Modifier.padding(bottom = 6.dp))
                 LinearProgressIndicator(
                     progress = { (row.progress.coerceIn(0, 100)) / 100f },
+                    drawStopIndicator = {},
                     modifier = Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)),
                     color = cs.primary, trackColor = cs.outlineVariant
                 )
@@ -749,6 +750,7 @@ private fun BenchmarkBatchControl(
                 progress = {
                     if (state.total > 0) state.completed.toFloat() / state.total else 0f
                 },
+                drawStopIndicator = {},
                 modifier = Modifier.fillMaxWidth().padding(top = 6.dp).clip(RoundedCornerShape(3.dp)),
                 color = cs.primary,
                 trackColor = cs.outlineVariant
@@ -963,6 +965,7 @@ private fun RunProgress(t: TranscribeUi) {
         } else {
             LinearProgressIndicator(
                 progress = { t.percent.coerceIn(0, 100) / 100f },
+                drawStopIndicator = {},
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(8.dp))
