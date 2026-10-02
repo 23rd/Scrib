@@ -1,0 +1,7 @@
+• Naprawiono proponowanie pomijania ciszy w modelach, które jej nie używają
+• Naprawiono zaniżone zużycie pamięci modeli mapowanych z dysku
+• Naprawiono połykanie spacji między segmentami przez podmiany słów
+• Dodano zapamiętywanie zwiniętych list modeli
+• Naprawiono strzałki zasłaniające przycisk pobierania
+• Naprawiono paski postępu pokazujące kawałek za końcem
+• Dodano znaczniki czasowe wywołań zwrotnych segmentów do kontraktu Open Transcribe

@@ -1,0 +1,7 @@
+• Fixed silence skip offered for models that never use it
+• Fixed model memory reading low for models mapped from disk
+• Fixed word replacements eating the space between segments
+• Added remembering of folded model lists
+• Fixed arrows crowding the download button
+• Fixed progress bars showing a stub past the end
+• Added timed segment callbacks to the Open Transcribe contract

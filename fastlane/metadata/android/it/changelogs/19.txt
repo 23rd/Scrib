@@ -1,0 +1,7 @@
+• Corretto che si proponesse di saltare i silenzi per modelli che non lo usano
+• Corretto che la memoria risultasse bassa per i modelli mappati dal disco
+• Corretto che le sostituzioni di parole mangiassero lo spazio tra i segmenti
+• Aggiunto il ricordo delle liste di modelli compresse
+• Corretto che le frecce affollassero il pulsante di download
+• Corretto che le barre di avanzamento mostrassero un tratto oltre la fine
+• Aggiunti i callback di segmento con tempo al contratto Open Transcribe

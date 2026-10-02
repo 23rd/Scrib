@@ -1,0 +1,7 @@
+• Correction du saut des silences proposé pour des modèles sans silence
+• Correction de la mémoire affichée trop basse pour les modèles mappés sur disque
+• Correction des remplacements de mots mangeant l'espace entre les segments
+• Ajout de la mémorisation des listes de modèles repliées
+• Correction des flèches qui encombraient le bouton de téléchargement
+• Correction des barres de progression laissant un bout au-delà de la fin
+• Ajout de callbacks de segment horodatés au contrat Open Transcribe

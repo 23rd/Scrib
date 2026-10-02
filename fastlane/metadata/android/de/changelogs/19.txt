@@ -1,0 +1,7 @@
+• Behoben, dass Stilleüberspringen für Modelle ohne Silenzen angeboten wurde
+• Behoben, dass der Modellspeicher bei aus dem Speicher geladenen Modellen zu niedrig war
+• Behoben, dass Wortersetzungen den Abstand zwischen Absätzen verschluckten
+• Merken eingeklappter Modelllisten hinzugefügt
+• Behoben, dass Pfeile die Download-Schaltfläche verdrängten
+• Behoben, dass Fortschrittsbalken über das Ende hinaus einen Rest zeigten
+• Zeitgesteuerte Segmentrückrufe zum Open-Transcribe-Vertrag hinzugefügt

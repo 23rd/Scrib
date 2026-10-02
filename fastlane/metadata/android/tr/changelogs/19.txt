@@ -1,0 +1,7 @@
+• Sessizliği hiç kullanmayan modellerde sessiz atlama seçeneğinin gösterilmesi düzeltildi
+• Diskten eşlenen modellerde model belleğinin düşük görünmesi düzeltildi
+• Kelime değiştirmelerinin bölümler arasındaki boşluğu yemesi düzeltildi
+• Katlanmış model listelerinin hatırlanması eklendi
+• Okların indirme düğmesini sıkıştırması düzeltildi
+• İlerleme çubuklarının sonun ötesinde kalıntı göstermesi düzeltildi
+• Open Transcribe sözleşmesine zaman damgalı bölüm geri çağrıları eklendi

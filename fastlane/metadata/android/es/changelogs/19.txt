@@ -1,0 +1,7 @@
+• Corregido que se ofreciera saltar silencios en modelos que no lo usan
+• Corregido que la memoria del modelo se mostrara baja en modelos mapeados del disco
+• Corregido que las sustituciones de palabras comieran el espacio entre segmentos
+• Añadido recordar las listas de modelos plegadas
+• Corregido que las flechas apretaran el botón de descarga
+• Corregido que las barras de progreso dejaran un resto pasado el final
+• Añadidos callbacks de segmento con tiempo al contrato de Open Transcribe

@@ -1,0 +1,7 @@
+• Opgelost dat stilte overslaan werd aangeboden bij modellen die het niet gebruiken
+• Opgelost dat modelgeheugen laag werd getoond bij modellen die vanaf schijf zijn gemapt
+• Opgelost dat woordvervangingen de ruimte tussen segmenten opslokten
+• Onthouden van ingeklapte modellenlijsten toegevoegd
+• Opgelost dat de pijlen de downloadknop in de weg zaten
+• Opgelost dat voortgangsbalken een stukje voorbij het einde toonden
+• Getimede segmentcallbacks toegevoegd aan het Open Transcribe-contract

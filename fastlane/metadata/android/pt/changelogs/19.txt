@@ -1,0 +1,7 @@
+• Corrigida oferta de pular silêncios em modelos que não usam isso
+• Corrigida memória do modelo exibida baixa em modelos mapeados do disco
+• Corrigidas substituições de palavras comendo o espaço entre segmentos
+• Adicionado lembrar das listas de modelos recolhidas
+• Corrigidas setas apertando o botão de download
+• Corrigidas barras de progresso mostrando um resto depois do fim
+• Adicionados callbacks de segmento com marca de tempo ao contrato do Open Transcribe
