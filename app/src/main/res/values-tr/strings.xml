@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Aşağıdan bir model seçip «Kullan» düğmesine dokunun.</string>
     <string name="privacy_full">Ses tamamen telefonunuzda yazıya dökülür. Hiçbir şey yüklenmez — uygulama yalnızca model indirmek için çevrimiçi olur.</string>
     <string name="privacy_short" formatted="false">%100 cihazda çalışır. Sesli mesajlarınız telefonu asla terk etmez.</string>
+    <string name="privacy_remote">Ses %1$s adresine yüklenir ve orada yazıya dökülür — telefonunda hiçbir şey çalışmaz.</string>
     <string name="setup_transcription">Yazıya dökmeyi ayarla</string>
     <string name="nudge_body">Henüz konuşma modeli yok. Bir tane indirin — Base dengeli bir seçim: küçük indirme, iyi doğruluk, her dilde çalışır.</string>
     <string name="download_named_size">%1$s indir · ≈%2$d MB</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Yazıya dökülüyor</string>
     <string name="recording">Kayıt</string>
     <string name="record_hint">Mikrofona konuşun. Kayıt bu telefonda yazıya dökülür ve sonra silinir.</string>
+    <string name="record_hint_remote">Mikrofona konuş. Kayıt %1$s adresine yüklenir, orada yazıya dökülür ve sonra atılır.</string>
     <string name="record_name">Kayıt %1$s</string>
     <string name="record_denied">Kayıt için mikrofon erişimi gerekiyor.</string>
     <string name="record_failed">Kayıt başlatılamadı — mikrofonu başka bir uygulama kullanıyor olabilir.</string>

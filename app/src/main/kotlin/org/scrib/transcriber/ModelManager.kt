@@ -61,6 +61,9 @@ object ModelManager {
         installedFileNames(context).filter { ModelCatalog.byFileName(it) == null }
 
     fun activeFileName(context: Context): String? {
+        if (EndpointPlugins.plugin?.isActive(context) == true) {
+            return null
+        }
         SherpaPlugins.plugin?.selectedId(context)?.let {
             return it
         }
@@ -82,6 +85,9 @@ object ModelManager {
     }
 
     fun activeDisplayName(context: Context): String? {
+        EndpointPlugins.plugin?.takeIf { it.isActive(context) }?.let {
+            return it.host(context)
+        }
         SherpaPlugins.plugin?.displayName(context)?.let {
             return it
         }
@@ -108,6 +114,9 @@ object ModelManager {
         val plugin = SherpaPlugins.plugin
         if (plugin?.selectedId(context) != null) {
             return plugin.hasActiveModel(context)
+        }
+        if (EndpointPlugins.plugin?.isActive(context) == true) {
+            return true
         }
         return activeModelFile(context) != null
     }
@@ -198,6 +207,9 @@ object ModelManager {
     }
 
     fun activeModelUsesVad(context: Context): Boolean {
+        if (EndpointPlugins.plugin?.isActive(context) == true) {
+            return false
+        }
         if (SherpaPlugins.plugin?.selectedId(context) != null) {
             return true
         }

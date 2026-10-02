@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">UZAK UÇ NOKTA</string>
+    <string name="endpoint_not_configured">Uç nokta ayarlanmadı. Scrib\'i kontrol ettiğiniz OpenAI uyumlu bir sunucuya yönlendirin — oraya gönderilen ses telefondan çıkar.</string>
+    <string name="endpoint_setup">Uç nokta ayarla</string>
+    <string name="endpoint_active">ETKİN</string>
+    <string name="endpoint_model_line">model: %1$s</string>
+    <string name="endpoint_privacy">Bu açıkken her kayıt yukarıdaki sunucuya yüklenir. Cihazdaki modeller sesi telefonun içinde tutar.</string>
+    <string name="endpoint_use">Bu uç noktayı kullan</string>
+    <string name="endpoint_stop_using">Kullanmayı bırak</string>
+    <string name="endpoint_edit">Düzenle</string>
+    <string name="endpoint_dialog_title">Transkripsiyon uç noktası</string>
+    <string name="endpoint_dialog_hint">OpenAI ses API\'sini konuşan her sunucu: kendinizinki ya da barındırılan bir tane. Adres yalnızca sunucu adı olabilir; /v1 sizin için eklenir.</string>
+    <string name="endpoint_url">Sunucu adresi</string>
+    <string name="endpoint_key">API anahtarı</string>
+    <string name="endpoint_model">Model</string>
+    <string name="endpoint_fetch">Modelleri getir</string>
+    <string name="endpoint_test">Sına</string>
+    <string name="endpoint_save">Kaydet</string>
+    <string name="endpoint_cancel">İptal</string>
+    <string name="endpoint_forget">Unut</string>
+    <string name="endpoint_models_found">Sunucu %1$d model sunuyor</string>
+    <string name="endpoint_test_ok">Sunucu yanıt verdi. %1$d model kullanılabilir.</string>
+    <string name="endpoint_test_ok_other">Sunucu %1$d model ile yanıt verdi, ancak %2$s ile değil. Listeden seçin.</string>
+</resources>

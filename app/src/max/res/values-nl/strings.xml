@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">VERE ENDPOINT</string>
+    <string name="endpoint_not_configured">Geen endpoint ingesteld. Laat Scrib naar een OpenAI-compatibele server wijzen die je zelf beheert — audio die je daarheen stuurt verlaat de telefoon.</string>
+    <string name="endpoint_setup">Endpoint instellen</string>
+    <string name="endpoint_active">ACTIEF</string>
+    <string name="endpoint_model_line">model: %1$s</string>
+    <string name="endpoint_privacy">Zolang dit aanstaat, wordt elke opname geüpload naar de server hierboven. Modellen op het apparaat houden de audio op de telefoon.</string>
+    <string name="endpoint_use">Dit endpoint gebruiken</string>
+    <string name="endpoint_stop_using">Niet meer gebruiken</string>
+    <string name="endpoint_edit">Bewerken</string>
+    <string name="endpoint_dialog_title">Transcriptie-endpoint</string>
+    <string name="endpoint_dialog_hint">Elke server die de OpenAI-audio-API spreekt: je eigen of een gehoste. Het adres mag alleen de host zijn; /v1 wordt er automatisch bijgezet.</string>
+    <string name="endpoint_url">Serveradres</string>
+    <string name="endpoint_key">API-sleutel</string>
+    <string name="endpoint_model">Model</string>
+    <string name="endpoint_fetch">Modellen ophalen</string>
+    <string name="endpoint_test">Testen</string>
+    <string name="endpoint_save">Opslaan</string>
+    <string name="endpoint_cancel">Annuleren</string>
+    <string name="endpoint_forget">Vergeten</string>
+    <string name="endpoint_models_found">Server biedt %1$d model(len)</string>
+    <string name="endpoint_test_ok">Server heeft geantwoord. %1$d model(len) beschikbaar.</string>
+    <string name="endpoint_test_ok_other">Server antwoordde met %1$d model(len), maar niet met %2$s. Kies het uit de lijst.</string>
+</resources>

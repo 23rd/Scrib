@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Wybierz model poniżej i dotknij «Użyj».</string>
     <string name="privacy_full">Dźwięk jest transkrybowany w całości na Twoim telefonie. Nic nie jest wysyłane — aplikacja łączy się z siecią tylko po to, by pobrać model.</string>
     <string name="privacy_short" formatted="false">Działa w 100% na urządzeniu. Twoje wiadomości głosowe nigdy nie opuszczają telefonu.</string>
+    <string name="privacy_remote">Dźwięk jest wysyłany na %1$s i tam rozpoznawany — na telefonie nic nie działa.</string>
     <string name="setup_transcription">Skonfiguruj transkrypcję</string>
     <string name="nudge_body">Brak jeszcze modelu mowy. Pobierz jeden — Base to dobry kompromis: mały rozmiar, solidna dokładność, działa w każdym języku.</string>
     <string name="download_named_size">Pobierz %1$s · ≈%2$d MB</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Transkrypcja</string>
     <string name="recording">Nagrywanie</string>
     <string name="record_hint">Mów do mikrofonu. Nagranie zostanie przepisane na tym telefonie, a potem usunięte.</string>
+    <string name="record_hint_remote">Mów do mikrofonu. Nagranie jest wysyłane na %1$s, rozpoznawane tam i odrzucane.</string>
     <string name="record_name">Nagranie %1$s</string>
     <string name="record_denied">Do nagrywania potrzebny jest dostęp do mikrofonu.</string>
     <string name="record_failed">Nie udało się rozpocząć nagrywania — mikrofon może być zajęty przez inną aplikację.</string>

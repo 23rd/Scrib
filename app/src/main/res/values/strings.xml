@@ -9,6 +9,7 @@
     <string name="pick_model_hint">Pick a model below and tap Use.</string>
     <string name="privacy_full">Audio is transcribed entirely on your phone. Nothing is uploaded — the app only goes online to download a model.</string>
     <string name="privacy_short" formatted="false">Runs 100% on-device. Your voice messages never leave the phone.</string>
+    <string name="privacy_remote">Audio is uploaded to %1$s and transcribed there — nothing runs on your phone.</string>
 
     <string name="setup_transcription">Set up transcription</string>
     <string name="nudge_body">No speech model yet. Download one to start — Base is a balanced choice: small download, solid accuracy, works in any language.</string>
@@ -62,6 +63,7 @@
     <string name="notif_transcribing">Transcribing</string>
     <string name="recording">Recording</string>
     <string name="record_hint">Speak into the microphone. The recording is transcribed on this phone and then discarded.</string>
+    <string name="record_hint_remote">Speak into the microphone. The recording is uploaded to %1$s, transcribed there, and then discarded.</string>
     <string name="record_name">Recording %1$s</string>
     <string name="record_denied">Microphone access is needed to record.</string>
     <string name="record_failed">Couldn\'t start recording — another app may be using the microphone.</string>

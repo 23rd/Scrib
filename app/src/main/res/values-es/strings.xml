@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Elige un modelo abajo y toca «Usar».</string>
     <string name="privacy_full">El audio se transcribe por completo en tu teléfono. No se sube nada — la app solo se conecta para descargar un modelo.</string>
     <string name="privacy_short" formatted="false">Funciona al 100% en el dispositivo. Tus mensajes de voz nunca salen del teléfono.</string>
+    <string name="privacy_remote">El audio se sube a %1$s y se transcribe allí: en tu teléfono no se ejecuta nada.</string>
     <string name="setup_transcription">Configurar la transcripción</string>
     <string name="nudge_body">Aún no hay modelo de voz. Descarga uno — Base es una opción equilibrada: descarga pequeña, buena precisión, funciona en cualquier idioma.</string>
     <string name="download_named_size">Descargar %1$s · ≈%2$d MB</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Transcribiendo</string>
     <string name="recording">Grabando</string>
     <string name="record_hint">Habla al micrófono. La grabación se transcribe en este teléfono y luego se descarta.</string>
+    <string name="record_hint_remote">Habla al micrófono. La grabación se sube a %1$s, se transcribe allí y luego se descarta.</string>
     <string name="record_name">Grabación %1$s</string>
     <string name="record_denied">Se necesita acceso al micrófono para grabar.</string>
     <string name="record_failed">No se pudo iniciar la grabación — puede que otra app esté usando el micrófono.</string>

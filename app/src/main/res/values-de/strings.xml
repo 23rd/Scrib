@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Wähle unten ein Modell und tippe auf „Verwenden“.</string>
     <string name="privacy_full">Audio wird vollständig auf deinem Telefon transkribiert. Nichts wird hochgeladen — die App geht nur online, um ein Modell herunterzuladen.</string>
     <string name="privacy_short" formatted="false">Läuft zu 100% auf dem Gerät. Deine Sprachnachrichten verlassen das Telefon nie.</string>
+    <string name="privacy_remote">Audio wird auf %1$s hochgeladen und dort transkribiert — auf deinem Telefon läuft nichts.</string>
     <string name="setup_transcription">Transkription einrichten</string>
     <string name="nudge_body">Noch kein Sprachmodell. Lade eins herunter — Base ist ausgewogen: kleiner Download, solide Genauigkeit, funktioniert in jeder Sprache.</string>
     <string name="download_named_size">%1$s herunterladen · ≈%2$d MB</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Transkribieren</string>
     <string name="recording">Aufnahme</string>
     <string name="record_hint">Sprich ins Mikrofon. Die Aufnahme wird auf diesem Telefon transkribiert und danach verworfen.</string>
+    <string name="record_hint_remote">Sprich ins Mikrofon. Die Aufnahme wird auf %1$s hochgeladen, dort transkribiert und danach verworfen.</string>
     <string name="record_name">Aufnahme %1$s</string>
     <string name="record_denied">Zum Aufnehmen wird Zugriff auf das Mikrofon benötigt.</string>
     <string name="record_failed">Aufnahme konnte nicht gestartet werden — vielleicht nutzt eine andere App das Mikrofon.</string>

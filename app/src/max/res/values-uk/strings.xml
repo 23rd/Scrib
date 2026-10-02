@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">ВІДДАЛЕНА ТОЧКА</string>
+    <string name="endpoint_not_configured">Точку не налаштовано. Спрямуйте Scrib на OpenAI-сумісний сервер, яким володієте ви: звук, надісланий туди, залишає телефон.</string>
+    <string name="endpoint_setup">Налаштувати точку</string>
+    <string name="endpoint_active">АКТИВНА</string>
+    <string name="endpoint_model_line">модель: %1$s</string>
+    <string name="endpoint_privacy">Поки це увімкнено, кожен запис завантажується на сервер вище. Моделі на пристрої залишають звук на телефоні.</string>
+    <string name="endpoint_use">Використати цю точку</string>
+    <string name="endpoint_stop_using">Припинити використання</string>
+    <string name="endpoint_edit">Змінити</string>
+    <string name="endpoint_dialog_title">Точка транскрипції</string>
+    <string name="endpoint_dialog_hint">Будь-який сервер, що говорить з audio API OpenAI: ваш або розміщений. Адреса може бути лише іменем хоста; /v1 додасться сам.</string>
+    <string name="endpoint_url">Адреса сервера</string>
+    <string name="endpoint_key">Ключ API</string>
+    <string name="endpoint_model">Модель</string>
+    <string name="endpoint_fetch">Отримати моделі</string>
+    <string name="endpoint_test">Перевірити</string>
+    <string name="endpoint_save">Зберегти</string>
+    <string name="endpoint_cancel">Скасувати</string>
+    <string name="endpoint_forget">Забути</string>
+    <string name="endpoint_models_found">Сервер пропонує %1$d модель(і)</string>
+    <string name="endpoint_test_ok">Сервер відповів. Доступно %1$d модель(ей).</string>
+    <string name="endpoint_test_ok_other">Сервер відповів %1$d модель(ями), але не %2$s. Виберіть її зі списку.</string>
+</resources>

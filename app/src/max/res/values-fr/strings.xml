@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">POINT DE TERMINAISON DISTANT</string>
+    <string name="endpoint_not_configured">Aucun point de terminaison défini. Pointez Scrib vers un serveur compatible OpenAI que vous contrôlez : l\'audio qui y est envoyé quitte le téléphone.</string>
+    <string name="endpoint_setup">Configurer le point de terminaison</string>
+    <string name="endpoint_active">ACTIF</string>
+    <string name="endpoint_model_line">modèle : %1$s</string>
+    <string name="endpoint_privacy">Tant que ceci est actif, chaque enregistrement est envoyé au serveur ci-dessus. Les modèles sur l\'appareil gardent l\'audio sur le téléphone.</string>
+    <string name="endpoint_use">Utiliser ce point de terminaison</string>
+    <string name="endpoint_stop_using">Ne plus l\'utiliser</string>
+    <string name="endpoint_edit">Modifier</string>
+    <string name="endpoint_dialog_title">Point de terminaison de transcription</string>
+    <string name="endpoint_dialog_hint">Tout serveur parlant l\'API audio OpenAI : le vôtre ou un service hébergé. L\'adresse peut être un simple hôte ; /v1 est ajouté automatiquement.</string>
+    <string name="endpoint_url">Adresse du serveur</string>
+    <string name="endpoint_key">Clé d\'API</string>
+    <string name="endpoint_model">Modèle</string>
+    <string name="endpoint_fetch">Récupérer les modèles</string>
+    <string name="endpoint_test">Tester</string>
+    <string name="endpoint_save">Enregistrer</string>
+    <string name="endpoint_cancel">Annuler</string>
+    <string name="endpoint_forget">Oublier</string>
+    <string name="endpoint_models_found">Le serveur propose %1$d modèle(s)</string>
+    <string name="endpoint_test_ok">Le serveur a répondu. %1$d modèle(s) disponible(s).</string>
+    <string name="endpoint_test_ok_other">Le serveur a répondu avec %1$d modèle(s), mais pas avec %2$s. Choisissez-le dans la liste.</string>
+</resources>

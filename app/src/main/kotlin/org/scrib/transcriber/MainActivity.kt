@@ -72,6 +72,8 @@ class MainActivity : ComponentActivity() {
                         onConfigureKeyboardLayouts = vm::setKeyboardLayouts,
                         onImportSherpa = vm::importSherpa,
                         sherpaPlugin = SherpaPlugins.plugin,
+                        endpointPlugin = EndpointPlugins.plugin,
+                        onEndpointChanged = vm::refresh,
                         recording = recording,
                         onStartRecording = vm::startRecording,
                         onStopRecording = vm::stopRecording,
@@ -132,7 +134,7 @@ class MainActivity : ComponentActivity() {
             @Suppress("DEPRECATION")
             intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
         } ?: return
-        if (ModelManager.activeFileName(this) == null) {
+        if (!ModelManager.hasActiveModel(this)) {
             return
         }
         sharedVm.transcribeFile(uri, queryDisplayName(this, uri))

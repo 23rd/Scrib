@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Choisissez un modèle ci-dessous et touchez « Utiliser ».</string>
     <string name="privacy_full">L\'audio est transcrit entièrement sur votre téléphone. Rien n\'est envoyé — l\'appli se connecte uniquement pour télécharger un modèle.</string>
     <string name="privacy_short" formatted="false">Fonctionne à 100% sur l\'appareil. Vos messages vocaux ne quittent jamais le téléphone.</string>
+    <string name="privacy_remote">L\'audio est envoyé à %1$s et transcrit là-bas — rien ne s\'exécute sur votre téléphone.</string>
     <string name="setup_transcription">Configurer la transcription</string>
     <string name="nudge_body">Pas encore de modèle vocal. Téléchargez-en un — Base est un bon compromis : petit téléchargement, précision correcte, fonctionne dans toutes les langues.</string>
     <string name="download_named_size">Télécharger %1$s · ≈%2$d Mo</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Transcription</string>
     <string name="recording">Enregistrement</string>
     <string name="record_hint">Parlez dans le micro. L\'enregistrement est transcrit sur ce téléphone, puis supprimé.</string>
+    <string name="record_hint_remote">Parlez dans le micro. L\'enregistrement est envoyé à %1$s, transcrit là-bas, puis supprimé.</string>
     <string name="record_name">Enregistrement %1$s</string>
     <string name="record_denied">L\'accès au micro est nécessaire pour enregistrer.</string>
     <string name="record_failed">Impossible de démarrer l\'enregistrement — une autre application utilise peut-être le micro.</string>

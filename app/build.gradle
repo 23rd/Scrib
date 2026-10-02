@@ -89,9 +89,11 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += 'src/main/kotlin'
-            if (project.hasProperty('withSherpa')) {
+            if (max) {
                 kotlin.srcDirs += 'src/sherpa/kotlin'
+                kotlin.srcDirs += 'src/max/kotlin'
                 res.srcDirs += 'src/sherpa/res'
+                res.srcDirs += 'src/max/res'
             }
         }
     }
@@ -106,7 +108,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
-    if (project.hasProperty('withSherpa')) {
+    if (max) {
         if (!file('libs/sherpa-onnx.aar').exists()) {
             throw new GradleException("Missing app/libs/sherpa-onnx.aar — run scripts/download-sherpa-onnx.sh first")
         }

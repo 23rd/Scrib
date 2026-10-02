@@ -7,6 +7,7 @@
     <string name="pick_model_hint">Виберіть модель нижче й торкніться «Вибрати».</string>
     <string name="privacy_full">Аудіо розпізнається повністю на вашому телефоні. Нічого не завантажується — застосунок виходить у мережу лише щоб завантажити модель.</string>
     <string name="privacy_short" formatted="false">Працює на 100% на пристрої. Ваші голосові ніколи не залишають телефон.</string>
+    <string name="privacy_remote">Аудіо надсилається на %1$s і розпізнається там — на телефоні нічого не виконується.</string>
     <string name="setup_transcription">Налаштування розпізнавання</string>
     <string name="nudge_body">Ще немає моделі мовлення. Завантажте одну — Base хороший баланс: невеликий розмір, пристойна точність, працює будь-якою мовою.</string>
     <string name="download_named_size">Завантажити %1$s · ≈%2$d МБ</string>
@@ -58,6 +59,7 @@
     <string name="notif_transcribing">Розпізнавання</string>
     <string name="recording">Запис</string>
     <string name="record_hint">Говоріть у мікрофон. Запис розпізнається на цьому телефоні, а потім видаляється.</string>
+    <string name="record_hint_remote">Говоріть у мікрофон. Запис надсилається на %1$s, розпізнається там і потім видаляється.</string>
     <string name="record_name">Запис %1$s</string>
     <string name="record_denied">Для запису потрібен доступ до мікрофона.</string>
     <string name="record_failed">Не вдалося почати запис — можливо, мікрофон зайнятий іншим застосунком.</string>

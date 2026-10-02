@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">PUNTO FINAL REMOTO</string>
+    <string name="endpoint_not_configured">No hay punto final configurado. Apunta Scrib a un servidor compatible con OpenAI que controles tú: el audio que envíes allí sale del teléfono.</string>
+    <string name="endpoint_setup">Configurar punto final</string>
+    <string name="endpoint_active">ACTIVO</string>
+    <string name="endpoint_model_line">modelo: %1$s</string>
+    <string name="endpoint_privacy">Mientras esté activo, cada grabación se sube al servidor de arriba. Los modelos en el dispositivo dejan el audio en el teléfono.</string>
+    <string name="endpoint_use">Usar este punto final</string>
+    <string name="endpoint_stop_using">Dejar de usar</string>
+    <string name="endpoint_edit">Editar</string>
+    <string name="endpoint_dialog_title">Punto final de transcripción</string>
+    <string name="endpoint_dialog_hint">Cualquier servidor que hable con la API de audio de OpenAI: el tuyo o uno alojado. La dirección puede ser solo el dominio; /v1 se añade por ti.</string>
+    <string name="endpoint_url">Dirección del servidor</string>
+    <string name="endpoint_key">Clave de API</string>
+    <string name="endpoint_model">Modelo</string>
+    <string name="endpoint_fetch">Obtener modelos</string>
+    <string name="endpoint_test">Probar</string>
+    <string name="endpoint_save">Guardar</string>
+    <string name="endpoint_cancel">Cancelar</string>
+    <string name="endpoint_forget">Olvidar</string>
+    <string name="endpoint_models_found">El servidor ofrece %1$d modelo(s)</string>
+    <string name="endpoint_test_ok">El servidor respondió. %1$d modelo(s) disponible(s).</string>
+    <string name="endpoint_test_ok_other">El servidor respondió con %1$d modelo(s), pero no con %2$s. Elígelo de la lista.</string>
+</resources>

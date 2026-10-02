@@ -57,7 +57,8 @@ data class ScribUiState(
     val dictionaryEnabled: Boolean,
     val benchmarkRuns: List<BenchmarkRun>,
     val benchmarkBatch: BenchmarkBatchState,
-    val benchmarkModelCount: Int
+    val benchmarkModelCount: Int,
+    val remoteHost: String?
 )
 
 // A take in progress: how long it has been running and the recent microphone levels the meter
@@ -142,8 +143,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
         val activeFriendly = ModelManager.activeDisplayName(ctx)
         val sherpaRows = SherpaPlugins.plugin?.modelRows(ctx, active) ?: emptyList()
+        val endpointReady = EndpointPlugins.plugin?.isActive(ctx) == true
         return ScribUiState(
-            firstRun = installed.isEmpty() && downloads.isEmpty() && sherpaRows.isEmpty() && !sherpaBusy,
+            firstRun = !endpointReady && installed.isEmpty() && downloads.isEmpty() &&
+                sherpaRows.isEmpty() && !sherpaBusy,
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
@@ -153,7 +156,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             dictionaryEnabled = Dictionary.isEnabled(ctx),
             benchmarkRuns = BenchmarkStore.load(ctx),
             benchmarkBatch = benchmarkBatch,
-            benchmarkModelCount = installed.size + sherpaRows.size
+            benchmarkModelCount = installed.size + sherpaRows.size,
+            remoteHost = EndpointPlugins.plugin
+                ?.takeIf { it.isActive(ctx) }
+                ?.host(ctx)
+                ?.takeIf { it.isNotEmpty() }
         )
     }
 
@@ -191,7 +198,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 val id = withContext(Dispatchers.IO) {
                     plugin.importModel(ctx, displayName, modelType, languages, parts)
                 }
-                if (ModelManager.activeFileName(ctx) == null) {
+                if (!ModelManager.hasActiveModel(ctx)) {
                     ModelManager.setActive(ctx, id)
                 }
             } catch (e: Throwable) {

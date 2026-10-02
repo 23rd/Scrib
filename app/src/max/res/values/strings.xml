@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">REMOTE ENDPOINT</string>
+    <string name="endpoint_not_configured">No endpoint set. Point Scrib at an OpenAI-compatible server you control — audio you send there leaves the phone.</string>
+    <string name="endpoint_setup">Set up endpoint</string>
+    <string name="endpoint_active">ACTIVE</string>
+    <string name="endpoint_model_line">model: %1$s</string>
+    <string name="endpoint_privacy">While this is on, every recording is uploaded to the server above. On-device models keep the audio on the phone.</string>
+    <string name="endpoint_use">Use this endpoint</string>
+    <string name="endpoint_stop_using">Stop using</string>
+    <string name="endpoint_edit">Edit</string>
+    <string name="endpoint_dialog_title">Transcription endpoint</string>
+    <string name="endpoint_dialog_hint">Any server that speaks the OpenAI audio API: your own, or a hosted one. The address may be given as a bare host; /v1 is added for you.</string>
+    <string name="endpoint_url">Server address</string>
+    <string name="endpoint_key">API key</string>
+    <string name="endpoint_model">Model</string>
+    <string name="endpoint_fetch">Fetch models</string>
+    <string name="endpoint_test">Test</string>
+    <string name="endpoint_save">Save</string>
+    <string name="endpoint_cancel">Cancel</string>
+    <string name="endpoint_forget">Forget</string>
+    <string name="endpoint_models_found">Server offers %1$d model(s)</string>
+    <string name="endpoint_test_ok">Server answered. %1$d model(s) available.</string>
+    <string name="endpoint_test_ok_other">Server answered with %1$d model(s), but not %2$s. Pick it from the list.</string>
+</resources>

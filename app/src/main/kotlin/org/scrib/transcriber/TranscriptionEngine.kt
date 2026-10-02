@@ -62,10 +62,12 @@ interface TranscriptionEngine {
             val app = context.applicationContext
             whisper?.releaseModel()
             runCatching { SherpaPlugins.plugin?.engine(app)?.releaseModel() }
+            runCatching { EndpointPlugins.plugin?.engine(app)?.releaseModel() }
         }
 
         fun get(context: Context): TranscriptionEngine {
             val app = context.applicationContext
+            EndpointPlugins.plugin?.takeIf { it.isActive(app) }?.let { return it.engine(app) }
             val plugin = SherpaPlugins.plugin
             if (plugin != null && plugin.selectedId(app) != null) {
                 return plugin.engine(app)

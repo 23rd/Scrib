@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="endpoint_header">УДАЛЁННЫЙ ЭНДПОИНТ</string>
+    <string name="endpoint_not_configured">Эндпоинт не задан. Укажите OpenAI-совместимый сервер, которым владеете вы — отправленное туда аудио покидает телефон.</string>
+    <string name="endpoint_setup">Настроить эндпоинт</string>
+    <string name="endpoint_active">АКТИВЕН</string>
+    <string name="endpoint_model_line">модель: %1$s</string>
+    <string name="endpoint_privacy">Пока это включено, каждая запись отправляется на сервер выше. Модели на устройстве оставляют аудио на телефоне.</string>
+    <string name="endpoint_use">Использовать</string>
+    <string name="endpoint_stop_using">Выключить</string>
+    <string name="endpoint_edit">Изменить</string>
+    <string name="endpoint_dialog_title">Эндпоинт транскрипции</string>
+    <string name="endpoint_dialog_hint">Любой сервер с OpenAI-совместимым аудио-API: свой или размещённый. Адрес можно указать без схемы — /v1 добавится сам.</string>
+    <string name="endpoint_url">Адрес сервера</string>
+    <string name="endpoint_key">API-ключ</string>
+    <string name="endpoint_model">Модель</string>
+    <string name="endpoint_fetch">Загрузить модели</string>
+    <string name="endpoint_test">Проверить</string>
+    <string name="endpoint_save">Сохранить</string>
+    <string name="endpoint_cancel">Отмена</string>
+    <string name="endpoint_forget">Забыть</string>
+    <string name="endpoint_models_found">Сервер предлагает моделей: %1$d</string>
+    <string name="endpoint_test_ok">Сервер ответил. Доступно моделей: %1$d.</string>
+    <string name="endpoint_test_ok_other">Сервер ответил, моделей: %1$d, но не %2$s. Выберите её из списка.</string>
+</resources>
