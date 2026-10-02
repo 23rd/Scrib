@@ -1,5 +1,8 @@
 # Scrib
 
+[![F-Droid](https://img.shields.io/f-droid/v/org.scrib.transcriber.svg)](https://f-droid.org/packages/org.scrib.transcriber/)
+[![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
+
 On-device voice transcription for Android. Your audio never leaves your phone.
 
 Scrib turns speech into text entirely on your device, using open
