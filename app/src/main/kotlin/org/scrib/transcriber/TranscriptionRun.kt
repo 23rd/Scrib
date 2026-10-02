@@ -195,6 +195,11 @@ object TranscriptionRun {
                             segments = segments, running = false, percent = 100, etaMs = null
                         )
                     }
+                    val settled = processMemory(app)
+                    synchronized(metricsLock) {
+                        modelPssMb = settled.pssMb
+                        modelMemoryDeltaMb = maxOf(0, settled.pssMb - initialMemory.pssMb)
+                    }
                     publishMetrics()
                     _state.value?.metrics?.let { metrics ->
                         BenchmarkStore.record(
@@ -207,6 +212,7 @@ object TranscriptionRun {
                             )
                         )
                     }
+
                     if (persistTranscript && segments.isNotEmpty()) {
                         _state.value?.let { TranscriptStore.save(app, it) }
                     }
