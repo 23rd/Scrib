@@ -128,11 +128,11 @@ fun ScribScreen(
     var showLanguages by remember { mutableStateOf(false) }
     var showKeyboardLayouts by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
-    var modelsExpanded by rememberSaveable { mutableStateOf(true) }
-    var customExpanded by rememberSaveable { mutableStateOf(true) }
     var showBenchmarks by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
+    var modelsExpanded by remember { mutableStateOf(SectionState.standardModels(context)) }
+    var customExpanded by remember { mutableStateOf(SectionState.customModels(context)) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onImport(uri, queryDisplayName(context, uri))
     }
@@ -196,7 +196,13 @@ fun ScribScreen(
                 )
             }
             item { LanguageEntry { showLanguages = true } }
-            item { StandardHeader(expanded = modelsExpanded, onToggle = { modelsExpanded = !modelsExpanded }) }
+            item {
+                StandardHeader(expanded = modelsExpanded, onToggle = {
+                    val next = !modelsExpanded
+                    modelsExpanded = next
+                    SectionState.setStandardModels(context, next)
+                })
+            }
             if (modelsExpanded) {
                 items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
             }
@@ -215,7 +221,13 @@ fun ScribScreen(
             if (endpointPlugin != null) {
                 item { endpointPlugin.SettingsBlocks(onChanged = onEndpointChanged) }
             }
-            item { CustomHeader(expanded = customExpanded, onToggle = { customExpanded = !customExpanded }) }
+            item {
+                CustomHeader(expanded = customExpanded, onToggle = {
+                    val next = !customExpanded
+                    customExpanded = next
+                    SectionState.setCustomModels(context, next)
+                })
+            }
             if (customExpanded) {
                 if (state.custom.isEmpty()) {
                     item {

@@ -148,7 +148,7 @@ class EndpointPluginImpl : EndpointPlugin {
     override fun SettingsBlocks(onChanged: () -> Unit) {
         val context = LocalContext.current
         val cs = MaterialTheme.colorScheme
-        var expanded by rememberSaveable { mutableStateOf(true) }
+        var expanded by remember { mutableStateOf(SectionState.remoteEndpoint(context)) }
         var showDialog by rememberSaveable { mutableStateOf(false) }
 
         var configured by remember { mutableStateOf(isConfigured(context)) }
@@ -165,7 +165,11 @@ class EndpointPluginImpl : EndpointPlugin {
         SectionHeader(
             title = stringResource(R.string.endpoint_header),
             expanded = expanded,
-            onToggle = { expanded = !expanded },
+            onToggle = {
+                val next = !expanded
+                expanded = next
+                SectionState.setRemoteEndpoint(context, next)
+            },
             top = 8.dp,
         )
         if (!expanded) return

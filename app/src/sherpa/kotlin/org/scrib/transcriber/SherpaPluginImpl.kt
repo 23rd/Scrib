@@ -155,12 +155,17 @@ class SherpaPluginImpl : SherpaPlugin {
         onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit
     ) {
         val cs = MaterialTheme.colorScheme
+        val context = LocalContext.current
         var showAdd by remember { mutableStateOf(false) }
-        var expanded by rememberSaveable { mutableStateOf(true) }
+        var expanded by remember { mutableStateOf(SectionState.sherpaModels(context)) }
         SectionHeader(
             title = stringResource(R.string.other_engines),
             expanded = expanded,
-            onToggle = { expanded = !expanded },
+            onToggle = {
+                val next = !expanded
+                expanded = next
+                SectionState.setSherpaModels(context, next)
+            },
             top = 8.dp,
         )
         if (!expanded) return
