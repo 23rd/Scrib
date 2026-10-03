@@ -188,7 +188,16 @@ Builds:
       - yes
     ndk: '27.2.12479018'
 
+  - versionName: '0.20'
+    versionCode: 20
+    commit: v0.20
+    subdir: app
+    submodules: true
+    gradle:
+      - yes
+    ndk: '27.2.12479018'
+
 AutoUpdateMode: Version v%v
 UpdateCheckMode: Tags
-CurrentVersion: '0.19'
-CurrentVersionCode: 19
+CurrentVersion: '0.20'
+CurrentVersionCode: 20
