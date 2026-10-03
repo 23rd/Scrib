@@ -19,8 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -796,7 +794,6 @@ private class CreateTranscriptDocument(private val initialUri: Uri?, mimeType: S
 private fun transcriptMimeType(format: TranscriptFormat): String =
     MimeTypeMap.getSingleton().getMimeTypeFromExtension(format.extension) ?: "application/octet-stream"
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TranscriptionDialog(
     t: TranscribeUi,
@@ -857,22 +854,6 @@ private fun TranscriptionDialog(
                     Spacer(Modifier.height(12.dp))
                     if (finished && t.segments.isNotEmpty()) {
                         FormatPicker(t.format, onFormat)
-                        Spacer(Modifier.height(2.dp))
-                    }
-                    FlowRow {
-                        TextButton(onClick = { clipboard.setText(AnnotatedString(t.formatted)) }) { Text(stringResource(R.string.action_copy)) }
-                        TextButton(onClick = {
-                            val send = Intent(Intent.ACTION_SEND)
-                                .setType("text/plain")
-                                .putExtra(Intent.EXTRA_TEXT, t.formatted)
-                                .putExtra(Intent.EXTRA_SUBJECT, baseName)
-                            context.startActivity(Intent.createChooser(send, null))
-                        }) { Text(stringResource(R.string.action_share)) }
-                        if (finished) {
-                            TextButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
-                                Text(stringResource(R.string.action_save_ext, t.format.extension))
-                            }
-                        }
                     }
                 }
             }
@@ -880,6 +861,32 @@ private fun TranscriptionDialog(
         confirmButton = {
             if (t.running) TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
             else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
+        },
+        dismissButton = {
+            if (hasText) {
+                Row {
+                    IconButton(onClick = { clipboard.setText(AnnotatedString(t.formatted)) }) {
+                        Icon(painterResource(R.drawable.ic_action_copy), stringResource(R.string.action_copy))
+                    }
+                    IconButton(onClick = {
+                        val send = Intent(Intent.ACTION_SEND)
+                            .setType("text/plain")
+                            .putExtra(Intent.EXTRA_TEXT, t.formatted)
+                            .putExtra(Intent.EXTRA_SUBJECT, baseName)
+                        context.startActivity(Intent.createChooser(send, null))
+                    }) {
+                        Icon(painterResource(R.drawable.ic_action_share), stringResource(R.string.action_share))
+                    }
+                    if (finished) {
+                        IconButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
+                            Icon(
+                                painterResource(R.drawable.ic_action_save),
+                                stringResource(R.string.action_save_ext, t.format.extension)
+                            )
+                        }
+                    }
+                }
+            }
         }
     )
 }
