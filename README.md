@@ -1,13 +1,15 @@
-# Scrib
+# <a href="https://f-droid.org/packages/org.scrib.transcriber/" title="Scrib on F-Droid"><img src="images/icon.png" width="34" alt="Scrib on F-Droid"></a> <a href="https://github.com/23rd/Scrib/releases/latest" title="Scrib Max on GitHub releases"><img src="images/icon-max.png" width="34" alt="Scrib Max on GitHub releases"></a> Scrib
 
 [![F-Droid](https://img.shields.io/f-droid/v/org.scrib.transcriber.svg)](https://f-droid.org/packages/org.scrib.transcriber/)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
-On-device voice transcription for Android. Your audio never leaves your phone.
+On-device voice transcription for Android. Your audio never leaves your phone,
+until you choose otherwise.
 
-Scrib turns speech into text entirely on your device, using open
+Scrib turns speech into text on your device, using open
 [Whisper](https://github.com/ggml-org/whisper.cpp) speech models. Nothing is
-uploaded — the app only goes online to download a model you choose.
+uploaded — the app only goes online to download a model you choose, unless you
+move transcription to an endpoint yourself.
 
 ## Two ways to use it
 
@@ -40,12 +42,12 @@ can run and in how much they weigh — not in what they promise you.
   each [GitHub release](https://github.com/23rd/Scrib/releases/tag/latest). It
   adds every model family the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
   runtime covers on top of Whisper — SenseVoice, Canary, streaming Zipformer,
-  Parakeet, Moonshine, Dolphin, FireRed — and the installer grows to about
-  150 MB.
+  Parakeet, Moonshine, Dolphin, FireRed — plus transcription on a remote endpoint
+  you configure, and the installer grows to about 150 MB.
 
 The two have separate application ids, so they install side by side and neither
-replaces the other. Both still transcribe on device; Max simply runs more kinds
-of model.
+replaces the other. Both transcribe on device out of the box; Max simply runs more
+kinds of model, and lets you move the work off the phone when you want to.
 
 ## For developers
 
@@ -80,10 +82,14 @@ Omit the flag and you get the lean Scrib that F-Droid builds.
 
 ## Privacy
 
-Transcription runs 100% on device. Your voice messages never leave your phone.
-The only network access is downloading a speech model you pick, over HTTPS.
-This holds for Scrib Max as well — the extra model families are larger, but they
-still run locally.
+By default transcription runs 100% on device: your voice messages never leave
+the phone, and the only network access is downloading a model you pick. The
+F-Droid build does nothing else.
+
+Scrib Max can also transcribe on a server instead — any OpenAI-compatible
+endpoint you configure, or Cloudflare Workers AI. While one is selected, the
+audio is uploaded there over HTTPS instead of being read on the phone, and the
+app names that address on screen.
 
 ## License
 
