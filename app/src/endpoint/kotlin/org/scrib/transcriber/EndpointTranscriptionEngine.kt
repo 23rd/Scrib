@@ -3,6 +3,7 @@ package org.scrib.transcriber
 import android.content.Context
 import android.os.ParcelFileDescriptor
 import android.os.SystemClock
+import android.util.Log
 import org.json.JSONObject
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
@@ -20,6 +21,9 @@ class EndpointTranscriptionEngine(
             other.provider == settings.provider && other.normalizedBaseUrl == settings.normalizedBaseUrl
 
     private val transport: EndpointTransport get() = settings.transport
+
+    private val target: String
+        get() = "${settings.provider} ${settings.host} model=${settings.model}"
 
     override fun transcribe(
         audio: ParcelFileDescriptor,
@@ -56,7 +60,12 @@ class EndpointTranscriptionEngine(
         val language = request?.languageHint?.takeIf { it.isNotEmpty() }
         return AudioStream(request, callback) { samples, sampleCount, _, prompt, _ ->
             val wav = WavWriter.encode(samples, sampleCount, SAMPLE_RATE)
-            val transcript = transport.transcribe(settings, wav, language, prompt, null)
+            val transcript = try {
+                transport.transcribe(settings, wav, language, prompt, null)
+            } catch (e: Throwable) {
+                Log.w(TAG, "Stream segment failed ($target): ${e.message}", e)
+                throw e
+            }
             TranscribedSegment(Dictionary.applyReplacements(appContext, transcript.text), language)
         }
     }
@@ -103,7 +112,14 @@ class EndpointTranscriptionEngine(
             }
 
             onProgress(20)
-            val transcript = transport.transcribe(settings, wav, languageHint, null, cancellation)
+            val transcript = try {
+                transport.transcribe(settings, wav, languageHint, null, cancellation)
+            } catch (e: CancelledException) {
+                throw e
+            } catch (e: Throwable) {
+                Log.w(TAG, "Request failed ($target, ${wav.size} bytes): ${e.message}", e)
+                throw e
+            }
             val elapsedMs = SystemClock.elapsedRealtime() - startedAt
             onProgress(100)
             onMetrics(
@@ -200,6 +216,8 @@ class EndpointTranscriptionEngine(
     }
 
     private companion object {
+        const val TAG = "EndpointEngine"
+
         const val SAMPLE_RATE = 16000
 
         const val ENGINE_ID = "openai-compatible-endpoint"
