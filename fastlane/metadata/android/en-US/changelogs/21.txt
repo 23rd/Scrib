@@ -1,0 +1,5 @@
+• Added Scrib Remote, a third app that transcribes through your own endpoint and nothing else
+• Added per-architecture apks of three builds
+• Added one speech engine for Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM and more
+• Fixed endpoint transcription failing on Android below 14
+• Added the failure reason to the voice keyboard

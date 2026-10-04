@@ -1,0 +1,5 @@
+• Adicionado o Scrib Remote, um terceiro app que transcreve só pelo seu endpoint
+• Adicionados apk por arquitetura das três builds
+• Adicionado um motor de voz para Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM e mais
+• Corrigida a transcrição por endpoint falhando abaixo do Android 14
+• Adicionado o motivo da falha ao teclado de voz

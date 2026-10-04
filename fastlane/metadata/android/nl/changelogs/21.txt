@@ -1,0 +1,5 @@
+• Scrib Remote toegevoegd, een derde app die alleen via je eigen endpoint transcrieert
+• Apk per architectuur van de drie builds toegevoegd
+• Eén spraakengine toegevoegd voor Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM en meer
+• Opgelost dat transcriptie via endpoint mislukte onder Android 14
+• De foutreden toegevoegd aan het spraaktoetsenbord

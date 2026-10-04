@@ -1,0 +1,5 @@
+• Scrib Remote hinzugefügt, eine dritte App, die nur über den eigenen Endpunkt transkribiert
+• Apk pro Architektur der drei Builds hinzugefügt
+• Eine Sprach-Engine für Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM und mehr hinzugefügt
+• Behoben, dass die Endpunkt-Transkription unter Android 14 fehlschlug
+• Fehlergrund zur Sprachtastatur hinzugefügt

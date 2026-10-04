@@ -1,0 +1,5 @@
+• Yalnızca kendi sunucunuz üzerinden yazan üçüncü uygulama Scrib Remote eklendi
+• Üç yapının her mimarisi için apk eklendi
+• Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM ve daha fazlası için tek bir konuşma motoru eklendi
+• Android 14'ün altında sunucu üzerinden yazmanın başarısız olması düzeltildi
+• Sesli klavyeye hata nedeni eklendi
