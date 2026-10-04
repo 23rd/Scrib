@@ -42,7 +42,7 @@ object WavWriter {
         for (i in shorts.indices) {
             view.putShort(i * 2, shorts[i])
         }
-        out.writeBytes(bytes)
+        out.write(bytes)
         return out.toByteArray()
     }
 
