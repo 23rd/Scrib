@@ -101,7 +101,7 @@
     <string name="standard_models">MODELOS ESTÁNDAR</string>
     <string name="size">tamaño</string>
     <string name="custom_models">MODELOS PROPIOS</string>
-    <string name="custom_empty">Añade tu propio modelo GGML por enlace directo o importa un .bin desde este dispositivo.</string>
+    <string name="custom_empty">Añade tu propio modelo por enlace o importa un archivo del dispositivo.</string>
     <string name="badge_multilingual">multilingüe</string>
     <string name="badge_english_only">solo inglés</string>
     <string name="badge_custom">propio</string>
@@ -124,7 +124,7 @@
     <string name="transcript_saved">Transcripción guardada.</string>
     <string name="transcript_save_failed">No se pudo guardar la transcripción.</string>
     <string name="add_from_hf">Añadir modelo de HuggingFace…</string>
-    <string name="import_bin">Importar .bin del dispositivo…</string>
+    <string name="import_bin">Importar archivo de modelo del dispositivo…</string>
     <string name="run_self_test">Autoprueba con clip de ejemplo</string>
     <string name="delete_model_q">¿Eliminar modelo?</string>
     <string name="lang_entry_title">Encuentra un modelo para tu idioma</string>
@@ -132,7 +132,7 @@
     <string name="your_language">Tu idioma</string>
     <string name="lang_dialog_hint">Un modelo multilingüe cubre ~99 idiomas — esto elige un buen tamaño y lo descarga.</string>
     <string name="hf_dialog_title">Modelo de HuggingFace</string>
-    <string name="hf_dialog_body">Pega un enlace directo a un modelo ggml .bin (cualquiera compatible con whisper.cpp).</string>
+    <string name="hf_dialog_body">Pega un enlace directo a un archivo de modelo: un .bin de Whisper antiguo o un .gguf de cualquier familia.</string>
     <string name="lang_english">Inglés</string>
     <string name="lang_spanish">Español</string>
     <string name="lang_german">Alemán</string>
@@ -194,7 +194,7 @@
     <string name="about_keyboard_b">Scrib puede funcionar como teclado de voz. Actívalo en los ajustes de teclado de tu teléfono, luego pulsa la tecla del micrófono de un teclado como HeliBoard o elige Scrib Voz en el selector de teclados, y habla. El texto va directo a donde estabas escribiendo, y tu teclado vuelve cuando paras.</string>
     <string name="about_models_h">Modelos</string>
     <string name="about_endpoint_h">Punto final</string>
-    <string name="about_models_b">Scrib transcribe con modelos de voz abiertos Whisper. Descarga uno en la pantalla principal, o elige tu idioma y Scrib obtiene uno adecuado. Los modelos más grandes son más precisos; guarda varios y cambia cuando quieras.</string>
+    <string name="about_models_b">Scrib transcribe con modelos de voz abiertos sobre un pequeño runtime ggml: Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM y más. Descarga uno en la pantalla principal, o elige tu idioma y Scrib obtiene uno adecuado. Los modelos más grandes son más precisos; guarda varios y cambia cuando quieras.</string>
     <string name="about_endpoint_b">En este teléfono no hay modelo ni código de inferencia: Scrib Remote es el grabador, el que sube y el que edita. Apúntalo a cualquier servidor compatible con OpenAI — whisper.cpp, faster-whisper, Speaches, LM Studio — o a Cloudflare Workers AI, y enviará el audio allí por HTTPS, mostrando la dirección en pantalla.</string>
     <string name="about_dev_h">Para desarrolladores</string>
     <string name="about_dev_b">Cualquier app puede usar Scrib como transcriptor sin conexión mediante el contrato abierto Open Transcribe (org.opentranscribe.api) — un pequeño servicio AIDL, sin SDK ni red. El contrato es neutral respecto al proveedor, así que las apps no dependen de Scrib: pueden vincular cualquier transcriptor compatible que el usuario tenga instalado.</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="other_engines">SHERPA MODELLERİ</string>
-    <string name="status_selftest_whisper_only">Seri testi yalnızca Whisper modellerinde çalışır — kontrol etmek için bir modele geçin.</string>
+    <string name="status_selftest_whisper_only">Seri testi yalnızca ggml modellerinde çalışır — kontrol etmek için bir modele geçin.</string>
     <string name="sherpa_empty_hint">Desteklenen bir sherpa-onnx ASR modeli ekleyin.</string>
     <string name="add_sherpa">Sherpa modeli ekle…</string>
     <string name="sherpa_add_title">Yeni sherpa modeli</string>

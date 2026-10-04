@@ -22,13 +22,17 @@ move transcription to an endpoint yourself.
 
 ## Models
 
-Scrib transcribes with open Whisper speech models. Download one on the main
-screen, or pick your language and Scrib fetches a suitable one. Larger models
-are more accurate but slower and bigger to download; keep several and switch any
-time. You can also add any whisper.cpp-compatible GGML model by direct link, or
-import a `.bin` from your device.
+Scrib transcribes with open speech models, through [transcribe.cpp][tc]: Whisper,
+Parakeet, SenseVoice, Canary, Moonshine, GigaAM, Qwen3-ASR, Nemotron, Voxtral
+and the rest, all read from one ggml runtime. Download one on the main screen, or
+pick your language and Scrib fetches a suitable one. Larger models are more
+accurate but slower and bigger to download; keep several and switch any time.
+You can also add any model the runtime reads by direct link, or import a file
+from your device — a legacy Whisper `.bin` or a `.gguf` of any family.
 
 Models are downloaded separately and are not bundled in the app.
+
+[tc]: https://github.com/handy-computer/transcribe.cpp
 
 ## Three builds
 
@@ -36,13 +40,13 @@ Scrib ships in three flavours from this one repository. They differ in what they
 can run and in how much they weigh — not in what they promise you.
 
 - **Scrib** (`org.scrib.transcriber`) is the lean build, the one F-Droid ships.
-  Whisper models only, small installer, nothing but model downloads over the
+  Every ggml family above, small installer, nothing but model downloads over the
   network.
-- **Scrib Max** (`org.scrib.transcriber.max`) is the extended build: every model
-  family the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) runtime covers
-  on top of Whisper — SenseVoice, Canary, streaming Zipformer, Parakeet,
-  Moonshine, Dolphin, FireRed — and transcription on a remote endpoint you
-  configure. By far the largest of the three.
+- **Scrib Max** (`org.scrib.transcriber.max`) is the extended build: the ggml
+  families plus everything the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
+  runtime covers and ggml does not — streaming Zipformer, Dolphin, FireRed,
+  Omnilingual — with transcription on a remote endpoint you configure. By far
+  the largest of the three.
 - **Scrib Remote** (`org.scrib.transcriber.remote`) has no models and no
   inference code at all: it uploads the audio to a server you control. The
   smallest of the three, and the same size on every phone.
@@ -65,7 +69,7 @@ they can bind any compatible transcriber the user has installed. See
 
 ## Building
 
-The native transcription library is compiled from the bundled `whisper.cpp`
+The native transcription library is compiled from the bundled `transcribe.cpp`
 submodule via CMake and the NDK, so clone with submodules:
 
 ```
@@ -84,8 +88,8 @@ scripts/download-sherpa-onnx.sh
 ./gradlew :app:assembleRelease -PwithSherpa
 ```
 
-Scrib Remote is `-PwithRemote`: the remote endpoints without whisper.cpp, so no
-NDK, no submodule and no AAR.
+Scrib Remote is `-PwithRemote`: the remote endpoints without any inference
+library, so no NDK, no submodule and no AAR.
 
 ```
 ./gradlew :app:assembleRelease -PwithRemote

@@ -1,4 +1,4 @@
-Scrib turns speech into text entirely on your device, using open Whisper speech models. Nothing is uploaded — the app only goes online to download a model you choose.
+Scrib turns speech into text entirely on your device, using open speech models. Nothing is uploaded — the app only goes online to download a model you choose.
 
 Two ways to use it
 
@@ -8,7 +8,7 @@ Two ways to use it
 
 Models
 
-Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick your language and Scrib fetches a suitable one. Larger models are more accurate but slower and bigger to download; keep several and switch any time. You can also add any whisper.cpp-compatible model by direct link, or import a .bin from your device. Models are downloaded separately and are not bundled in the app. This F-Droid build runs Whisper models only. The other families — SenseVoice, streaming Zipformer, Moonshine, Canary, Dolphin, FireRed — need the sherpa runtime and ship as Scrib Max on GitHub.
+Scrib transcribes with open speech models — Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM and more — through one small ggml runtime. Download one on the main screen, or pick your language and Scrib fetches a suitable one. Larger models are more accurate but slower and bigger to download; keep several and switch any time. You can also add any compatible model by direct link, or import a file from your device. Models are downloaded separately and are not bundled in the app. The sherpa-only families — streaming Zipformer, Dolphin, FireRed — ship as Scrib Max on GitHub.
 
 Privacy
 

@@ -101,7 +101,7 @@
     <string name="standard_models">STANDART MODELLER</string>
     <string name="size">boyut</string>
     <string name="custom_models">ÖZEL MODELLER</string>
-    <string name="custom_empty">Kendi GGML modelinizi doğrudan bağlantıyla ekleyin veya bu cihazdan bir .bin içe aktarın.</string>
+    <string name="custom_empty">Kendi modelinizi bağlantıyla ekleyin ya da cihazdan bir dosya içe aktarın.</string>
     <string name="badge_multilingual">çok dilli</string>
     <string name="badge_english_only">yalnızca İngilizce</string>
     <string name="badge_custom">özel</string>
@@ -124,7 +124,7 @@
     <string name="transcript_saved">Metin kaydedildi.</string>
     <string name="transcript_save_failed">Metin kaydedilemedi.</string>
     <string name="add_from_hf">HuggingFace üzerinden model ekle…</string>
-    <string name="import_bin">Cihazdan .bin içe aktar…</string>
+    <string name="import_bin">Cihazdan model dosyası içe aktar…</string>
     <string name="run_self_test">Örnek klip üzerinde otomatik test</string>
     <string name="delete_model_q">Model silinsin mi?</string>
     <string name="lang_entry_title">Diliniz için bir model bulun</string>
@@ -132,7 +132,7 @@
     <string name="your_language">Diliniz</string>
     <string name="lang_dialog_hint">Tek bir çok dilli model ~99 dili kapsar — bu, iyi bir boyut seçip indirir.</string>
     <string name="hf_dialog_title">HuggingFace modeli</string>
-    <string name="hf_dialog_body">.bin ggml modeline doğrudan bir bağlantı yapıştırın (whisper.cpp ile uyumlu herhangi biri).</string>
+    <string name="hf_dialog_body">Bir model dosyasına doğrudan bağlantı yapıştırın: eski bir Whisper .bin ya da herhangi bir ailenin .gguf dosyası.</string>
     <string name="lang_english">İngilizce</string>
     <string name="lang_spanish">İspanyolca</string>
     <string name="lang_german">Almanca</string>
@@ -194,7 +194,7 @@
     <string name="about_keyboard_b">Scrib sesli klavye olarak da çalışabilir. Telefonunuzun klavye ayarlarından açın, sonra HeliBoard gibi bir klavyenin mikrofon tuşuna basın ya da klavye değiştiriciden Scrib Ses\'i seçin ve konuşun. Metin doğrudan yazmakta olduğunuz yere gider, siz durunca klavyeniz geri gelir.</string>
     <string name="about_models_h">Modeller</string>
     <string name="about_endpoint_h">Uç nokta</string>
-    <string name="about_models_b">Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
+    <string name="about_models_b">Scrib, küçük bir ggml çalışma zamanı üzerinde açık konuşma modelleriyle yazıya döker: Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM ve daha fazlası. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
     <string name="about_endpoint_b">Bu telefonda model ve çıkarım kodu yok: Scrib Remote kayıt eden, yükleyen ve düzenleyendir. Onu herhangi bir OpenAI uyumlu sunucuya — whisper.cpp, faster-whisper, Speaches, LM Studio — ya da Cloudflare Workers AI’a yönlendirin; ses HTTPS üzerinden oraya gider ve adres ekranda görünür.</string>
     <string name="about_dev_h">Geliştiriciler için</string>
     <string name="about_dev_b">Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib\'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib\'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.</string>

@@ -109,7 +109,7 @@
     <string name="standard_models">STANDARD MODELS</string>
     <string name="size">size</string>
     <string name="custom_models">CUSTOM MODELS</string>
-    <string name="custom_empty">Add your own GGML model by direct link or import a .bin from this device.</string>
+    <string name="custom_empty">Add your own model by direct link, or import a file from this device.</string>
 
     <string name="badge_multilingual">multilingual</string>
     <string name="badge_english_only">English only</string>
@@ -135,7 +135,7 @@
     <string name="transcript_save_failed">Couldn\'t save the transcript.</string>
 
     <string name="add_from_hf">Add model from HuggingFace…</string>
-    <string name="import_bin">Import .bin from device…</string>
+    <string name="import_bin">Import model file from device…</string>
     <string name="run_self_test">Run self-test on sample clip</string>
 
     <string name="delete_model_q">Delete model?</string>
@@ -146,7 +146,7 @@
     <string name="lang_dialog_hint">One multilingual model covers ~99 languages — this picks a good size and downloads it.</string>
 
     <string name="hf_dialog_title">Model from HuggingFace</string>
-    <string name="hf_dialog_body">Paste a direct link to a .bin ggml model (any whisper.cpp-compatible model).</string>
+    <string name="hf_dialog_body">Paste a direct link to a model file: a legacy Whisper .bin, or a .gguf of any family the engine reads.</string>
     <string name="hf_placeholder" translatable="false">https://huggingface.co/…/ggml-….bin</string>
 
     <string name="lang_english">English</string>
@@ -214,7 +214,7 @@
     <string name="about_keyboard_b">Scrib can act as a voice keyboard. Switch it on in your phone\'s keyboard settings, then press the microphone key of a keyboard like HeliBoard, or pick Scrib Voice from the keyboard switcher, and speak — the text goes straight into whatever you were writing, and your keyboard comes back when you stop.</string>
     <string name="about_models_h">Models</string>
     <string name="about_endpoint_h">Endpoint</string>
-    <string name="about_models_b">Scrib transcribes with open Whisper speech models. Download one on the main screen, or pick your language and Scrib fetches a fitting one. Bigger models are more accurate; keep several and switch anytime.</string>
+    <string name="about_models_b">Scrib transcribes with open speech models through one small ggml runtime: Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM and more. Download one on the main screen, or pick your language and Scrib fetches a fitting one. Bigger models are more accurate; keep several and switch anytime.</string>
     <string name="about_endpoint_b">There is no model on this phone and no inference code: Scrib Remote is the recorder, the uploader and the editor. Point it at any OpenAI-compatible server — whisper.cpp, faster-whisper, Speaches, LM Studio — or at Cloudflare Workers AI, and it sends the audio there over HTTPS, naming the address on screen.</string>
     <string name="about_dev_h">For developers</string>
     <string name="about_dev_b">Any app can use Scrib as an offline transcriber through the open Open Transcribe contract (org.opentranscribe.api) — a small AIDL service, no SDK and no network. The contract is vendor-neutral, so apps aren\'t tied to Scrib: they can bind any compatible transcriber the user has installed.</string>

@@ -101,7 +101,7 @@
     <string name="standard_models">СТАНДАРТНЫЕ МОДЕЛИ</string>
     <string name="size">размер</string>
     <string name="custom_models">СВОИ МОДЕЛИ</string>
-    <string name="custom_empty">Добавьте свою GGML-модель по прямой ссылке или импортируйте .bin с этого устройства.</string>
+    <string name="custom_empty">Добавьте свою модель по ссылке или импортируйте файл с устройства.</string>
     <string name="badge_multilingual">многоязычная</string>
     <string name="badge_english_only">только английский</string>
     <string name="badge_custom">своя</string>
@@ -124,7 +124,7 @@
     <string name="transcript_saved">Текст сохранён.</string>
     <string name="transcript_save_failed">Не удалось сохранить текст.</string>
     <string name="add_from_hf">Добавить модель с HuggingFace…</string>
-    <string name="import_bin">Импортировать .bin с устройства…</string>
+    <string name="import_bin">Импортировать файл модели с устройства…</string>
     <string name="run_self_test">Самопроверка на тестовом клипе</string>
     <string name="delete_model_q">Удалить модель?</string>
     <string name="lang_entry_title">Найти модель для вашего языка</string>
@@ -132,7 +132,7 @@
     <string name="your_language">Ваш язык</string>
     <string name="lang_dialog_hint">Одна многоязычная модель покрывает ~99 языков — Scrib подберёт подходящий размер и скачает.</string>
     <string name="hf_dialog_title">Модель с HuggingFace</string>
-    <string name="hf_dialog_body">Вставьте прямую ссылку на .bin ggml-модель (любую, совместимую с whisper.cpp).</string>
+    <string name="hf_dialog_body">Вставьте прямую ссылку на файл модели: старый Whisper .bin или .gguf любого семейства.</string>
     <string name="lang_english">Английский</string>
     <string name="lang_spanish">Испанский</string>
     <string name="lang_german">Немецкий</string>
@@ -194,7 +194,7 @@
     <string name="about_keyboard_b">Scrib умеет работать как голосовая клавиатура. Включите её в настройках клавиатур телефона, затем нажмите кнопку микрофона в клавиатуре вроде HeliBoard или выберите Scrib Голос в переключателе клавиатур — и говорите. Текст попадёт прямо туда, где вы писали, а ваша клавиатура вернётся, когда вы закончите.</string>
     <string name="about_models_h">Модели</string>
     <string name="about_endpoint_h">Эндпоинт</string>
-    <string name="about_models_b">Scrib распознаёт открытыми моделями Whisper. Скачайте модель на главном экране или выберите язык — Scrib подберёт подходящую. Крупнее = точнее; можно держать несколько и переключаться.</string>
+    <string name="about_models_b">Scrib распознаёт открытыми моделями речи через небольшой ggml-рантайм: Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM и другие. Скачайте модель на главном экране или выберите язык — Scrib подберёт подходящую. Крупнее = точнее; можно держать несколько и переключаться.</string>
     <string name="about_endpoint_b">На этом телефоне нет модели и кода вывода: Scrib Remote — это запись, отправка и правка. Укажите ему любой OpenAI-совместимый сервер — whisper.cpp, faster-whisper, Speaches, LM Studio — или Cloudflare Workers AI: аудио уйдёт туда по HTTPS, а адрес будет виден на экране.</string>
     <string name="about_dev_h">Для разработчиков</string>
     <string name="about_dev_b">Любое приложение может использовать Scrib как офлайн-распознаватель через открытый контракт Open Transcribe (org.opentranscribe.api) — небольшой AIDL-сервис, без SDK и без сети. Контракт вендор-нейтральный, поэтому приложения не привязаны к Scrib: они могут подключить любой совместимый распознаватель, установленный у пользователя.</string>

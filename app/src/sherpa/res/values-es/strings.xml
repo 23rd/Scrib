@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="other_engines">MODELOS SHERPA</string>
-    <string name="status_selftest_whisper_only">El autodiagnóstico solo funciona con modelos Whisper: cambia a uno para comprobarlo.</string>
+    <string name="status_selftest_whisper_only">El autodiagnóstico solo funciona con modelos ggml: cambia a uno para comprobarlo.</string>
     <string name="sherpa_empty_hint">Añade un modelo ASR sherpa-onnx compatible.</string>
     <string name="add_sherpa">Añadir modelo sherpa…</string>
     <string name="sherpa_add_title">Nuevo modelo sherpa</string>

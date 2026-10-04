@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="other_engines">SHERPA-MODELLE</string>
-    <string name="status_selftest_whisper_only">Der Selbsttest läuft nur mit Whisper-Modellen – wechsle zu einem Modell, um ihn zu prüfen.</string>
+    <string name="status_selftest_whisper_only">Der Selbsttest läuft nur mit ggml-Modellen – wechsle zu einem Modell, um ihn zu prüfen.</string>
     <string name="sherpa_empty_hint">Füge ein unterstütztes sherpa-onnx-ASR-Modell hinzu.</string>
     <string name="add_sherpa">Sherpa-Modell hinzufügen…</string>
     <string name="sherpa_add_title">Neues Sherpa-Modell</string>

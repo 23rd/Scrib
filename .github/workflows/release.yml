@@ -130,7 +130,7 @@ jobs:
 
           Three separate apps with three separate application ids. They install side by side and none of them replaces another.
 
-          **Scrib** — the lean build, the same one F-Droid ships. Whisper models only; nothing leaves the phone.
+          **Scrib** — the lean build, the same one F-Droid ships. Every ggml model family, from Whisper to Parakeet and SenseVoice; nothing leaves the phone.
 
           **Scrib Max** — the extended build, and by far the largest download of the three. Whisper plus every model family sherpa-onnx adds on top — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — and custom OpenAI-compatible endpoints.
 

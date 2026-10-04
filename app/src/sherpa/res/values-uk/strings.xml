@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="other_engines">МОДЕЛІ SHERPA</string>
-    <string name="status_selftest_whisper_only">Самоперевірка працює лише з моделями Whisper — перейдіть до однієї, щоб перевірити її.</string>
+    <string name="status_selftest_whisper_only">Самоперевірка працює лише з моделями ggml — перейдіть до однієї, щоб перевірити її.</string>
     <string name="sherpa_empty_hint">Додайте підтримувану ASR-модель sherpa-onnx.</string>
     <string name="add_sherpa">Додати модель sherpa…</string>
     <string name="sherpa_add_title">Нова модель sherpa</string>

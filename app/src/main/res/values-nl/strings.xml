@@ -101,7 +101,7 @@
     <string name="standard_models">STANDAARDMODELLEN</string>
     <string name="size">grootte</string>
     <string name="custom_models">EIGEN MODELLEN</string>
-    <string name="custom_empty">Voeg je eigen GGML-model toe via een directe link of importeer een .bin van dit apparaat.</string>
+    <string name="custom_empty">Voeg je eigen model toe via een link, of importeer een bestand van het apparaat.</string>
     <string name="badge_multilingual">meertalig</string>
     <string name="badge_english_only">alleen Engels</string>
     <string name="badge_custom">eigen</string>
@@ -124,7 +124,7 @@
     <string name="transcript_saved">Transcriptie opgeslagen.</string>
     <string name="transcript_save_failed">Transcriptie kon niet worden opgeslagen.</string>
     <string name="add_from_hf">Model van HuggingFace toevoegen…</string>
-    <string name="import_bin">.bin van apparaat importeren…</string>
+    <string name="import_bin">Modelbestand van apparaat importeren…</string>
     <string name="run_self_test">Zelftest met voorbeeldclip</string>
     <string name="delete_model_q">Model verwijderen?</string>
     <string name="lang_entry_title">Vind een model voor je taal</string>
@@ -132,7 +132,7 @@
     <string name="your_language">Je taal</string>
     <string name="lang_dialog_hint">Eén meertalig model dekt ~99 talen — dit kiest een goede grootte en downloadt die.</string>
     <string name="hf_dialog_title">Model van HuggingFace</string>
-    <string name="hf_dialog_body">Plak een directe link naar een ggml .bin-model (elk whisper.cpp-compatibel model).</string>
+    <string name="hf_dialog_body">Plak een directe link naar een modelbestand: een oude Whisper-.bin of een .gguf van elke familie.</string>
     <string name="lang_english">Engels</string>
     <string name="lang_spanish">Spaans</string>
     <string name="lang_german">Duits</string>
@@ -194,7 +194,7 @@
     <string name="about_keyboard_b">Scrib kan als spraaktoetsenbord werken. Zet het aan in de toetsenbordinstellingen van je telefoon, druk dan op de microfoontoets van een toetsenbord zoals HeliBoard of kies Scrib Stem in de toetsenbordwisselaar, en spreek. De tekst komt direct terecht waar je aan het schrijven was, en je toetsenbord komt terug zodra je stopt.</string>
     <string name="about_models_h">Modellen</string>
     <string name="about_endpoint_h">Endpoint</string>
-    <string name="about_models_b">Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
+    <string name="about_models_b">Scrib transcribeert met open spraakmodellen via een kleine ggml-runtime: Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM en meer. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
     <string name="about_endpoint_b">Op deze telefoon staat geen model en staat geen inferentiecode: Scrib Remote is de opnemer, de uploader en de bewerker. Richt het op een OpenAI-compatibele server — whisper.cpp, faster-whisper, Speaches, LM Studio — of op Cloudflare Workers AI, en de audio gaat daar via HTTPS heen, met het adres zichtbaar op het scherm.</string>
     <string name="about_dev_h">Voor ontwikkelaars</string>
     <string name="about_dev_b">Elke app kan Scrib als offline transcriber gebruiken via het open Open Transcribe-contract (org.opentranscribe.api) — een kleine AIDL-service, zonder SDK en zonder netwerk. Het contract is leveranciersneutraal, dus apps zijn niet aan Scrib gebonden: ze kunnen elke compatibele transcriber binden die de gebruiker heeft geïnstalleerd.</string>
