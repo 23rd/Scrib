@@ -51,7 +51,10 @@ object ModelManager {
     // picked as the active one.
     fun installedFileNames(context: Context): List<String> =
         modelsDir(context).listFiles()
-            ?.filter { it.isFile && it.name.endsWith(".bin") && it.name != ModelCatalog.VAD_FILE && valid(it) }
+            ?.filter {
+                it.isFile && (it.name.endsWith(".bin") || it.name.endsWith(".gguf")) &&
+                    it.name != ModelCatalog.VAD_FILE && valid(it)
+            }
             ?.map { it.name }
             ?.sorted()
             ?: emptyList()
@@ -92,7 +95,7 @@ object ModelManager {
         }
         val name = activeFileName(context) ?: return null
         return ModelCatalog.byFileName(name)?.displayName
-            ?: name.removePrefix("ggml-").removeSuffix(".bin")
+            ?: name.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf")
     }
 
     internal fun storedActiveName(context: Context): String? =
@@ -304,15 +307,18 @@ object ModelManager {
 
     fun customModelFromUrl(url: String): WhisperModel {
         val trimmed = url.trim().replace("/blob/", "/resolve/")
-        require(trimmed.startsWith("https://")) { "Enter a full https:// link to a .bin model" }
+        require(trimmed.startsWith("https://")) { "Enter a full https:// link to a model file" }
         val fileName = trimmed.substringBefore('?').substringAfterLast('/')
-        require(fileName.endsWith(".bin")) { "Link must point to a .bin ggml model" }
+        require(isModelFile(fileName)) { "Link must point to a .bin or .gguf model" }
         return ModelCatalog.customModel(fileName, trimmed)
     }
 
+    fun isModelFile(fileName: String): Boolean =
+        fileName.endsWith(".bin") || fileName.endsWith(".gguf")
+
     fun importFromUri(context: Context, uri: Uri, suggestedName: String?): String {
-        val name = (suggestedName ?: "imported-model.bin").let {
-            if (it.endsWith(".bin")) it else "$it.bin"
+        val name = (suggestedName ?: "imported-model.gguf").let {
+            if (isModelFile(it)) it else "$it.gguf"
         }
         val dest = fileFor(context, name)
         val temp = File(dest.absolutePath + ".part")

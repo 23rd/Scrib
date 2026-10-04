@@ -71,7 +71,7 @@ object BenchmarkRunner {
             .map { fileName ->
                 BenchmarkModelTarget(
                     id = fileName,
-                    displayName = fileName.removePrefix("ggml-").removeSuffix(".bin"),
+                    displayName = fileName.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf"),
                     kind = BenchmarkModelKind.WHISPER
                 )
             }

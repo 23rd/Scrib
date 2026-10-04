@@ -139,7 +139,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         val custom = customFiles.map { f ->
             val multi = !ModelCatalog.isEnglishOnly(f)
             ModelRow(
-                id = f, name = f.removePrefix("ggml-").removeSuffix(".bin"),
+                id = f, name = f.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf"),
                 badge = str(if (multi) R.string.badge_multilingual else R.string.badge_english_only),
                 multilingual = multi, sizeMb = 0,
                 tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
