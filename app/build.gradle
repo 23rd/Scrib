@@ -89,11 +89,14 @@ android {
     sourceSets {
         main {
             kotlin.srcDirs += 'src/main/kotlin'
+            // whisper.cpp, its JNI wrapper and the wav the self test runs on.
+            kotlin.srcDirs += 'src/local/kotlin'
+            assets.srcDirs += 'src/local/assets'
             if (max) {
                 kotlin.srcDirs += 'src/sherpa/kotlin'
-                kotlin.srcDirs += 'src/max/kotlin'
+                kotlin.srcDirs += 'src/endpoint/kotlin'
                 res.srcDirs += 'src/sherpa/res'
-                res.srcDirs += 'src/max/res'
+                res.srcDirs += 'src/endpoint/res'
             }
         }
     }
