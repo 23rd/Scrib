@@ -1,10 +1,10 @@
-package com.whispercpp.whisper
+package org.scrib.transcriber
 
 import android.util.Log
 import java.io.BufferedReader
 import java.io.FileReader
 
-object WhisperCpuConfig {
+object CpuConfig {
     val preferredThreadCount: Int
         // Always use at least 2 threads:
         get() = CpuInfo.getHighPerfCpuCount().coerceAtLeast(2)
@@ -51,7 +51,7 @@ private class CpuInfo(private val lines: List<String>) {
         .toList()
 
 
-    // Every core close enough to the fastest one earns a thread: whisper splits each matmul into
+    // Every core close enough to the fastest one earns a thread: the library splits each matmul into
     // equal shares and waits for the last core to finish, so a core that keeps up is worth having
     // and one that lags holds up all the others. Keeping only the topmost bin would leave a CPU
     // like the Snapdragon 8 Elite -- where six of the eight big cores merely clock a little lower
@@ -75,7 +75,7 @@ private class CpuInfo(private val lines: List<String>) {
     }
 
     companion object {
-        private const val LOG_TAG = "WhisperCpuConfig"
+        private const val LOG_TAG = "CpuConfig"
 
         // A LITTLE core sits at about a quarter of the capacity of a big one, while a big core on
         // a lower clock stays above two thirds, so half of the maximum tells the two apart. Bare

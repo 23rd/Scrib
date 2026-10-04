@@ -15,7 +15,7 @@ object ModelManager {
     private const val KEY_LIVE_STATS = "liveStats"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
 
-    // The VAD model is a fraction of the size of even the smallest whisper one, so it cannot be
+    // The VAD model is a fraction of the size of even the smallest speech one, so it cannot be
     // held to the same floor.
     private const val MIN_VALID_VAD_SIZE = 500_000L
 
@@ -189,7 +189,7 @@ object ModelManager {
             .putBoolean(KEY_LIVE_STATS, enabled).apply()
     }
 
-    // The path to hand whisper, or null when silence is to be decoded along with everything else.
+    // The path to hand the engine, or null when silence is to be decoded along with everything else.
     // The model can go missing after the setting was turned on — a cleared app storage, a restore
     // onto another phone — so the file is checked, not just the preference.
     fun vadModelPath(context: Context): String? {
@@ -215,7 +215,7 @@ object ModelManager {
         }
         val model = activeModelFile(context) ?: return true
         return try {
-            LocalModelsPlugins.plugin?.isParakeetModel(model.absolutePath) != true
+            LocalModelsPlugins.plugin?.usesVadModel(model.absolutePath) ?: true
         } catch (ignore: Throwable) {
             true
         }

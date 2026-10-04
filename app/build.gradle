@@ -33,7 +33,7 @@ android {
         resValue 'string', 'app_name', appName
 
         // LocalModelsPlugin is an interface in main whose implementation only exists in the
-        // source set that also carries libwhisper.so, so the UI asks the flag rather than the
+        // source set that also carries libtranscribe.so, so the UI asks the flag rather than the
         // plugin whether there are models to show.
         buildConfigField 'boolean', 'LOCAL_MODELS', local.toString()
         // Remote is the one build where every recording goes to a server, which the About screen
@@ -53,7 +53,16 @@ android {
                 cmake {
                     cppFlags '-O3'
                     cFlags '-O3'
-                    arguments '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                    arguments '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON',
+                              "-DCMAKE_PROJECT_transcribe_INCLUDE=${file('src/main/jni/transcribe/bridge.cmake').absolutePath}",
+                              "-DCMAKE_PROJECT_ggml_INCLUDE=${file('src/main/jni/transcribe/ggml-hooks.cmake').absolutePath}",
+                              '-DTRANSCRIBE_BUILD_SHARED=ON',
+                              '-DTRANSCRIBE_BUILD_TESTS=OFF',
+                              '-DTRANSCRIBE_BUILD_EXAMPLES=OFF',
+                              '-DTRANSCRIBE_BUILD_TOOLS=OFF',
+                              '-DTRANSCRIBE_INSTALL=OFF',
+                              '-DTRANSCRIBE_USE_OPENMP=OFF',
+                              '-DTRANSCRIBE_USE_SYSTEM_BLAS=OFF'
                 }
             }
         }
@@ -68,7 +77,7 @@ android {
     if (local) {
         externalNativeBuild {
             cmake {
-                path 'src/main/jni/whisper/CMakeLists.txt'
+                path file('../transcribe.cpp/CMakeLists.txt')
             }
         }
     }

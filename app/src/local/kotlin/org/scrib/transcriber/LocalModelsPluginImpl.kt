@@ -1,28 +1,37 @@
 package org.scrib.transcriber
 
 import android.content.Context
-import com.whispercpp.whisper.WhisperContext
 
 class LocalModelsPluginImpl : LocalModelsPlugin {
 
     @Volatile
-    private var whisper: TranscriptionEngine? = null
+    private var engine: TranscriptionEngine? = null
 
     @Synchronized
     override fun engine(context: Context): TranscriptionEngine =
-        whisper ?: WhisperTranscriptionEngine(context.applicationContext).also { whisper = it }
+        engine ?: GgmlTranscriptionEngine(context.applicationContext).also { engine = it }
 
-    override fun isParakeetModel(modelPath: String): Boolean = WhisperContext.isParakeetModel(modelPath)
+    override fun usesVadModel(modelPath: String): Boolean = TranscribeModel.usesVad(modelPath)
 
     override fun selfTest(context: Context): SelfTestResult {
         val active = ModelManager.activeModelFile(context)
             ?: return SelfTestResult(context.getString(R.string.status_selftest_needs_model), true)
         return try {
-            val whisper = WhisperContext.createContextFromFile(active.absolutePath)
-            val audio = context.assets.open("jfk.wav").use { WavDecoder.decode(it) }
-            val text = whisper.transcribeData(audio, "en")
-            whisper.release()
-            SelfTestResult(context.getString(R.string.status_selftest_ok, text.trim()), false)
+            val model = TranscribeModel.load(active.absolutePath)
+            try {
+                val session = model.openSession(CpuConfig.preferredThreadCount)
+                try {
+                    val samples = context.assets.open("jfk.wav").use { WavDecoder.decode(it) }
+                    val pcm = pcmBuffer(samples)
+                    session.run(pcm, samples.size, "en", null, false, null)
+                    val text = session.fullText.orEmpty()
+                    SelfTestResult(context.getString(R.string.status_selftest_ok, text.trim()), false)
+                } finally {
+                    session.release()
+                }
+            } finally {
+                model.release()
+            }
         } catch (e: Throwable) {
             SelfTestResult(context.getString(R.string.status_selftest_failed, e.message ?: ""), true)
         }

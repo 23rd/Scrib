@@ -973,7 +973,7 @@ private fun elapsedOrDash(ms: Long): String = if (ms > 0L) elapsed(ms) else "—
 private fun rtfText(metrics: TranscriptionMetrics): String =
     metrics.rtf?.let { String.format(Locale.ROOT, "%.2f", it) } ?: "—"
 
-// Whisper only starts reporting once decoding is done and the model is loaded, so the bar spins
+// The engine only starts reporting once decoding is done and the model is loaded, so the bar spins
 // until then rather than sitting at a misleading zero. The line underneath doubles as the promise
 // that walking away is safe — the run keeps going in the notification.
 @Composable

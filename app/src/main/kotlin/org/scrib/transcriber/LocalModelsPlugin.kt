@@ -2,15 +2,16 @@ package org.scrib.transcriber
 
 import android.content.Context
 
-// The Whisper models: the engine, the catalog and the files they are downloaded to. All of it
-// lives behind this interface, because Scrib Remote ships none of it — no libwhisper.so, no model
+// The local models: the engine, the catalog and the files they are downloaded to. All of it lives
+// behind this interface, because Scrib Remote ships none of it — no inference library, no model
 // list, no downloader — and still has to compile the same screens.
 interface LocalModelsPlugin {
 
     fun engine(context: Context): TranscriptionEngine
 
-    // A parakeet file segments itself, so it does not want the VAD model in front of it.
-    fun isParakeetModel(modelPath: String): Boolean
+    // Whether the silence-skipping model is worth handing to this file: a family that finds the
+    // speech in the audio itself has no use for a second model doing the same job in front of it.
+    fun usesVadModel(modelPath: String): Boolean
 
     // Blocking: the caller keeps it off the main thread.
     fun selfTest(context: Context): SelfTestResult
