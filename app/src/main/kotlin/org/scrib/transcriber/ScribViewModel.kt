@@ -8,7 +8,6 @@ import android.os.SystemClock
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.whispercpp.whisper.WhisperContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -411,25 +410,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             statusMsg = it
             statusError = false; push(); return
         }
-        val active = ModelManager.activeModelFile(ctx)
-        if (active == null) {
-            statusMsg = str(R.string.status_selftest_needs_model)
-            statusError = true; push(); return
-        }
+        val local = LocalModelsPlugins.plugin ?: return
         statusMsg = str(R.string.status_running_selftest); statusError = false; push()
         viewModelScope.launch {
-            val (msg, err) = withContext(Dispatchers.IO) {
-                try {
-                    val whisper = WhisperContext.createContextFromFile(active.absolutePath)
-                    val audio = ctx.assets.open("jfk.wav").use { WavDecoder.decode(it) }
-                    val text = whisper.transcribeData(audio, "en")
-                    whisper.release()
-                    str(R.string.status_selftest_ok, text.trim()) to false
-                } catch (e: Throwable) {
-                    str(R.string.status_selftest_failed, e.message ?: "") to true
-                }
-            }
-            statusMsg = msg; statusError = err
+            val result = withContext(Dispatchers.IO) { local.selfTest(ctx) }
+            statusMsg = result.message; statusError = result.failed
             push()
         }
     }

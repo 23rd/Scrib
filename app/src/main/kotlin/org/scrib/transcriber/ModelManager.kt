@@ -2,7 +2,6 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.net.Uri
-import com.whispercpp.whisper.WhisperContext
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -216,7 +215,7 @@ object ModelManager {
         }
         val model = activeModelFile(context) ?: return true
         return try {
-            !WhisperContext.isParakeetModel(model.absolutePath)
+            LocalModelsPlugins.plugin?.isParakeetModel(model.absolutePath) != true
         } catch (ignore: Throwable) {
             true
         }

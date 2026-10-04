@@ -55,26 +55,23 @@ interface TranscriptionEngine {
     companion object {
         const val CONTRACT_VERSION = 3
 
-        @Volatile
-        private var whisper: TranscriptionEngine? = null
-
         fun releaseAll(context: Context) {
             val app = context.applicationContext
-            whisper?.releaseModel()
+            runCatching { LocalModelsPlugins.plugin?.engine(app)?.releaseModel() }
             runCatching { SherpaPlugins.plugin?.engine(app)?.releaseModel() }
             runCatching { EndpointPlugins.plugin?.engine(app)?.releaseModel() }
         }
 
         fun get(context: Context): TranscriptionEngine {
             val app = context.applicationContext
+            val local = LocalModelsPlugins.plugin
             EndpointPlugins.plugin?.takeIf { it.isActive(app) }?.let { return it.engine(app) }
-            val plugin = SherpaPlugins.plugin
-            if (plugin != null && plugin.selectedId(app) != null) {
-                return plugin.engine(app)
+            val sherpa = SherpaPlugins.plugin
+            if (sherpa != null && sherpa.selectedId(app) != null) {
+                return sherpa.engine(app)
             }
-            return whisper ?: synchronized(this) {
-                whisper ?: WhisperTranscriptionEngine(context.applicationContext).also { whisper = it }
-            }
+            local?.let { return it.engine(app) }
+            throw ModelNotAvailableException("No engine is set up")
         }
     }
 }

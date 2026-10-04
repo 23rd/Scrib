@@ -54,9 +54,17 @@ class WhisperTranscriptionEngine(private val appContext: Context) : Transcriptio
     }
 
     override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
-        AudioStream(request, callback) { samples, sampleCount, language, prompt, abortFlag ->
-            val chunk = whisperContext().transcribeChunk(samples, sampleCount, language, prompt, abortFlag)
-            TranscribedSegment(Dictionary.applyReplacements(appContext, chunk.text), chunk.language)
+        AudioStream(request, callback) { samples, sampleCount, language, prompt, cancellation ->
+            // One abort flag per utterance, so the native call can be cut short from the stream
+            // thread while it is still decoding.
+            val abortFlag = WhisperAbortFlag()
+            try {
+                cancellation.onCancel { abortFlag.cancel() }
+                val chunk = whisperContext().transcribeChunk(samples, sampleCount, language, prompt, abortFlag)
+                TranscribedSegment(Dictionary.applyReplacements(appContext, chunk.text), chunk.language)
+            } finally {
+                abortFlag.close()
+            }
         }
 
     override fun transcribeToSegments(

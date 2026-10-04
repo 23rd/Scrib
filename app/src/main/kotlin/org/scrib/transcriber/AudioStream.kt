@@ -3,7 +3,6 @@ package org.scrib.transcriber
 import android.media.AudioFormat
 import android.os.IBinder
 import android.util.Log
-import com.whispercpp.whisper.WhisperAbortFlag
 import org.opentranscribe.api.ErrorType
 import org.opentranscribe.api.ITranscriptionCallback
 import org.opentranscribe.api.StreamRequest
@@ -21,7 +20,7 @@ fun interface SegmentTranscriber {
         sampleCount: Int,
         language: String?,
         prompt: String?,
-        abortFlag: WhisperAbortFlag
+        cancellation: CancellationToken
     ): TranscribedSegment
 }
 
@@ -37,7 +36,7 @@ class AudioStream(
     private val lock = Object()
     private val pending = PendingAudio()
     private val converter: AudioDecoder.ChunkConverter
-    private val abortFlag = WhisperAbortFlag()
+    private val cancellation = CancellationToken()
     private val settled = AtomicBoolean(false)
     private val worker = Thread({ run() }, "scrib-stream")
 
@@ -129,7 +128,7 @@ class AudioStream(
             cancelled = true
             lock.notifyAll()
         }
-        abortFlag.cancel()
+        cancellation.cancel()
     }
 
     private fun run() {
@@ -179,7 +178,6 @@ class AudioStream(
             Log.w(TAG, "Stream failed", e)
             settle { callback.onTranscriptionError(transcriptionError(ErrorType.UNEXPECTED, e.message)) }
         } finally {
-            abortFlag.close()
             try {
                 callback.asBinder().unlinkToDeath(death, 0)
             } catch (ignore: Exception) {
@@ -190,7 +188,7 @@ class AudioStream(
 
     private fun transcribeSegment(length: Int) {
         val prompt = committed.takeLast(PROMPT_CHARS).toString()
-        val result = transcriber.transcribe(segment, length, language, prompt, abortFlag)
+        val result = transcriber.transcribe(segment, length, language, prompt, cancellation)
         synchronized(lock) {
             if (cancelled) {
                 throw CancelledException()
