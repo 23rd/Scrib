@@ -65,7 +65,9 @@ interface TranscriptionEngine {
         fun get(context: Context): TranscriptionEngine {
             val app = context.applicationContext
             val local = LocalModelsPlugins.plugin
-            EndpointPlugins.plugin?.takeIf { it.isActive(app) }?.let { return it.engine(app) }
+            // Remote has no local engine, so an endpoint that is saved but not switched on still
+            // counts: it reports itself as unset rather than leaving nothing to hand back.
+            EndpointPlugins.plugin?.takeIf { it.isActive(app) || local == null }?.let { return it.engine(app) }
             val sherpa = SherpaPlugins.plugin
             if (sherpa != null && sherpa.selectedId(app) != null) {
                 return sherpa.engine(app)

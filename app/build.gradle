@@ -7,6 +7,15 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 def abis = (findProperty('abis') ?: 'arm64-v8a').toString().split(',').toList()
 
 def max = project.hasProperty('withSherpa')
+def remote = project.hasProperty('withRemote')
+if (max && remote) {
+    throw new GradleException('withSherpa and withRemote are two different apps, not one. Pick one.')
+}
+def local = !remote
+def suffix = max ? '.max' : remote ? '.remote' : ''
+def appName = max ? 'Scrib Max' : remote ? 'Scrib Remote' : 'Scrib'
+def launcher = max ? 'ic_launcher_max' : remote ? 'ic_launcher_remote' : 'ic_launcher'
+def launcherRound = max ? 'ic_launcher_round_max' : remote ? 'ic_launcher_round_remote' : 'ic_launcher_round'
 
 android {
     namespace 'org.scrib.transcriber'
@@ -15,25 +24,29 @@ android {
     ndkVersion '27.2.12479018'
 
     defaultConfig {
-        applicationId max ? 'org.scrib.transcriber.max' : 'org.scrib.transcriber'
+        applicationId "org.scrib.transcriber${suffix}"
         minSdk 26
         targetSdk 35
         versionCode 20
         versionName '0.20'
 
-        resValue 'string', 'app_name', max ? 'Scrib Max' : 'Scrib'
+        resValue 'string', 'app_name', appName
 
-        manifestPlaceholders.launcherIcon = max ? '@mipmap/ic_launcher_max' : '@mipmap/ic_launcher'
-        manifestPlaceholders.launcherRoundIcon = max ? '@mipmap/ic_launcher_round_max' : '@mipmap/ic_launcher_round'
+        manifestPlaceholders.launcherIcon = "@mipmap/${launcher}"
+        manifestPlaceholders.launcherRoundIcon = "@mipmap/${launcherRound}"
 
-        ndk {
-            abiFilters.addAll(abis)
-        }
-        externalNativeBuild {
-            cmake {
-                cppFlags '-O3'
-                cFlags '-O3'
-                arguments '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+        // Remote has no native code of its own, so there is nothing for an abi filter to select
+        // and nothing for a split to divide up.
+        if (local) {
+            ndk {
+                abiFilters.addAll(abis)
+            }
+            externalNativeBuild {
+                cmake {
+                    cppFlags '-O3'
+                    cFlags '-O3'
+                    arguments '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                }
             }
         }
     }
@@ -44,9 +57,11 @@ android {
         buildConfig true
     }
 
-    externalNativeBuild {
-        cmake {
-            path 'src/main/jni/whisper/CMakeLists.txt'
+    if (local) {
+        externalNativeBuild {
+            cmake {
+                path 'src/main/jni/whisper/CMakeLists.txt'
+            }
         }
     }
 
@@ -65,7 +80,7 @@ android {
         }
         debug {
             applicationIdSuffix '.debug'
-            resValue 'string', 'app_name', max ? 'Scrib Max Debug' : 'Scrib Debug'
+            resValue 'string', 'app_name', "${appName} Debug"
         }
     }
 
@@ -86,17 +101,24 @@ android {
         }
     }
 
+    // srcDirs of main rather than source sets of their own: one module, one compilation, so an
+    // internal declaration in main stays visible to the code that plugs into it.
     sourceSets {
         main {
             kotlin.srcDirs += 'src/main/kotlin'
-            // whisper.cpp, its JNI wrapper and the wav the self test runs on.
-            kotlin.srcDirs += 'src/local/kotlin'
-            assets.srcDirs += 'src/local/assets'
+            if (local) {
+                // whisper.cpp, its JNI wrapper and the wav the self test runs on.
+                kotlin.srcDirs += 'src/local/kotlin'
+                assets.srcDirs += 'src/local/assets'
+            }
+            if (max || remote) {
+                // The remote endpoints: OpenAI-compatible servers and Cloudflare Workers AI.
+                kotlin.srcDirs += 'src/endpoint/kotlin'
+                res.srcDirs += 'src/endpoint/res'
+            }
             if (max) {
                 kotlin.srcDirs += 'src/sherpa/kotlin'
-                kotlin.srcDirs += 'src/endpoint/kotlin'
                 res.srcDirs += 'src/sherpa/res'
-                res.srcDirs += 'src/endpoint/res'
             }
         }
     }
