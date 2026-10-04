@@ -12,10 +12,27 @@ concurrency:
   group: latest-apk
   cancel-in-progress: true
 
+env:
+  ALL_ABIS: arm64-v8a,armeabi-v7a,x86_64,x86
+
 jobs:
   build:
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: scrib
+            name: Scrib
+            flags: ''
+          - id: max
+            name: Scrib-Max
+            flags: '-PwithSherpa'
+          - id: remote
+            name: Scrib-Remote
+            flags: '-PwithRemote'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,12 +46,6 @@ jobs:
           git checkout "$(git tag --list 'v*' --sort=-version:refname | head -n1)"
           git submodule update --init --recursive
 
-      - name: Resolve the version
-        run: |
-          tag="$(git describe --tags --exact-match --match 'v*')"
-          grep -qF "versionName '${tag#v}'" app/build.gradle
-          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
-
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -42,54 +53,111 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # One universal APK, so a laptop running Waydroid or an older 32-bit phone is served by
-      # the same download. F-Droid keeps building the arm64-only default.
-      - run: ./gradlew :app:assembleRelease -Pabis=arm64-v8a,armeabi-v7a,x86_64,x86
-
-      - name: Sign the APK
-        env:
-          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
-          KEYSTORE_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-        run: |
-          tools="$ANDROID_HOME/build-tools/35.0.0"
-          printf '%s' "$KEYSTORE_B64" | base64 -d > release.jks
-          "$tools/zipalign" -f -P 16 4 \
-            app/build/outputs/apk/release/app-release-unsigned.apk aligned.apk
-          "$tools/apksigner" sign --ks release.jks --ks-key-alias scrib \
-            --ks-pass env:KEYSTORE_PASS --out Scrib.apk aligned.apk
-          "$tools/apksigner" verify Scrib.apk
-          rm release.jks
-
       - name: Fetch the sherpa-onnx runtime
+        if: matrix.id == 'max'
         run: scripts/download-sherpa-onnx.sh
 
-      - run: ./gradlew :app:assembleRelease -Pabis=arm64-v8a,armeabi-v7a,x86_64,x86 -PwithSherpa
+      # One build of the native code, five apks out of it: the four architectures and the
+      # universal one, so a phone on a metered connection downloads its own .so files rather than
+      # the other three alongside them. F-Droid keeps building the arm64-only default.
+      - name: Build
+        run: ./gradlew :app:assembleRelease -PabiSplits -Pabis=$ALL_ABIS ${{ matrix.flags }}
 
-      - name: Sign Scrib Max
+      - name: Sign
         env:
           KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
           KEYSTORE_PASS: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          NAME: ${{ matrix.name }}
         run: |
           tools="$ANDROID_HOME/build-tools/35.0.0"
           printf '%s' "$KEYSTORE_B64" | base64 -d > release.jks
-          "$tools/zipalign" -f -P 16 4 \
-            app/build/outputs/apk/release/app-release-unsigned.apk aligned-max.apk
-          "$tools/apksigner" sign --ks release.jks --ks-key-alias scrib \
-            --ks-pass env:KEYSTORE_PASS --out Scrib-Max.apk aligned-max.apk
-          "$tools/apksigner" verify Scrib-Max.apk
+          mkdir -p dist
+          for apk in app/build/outputs/apk/release/app-*-release-unsigned.apk; do
+            abi="$(basename "$apk" .apk)"
+            abi="${abi#app-}"
+            abi="${abi%-release-unsigned}"
+            if [ "$abi" = universal ]; then
+              out="dist/$NAME.apk"
+            else
+              out="dist/$NAME-$abi.apk"
+            fi
+            "$tools/zipalign" -f -P 16 4 "$apk" "$out.aligned"
+            "$tools/apksigner" sign --ks release.jks --ks-key-alias scrib \
+              --ks-pass env:KEYSTORE_PASS --out "$out" "$out.aligned"
+            "$tools/apksigner" verify "$out"
+            rm "$out.aligned"
+          done
           rm release.jks
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: apk-${{ matrix.id }}
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Switch to the newest release tag
+        if: github.event_name == 'workflow_dispatch'
+        run: git checkout "$(git tag --list 'v*' --sort=-version:refname | head -n1)"
+
+      - name: Resolve the version
+        run: |
+          tag="$(git describe --tags --exact-match --match 'v*')"
+          grep -qF "versionName '${tag#v}'" app/build.gradle
+          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: apk-*
+          path: apks
+          merge-multiple: true
+
+      - name: Write the release notes
+        run: |
+          cat > notes.md <<EOF
+          Version $VERSION · $(date -u +%Y-%m-%d)
+
+          Three separate apps with three separate application ids. They install side by side and none of them replaces another.
+
+          **Scrib** — the lean build, the same one F-Droid ships. Whisper models only; nothing leaves the phone.
+
+          **Scrib Max** — the extended build. Whisper plus every model family sherpa-onnx adds on top — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — and custom OpenAI-compatible endpoints.
+
+          **Scrib Remote** — no models at all, about 7 MB. It uploads the audio to a server you control and shows what comes back.
+
+          Each app is attached twice over: a universal apk, and one per architecture — **arm64-v8a** (nearly every phone since 2016), **armeabi-v7a** (older 32-bit phones), **x86_64** and **x86** (emulators, Waydroid, Chromebooks). The per-architecture files are the same app in a smaller download; they carry the same version code, so moving between them in either direction is a plain install, with no uninstall first.
+
+          All of them are signed with our own key, so none of them can update an F-Droid install.
+          EOF
 
       - name: Update the latest release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git push --force origin HEAD:refs/tags/latest
-          title="Scrib $VERSION"
-          notes="$(printf 'Version %s · %s · arm64-v8a, armeabi-v7a, x86_64, x86.\n\n**Scrib.apk** is the lean build, the same one F-Droid ships.\n**Scrib-Max.apk** is the extended build: every model family the sherpa runtime adds on top of Whisper — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — for a much larger download. The two have separate application ids, so they install side by side and neither replaces the other.\n\nBoth are signed with their own key, so neither can update an F-Droid install.' \
-            "$VERSION" "$(date -u +%Y-%m-%d)")"
           if gh release view latest >/dev/null 2>&1; then
-            gh release edit latest --title "$title" --notes "$notes"
-            gh release upload latest Scrib.apk Scrib-Max.apk --clobber
+            gh release edit latest --title "Scrib $VERSION" --notes-file notes.md
+            # --clobber replaces what it is given and leaves the rest, so a renamed or dropped
+            # build would sit on the release page for ever.
+            fresh="$(cd apks && ls *.apk | tr '\n' ' ')"
+            for asset in $(gh release view latest --json assets --jq '.assets[].name'); do
+              case " $fresh " in
+                *" $asset "*) ;;
+                *) gh release delete-asset latest "$asset" -y ;;
+              esac
+            done
+            gh release upload latest apks/*.apk --clobber
           else
-            gh release create latest Scrib.apk Scrib-Max.apk --title "$title" --notes "$notes"
+            gh release create latest apks/*.apk --title "Scrib $VERSION" --notes-file notes.md
           fi

@@ -92,6 +92,18 @@ android {
         }
     }
 
+    // One build of the native code, five apks out of it: the phone gets its own architecture
+    // instead of downloading the other three with it. Only the release workflow passes
+    // -PabiSplits, and it pairs it with -Pabis covering all four; F-Droid takes the default one.
+    splits {
+        abi {
+            enable project.hasProperty('abiSplits')
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'
+            universalApk true
+        }
+    }
+
     dependenciesInfo {
         includeInApk false
         includeInBundle false
