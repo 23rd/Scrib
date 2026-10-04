@@ -39,22 +39,22 @@ fun AboutScreen(onBack: () -> Unit) {
         ) {
             Text(stringResource(R.string.app_name), fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground)
             Text(
-                stringResource(R.string.about_tagline),
+                stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.about_tagline_remote else R.string.about_tagline),
                 fontSize = 14.sp, color = cs.onSurfaceVariant, lineHeight = 20.sp,
                 modifier = Modifier.padding(top = 6.dp, bottom = 24.dp)
             )
 
             Heading(stringResource(R.string.about_two_ways))
             SubHeading(stringResource(R.string.about_own_h))
-            Body(stringResource(R.string.about_own_b))
+            Body(stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.about_own_b_remote else R.string.about_own_b))
             SubHeading(stringResource(R.string.about_engine_h))
-            Body(stringResource(R.string.about_engine_b))
+            Body(stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.about_engine_b_remote else R.string.about_engine_b))
             SubHeading(stringResource(R.string.about_keyboard_h))
             Body(stringResource(R.string.about_keyboard_b))
 
             Spacer(Modifier.height(22.dp))
-            Heading(stringResource(R.string.about_models_h))
-            Body(stringResource(R.string.about_models_b))
+            Heading(stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.about_endpoint_h else R.string.about_models_h))
+            Body(stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.about_endpoint_b else R.string.about_models_b))
 
             Spacer(Modifier.height(22.dp))
             Heading(stringResource(R.string.about_dev_h))

@@ -173,36 +173,42 @@ fun ScribScreen(
                 item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
                 item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
                 item { KeyboardEntry(state.keyboardLayouts) { showKeyboardLayouts = true } }
-                item { SkipSilenceEntry(state, onSkipSilence) }
+                if (BuildConfig.LOCAL_MODELS) {
+                    item { SkipSilenceEntry(state, onSkipSilence) }
+                }
                 item { LiveStatsEntry(state.liveStats, onLiveStats) }
                 item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
-                item {
-                    BenchmarkEntry(benchmarkRuns) {
-                        if (BenchmarkStore.isFullscreen(context)) {
-                            context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
-                        } else {
-                            showBenchmarks = true
+                if (BuildConfig.LOCAL_MODELS) {
+                    item {
+                        BenchmarkEntry(benchmarkRuns) {
+                            if (BenchmarkStore.isFullscreen(context)) {
+                                context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
+                            } else {
+                                showBenchmarks = true
+                            }
                         }
                     }
                 }
             }
-            item {
-                Text(
-                    stringResource(R.string.models_explainer),
-                    fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                    lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
-                )
-            }
-            item { LanguageEntry { showLanguages = true } }
-            item {
-                StandardHeader(expanded = modelsExpanded, onToggle = {
-                    val next = !modelsExpanded
-                    modelsExpanded = next
-                    SectionState.setStandardModels(context, next)
-                })
-            }
-            if (modelsExpanded) {
-                items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
+            if (BuildConfig.LOCAL_MODELS) {
+                item {
+                    Text(
+                        stringResource(R.string.models_explainer),
+                        fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                        lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
+                    )
+                }
+                item { LanguageEntry { showLanguages = true } }
+                item {
+                    StandardHeader(expanded = modelsExpanded, onToggle = {
+                        val next = !modelsExpanded
+                        modelsExpanded = next
+                        SectionState.setStandardModels(context, next)
+                    })
+                }
+                if (modelsExpanded) {
+                    items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
+                }
             }
             if (sherpaPlugin != null) {
                 item {
@@ -219,67 +225,73 @@ fun ScribScreen(
             if (endpointPlugin != null) {
                 item { endpointPlugin.SettingsBlocks(onChanged = onEndpointChanged) }
             }
-            item {
-                CustomHeader(expanded = customExpanded, onToggle = {
-                    val next = !customExpanded
-                    customExpanded = next
-                    SectionState.setCustomModels(context, next)
-                })
-            }
-            if (customExpanded) {
-                if (state.custom.isEmpty()) {
-                    item {
-                        Text(
-                            stringResource(R.string.custom_empty),
-                            fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                            lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
-                        )
-                    }
-                } else {
-                    items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions) { deleteTarget = it } }
+            if (BuildConfig.LOCAL_MODELS) {
+                item {
+                    CustomHeader(expanded = customExpanded, onToggle = {
+                        val next = !customExpanded
+                        customExpanded = next
+                        SectionState.setCustomModels(context, next)
+                    })
                 }
-            }
-            item {
-                Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AddButton("+", stringResource(R.string.add_from_hf)) { showAdd = true }
-                    AddButton("↥", stringResource(R.string.import_bin)) { picker.launch(arrayOf("*/*")) }
+                if (customExpanded) {
+                    if (state.custom.isEmpty()) {
+                        item {
+                            Text(
+                                stringResource(R.string.custom_empty),
+                                fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                                lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
+                            )
+                        }
+                    } else {
+                        items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions) { deleteTarget = it } }
+                    }
+                }
+                item {
+                    Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        AddButton("+", stringResource(R.string.add_from_hf)) { showAdd = true }
+                        AddButton("↥", stringResource(R.string.import_bin)) { picker.launch(arrayOf("*/*")) }
+                    }
                 }
             }
             if (state.statusMsg.isNotEmpty()) {
                 item { StatusBox(state.statusMsg, state.statusError) }
             }
-            item {
-                Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
-                    TextButton(onClick = onSelfTest) {
-                        Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+            if (BuildConfig.LOCAL_MODELS) {
+                item {
+                    Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
+                        TextButton(onClick = onSelfTest) {
+                            Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                        }
                     }
                 }
             }
-            item {
-                BenchmarkBatchControl(
-                    state = state.benchmarkBatch,
-                    enabled = state.benchmarkModelCount > 0 &&
-                        !state.benchmarkBatch.running &&
-                        transcription == null && recording == null,
-                    onClick = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
-                    onCancel = onCancelBenchmark
-                )
-            }
-            val batch = state.benchmarkBatch
-            if (batch.total > 0 && !batch.running &&
-                (batch.completed > 0 || batch.failed > 0 || batch.cancelled)) {
+            if (BuildConfig.LOCAL_MODELS) {
                 item {
-                    val text = when {
-                        batch.cancelled -> stringResource(R.string.benchmark_batch_cancelled, batch.completed, batch.total)
-                        batch.failed > 0 -> stringResource(
-                            R.string.benchmark_batch_partial,
-                            batch.completed - batch.failed,
-                            batch.total,
-                            batch.failed
-                        )
-                        else -> stringResource(R.string.benchmark_batch_done, batch.completed, batch.total)
+                    BenchmarkBatchControl(
+                        state = state.benchmarkBatch,
+                        enabled = state.benchmarkModelCount > 0 &&
+                            !state.benchmarkBatch.running &&
+                            transcription == null && recording == null,
+                        onClick = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
+                        onCancel = onCancelBenchmark
+                    )
+                }
+                val batch = state.benchmarkBatch
+                if (batch.total > 0 && !batch.running &&
+                    (batch.completed > 0 || batch.failed > 0 || batch.cancelled)) {
+                    item {
+                        val text = when {
+                            batch.cancelled -> stringResource(R.string.benchmark_batch_cancelled, batch.completed, batch.total)
+                            batch.failed > 0 -> stringResource(
+                                R.string.benchmark_batch_partial,
+                                batch.completed - batch.failed,
+                                batch.total,
+                                batch.failed
+                            )
+                            else -> stringResource(R.string.benchmark_batch_done, batch.completed, batch.total)
+                        }
+                        StatusBox(text, batch.cancelled || batch.failed > 0)
                     }
-                    StatusBox(text, batch.cancelled || batch.failed > 0)
                 }
             }
         }
@@ -373,15 +385,15 @@ private fun StatusCard(state: ScribUiState) {
         Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Box(Modifier.size(9.dp).clip(RoundedCornerShape(50)).background(cs.primary))
-                Text(stringResource(R.string.active_model), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
+                Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.active_model else R.string.active_endpoint), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
             }
             Spacer(Modifier.height(10.dp))
             if (state.activeName != null) {
                 Text(state.activeName, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cs.onSurface, letterSpacing = (-0.5).sp)
                 Text(stringResource(R.string.ready_to_transcribe), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = cs.primary, modifier = Modifier.padding(top = 6.dp))
             } else {
-                Text(stringResource(R.string.no_active_model), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text(stringResource(R.string.pick_model_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
+                Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.no_active_model else R.string.no_active_endpoint), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.pick_model_hint else R.string.pick_endpoint_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
             }
             PrivacyLine(cs.onSurfaceVariant, topBorder = true, remoteHost = state.remoteHost)
         }
@@ -396,19 +408,21 @@ private fun NudgeCard(state: ScribUiState, actions: Actions) {
         Column(Modifier.padding(horizontal = 18.dp, vertical = 20.dp)) {
             Text(stringResource(R.string.setup_transcription), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = cs.onPrimaryContainer)
             Text(
-                stringResource(R.string.nudge_body),
+                stringResource(if (BuildConfig.LOCAL_MODELS) R.string.nudge_body else R.string.nudge_remote_body),
                 fontSize = 13.5.sp, fontWeight = FontWeight.Medium, color = cs.onPrimaryContainer, lineHeight = 20.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
-            Surface(
-                color = cs.primary, shape = RoundedCornerShape(22.dp),
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow(RoundedCornerShape(22.dp)) { base?.let { actions.onDownload(it.id) } }
-            ) {
-                Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
-                    Text(
-                        if (base != null) stringResource(R.string.download_named_size, base.name, base.sizeMb) else stringResource(R.string.action_download),
-                        fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary
-                    )
+            if (BuildConfig.LOCAL_MODELS) {
+                Surface(
+                    color = cs.primary, shape = RoundedCornerShape(22.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp).clickableRow(RoundedCornerShape(22.dp)) { base?.let { actions.onDownload(it.id) } }
+                ) {
+                    Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+                        Text(
+                            if (base != null) stringResource(R.string.download_named_size, base.name, base.sizeMb) else stringResource(R.string.action_download),
+                            fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary
+                        )
+                    }
                 }
             }
             PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), topBorder = false, remoteHost = null)

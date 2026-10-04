@@ -2,14 +2,19 @@
 <resources>
     <string name="about">À propos</string>
     <string name="active_model">MODÈLE ACTIF</string>
+    <string name="active_endpoint">POINT DE TERMINAISON</string>
     <string name="ready_to_transcribe">Prêt à transcrire</string>
     <string name="no_active_model">Aucun modèle actif</string>
+    <string name="no_active_endpoint">Aucun point de terminaison actif</string>
     <string name="pick_model_hint">Choisissez un modèle ci-dessous et touchez « Utiliser ».</string>
+    <string name="pick_endpoint_hint">Ajoutez votre serveur ci-dessous et touchez « Utiliser ».</string>
     <string name="privacy_full">L\'audio est transcrit entièrement sur votre téléphone. Rien n\'est envoyé — l\'appli se connecte uniquement pour télécharger un modèle.</string>
     <string name="privacy_short" formatted="false">Fonctionne à 100% sur l\'appareil. Vos messages vocaux ne quittent jamais le téléphone.</string>
     <string name="privacy_remote">L\'audio est envoyé à %1$s et transcrit là-bas — rien ne s\'exécute sur votre téléphone.</string>
+    <string name="endpoint_privacy_remote">Chaque enregistrement est envoyé en HTTPS au serveur ci-dessus. Rien n\'est transcrit sur ce téléphone.</string>
     <string name="setup_transcription">Configurer la transcription</string>
     <string name="nudge_body">Pas encore de modèle vocal. Téléchargez-en un — Base est un bon compromis : petit téléchargement, précision correcte, fonctionne dans toutes les langues.</string>
+    <string name="nudge_remote_body">Scrib Remote ne conserve aucun modèle sur le téléphone. Pointez-le vers un serveur de transcription ci-dessous — le vôtre ou tout serveur compatible OpenAI — et l\'audio y sera envoyé.</string>
     <string name="download_named_size">Télécharger %1$s · ≈%2$d Mo</string>
     <string name="record_and_transcribe">Enregistrer et transcrire</string>
     <string name="transcribe_audio_file">Transcrire un fichier audio</string>
@@ -82,6 +87,7 @@
     <string name="ime_backspace">Supprimer</string>
     <string name="ime_keyboard">Clavier</string>
     <string name="ime_needs_model">Aucun modèle vocal — ouvrez Scrib et téléchargez-en un.</string>
+    <string name="ime_needs_endpoint">Aucun point de terminaison de transcription : ouvrez Scrib et configurez-en un.</string>
     <string name="ime_layout_buttons_title">Boutons de disposition</string>
     <string name="ime_layout_buttons_show">Afficher les boutons de disposition</string>
     <string name="ime_layout_buttons_hint">Choisissez les dispositions activées. Leur ordre de sélection définit l’ordre des boutons. Désactivez cette option pour garder un bouton clavier générique.</string>
@@ -176,15 +182,20 @@
     <string name="transcribe_failed">Échec de la transcription</string>
     <string name="about_back">Retour</string>
     <string name="about_tagline">Reconnaissance vocale sur l\'appareil. Votre audio ne quitte jamais le téléphone.</string>
+    <string name="about_tagline_remote">Transcription vocale via un serveur que vous contrôlez. L\'audio y est envoyé.</string>
     <string name="about_two_ways">Deux façons d\'utiliser Scrib</string>
     <string name="about_own_h">Transcrire votre propre audio</string>
     <string name="about_own_b">Enregistrez directement dans l\'application ou choisissez n\'importe quel fichier audio de votre téléphone, et obtenez le texte — ici même, entièrement hors ligne.</string>
+    <string name="about_own_b_remote">Enregistrez directement dans l\'appli ou choisissez un fichier audio de votre téléphone et obtenez le texte. L\'audio part vers votre point de terminaison, y est transcrit, et le texte revient.</string>
     <string name="about_engine_h">Un moteur de transcription pour d\'autres applis</string>
     <string name="about_engine_b">Scrib fonctionne aussi en arrière-plan. Les applis qui le prennent en charge — comme Forkgram — peuvent convertir un message vocal en texte avec Scrib, sur votre appareil. Dans les réglages de cette appli, choisissez Scrib comme transcripteur hors ligne. Rien n\'est envoyé.</string>
+    <string name="about_engine_b_remote">Scrib fonctionne aussi en arrière-plan. Les applis compatibles — comme Forkgram — peuvent transformer un message vocal en texte avec Scrib. Dans leurs réglages, choisissez Scrib comme transcripteur. L\'enregistrement est envoyé à votre point de terminaison.</string>
     <string name="about_keyboard_h">Dicter dans n\'importe quelle appli</string>
     <string name="about_keyboard_b">Scrib peut servir de clavier vocal. Activez-le dans les réglages de clavier de votre téléphone, puis appuyez sur la touche micro d\'un clavier comme HeliBoard ou choisissez Scrib Voix dans le sélecteur de claviers, et parlez. Le texte arrive directement là où vous écriviez, et votre clavier revient quand vous vous arrêtez.</string>
     <string name="about_models_h">Modèles</string>
+    <string name="about_endpoint_h">Point de terminaison</string>
     <string name="about_models_b">Scrib transcrit avec des modèles vocaux ouverts Whisper. Téléchargez-en un sur l\'écran principal, ou choisissez votre langue et Scrib en récupère un adapté. Les modèles plus grands sont plus précis ; gardez-en plusieurs et changez à tout moment.</string>
+    <string name="about_endpoint_b">Aucun modèle sur ce téléphone, aucun code d\'inférence : Scrib Remote est l\'enregistreur, l\'expéditeur et l\'éditeur. Pointez-le vers un serveur compatible OpenAI — whisper.cpp, faster-whisper, Speaches, LM Studio — ou vers Cloudflare Workers AI ; l\'audio y est envoyé en HTTPS, et l\'adresse reste affichée.</string>
     <string name="about_dev_h">Pour les développeurs</string>
     <string name="about_dev_b">Toute appli peut utiliser Scrib comme transcripteur hors ligne via le contrat ouvert Open Transcribe (org.opentranscribe.api) — un petit service AIDL, sans SDK ni réseau. Le contrat est neutre vis-à-vis du fournisseur, donc les applis ne sont pas liées à Scrib : elles peuvent connecter n\'importe quel transcripteur compatible installé par l\'utilisateur.</string>
     <string name="about_version">Version %s</string>

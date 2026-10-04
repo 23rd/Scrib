@@ -2,14 +2,19 @@
 <resources>
     <string name="about">Hakkında</string>
     <string name="active_model">ETKİN MODEL</string>
+    <string name="active_endpoint">UÇ NOKTA</string>
     <string name="ready_to_transcribe">Yazıya dökmeye hazır</string>
     <string name="no_active_model">Etkin model yok</string>
+    <string name="no_active_endpoint">Etkin uç nokta yok</string>
     <string name="pick_model_hint">Aşağıdan bir model seçip «Kullan» düğmesine dokunun.</string>
+    <string name="pick_endpoint_hint">Aşağıya sunucunuzu ekleyin ve „Kullan“a dokunun.</string>
     <string name="privacy_full">Ses tamamen telefonunuzda yazıya dökülür. Hiçbir şey yüklenmez — uygulama yalnızca model indirmek için çevrimiçi olur.</string>
     <string name="privacy_short" formatted="false">%100 cihazda çalışır. Sesli mesajlarınız telefonu asla terk etmez.</string>
     <string name="privacy_remote">Ses %1$s adresine yüklenir ve orada yazıya dökülür — telefonunda hiçbir şey çalışmaz.</string>
+    <string name="endpoint_privacy_remote">Her kayıt yukarıdaki sunucuya HTTPS ile gönderilir. Bu telefonda hiçbir şey yazıya dökülmez.</string>
     <string name="setup_transcription">Yazıya dökmeyi ayarla</string>
     <string name="nudge_body">Henüz konuşma modeli yok. Bir tane indirin — Base dengeli bir seçim: küçük indirme, iyi doğruluk, her dilde çalışır.</string>
+    <string name="nudge_remote_body">Scrib Remote telefonda model tutmaz. Aşağıda bir yazıya dökme sunucusuna yönlendirin — kendinizinki ya da OpenAI uyumlu herhangi biri — ses oraya gider.</string>
     <string name="download_named_size">%1$s indir · ≈%2$d MB</string>
     <string name="record_and_transcribe">Kaydet ve yazıya dök</string>
     <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
@@ -82,6 +87,7 @@
     <string name="ime_backspace">Sil</string>
     <string name="ime_keyboard">Klavye</string>
     <string name="ime_needs_model">Henüz konuşma modeli yok — Scrib\'i açıp bir tane indirin.</string>
+    <string name="ime_needs_endpoint">Henüz yazıya dökme uç noktası yok — Scrib’u açıp bir tane ayarlayın.</string>
     <string name="ime_layout_buttons_title">Klavye düzeni düğmeleri</string>
     <string name="ime_layout_buttons_show">Düzen düğmelerini göster</string>
     <string name="ime_layout_buttons_hint">Etkin klavye düzenlerini seçin. Seçim sırası düğmelerin sırası olur. Tek bir genel klavye düğmesi bırakmak için kapatın.</string>
@@ -176,15 +182,20 @@
     <string name="transcribe_failed">Yazıya dökme başarısız</string>
     <string name="about_back">Geri</string>
     <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
+    <string name="about_tagline_remote">Kendi denetlediğiniz bir sunucu üzerinden konuşmadan metne. Sesiniz oraya gönderilir.</string>
     <string name="about_two_ways">Scrib\'i kullanmanın iki yolu</string>
     <string name="about_own_h">Kendi sesinizi yazıya dökün</string>
     <string name="about_own_b">Doğrudan uygulamada kaydedin ya da telefonunuzdaki herhangi bir ses dosyasını seçin ve metni alın — tam burada, tamamen çevrimdışı.</string>
+    <string name="about_own_b_remote">Doğrudan uygulamada kayıt yapın ya da telefonunuzdan bir ses dosyası seçin; metni alın. Ses uç noktanıza gider, orada yazıya dökülür ve metin geri gelir.</string>
     <string name="about_engine_h">Diğer uygulamalar için bir yazıya dökme motoru</string>
     <string name="about_engine_b">Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — Forkgram gibi — bir sesli mesajı Scrib ile cihazınızda metne dönüştürebilir. O uygulamanın ayarlarında Scrib\'i çevrimdışı yazıya dökücü olarak seçin. Hiçbir şey yüklenmez.</string>
+    <string name="about_engine_b_remote">Scrib arka planda da çalışır. Bunu destekleyen uygulamalar — örneğin Forkgram — bir sesli mesajı Scrib ile metne dönüştürebilir. Ayarlarından Scrib’ı yazıya dökücü olarak seçin. Kayıt uç noktanıza yüklenir.</string>
     <string name="about_keyboard_h">Herhangi bir uygulamaya dikte edin</string>
     <string name="about_keyboard_b">Scrib sesli klavye olarak da çalışabilir. Telefonunuzun klavye ayarlarından açın, sonra HeliBoard gibi bir klavyenin mikrofon tuşuna basın ya da klavye değiştiriciden Scrib Ses\'i seçin ve konuşun. Metin doğrudan yazmakta olduğunuz yere gider, siz durunca klavyeniz geri gelir.</string>
     <string name="about_models_h">Modeller</string>
+    <string name="about_endpoint_h">Uç nokta</string>
     <string name="about_models_b">Scrib, açık Whisper konuşma modelleriyle yazıya döker. Ana ekrandan bir tane indirin veya dilinizi seçin, Scrib uygun bir tane getirir. Daha büyük modeller daha doğrudur; birden fazlasını tutup istediğiniz zaman geçiş yapın.</string>
+    <string name="about_endpoint_b">Bu telefonda model ve çıkarım kodu yok: Scrib Remote kayıt eden, yükleyen ve düzenleyendir. Onu herhangi bir OpenAI uyumlu sunucuya — whisper.cpp, faster-whisper, Speaches, LM Studio — ya da Cloudflare Workers AI’a yönlendirin; ses HTTPS üzerinden oraya gider ve adres ekranda görünür.</string>
     <string name="about_dev_h">Geliştiriciler için</string>
     <string name="about_dev_b">Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib\'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib\'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.</string>
     <string name="about_version">Sürüm %s</string>

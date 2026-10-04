@@ -32,6 +32,14 @@ android {
 
         resValue 'string', 'app_name', appName
 
+        // LocalModelsPlugin is an interface in main whose implementation only exists in the
+        // source set that also carries libwhisper.so, so the UI asks the flag rather than the
+        // plugin whether there are models to show.
+        buildConfigField 'boolean', 'LOCAL_MODELS', local.toString()
+        // Remote is the one build where every recording goes to a server, which the About screen
+        // and the first-run card have to say out loud rather than imply.
+        buildConfigField 'boolean', 'ENDPOINTS_ONLY', remote.toString()
+
         manifestPlaceholders.launcherIcon = "@mipmap/${launcher}"
         manifestPlaceholders.launcherRoundIcon = "@mipmap/${launcherRound}"
 

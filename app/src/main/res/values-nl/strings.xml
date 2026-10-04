@@ -2,14 +2,19 @@
 <resources>
     <string name="about">Over</string>
     <string name="active_model">ACTIEF MODEL</string>
+    <string name="active_endpoint">ENDPOINT</string>
     <string name="ready_to_transcribe">Klaar om te transcriberen</string>
     <string name="no_active_model">Geen actief model</string>
+    <string name="no_active_endpoint">Geen actieve endpoint</string>
     <string name="pick_model_hint">Kies hieronder een model en tik op «Gebruiken».</string>
+    <string name="pick_endpoint_hint">Voeg hieronder je server toe en tik op «Gebruiken».</string>
     <string name="privacy_full">Audio wordt volledig op je telefoon getranscribeerd. Er wordt niets geüpload — de app gaat alleen online om een model te downloaden.</string>
     <string name="privacy_short" formatted="false">Draait 100% op het apparaat. Je spraakberichten verlaten nooit de telefoon.</string>
     <string name="privacy_remote">Audio wordt naar %1$s geüpload en daar getranscribeerd — er draait niets op je telefoon.</string>
+    <string name="endpoint_privacy_remote">Elke opname wordt via HTTPS naar de server hierboven gestuurd. Op deze telefoon wordt niets getranscribeerd.</string>
     <string name="setup_transcription">Transcriptie instellen</string>
     <string name="nudge_body">Nog geen spraakmodel. Download er een — Base is een goede balans: kleine download, degelijke nauwkeurigheid, werkt in elke taal.</string>
+    <string name="nudge_remote_body">Scrib Remote bewaart geen model op de telefoon. Richt het hieronder op een transcriptieserver — de jouwe of een OpenAI-compatibele — en de audio gaat daarheen.</string>
     <string name="download_named_size">%1$s downloaden · ≈%2$d MB</string>
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
@@ -82,6 +87,7 @@
     <string name="ime_backspace">Wissen</string>
     <string name="ime_keyboard">Toetsenbord</string>
     <string name="ime_needs_model">Nog geen spraakmodel — open Scrib en download er een.</string>
+    <string name="ime_needs_endpoint">Nog geen transcriptie-endpoint — open Scrib en stel er een in.</string>
     <string name="ime_layout_buttons_title">Toetsenbordlayoutknoppen</string>
     <string name="ime_layout_buttons_show">Layoutknoppen tonen</string>
     <string name="ime_layout_buttons_hint">Kies ingeschakelde toetsenbordlayouts. De selectievolgorde wordt de volgorde van de knoppen. Schakel dit uit om één algemene toetsenbordknop te behouden.</string>
@@ -176,15 +182,20 @@
     <string name="transcribe_failed">Transcriptie mislukt</string>
     <string name="about_back">Terug</string>
     <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>
+    <string name="about_tagline_remote">Spraak-naar-tekst via een server die je zelf beheert. Je audio wordt daarheen gestuurd.</string>
     <string name="about_two_ways">Twee manieren om Scrib te gebruiken</string>
     <string name="about_own_h">Je eigen audio transcriberen</string>
     <string name="about_own_b">Neem meteen in de app op of kies een willekeurig audiobestand op je telefoon en krijg de tekst — hier meteen, volledig offline.</string>
+    <string name="about_own_b_remote">Neem op in de app zelf op, of kies een audiobestand van je telefoon en je krijgt de tekst. De audio gaat naar je endpoint, wordt daar getranscribeerd en de tekst komt terug.</string>
     <string name="about_engine_h">Een transcriptie-engine voor andere apps</string>
     <string name="about_engine_b">Scrib werkt ook op de achtergrond. Apps die dit ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib omzetten naar tekst, op je apparaat. Kies Scrib in de instellingen van die app als offline transcriber. Er wordt niets geüpload.</string>
+    <string name="about_engine_b_remote">Scrib werkt ook op de achtergrond. Apps die het ondersteunen — zoals Forkgram — kunnen een spraakbericht met Scrib naar tekst omzetten. Kies in hun instellingen Scrib als transcriber. De opname wordt naar je endpoint gestuurd.</string>
     <string name="about_keyboard_h">Dicteren in elke app</string>
     <string name="about_keyboard_b">Scrib kan als spraaktoetsenbord werken. Zet het aan in de toetsenbordinstellingen van je telefoon, druk dan op de microfoontoets van een toetsenbord zoals HeliBoard of kies Scrib Stem in de toetsenbordwisselaar, en spreek. De tekst komt direct terecht waar je aan het schrijven was, en je toetsenbord komt terug zodra je stopt.</string>
     <string name="about_models_h">Modellen</string>
+    <string name="about_endpoint_h">Endpoint</string>
     <string name="about_models_b">Scrib transcribeert met open Whisper-spraakmodellen. Download er een op het hoofdscherm, of kies je taal en Scrib haalt een passend model op. Grotere modellen zijn nauwkeuriger; houd er meerdere en wissel wanneer je wilt.</string>
+    <string name="about_endpoint_b">Op deze telefoon staat geen model en staat geen inferentiecode: Scrib Remote is de opnemer, de uploader en de bewerker. Richt het op een OpenAI-compatibele server — whisper.cpp, faster-whisper, Speaches, LM Studio — of op Cloudflare Workers AI, en de audio gaat daar via HTTPS heen, met het adres zichtbaar op het scherm.</string>
     <string name="about_dev_h">Voor ontwikkelaars</string>
     <string name="about_dev_b">Elke app kan Scrib als offline transcriber gebruiken via het open Open Transcribe-contract (org.opentranscribe.api) — een kleine AIDL-service, zonder SDK en zonder netwerk. Het contract is leveranciersneutraal, dus apps zijn niet aan Scrib gebonden: ze kunnen elke compatibele transcriber binden die de gebruiker heeft geïnstalleerd.</string>
     <string name="about_version">Versie %s</string>

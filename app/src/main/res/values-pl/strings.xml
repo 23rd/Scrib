@@ -2,14 +2,19 @@
 <resources>
     <string name="about">O aplikacji</string>
     <string name="active_model">AKTYWNY MODEL</string>
+    <string name="active_endpoint">PUNKT KOŃCOWY</string>
     <string name="ready_to_transcribe">Gotowy do transkrypcji</string>
     <string name="no_active_model">Brak aktywnego modelu</string>
+    <string name="no_active_endpoint">Brak aktywnego punktu końcowego</string>
     <string name="pick_model_hint">Wybierz model poniżej i dotknij «Użyj».</string>
+    <string name="pick_endpoint_hint">Dodaj poniżej swój serwer i dotknij «Użyj».</string>
     <string name="privacy_full">Dźwięk jest transkrybowany w całości na Twoim telefonie. Nic nie jest wysyłane — aplikacja łączy się z siecią tylko po to, by pobrać model.</string>
     <string name="privacy_short" formatted="false">Działa w 100% na urządzeniu. Twoje wiadomości głosowe nigdy nie opuszczają telefonu.</string>
     <string name="privacy_remote">Dźwięk jest wysyłany na %1$s i tam rozpoznawany — na telefonie nic nie działa.</string>
+    <string name="endpoint_privacy_remote">Każde nagranie jest wysyłane przez HTTPS na serwer powyżej. Na tym telefonie nic nie jest rozpoznawane.</string>
     <string name="setup_transcription">Skonfiguruj transkrypcję</string>
     <string name="nudge_body">Brak jeszcze modelu mowy. Pobierz jeden — Base to dobry kompromis: mały rozmiar, solidna dokładność, działa w każdym języku.</string>
+    <string name="nudge_remote_body">Scrib Remote nie trzyma na telefonie żadnego modelu. Wskaż mu poniżej serwer transkrypcji — własny lub dowolny zgodny z OpenAI — a dźwięk trafi tam.</string>
     <string name="download_named_size">Pobierz %1$s · ≈%2$d MB</string>
     <string name="record_and_transcribe">Nagraj i transkrybuj</string>
     <string name="transcribe_audio_file">Transkrybuj plik audio</string>
@@ -82,6 +87,7 @@
     <string name="ime_backspace">Usuń</string>
     <string name="ime_keyboard">Klawiatura</string>
     <string name="ime_needs_model">Brak modelu mowy — otwórz Scrib i pobierz jeden.</string>
+    <string name="ime_needs_endpoint">Nie ma jeszcze punktu końcowego transkrypcji — otwórz Scrib i skonfiguruj go.</string>
     <string name="ime_layout_buttons_title">Przyciski układów</string>
     <string name="ime_layout_buttons_show">Pokaż przyciski układów</string>
     <string name="ime_layout_buttons_hint">Wybierz włączone układy. Kolejność wyboru będzie kolejnością przycisków. Wyłącz tę opcję, aby pozostawić jeden ogólny przycisk klawiatury.</string>
@@ -176,15 +182,20 @@
     <string name="transcribe_failed">Błąd transkrypcji</string>
     <string name="about_back">Wstecz</string>
     <string name="about_tagline">Mowa na tekst na urządzeniu. Twój dźwięk nigdy nie opuszcza telefonu.</string>
+    <string name="about_tagline_remote">Rozpoznawanie mowy przez serwer, który kontrolujesz. Dźwięk trafia do niego.</string>
     <string name="about_two_ways">Dwa sposoby korzystania ze Scrib</string>
     <string name="about_own_h">Transkrybuj własne audio</string>
     <string name="about_own_b">Nagraj bezpośrednio w aplikacji albo wybierz dowolny plik audio w telefonie i uzyskaj tekst — tutaj, całkowicie offline.</string>
+    <string name="about_own_b_remote">Nagraj w aplikacji albo wybierz plik audio z telefonu i dostań tekst. Dźwięk idzie na Twój punkt końcowy, jest tam rozpoznawany, a tekst wraca.</string>
     <string name="about_engine_h">Silnik transkrypcji dla innych aplikacji</string>
     <string name="about_engine_b">Scrib działa też w tle. Aplikacje, które to obsługują — jak Forkgram — mogą zamienić wiadomość głosową na tekst za pomocą Scrib, na Twoim urządzeniu. W ustawieniach tej aplikacji wybierz Scrib jako transkryptor offline. Nic nie jest wysyłane.</string>
+    <string name="about_engine_b_remote">Scrib działa też w tle. Aplikacje, które go wspierają — takie jak Forkgram — mogą zamienić wiadomość głosową w tekst przez Scrib. W ich ustawieniach wybierz Scrib jako transkryber. Nagranie trafia na Twój punkt końcowy.</string>
     <string name="about_keyboard_h">Dyktowanie w dowolnej aplikacji</string>
     <string name="about_keyboard_b">Scrib może działać jako klawiatura głosowa. Włącz ją w ustawieniach klawiatur telefonu, następnie naciśnij klawisz mikrofonu w klawiaturze takiej jak HeliBoard albo wybierz Scrib Głos w przełączniku klawiatur — i mów. Tekst trafia prosto tam, gdzie piszesz, a Twoja klawiatura wraca, gdy skończysz.</string>
     <string name="about_models_h">Modele</string>
+    <string name="about_endpoint_h">Punkt końcowy</string>
     <string name="about_models_b">Scrib transkrybuje otwartymi modelami mowy Whisper. Pobierz jeden na ekranie głównym lub wybierz język, a Scrib pobierze odpowiedni. Większe modele są dokładniejsze; trzymaj kilka i przełączaj kiedy chcesz.</string>
+    <string name="about_endpoint_b">Na tym telefonie nie ma modelu ani kodu wnioskowania: Scrib Remote to nagrywanie, wysyłanie i edycja. Wskaż mu serwer zgodny z OpenAI — whisper.cpp, faster-whisper, Speaches, LM Studio — albo Cloudflare Workers AI, a dźwięk trafi tam przez HTTPS, z adresem widocznym na ekranie.</string>
     <string name="about_dev_h">Dla programistów</string>
     <string name="about_dev_b">Każda aplikacja może używać Scrib jako transkryptora offline przez otwarty kontrakt Open Transcribe (org.opentranscribe.api) — mała usługa AIDL, bez SDK i bez sieci. Kontrakt jest neutralny wobec dostawcy, więc aplikacje nie są powiązane ze Scrib: mogą podłączyć dowolny zgodny transkryptor zainstalowany przez użytkownika.</string>
     <string name="about_version">Wersja %s</string>

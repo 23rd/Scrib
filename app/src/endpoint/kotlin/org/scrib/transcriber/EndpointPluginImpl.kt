@@ -229,7 +229,7 @@ class EndpointPluginImpl : EndpointPlugin {
 
         if (configured) {
             Text(
-                stringResource(R.string.endpoint_privacy),
+                stringResource(if (BuildConfig.ENDPOINTS_ONLY) R.string.endpoint_privacy_remote else R.string.endpoint_privacy),
                 fontSize = 12.sp, color = cs.onSurfaceVariant, lineHeight = 17.sp,
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
             )
@@ -322,7 +322,13 @@ private fun EndpointDialog(
 
     fun save(): EndpointSettings? = try {
         val settings = EndpointSettings.parse(url, key, model, name, provider)
+        val wasConfigured = EndpointStore.isConfigured(context)
         EndpointStore.save(context, settings)
+        // In Remote the endpoint is the only engine there is, so a saved server is a server that
+        // is in use: leaving it switched off would hide the record button with nothing to undo it.
+        if (BuildConfig.ENDPOINTS_ONLY && !wasConfigured) {
+            EndpointStore.setActive(context.applicationContext, true)
+        }
         settings
     } catch (e: IllegalArgumentException) {
         status = (e.message ?: "Check the fields") to true

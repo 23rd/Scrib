@@ -109,7 +109,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     private fun push() { _state.value = build() }
 
     private fun build(): ScribUiState {
-        val installed = ModelManager.installedFileNames(ctx).toHashSet()
+        val installed = if (BuildConfig.LOCAL_MODELS) {
+            ModelManager.installedFileNames(ctx).toHashSet()
+        } else {
+            emptySet()
+        }
         val active = ModelManager.activeFileName(ctx)
         fun stateOf(f: String): RowState = when {
             downloads.containsKey(f) -> RowState.Downloading
@@ -117,7 +121,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             installed.contains(f) -> if (f == active) RowState.Active else RowState.Installed
             else -> RowState.NotDownloaded
         }
-        val standard = ModelCatalog.MODELS.map { m ->
+        val standard = if (!BuildConfig.LOCAL_MODELS) emptyList() else ModelCatalog.MODELS.map { m ->
             ModelRow(
                 id = m.fileName, name = m.displayName,
                 badge = str(if (m.multilingual) R.string.badge_multilingual else R.string.badge_english_only),
@@ -128,8 +132,10 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         val customFiles = LinkedHashSet<String>()
-        customFiles.addAll(ModelManager.installedCustomFileNames(ctx))
-        downloads.forEach { (f, p) -> if (p.model?.custom == true) customFiles.add(f) }
+        if (BuildConfig.LOCAL_MODELS) {
+            customFiles.addAll(ModelManager.installedCustomFileNames(ctx))
+            downloads.forEach { (f, p) -> if (p.model?.custom == true) customFiles.add(f) }
+        }
         val custom = customFiles.map { f ->
             val multi = !ModelCatalog.isEnglishOnly(f)
             ModelRow(
@@ -148,14 +154,14 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 sherpaRows.isEmpty() && !sherpaBusy,
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
-            skipSilence = ModelManager.skipSilence(ctx), vadProgress = vadPct,
-            vadSupported = ModelManager.activeModelUsesVad(ctx),
+            skipSilence = BuildConfig.LOCAL_MODELS && ModelManager.skipSilence(ctx), vadProgress = vadPct,
+            vadSupported = BuildConfig.LOCAL_MODELS && ModelManager.activeModelUsesVad(ctx),
             liveStats = ModelManager.liveStats(ctx),
             keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
             benchmarkRuns = BenchmarkStore.load(ctx),
             benchmarkBatch = benchmarkBatch,
-            benchmarkModelCount = installed.size + sherpaRows.size,
+            benchmarkModelCount = if (BuildConfig.LOCAL_MODELS) installed.size + sherpaRows.size else 0,
             remoteHost = EndpointPlugins.plugin
                 ?.takeIf { it.isActive(ctx) }
                 ?.host(ctx)

@@ -2,14 +2,19 @@
 <resources>
     <string name="about">Про програму</string>
     <string name="active_model">АКТИВНА МОДЕЛЬ</string>
+    <string name="active_endpoint">ТОЧКА</string>
     <string name="ready_to_transcribe">Готова до розпізнавання</string>
     <string name="no_active_model">Немає активної моделі</string>
+    <string name="no_active_endpoint">Немає активної точки</string>
     <string name="pick_model_hint">Виберіть модель нижче й торкніться «Вибрати».</string>
+    <string name="pick_endpoint_hint">Додайте сервер нижче й торкніться «Вибрати».</string>
     <string name="privacy_full">Аудіо розпізнається повністю на вашому телефоні. Нічого не завантажується — застосунок виходить у мережу лише щоб завантажити модель.</string>
     <string name="privacy_short" formatted="false">Працює на 100% на пристрої. Ваші голосові ніколи не залишають телефон.</string>
     <string name="privacy_remote">Аудіо надсилається на %1$s і розпізнається там — на телефоні нічого не виконується.</string>
+    <string name="endpoint_privacy_remote">Кожен запис надсилається на сервер вище по HTTPS. На цьому телефоні нічого не розпізнається.</string>
     <string name="setup_transcription">Налаштування розпізнавання</string>
     <string name="nudge_body">Ще немає моделі мовлення. Завантажте одну — Base хороший баланс: невеликий розмір, пристойна точність, працює будь-якою мовою.</string>
+    <string name="nudge_remote_body">Scrib Remote не тримає на телефоні модель. Спрямуйте його на сервер розпізнавання нижче — свій або будь-який OpenAI-сумісний — і звук піде туди.</string>
     <string name="download_named_size">Завантажити %1$s · ≈%2$d МБ</string>
     <string name="record_and_transcribe">Записати й розпізнати</string>
     <string name="transcribe_audio_file">Розпізнати аудіофайл</string>
@@ -82,6 +87,7 @@
     <string name="ime_backspace">Видалити</string>
     <string name="ime_keyboard">Клавіатура</string>
     <string name="ime_needs_model">Моделі ще немає — відкрийте Scrib і завантажте її.</string>
+    <string name="ime_needs_endpoint">Точку розпізнавання ще не налаштовано — відкрийте Scrib і налаштуйте її.</string>
     <string name="ime_layout_buttons_title">Кнопки розкладок</string>
     <string name="ime_layout_buttons_show">Показувати кнопки розкладок</string>
     <string name="ime_layout_buttons_hint">Виберіть увімкнені розкладки. Порядок вибору — порядок кнопок. Вимкніть, щоб залишити одну звичайну кнопку клавіатури.</string>
@@ -176,15 +182,20 @@
     <string name="transcribe_failed">Помилка розпізнавання</string>
     <string name="about_back">Назад</string>
     <string name="about_tagline">Розпізнавання мовлення на пристрої. Ваше аудіо ніколи не залишає телефон.</string>
+    <string name="about_tagline_remote">Розпізнавання мовлення через сервер, яким володієте ви. Звук надсилається туди.</string>
     <string name="about_two_ways">Два способи використовувати Scrib</string>
     <string name="about_own_h">Розпізнати власне аудіо</string>
     <string name="about_own_b">Запишіть прямо в застосунку або виберіть будь-який аудіофайл на телефоні й отримайте текст — прямо тут, повністю офлайн.</string>
+    <string name="about_own_b_remote">Запишіть просто в застосунку або виберіть аудіофайл із телефона й отримайте текст. Звук іде на вашу точку, розпізнається там, а текст повертається.</string>
     <string name="about_engine_h">Рушій розпізнавання для інших застосунків</string>
     <string name="about_engine_b">Scrib також працює у фоні. Застосунки, що це підтримують — наприклад Forkgram — можуть перетворювати голосові на текст через Scrib, на вашому пристрої. У налаштуваннях того застосунку виберіть Scrib як офлайн-розпізнавач. Нічого не завантажується.</string>
+    <string name="about_engine_b_remote">Scrib працює й у тлі. Застосунки, які його підтримують — наприклад Forkgram, — можуть перетворити голосове повідомлення на текст через Scrib. У їхніх налаштуваннях виберіть Scrib як розпізнавач. Запис надсилається на вашу точку.</string>
     <string name="about_keyboard_h">Диктування в будь-якому застосунку</string>
     <string name="about_keyboard_b">Scrib може працювати як голосова клавіатура. Увімкніть її в налаштуваннях клавіатур телефона, потім натисніть кнопку мікрофона в клавіатурі на кшталт HeliBoard або виберіть Scrib Голос у перемикачі клавіатур — і говоріть. Текст потрапить прямо туди, де ви писали, а ваша клавіатура повернеться, коли ви закінчите.</string>
     <string name="about_models_h">Моделі</string>
+    <string name="about_endpoint_h">Точка</string>
     <string name="about_models_b">Scrib розпізнає відкритими моделями мовлення Whisper. Завантажте модель на головному екрані або виберіть мову — Scrib підбере відповідну. Більші моделі точніші; тримайте кілька й перемикайтеся будь-коли.</string>
+    <string name="about_endpoint_b">На цьому телефоні немає моделі й коду виведення: Scrib Remote — це запис, надсилання та редагування. Вкажіть йому будь-який OpenAI-сумісний сервер — whisper.cpp, faster-whisper, Speaches, LM Studio — або Cloudflare Workers AI: звук піде туди по HTTPS, а адреса буде видно на екрані.</string>
     <string name="about_dev_h">Для розробників</string>
     <string name="about_dev_b">Будь-який застосунок може використовувати Scrib як офлайн-розпізнавач через відкритий контракт Open Transcribe (org.opentranscribe.api) — невеликий AIDL-сервіс, без SDK і без мережі. Контракт вендор-нейтральний, тож застосунки не прив’язані до Scrib: вони можуть під’єднати будь-який сумісний розпізнавач, установлений користувачем.</string>
     <string name="about_version">Версія %s</string>

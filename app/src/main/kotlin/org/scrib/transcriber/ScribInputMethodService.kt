@@ -287,7 +287,9 @@ class ScribInputMethodService : InputMethodService() {
         override fun onTranscriptionError(error: TranscriptionError?) {
             val message = when (error?.type) {
                 ErrorType.CANCELLED -> null
-                ErrorType.MODEL_NOT_AVAILABLE -> getString(R.string.ime_needs_model)
+                ErrorType.MODEL_NOT_AVAILABLE -> getString(
+                    if (BuildConfig.ENDPOINTS_ONLY) R.string.ime_needs_endpoint else R.string.ime_needs_model
+                )
                 else -> getString(R.string.transcribe_failed)
             }
             main.post { if (id == session) settled(message) }
@@ -352,7 +354,9 @@ class ScribInputMethodService : InputMethodService() {
         val blocker = blocker()
         val message = notice ?: when {
             blocker == Blocker.Microphone -> getString(R.string.record_denied)
-            blocker == Blocker.Model -> getString(R.string.ime_needs_model)
+            blocker == Blocker.Model -> getString(
+                if (BuildConfig.ENDPOINTS_ONLY) R.string.ime_needs_endpoint else R.string.ime_needs_model
+            )
             stage == Stage.Listening -> getString(R.string.ime_listening)
             stage == Stage.Finishing -> getString(R.string.ime_finishing)
             else -> getString(R.string.ime_ready)
