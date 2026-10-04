@@ -63,6 +63,8 @@ class ScribInputMethodService : InputMethodService() {
 
     private companion object {
         const val LINGER_AFTER_STOP_MS = 250L
+
+        const val NOTICE_CHARS = 120
     }
 
     override fun onCreateInputView(): View {
@@ -290,10 +292,18 @@ class ScribInputMethodService : InputMethodService() {
                 ErrorType.MODEL_NOT_AVAILABLE -> getString(
                     if (BuildConfig.ENDPOINTS_ONLY) R.string.ime_needs_endpoint else R.string.ime_needs_model
                 )
-                else -> getString(R.string.transcribe_failed)
+                else -> brief(error?.message) ?: getString(R.string.transcribe_failed)
             }
             main.post { if (id == session) settled(message) }
         }
+    }
+
+    private fun brief(message: String?): String? {
+        val text = message?.trim().orEmpty()
+        if (text.isEmpty()) {
+            return null
+        }
+        return if (text.length <= NOTICE_CHARS) text else text.take(NOTICE_CHARS).trimEnd() + "…"
     }
 
     // Progress carries everything recognised so far and only ever grows, so what is new is
