@@ -30,24 +30,30 @@ import a `.bin` from your device.
 
 Models are downloaded separately and are not bundled in the app.
 
-## Two builds
+## Three builds
 
-Scrib ships in two flavours from this one repository. They differ in what they
+Scrib ships in three flavours from this one repository. They differ in what they
 can run and in how much they weigh — not in what they promise you.
 
 - **Scrib** (`org.scrib.transcriber`) is the lean build, the one F-Droid ships.
   Whisper models only, small installer, nothing but model downloads over the
   network.
-- **Scrib Max** (`org.scrib.transcriber.max`) is the extended build, attached to
-  each [GitHub release](https://github.com/23rd/Scrib/releases/tag/latest). It
-  adds every model family the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
-  runtime covers on top of Whisper — SenseVoice, Canary, streaming Zipformer,
-  Parakeet, Moonshine, Dolphin, FireRed — plus transcription on a remote endpoint
-  you configure, and the installer grows to about 150 MB.
+- **Scrib Max** (`org.scrib.transcriber.max`) is the extended build: every model
+  family the [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) runtime covers
+  on top of Whisper — SenseVoice, Canary, streaming Zipformer, Parakeet,
+  Moonshine, Dolphin, FireRed — and transcription on a remote endpoint you
+  configure. By far the largest of the three.
+- **Scrib Remote** (`org.scrib.transcriber.remote`) has no models and no
+  inference code at all: it uploads the audio to a server you control. The
+  smallest of the three, and the same size on every phone.
 
-The two have separate application ids, so they install side by side and neither
-replaces the other. Both transcribe on device out of the box; Max simply runs more
-kinds of model, and lets you move the work off the phone when you want to.
+Separate application ids, so all three install side by side and none replaces
+another. Each is attached to every
+[GitHub release](https://github.com/23rd/Scrib/releases/tag/latest) as a
+universal apk and once per architecture — `arm64-v8a` for nearly every phone,
+`armeabi-v7a` for older 32-bit ones, `x86_64` and `x86` for emulators and
+Waydroid. Every one of them carries the same version code, so switching between
+them needs no uninstall.
 
 ## For developers
 
@@ -78,7 +84,16 @@ scripts/download-sherpa-onnx.sh
 ./gradlew :app:assembleRelease -PwithSherpa
 ```
 
-Omit the flag and you get the lean Scrib that F-Droid builds.
+Scrib Remote is `-PwithRemote`: the remote endpoints without whisper.cpp, so no
+NDK, no submodule and no AAR.
+
+```
+./gradlew :app:assembleRelease -PwithRemote
+```
+
+Omit both flags and you get the lean Scrib that F-Droid builds. `-Pabis=` picks
+the architectures to compile and `-PabiSplits` adds one apk per architecture next
+to the universal one; the release workflow passes both.
 
 ## Privacy
 
@@ -86,10 +101,10 @@ By default transcription runs 100% on device: your voice messages never leave
 the phone, and the only network access is downloading a model you pick. The
 F-Droid build does nothing else.
 
-Scrib Max can also transcribe on a server instead — any OpenAI-compatible
-endpoint you configure, or Cloudflare Workers AI. While one is selected, the
-audio is uploaded there over HTTPS instead of being read on the phone, and the
-app names that address on screen.
+Scrib Max and Scrib Remote can also transcribe on a server instead — any
+OpenAI-compatible endpoint you configure, or Cloudflare Workers AI. While one is
+selected, the audio is uploaded there over HTTPS and the app names that address
+on screen. Remote has no other engine, so its audio always leaves the phone.
 
 ## License
 

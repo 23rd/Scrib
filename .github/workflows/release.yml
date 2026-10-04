@@ -132,11 +132,11 @@ jobs:
 
           **Scrib** — the lean build, the same one F-Droid ships. Whisper models only; nothing leaves the phone.
 
-          **Scrib Max** — the extended build. Whisper plus every model family sherpa-onnx adds on top — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — and custom OpenAI-compatible endpoints.
+          **Scrib Max** — the extended build, and by far the largest download of the three. Whisper plus every model family sherpa-onnx adds on top — SenseVoice, Canary, streaming Zipformer, Parakeet, Moonshine — and custom OpenAI-compatible endpoints.
 
-          **Scrib Remote** — no models at all, about 7 MB. It uploads the audio to a server you control and shows what comes back.
+          **Scrib Remote** — no models and no inference code; the same small apk on every phone. It uploads the audio to a server you control and shows what comes back.
 
-          Each app is attached twice over: a universal apk, and one per architecture — **arm64-v8a** (nearly every phone since 2016), **armeabi-v7a** (older 32-bit phones), **x86_64** and **x86** (emulators, Waydroid, Chromebooks). The per-architecture files are the same app in a smaller download; they carry the same version code, so moving between them in either direction is a plain install, with no uninstall first.
+          Each app is attached twice over: a universal apk carrying all four architectures, and one apk per architecture — **arm64-v8a** (nearly every phone since 2016), **armeabi-v7a** (older 32-bit phones), **x86_64** and **x86** (emulators, Waydroid, Chromebooks). They all carry the same version code, so moving between them in either direction is a plain install, with no uninstall first.
 
           All of them are signed with our own key, so none of them can update an F-Droid install.
           EOF
