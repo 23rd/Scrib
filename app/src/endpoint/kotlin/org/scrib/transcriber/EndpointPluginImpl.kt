@@ -25,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
@@ -298,6 +300,7 @@ private fun EndpointDialog(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val scroll = rememberScrollState()
     var provider by rememberSaveable { mutableStateOf(initial.provider) }
     var url by rememberSaveable { mutableStateOf(initial.baseUrl) }
     var key by rememberSaveable { mutableStateOf(initial.apiKey) }
@@ -309,6 +312,22 @@ private fun EndpointDialog(
     var providerOpen by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var status by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
+    LaunchedEffect(status) {
+        if (status != null) scroll.animateScrollTo(scroll.maxValue)
+    }
+
+    var modelChosen by remember { mutableStateOf(false) }
+    LaunchedEffect(url, key, provider) {
+        val settings = runCatching { EndpointSettings.parse(url, key, model, name, provider) }.getOrNull()
+        if (settings == null || !settings.isComplete) return@LaunchedEffect
+        delay(MODEL_LIST_WAIT_MS)
+        fetchModels(settings).onSuccess { ids ->
+            modelOptions = transcriptionFirst(ids)
+            if (!modelChosen && model !in ids && onlyDefaultLeft(model, provider)) {
+                model = preferredModel(ids)
+            }
+        }
+    }
 
     fun run(action: suspend () -> Result<String>) {
         if (busy) return
@@ -340,7 +359,7 @@ private fun EndpointDialog(
         title = { Text(stringResource(R.string.endpoint_dialog_title), fontSize = 17.sp) },
         text = {
             Column(
-                Modifier.verticalScroll(rememberScrollState()).heightIn(max = 460.dp),
+                Modifier.heightIn(max = 460.dp).verticalScroll(scroll),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
@@ -366,6 +385,8 @@ private fun EndpointDialog(
                                 onClick = {
                                     provider = option
                                     providerOpen = false
+                                    modelOptions = emptyList()
+                                    modelChosen = false
                                     model = if (option == EndpointProvider.CLOUDFLARE) {
                                         CLOUDFLARE_WHISPER_MODELS.first()
                                     } else {
@@ -394,14 +415,37 @@ private fun EndpointDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text(stringResource(R.string.endpoint_name)) },
-                    supportingText = { Text(stringResource(R.string.endpoint_name_hint)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                ExposedDropdownMenuBox(
+                    expanded = menuOpen,
+                    onExpandedChange = { menuOpen = !menuOpen }
+                ) {
+                    OutlinedTextField(
+                        value = model,
+                        onValueChange = {
+                            model = it
+                            modelChosen = true
+                        },
+                        label = { Text(stringResource(R.string.endpoint_model)) },
+                        singleLine = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuOpen) },
+                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryEditable)
+                    )
+                    ExposedDropdownMenu(
+                        expanded = menuOpen,
+                        onDismissRequest = { menuOpen = false }
+                    ) {
+                        modelOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    model = option
+                                    modelChosen = true
+                                    menuOpen = false
+                                }
+                            )
+                        }
+                    }
+                }
                 OutlinedTextField(
                     value = key,
                     onValueChange = { key = it },
@@ -416,33 +460,14 @@ private fun EndpointDialog(
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth()
                 )
-                ExposedDropdownMenuBox(
-                    expanded = menuOpen,
-                    onExpandedChange = { menuOpen = !menuOpen }
-                ) {
-                    OutlinedTextField(
-                        value = model,
-                        onValueChange = { model = it },
-                        label = { Text(stringResource(R.string.endpoint_model)) },
-                        singleLine = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuOpen) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = menuOpen,
-                        onDismissRequest = { menuOpen = false }
-                    ) {
-                        modelOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    model = option
-                                    menuOpen = false
-                                }
-                            )
-                        }
-                    }
-                }
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.endpoint_name)) },
+                    supportingText = { Text(stringResource(R.string.endpoint_name_hint)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -454,9 +479,9 @@ private fun EndpointDialog(
                             val settings = save() ?: return@TextButton
                             val known = settings.transport.modelOptions(settings)
                             if (known.isNotEmpty()) {
-                                modelOptions = known
-                                if (model.isBlank() || model !in known) {
-                                    model = known.first()
+                                modelOptions = transcriptionFirst(known)
+                                if (!modelChosen && model !in known && onlyDefaultLeft(model, provider)) {
+                                    model = preferredModel(known)
                                 }
                                 status = context.getString(R.string.endpoint_models_found, known.size) to false
                                 return@TextButton
@@ -466,9 +491,9 @@ private fun EndpointDialog(
                             scope.launch {
                                 fetchModels(settings).fold(
                                     { ids ->
-                                        modelOptions = ids
-                                        if (model.isBlank() || model !in ids) {
-                                            model = ids.first()
+                                        modelOptions = transcriptionFirst(ids)
+                                        if (!modelChosen && model !in ids && onlyDefaultLeft(model, provider)) {
+                                            model = preferredModel(ids)
                                         }
                                         status = context.getString(R.string.endpoint_models_found, ids.size) to false
                                     },
@@ -537,3 +562,21 @@ private fun EndpointProvider.labelRes(): Int = when (this) {
     EndpointProvider.OPENAI -> R.string.endpoint_provider_openai
     EndpointProvider.CLOUDFLARE -> R.string.endpoint_provider_cloudflare
 }
+private val TRANSCRIPTION_HINTS = listOf("whisper", "transcrib", "speech", "stt", "asr", "audio")
+
+private const val MODEL_LIST_WAIT_MS = 700L
+
+private fun looksLikeTranscription(id: String): Boolean =
+    TRANSCRIPTION_HINTS.any { id.contains(it, ignoreCase = true) }
+
+private fun transcriptionFirst(ids: List<String>): List<String> =
+    ids.sortedBy { id -> if (looksLikeTranscription(id)) 0 else 1 }
+
+private fun preferredModel(ids: List<String>): String =
+    ids.firstOrNull { looksLikeTranscription(it) } ?: ids.first()
+private fun onlyDefaultLeft(model: String, provider: EndpointProvider): Boolean =
+    model.isBlank() || model == if (provider == EndpointProvider.CLOUDFLARE) {
+        CLOUDFLARE_WHISPER_MODELS.first()
+    } else {
+        EndpointSettings.DEFAULT_MODEL
+    }

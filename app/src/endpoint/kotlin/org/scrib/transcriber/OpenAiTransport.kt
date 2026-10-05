@@ -24,21 +24,28 @@ class OpenAiTransport : EndpointTransport {
         val url = settings.transcriptionsUrl
         val connection = EndpointHttp.open(url, settings.apiKey)
         try {
+            val model = field(boundary, "model", settings.model)
+            val language = languageHint?.takeIf { it.isNotEmpty() }?.let { field(boundary, "language", it) }
+            val promptField = prompt?.takeIf { it.isNotBlank() }?.let { field(boundary, "prompt", it) }
+            val fileHeader = fileHeader(boundary)
+            val closing = "--$boundary--\r\n".toByteArray()
             connection.requestMethod = "POST"
             connection.doOutput = true
             connection.setRequestProperty("Content-Type", "multipart/form-data; boundary=$boundary")
-            connection.setChunkedStreamingMode(0)
+            connection.setFixedLengthStreamingMode(
+                model.size.toLong() + (language?.size?.toLong() ?: 0L) +
+                    (promptField?.size?.toLong() ?: 0L) + fileHeader.size.toLong() +
+                    wav.size.toLong() + CRLF.size.toLong() + closing.size.toLong()
+            )
 
             connection.outputStream.use { out ->
-                writeField(out, boundary, "model", settings.model)
-                if (!languageHint.isNullOrEmpty()) {
-                    writeField(out, boundary, "language", languageHint)
-                }
-                if (!prompt.isNullOrBlank()) {
-                    writeField(out, boundary, "prompt", prompt)
-                }
-                writeFile(out, boundary, wav)
-                out.write("--$boundary--\r\n".toByteArray())
+                out.write(model)
+                language?.let { out.write(it) }
+                promptField?.let { out.write(it) }
+                out.write(fileHeader)
+                out.write(wav)
+                out.write(CRLF)
+                out.write(closing)
                 out.flush()
             }
 
@@ -64,20 +71,16 @@ class OpenAiTransport : EndpointTransport {
         }
     }
 
-    private fun writeField(out: java.io.OutputStream, boundary: String, name: String, value: String) {
-        out.write(
-            ("--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n")
-                .toByteArray()
-        )
-    }
+    private fun field(boundary: String, name: String, value: String): ByteArray =
+        ("--$boundary\r\nContent-Disposition: form-data; name=\"$name\"\r\n\r\n$value\r\n")
+            .toByteArray()
 
-    private fun writeFile(out: java.io.OutputStream, boundary: String, wav: ByteArray) {
-        out.write(
-            ("--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"audio.wav\"\r\n" +
-                "Content-Type: audio/wav\r\n\r\n").toByteArray()
-        )
-        out.write(wav)
-        out.write("\r\n".toByteArray())
+    private fun fileHeader(boundary: String): ByteArray =
+        ("--$boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"audio.wav\"\r\n" +
+            "Content-Type: audio/wav\r\n\r\n").toByteArray()
+
+    private companion object {
+        val CRLF = "\r\n".toByteArray()
     }
 }
 
@@ -129,8 +132,8 @@ object EndpointHttp {
         val shown = detail.ifEmpty { preview(body) }
         return when (status) {
             401, 403 -> "The server rejected the API key (HTTP $status). $shown"
-            404 -> "No transcriptions endpoint at $url (HTTP 404)."
-            413 -> "The recording is too large for this server (HTTP 413)."
+            404 -> "Nothing at $url (HTTP 404): no such endpoint, or no such model. $shown"
+            413 -> "The recording is too large for this server (HTTP 413). $shown"
             in 500..599 -> "The server failed (HTTP $status). $shown"
             else -> "The server returned HTTP $status. $shown"
         }
