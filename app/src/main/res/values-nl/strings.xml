@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Zelftest ✓ — %1$s</string>
     <string name="status_selftest_failed">Zelftest mislukt: %1$s</string>
     <string name="dict_entry_title">Woordvervangingen</string>
-    <string name="dict_entry_sub">Corrigeer woorden die verkeerd worden herkend, bijv. дископ → десктоп</string>
+    <string name="dict_entry_sub">Corrigeer woorden die verkeerd worden herkend</string>
     <string name="dict_entry_on">Aan — toegepast op resultaten</string>
     <string name="dict_dialog_title">Woordvervangingen</string>
     <string name="dict_dialog_body">Eén regel per regel: «gehoord=tekst».</string>

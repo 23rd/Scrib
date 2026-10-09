@@ -199,7 +199,7 @@
     <string name="status_selftest_failed">Self-test failed: %1$s</string>
 
     <string name="dict_entry_title">Word replacements</string>
-    <string name="dict_entry_sub">Fix words the recognizer mishears, e.g. дископ → десктоп</string>
+    <string name="dict_entry_sub">Fix words the recognizer mishears</string>
     <string name="dict_entry_on">On — applied to transcription results</string>
     <string name="dict_dialog_title">Word replacements</string>
     <string name="dict_dialog_body">One rule per line: «heard=text».</string>

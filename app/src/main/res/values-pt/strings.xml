@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Autoteste ✓ — %1$s</string>
     <string name="status_selftest_failed">Falha no autoteste: %1$s</string>
     <string name="dict_entry_title">Substituições de palavras</string>
-    <string name="dict_entry_sub">Corrija palavras reconhecidas errado, ex. дископ → десктоп</string>
+    <string name="dict_entry_sub">Corrija palavras reconhecidas errado</string>
     <string name="dict_entry_on">Ativado — aplicado aos resultados</string>
     <string name="dict_dialog_title">Substituições de palavras</string>
     <string name="dict_dialog_body">Uma regra por linha: «ouvido=texto».</string>

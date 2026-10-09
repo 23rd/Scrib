@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
     <string name="status_selftest_failed">Échec de l\'autotest : %1$s</string>
     <string name="dict_entry_title">Remplacements de mots</string>
-    <string name="dict_entry_sub">Corrigez les mots mal reconnus, p. ex. дископ → десктоп</string>
+    <string name="dict_entry_sub">Corrigez les mots mal reconnus</string>
     <string name="dict_entry_on">Activé — appliqué aux résultats</string>
     <string name="dict_dialog_title">Remplacements de mots</string>
     <string name="dict_dialog_body">Une règle par ligne : «entendu=texte».</string>

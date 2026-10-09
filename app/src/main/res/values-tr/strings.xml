@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Otomatik test ✓ — %1$s</string>
     <string name="status_selftest_failed">Otomatik test başarısız: %1$s</string>
     <string name="dict_entry_title">Sözcük değiştirmeler</string>
-    <string name="dict_entry_sub">Yanlış tanınan sözcükleri düzelt, örn. дископ → десктоп</string>
+    <string name="dict_entry_sub">Yanlış tanınan sözcükleri düzelt</string>
     <string name="dict_entry_on">Açık — sonuçlara uygulanır</string>
     <string name="dict_dialog_title">Sözcük değiştirmeler</string>
     <string name="dict_dialog_body">Satır başına bir kural: «duyulan=metin».</string>

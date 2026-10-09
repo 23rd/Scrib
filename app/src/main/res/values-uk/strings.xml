@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Самоперевірка ✓ — %1$s</string>
     <string name="status_selftest_failed">Самоперевірка не вдалася: %1$s</string>
     <string name="dict_entry_title">Заміни слів</string>
-    <string name="dict_entry_sub">Виправляйте слова, які розпізнаються невірно: дископ → десктоп</string>
+    <string name="dict_entry_sub">Виправляйте слова, які розпізнаються невірно</string>
     <string name="dict_entry_on">Увімкнено — діє на результати</string>
     <string name="dict_dialog_title">Заміни слів</string>
     <string name="dict_dialog_body">По одному правилу на рядок: «чує=вставити».</string>

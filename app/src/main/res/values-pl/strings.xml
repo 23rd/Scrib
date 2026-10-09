@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Autotest ✓ — %1$s</string>
     <string name="status_selftest_failed">Autotest nie powiódł się: %1$s</string>
     <string name="dict_entry_title">Zamiany słów</string>
-    <string name="dict_entry_sub">Poprawiaj słowa błędnie rozpoznawane, np. дископ → десктоп</string>
+    <string name="dict_entry_sub">Poprawiaj słowa błędnie rozpoznawane</string>
     <string name="dict_entry_on">Włączone — dotyczy wyników</string>
     <string name="dict_dialog_title">Zamiany słów</string>
     <string name="dict_dialog_body">Jedna reguła na wiersz: «usłyszano=tekst».</string>

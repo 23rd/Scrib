@@ -180,7 +180,7 @@
     <string name="status_selftest_ok">Selbsttest ✓ — %1$s</string>
     <string name="status_selftest_failed">Selbsttest fehlgeschlagen: %1$s</string>
     <string name="dict_entry_title">Wortersetzungen</string>
-    <string name="dict_entry_sub">Korrigiere Wörter, die falsch erkannt werden, z. B. дископ → десктоп</string>
+    <string name="dict_entry_sub">Korrigiere Wörter, die falsch erkannt werden</string>
     <string name="dict_entry_on">An — gilt für Transkriptionsergebnisse</string>
     <string name="dict_dialog_title">Wortersetzungen</string>
     <string name="dict_dialog_body">Eine Regel pro Zeile: «Gehört=Text».</string>
