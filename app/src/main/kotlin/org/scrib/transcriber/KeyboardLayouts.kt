@@ -41,16 +41,22 @@ data class KeyboardLayoutOption(
 
 data class KeyboardLayoutSettings(
     val enabled: Boolean,
-    val options: List<KeyboardLayoutOption>
+    val options: List<KeyboardLayoutOption>,
+    val customKeys: List<String>
 )
 
 object KeyboardLayouts {
     private const val PREFS = "keyboard"
     private const val KEY_ENABLED = "layoutButtonsEnabled"
     private const val KEY_TARGETS = "layoutTargets"
+    private const val KEY_CUSTOM_KEYS = "customKeys"
+    private const val KEY_CUSTOM_SCROLL = "customScrollX"
     private const val TARGET_SEPARATOR = "\n"
     private const val KEYBOARD_MODE = "keyboard"
     private const val VOICE_MODE = "voice"
+
+    const val MAX_CUSTOM_KEYS = 50
+    const val MAX_CUSTOM_KEY_LENGTH = 64
 
     fun settings(context: Context): KeyboardLayoutSettings {
         val selectedKeys = savedKeys(context)
@@ -70,7 +76,8 @@ object KeyboardLayouts {
                     languageTag = target.languageTag,
                     selected = target.key in selected
                 )
-            }
+            },
+            customKeys = savedCustomKeys(context)
         )
     }
 
@@ -89,6 +96,50 @@ object KeyboardLayouts {
             .putString(KEY_TARGETS, normalized.joinToString(TARGET_SEPARATOR))
             .apply()
     }
+
+    // One custom key per line: anything the user wants to insert — ".", "!", "?" or a whole
+    // phrase. Newlines cannot survive the storage, so they never reach the list.
+    fun saveCustomKeys(context: Context, keys: List<String>) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(KEY_CUSTOM_KEYS, normalizeCustomKeys(keys).joinToString(TARGET_SEPARATOR))
+            .apply()
+    }
+
+    fun save(context: Context, enabled: Boolean, keys: List<String>, customKeys: List<String>) {
+        val normalized = keys.filter { it.isNotBlank() }.distinct()
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_ENABLED, enabled)
+            .putString(KEY_TARGETS, normalized.joinToString(TARGET_SEPARATOR))
+            .putString(KEY_CUSTOM_KEYS, normalizeCustomKeys(customKeys).joinToString(TARGET_SEPARATOR))
+            .apply()
+    }
+
+    fun customKeys(context: Context): List<String> = savedCustomKeys(context)
+
+    fun customScroll(context: Context): Int =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_CUSTOM_SCROLL, 0)
+
+    fun saveCustomScroll(context: Context, scrollX: Int) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putInt(KEY_CUSTOM_SCROLL, scrollX.coerceAtLeast(0))
+            .apply()
+    }
+
+    private fun normalizeCustomKeys(keys: List<String>): List<String> =
+        keys.map { it.replace("\r", "").replace("\n", "") }
+            .filter { it.isNotBlank() }
+            .map { if (it.length > MAX_CUSTOM_KEY_LENGTH) it.take(MAX_CUSTOM_KEY_LENGTH) else it }
+            .distinct()
+            .take(MAX_CUSTOM_KEYS)
+
+    private fun savedCustomKeys(context: Context): List<String> =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_CUSTOM_KEYS, "")
+            .orEmpty()
+            .split(TARGET_SEPARATOR)
+            .map { it.replace("\r", "") }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(MAX_CUSTOM_KEYS)
 
     private fun savedEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_ENABLED, false)

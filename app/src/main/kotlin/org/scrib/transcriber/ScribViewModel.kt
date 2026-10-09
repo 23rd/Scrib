@@ -343,8 +343,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) { TranscriptionEngine.releaseAll(ctx) }
     }
 
-    fun setKeyboardLayouts(enabled: Boolean, keys: List<String>) {
-        KeyboardLayouts.save(ctx, enabled, keys)
+    fun setKeyboardLayouts(enabled: Boolean, keys: List<String>, customKeys: List<String>) {
+        KeyboardLayouts.save(ctx, enabled, keys, customKeys)
         keyboardLayouts = KeyboardLayouts.settings(ctx)
         push()
     }

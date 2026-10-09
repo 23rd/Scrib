@@ -96,6 +96,15 @@
     <string name="ime_layout_buttons_clear">Auswahl löschen</string>
     <string name="ime_layout_buttons_off">Eine allgemeine Tastaturschaltfläche</string>
     <string name="ime_layout_buttons_none">Keine Layout-Schaltflächen</string>
+    <string name="ime_custom_keys_title">Eigene Einfüge-Tasten</string>
+    <string name="ime_custom_keys_hint">Alles, was du mit einem Tipp einfügen willst — \".\", \"!\", \"?\" oder eine ganze Phrase. Ihre Reihenfolge ist die Reihenfolge der Tasten.</string>
+    <string name="ime_custom_keys_add_hint">Neue Taste, z. B. ?!</string>
+    <string name="ime_custom_keys_add">Hinzufügen</string>
+    <string name="ime_custom_keys_empty">Noch keine eigenen Tasten.</string>
+    <string name="ime_custom_keys_delete">%1$s entfernen</string>
+    <string name="ime_custom_keys_move_up">%1$s nach oben</string>
+    <string name="ime_custom_keys_move_down">%1$s nach unten</string>
+    <string name="ime_custom_keys_edit">%1$s bearbeiten</string>
     <string name="ime_layout_buttons_on">Eigene Layout-Schaltflächen</string>
     <string name="models_explainer">Größere Modelle sind genauer, aber langsamer und größer beim Download. Modelle „nur Englisch“ sind kleiner und schneller; für andere Sprachen wähle Base oder größer — Tiny ist schwach.</string>
     <string name="standard_models">STANDARDMODELLE</string>

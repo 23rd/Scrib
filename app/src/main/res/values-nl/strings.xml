@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Eén algemene toetsenbordknop</string>
     <string name="ime_layout_buttons_none">Geen layoutknoppen</string>
     <string name="ime_layout_buttons_on">Eigen layoutknoppen</string>
+    <string name="ime_custom_keys_title">Eigen invoegtoetsen</string>
+    <string name="ime_custom_keys_hint">Alles wat je met één tik wil invoegen — ‘.’, ‘!’, ‘?’ of een hele zin. Hun volgorde is de volgorde van de toetsen.</string>
+    <string name="ime_custom_keys_add_hint">Nieuwe toets, bijv. ?!</string>
+    <string name="ime_custom_keys_add">Toevoegen</string>
+    <string name="ime_custom_keys_empty">Nog geen eigen toetsen.</string>
+    <string name="ime_custom_keys_delete">%1$s verwijderen</string>
+    <string name="ime_custom_keys_move_up">%1$s omhoog</string>
+    <string name="ime_custom_keys_move_down">%1$s omlaag</string>
+    <string name="ime_custom_keys_edit">%1$s bewerken</string>
     <string name="models_explainer">Grotere modellen zijn nauwkeuriger maar langzamer en groter om te downloaden. «Alleen Engels»-modellen zijn kleiner en sneller; kies voor andere talen Base of groter — Tiny is zwak.</string>
     <string name="standard_models">STANDAARDMODELLEN</string>
     <string name="size">grootte</string>

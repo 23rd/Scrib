@@ -11,8 +11,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +27,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +45,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -55,6 +62,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -66,13 +74,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.DateFormat
+import java.util.Collections
 import java.util.Date
 import java.util.Locale
 import kotlin.math.sqrt
@@ -102,7 +113,7 @@ fun ScribScreen(
     onPickLanguage: (LanguageOption) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
     onLiveStats: (Boolean) -> Unit,
-    onConfigureKeyboardLayouts: (Boolean, List<String>) -> Unit,
+    onConfigureKeyboardLayouts: (Boolean, List<String>, List<String>) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
     sherpaPlugin: SherpaPlugin?,
     endpointPlugin: EndpointPlugin?,
@@ -307,8 +318,8 @@ fun ScribScreen(
         KeyboardLayoutsDialog(
             settings = state.keyboardLayouts,
             onDismiss = { showKeyboardLayouts = false },
-            onSave = { enabled, keys ->
-                onConfigureKeyboardLayouts(enabled, keys)
+            onSave = { enabled, keys, customKeys ->
+                onConfigureKeyboardLayouts(enabled, keys, customKeys)
                 showKeyboardLayouts = false
             },
             onOpenSystemSettings = {
@@ -1065,7 +1076,7 @@ private fun KeyboardEntry(settings: KeyboardLayoutSettings, onClick: () -> Unit)
         !settings.enabled -> stringResource(R.string.ime_layout_buttons_off)
         settings.options.none { it.selected } -> stringResource(R.string.ime_layout_buttons_none)
         else -> stringResource(R.string.ime_layout_buttons_on)
-    }
+    } + if (settings.customKeys.isNotEmpty()) " · ✎" + settings.customKeys.size.toString() else ""
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
@@ -1374,54 +1385,96 @@ private fun BenchmarkMetric(label: String, value: String, modifier: Modifier = M
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun KeyboardLayoutsDialog(
     settings: KeyboardLayoutSettings,
     onDismiss: () -> Unit,
-    onSave: (Boolean, List<String>) -> Unit,
+    onSave: (Boolean, List<String>, List<String>) -> Unit,
     onOpenSystemSettings: () -> Unit
 ) {
     var enabled by remember(settings) { mutableStateOf(settings.enabled) }
     var selectedKeys by remember(settings) {
         mutableStateOf(settings.options.filter { it.selected }.map { it.key })
     }
+    var customKeys by remember(settings) { mutableStateOf(settings.customKeys) }
+    var newKey by remember(settings) { mutableStateOf("") }
+    var editingKey by remember(settings) { mutableStateOf<String?>(null) }
+    var editText by remember(settings) { mutableStateOf("") }
+    fun addNewKey() {
+        val value = newKey.replace("\r", "").replace("\n", "")
+        if (value.isBlank() || value in customKeys || customKeys.size >= KeyboardLayouts.MAX_CUSTOM_KEYS) {
+            return
+        }
+        // The newest key goes on top: it is the one just typed, and the top is where the add row
+        // already is, so it is in sight without scrolling.
+        customKeys = listOf(value.take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)) + customKeys
+        newKey = ""
+    }
+    fun renameCustomKey(from: String, to: String) {
+        val value = to.replace("\r", "").replace("\n", "").take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+        if (value.isBlank() || (value in customKeys && value != from)) {
+            return
+        }
+        customKeys = customKeys.map { if (it == from) value else it }
+        editingKey = null
+    }
+    fun moveCustomKey(key: String, delta: Int) {
+        val index = customKeys.indexOf(key)
+        val to = index + delta
+        if (index < 0 || to !in customKeys.indices) {
+            return
+        }
+        customKeys = customKeys.toMutableList().also { Collections.swap(it, index, to) }
+    }
     val cs = MaterialTheme.colorScheme
+    val canAdd = newKey.isNotBlank() && newKey !in customKeys &&
+        customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.ime_layout_buttons_title)) },
         text = {
-            Column {
-                Row(
-                    Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(R.string.ime_layout_buttons_show),
-                        modifier = Modifier.weight(1f),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = cs.onSurface
-                    )
-                    Switch(checked = enabled, onCheckedChange = { enabled = it })
+            // One flat list, not a list inside a scroll: a nested LazyColumn confuses item
+            // placement animations, and a moved row flies out of its strip.
+            LazyColumn {
+                item {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.ime_layout_buttons_show),
+                            modifier = Modifier.weight(1f),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = cs.onSurface
+                        )
+                        Switch(checked = enabled, onCheckedChange = { enabled = it })
+                    }
                 }
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    stringResource(R.string.ime_layout_buttons_hint),
-                    fontSize = 12.5.sp,
-                    color = cs.onSurfaceVariant,
-                    lineHeight = 17.sp
-                )
-                Spacer(Modifier.height(10.dp))
+                item {
+                    Column {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            stringResource(R.string.ime_layout_buttons_hint),
+                            fontSize = 12.5.sp,
+                            color = cs.onSurfaceVariant,
+                            lineHeight = 17.sp
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
                 if (settings.options.isEmpty()) {
-                    Text(
-                        stringResource(R.string.ime_layout_buttons_empty),
-                        fontSize = 13.sp,
-                        color = cs.onSurfaceVariant,
-                        lineHeight = 18.sp
-                    )
+                    item {
+                        Text(
+                            stringResource(R.string.ime_layout_buttons_empty),
+                            fontSize = 13.sp,
+                            color = cs.onSurfaceVariant,
+                            lineHeight = 18.sp
+                        )
+                    }
                 } else {
-                    Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
-                        settings.options.forEach { option ->
+                    items(settings.options, key = { it.key }) { option ->
                             val selected = selectedKeys.contains(option.key)
                             val detail = buildString {
                                 append(option.imeLabel)
@@ -1493,27 +1546,319 @@ private fun KeyboardLayoutsDialog(
                                 }
                             }
                         }
-                    }
-                    TextButton(
-                        onClick = { selectedKeys = emptyList() },
-                        enabled = selectedKeys.isNotEmpty(),
-                        modifier = Modifier.align(Alignment.End)
-                    ) {
-                        Text(stringResource(R.string.ime_layout_buttons_clear), fontSize = 12.sp)
+                    item {
+                        Box(
+                            Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.CenterEnd
+                        ) {
+                            TextButton(
+                                onClick = { selectedKeys = emptyList() },
+                                enabled = selectedKeys.isNotEmpty()
+                            ) {
+                                Text(stringResource(R.string.ime_layout_buttons_clear), fontSize = 12.sp)
+                            }
+                        }
                     }
                 }
-                TextButton(onClick = onOpenSystemSettings) {
-                    Text(stringResource(R.string.ime_layout_buttons_open), fontSize = 12.sp)
+                item {
+                    OutlinedButton(
+                        onClick = onOpenSystemSettings,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.ime_layout_buttons_open), fontSize = 12.sp)
+                    }
+                }
+                item {
+                    Column {
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            stringResource(R.string.ime_custom_keys_title),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = cs.onSurface
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            stringResource(R.string.ime_custom_keys_hint),
+                            fontSize = 12.5.sp,
+                            color = cs.onSurfaceVariant,
+                            lineHeight = 17.sp
+                        )
+                        Spacer(Modifier.height(10.dp))
+                    }
+                }
+                item {
+                    AddKeyRow(
+                        value = newKey,
+                        onValueChange = {
+                            newKey = it.replace("\r", "").replace("\n", "")
+                                .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+                        },
+                        enabled = canAdd,
+                        onAdd = { addNewKey() }
+                    )
+                }
+                if (customKeys.isEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.ime_custom_keys_empty),
+                            fontSize = 13.sp,
+                            color = cs.onSurfaceVariant,
+                            lineHeight = 18.sp
+                        )
+                    }
+                } else {
+                    items(customKeys, key = { it }) { key ->
+                        val index = customKeys.indexOf(key)
+                        val editing = editingKey == key
+                        val cleaned = editText.replace("\r", "").replace("\n", "")
+                        val confirmEnabled = cleaned.isNotBlank() &&
+                            (cleaned == key || cleaned !in customKeys)
+                        CustomKeyRow(
+                            key = key,
+                            editing = editing,
+                            editText = editText,
+                            onEditTextChange = {
+                                editText = it.replace("\r", "").replace("\n", "")
+                                    .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+                            },
+                            confirmEnabled = confirmEnabled,
+                            onConfirmEdit = { renameCustomKey(key, editText) },
+                            actionsEnabled = editingKey == null,
+                            canMoveUp = index > 0,
+                            canMoveDown = index >= 0 && index < customKeys.lastIndex,
+                            onStartEdit = { editingKey = key; editText = key },
+                            onCancelEdit = { editingKey = null },
+                            onMoveUp = { moveCustomKey(key, -1) },
+                            onMoveDown = { moveCustomKey(key, 1) },
+                            onDelete = {
+                                customKeys = customKeys - key
+                                if (editingKey == key) {
+                                    editingKey = null
+                                }
+                            },
+                            modifier = Modifier.animateItem()
+                        )
+                    }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(enabled, selectedKeys) }) {
+            TextButton(onClick = { onSave(enabled, selectedKeys, customKeys) }) {
                 Text(stringResource(R.string.action_save))
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
     )
+}
+
+// Every custom key occupies this height whether it is being read or edited, so switching one to
+// an edit field never resizes the row the list has already placed.
+private val ROW_HEIGHT = 56.dp
+
+// The same white row the keys live in, only empty and adding rather than holding one: a new key
+// is typed and confirmed in one place, in the same shape as what is being edited.
+@Composable
+private fun AddKeyRow(
+    value: String,
+    onValueChange: (String) -> Unit,
+    enabled: Boolean,
+    onAdd: () -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surface,
+        shape = RoundedCornerShape(14.dp),
+        // The same bottom spacing every key row keeps below itself, so it sits in line with them.
+        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp).height(ROW_HEIGHT)
+    ) {
+        Row(
+            Modifier.padding(start = 8.dp, end = 4.dp).fillMaxHeight(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            KeyField(
+                value = value,
+                onValueChange = onValueChange,
+                hint = stringResource(R.string.ime_custom_keys_add_hint),
+                modifier = Modifier.weight(1f),
+                onDone = onAdd
+            )
+            Spacer(Modifier.width(2.dp))
+            KeyActionButton(
+                icon = R.drawable.ic_add,
+                description = stringResource(R.string.ime_custom_keys_add),
+                tint = cs.primary,
+                enabled = enabled,
+                onClick = onAdd
+            )
+        }
+    }
+}
+
+// The field of an edit or an add row: one height, one alignment, no decoration box of its own.
+@Composable
+private fun KeyField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    hint: String,
+    onDone: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val cs = MaterialTheme.colorScheme
+    Box(
+        modifier
+            .height(40.dp)
+            .clip(RoundedCornerShape(10.dp))
+            .background(cs.surfaceContainerHighest)
+            .padding(horizontal = 10.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            textStyle = TextStyle(
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = cs.onSurface
+            ),
+            cursorBrush = SolidColor(cs.primary),
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { onDone() })
+        )
+        if (value.isEmpty()) {
+            Text(
+                hint,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal,
+                color = cs.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+// One key per row: the text on the left, order and edit actions on the right.
+
+@Composable
+private fun CustomKeyRow(
+    key: String,
+    editing: Boolean,
+    editText: String,
+    onEditTextChange: (String) -> Unit,
+    confirmEnabled: Boolean,
+    onConfirmEdit: () -> Unit,
+    actionsEnabled: Boolean,
+    canMoveUp: Boolean,
+    canMoveDown: Boolean,
+    onStartEdit: () -> Unit,
+    onCancelEdit: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surface,
+        shape = RoundedCornerShape(14.dp),
+        // Both states measure the same: an edit field that grows on focus makes the row jump.
+        modifier = modifier.fillMaxWidth().padding(bottom = 8.dp).height(ROW_HEIGHT)
+    ) {
+        if (editing) {
+                // The same left inset as the text of a plain row, and the same right inset as its
+                // last action, so swapping states moves nothing.
+                Row(
+                    Modifier.padding(start = 8.dp, end = 4.dp).fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    KeyField(
+                        value = editText,
+                        onValueChange = onEditTextChange,
+                        hint = key,
+                        modifier = Modifier.weight(1f),
+                        onDone = onConfirmEdit
+                    )
+                    Spacer(Modifier.width(2.dp))
+                KeyActionButton(
+                    icon = R.drawable.ic_check,
+                    description = stringResource(R.string.action_save),
+                    tint = cs.primary,
+                    enabled = confirmEnabled,
+                    onClick = onConfirmEdit
+                )
+                KeyActionButton(
+                    icon = R.drawable.ic_close,
+                    description = stringResource(R.string.action_cancel),
+                    enabled = true,
+                    onClick = onCancelEdit
+                )
+            }
+        } else {
+            Row(
+                Modifier.padding(start = 14.dp, end = 4.dp).fillMaxHeight(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    key,
+                    modifier = Modifier.weight(1f),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = cs.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                KeyActionButton(
+                    icon = R.drawable.ic_chevron_up,
+                    description = stringResource(R.string.ime_custom_keys_move_up, key),
+                    enabled = actionsEnabled && canMoveUp,
+                    onClick = onMoveUp
+                )
+                KeyActionButton(
+                    icon = R.drawable.ic_chevron_down,
+                    description = stringResource(R.string.ime_custom_keys_move_down, key),
+                    enabled = actionsEnabled && canMoveDown,
+                    onClick = onMoveDown
+                )
+                KeyActionButton(
+                    icon = R.drawable.ic_edit,
+                    description = stringResource(R.string.ime_custom_keys_edit, key),
+                    enabled = actionsEnabled,
+                    onClick = onStartEdit
+                )
+                KeyActionButton(
+                    icon = R.drawable.ic_close,
+                    description = stringResource(R.string.ime_custom_keys_delete, key),
+                    enabled = actionsEnabled,
+                    onClick = onDelete
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun KeyActionButton(
+    icon: Int,
+    description: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
+    IconButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier.size(40.dp)
+    ) {
+        Icon(
+            painterResource(icon),
+            contentDescription = description,
+            tint = tint,
+            modifier = Modifier.size(22.dp)
+        )
+    }
 }
 
 @Composable

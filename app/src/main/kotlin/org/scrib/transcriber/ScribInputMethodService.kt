@@ -10,6 +10,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.inputmethodservice.InputMethodService
 import android.os.Build
 import android.os.Handler
@@ -22,6 +23,8 @@ import android.view.WindowInsetsController
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.view.inputmethod.InputMethodManager
+import android.text.TextUtils
+import android.util.TypedValue
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
@@ -73,6 +76,7 @@ class ScribInputMethodService : InputMethodService() {
         fresh.onKeyboard = { leave() }
         fresh.onKeyboardLayout = { target -> leave(target) }
         fresh.onBackspace = { sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL) }
+        fresh.onCustomKey = { snippet -> insertCustom(snippet) }
         view = fresh
         return fresh
     }
@@ -318,6 +322,15 @@ class ScribInputMethodService : InputMethodService() {
         inserted = text
     }
 
+    // A custom key inserts exactly what the user put there — no spacing, no tracking: it is
+    // typing, not dictation, and the next progress delta still follows the last dictated text.
+    private fun insertCustom(snippet: String) {
+        if (snippet.isEmpty()) {
+            return
+        }
+        currentInputConnection?.commitText(snippet, 1)
+    }
+
     // Dictation lands wherever the cursor was left, which is often right after a word.
     private fun spaced(connection: InputConnection, delta: String): String {
         if (inserted.isNotEmpty() || delta.first().isWhitespace()) {
@@ -377,7 +390,8 @@ class ScribInputMethodService : InputMethodService() {
             listening = stage == Stage.Listening,
             enabled = stage != Stage.Finishing,
             modelName = ModelManager.activeDisplayName(this),
-            keyboardTargets = keyboardTargets()
+            keyboardTargets = keyboardTargets(),
+            customKeys = KeyboardLayouts.customKeys(this)
         )
     }
 
@@ -395,6 +409,7 @@ class ScribInputMethodService : InputMethodService() {
     var onKeyboard: () -> Unit = {}
     var onKeyboardLayout: (KeyboardLayoutTarget) -> Unit = {}
     var onBackspace: () -> Unit = {}
+    var onCustomKey: (String) -> Unit = {}
 
     private val status = TextView(context)
     private val model = TextView(context)
@@ -404,12 +419,16 @@ class ScribInputMethodService : InputMethodService() {
     private val backspace = RoundKey(context, filled = false)
     private val layoutScroller = HorizontalScrollView(context)
     private val layoutKeys = LinearLayout(context)
+    private val customScroller = HorizontalScrollView(context)
+    private val customRow = LinearLayout(context)
     private val controlRow = FrameLayout(context)
 
     private val alertColor = color(R.color.ime_alert)
     private val quietColor = color(R.color.ime_on_surface_variant)
     private val basePadding = dp(24)
     private var targetKeys: List<String>? = null
+    private var snippets: List<String>? = null
+    private var customScrollRestored = false
 
     init {
         orientation = VERTICAL
@@ -453,8 +472,23 @@ class ScribInputMethodService : InputMethodService() {
             overScrollMode = View.OVER_SCROLL_NEVER
             addView(layoutKeys, FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
         }
+        customRow.orientation = HORIZONTAL
+        customRow.gravity = Gravity.CENTER_VERTICAL
+        customScroller.apply {
+            isHorizontalScrollBarEnabled = false
+            isFillViewport = false
+            overScrollMode = View.OVER_SCROLL_NEVER
+            visibility = GONE
+            addView(customRow, FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+            setOnScrollChangeListener { _, scrollX, _, _, _ ->
+                KeyboardLayouts.saveCustomScroll(context, scrollX)
+            }
+        }
+        addView(customScroller, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+            topMargin = dp(12)
+        })
         addView(controlRow, LayoutParams(LayoutParams.MATCH_PARENT, dp(64)).apply {
-            topMargin = dp(16)
+            topMargin = dp(12)
         })
         controlRow.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             sizeLanguageScroller()
@@ -468,7 +502,8 @@ class ScribInputMethodService : InputMethodService() {
         listening: Boolean,
         enabled: Boolean,
         modelName: String?,
-        keyboardTargets: List<KeyboardLayoutTarget>
+        keyboardTargets: List<KeyboardLayoutTarget>,
+        customKeys: List<String>
     ) {
         status.text = message
         status.setTextColor(if (alert) alertColor else quietColor)
@@ -480,6 +515,63 @@ class ScribInputMethodService : InputMethodService() {
         record.alpha = if (enabled) 1f else 0.45f
         meter.alpha = if (listening) 1f else 0.4f
         updateKeyboardKeys(keyboardTargets)
+        updateCustomKeys(customKeys)
+    }
+
+    // Custom snippets are the user's own punctuation and phrases. A horizontal strip holds
+    // any number of them; the scroll position is remembered across takes, so a long strip
+    // stays where it was left.
+    private fun updateCustomKeys(keys: List<String>) {
+        if (keys == snippets) {
+            if (customScroller.visibility != VISIBLE && keys.isNotEmpty()) {
+                customScroller.visibility = VISIBLE
+            } else if (keys.isEmpty() && customScroller.visibility != GONE) {
+                customScroller.visibility = GONE
+            }
+            return
+        }
+        snippets = keys
+        customRow.removeAllViews()
+        if (keys.isEmpty()) {
+            customScroller.visibility = GONE
+            return
+        }
+        customScroller.visibility = VISIBLE
+        keys.forEach { snippet ->
+            customRow.addView(pill(snippet), LayoutParams(LayoutParams.WRAP_CONTENT, dp(40)).apply {
+                rightMargin = dp(8)
+            })
+        }
+        if (!customScrollRestored) {
+            customScrollRestored = true
+            val saved = KeyboardLayouts.customScroll(context)
+            if (saved > 0) {
+                customScroller.post { customScroller.scrollTo(saved, 0) }
+            }
+        }
+    }
+
+    private fun pill(snippet: String): TextView {
+        val pill = TextView(context)
+        pill.text = snippet
+        pill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        pill.setTextColor(color(R.color.ime_on_surface_variant))
+        pill.gravity = Gravity.CENTER
+        pill.maxLines = 1
+        pill.ellipsize = TextUtils.TruncateAt.END
+        pill.maxWidth = dp(180)
+        pill.isClickable = true
+        pill.isFocusable = false
+        pill.setPadding(dp(16), dp(8), dp(16), dp(8))
+        pill.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(20).toFloat()
+            setColor(color(R.color.ime_surface))
+            setStroke(dp(1), color(R.color.ime_outline))
+        }
+        pill.contentDescription = snippet
+        pill.setOnClickListener { onCustomKey(snippet) }
+        return pill
     }
 
     private fun updateKeyboardKeys(targets: List<KeyboardLayoutTarget>) {

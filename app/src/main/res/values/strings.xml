@@ -104,6 +104,15 @@
     <string name="ime_layout_buttons_off">One generic keyboard button</string>
     <string name="ime_layout_buttons_none">No layout buttons</string>
     <string name="ime_layout_buttons_on">Custom layout buttons</string>
+    <string name="ime_custom_keys_title">Custom insert keys</string>
+    <string name="ime_custom_keys_hint">Anything you want to insert with one tap — \".\", \"!\", \"?\" or a whole phrase. Their order is the order of the buttons.</string>
+    <string name="ime_custom_keys_add_hint">New key, e.g. ?!</string>
+    <string name="ime_custom_keys_add">Add</string>
+    <string name="ime_custom_keys_empty">No custom keys yet.</string>
+    <string name="ime_custom_keys_delete">Remove %1$s</string>
+    <string name="ime_custom_keys_move_up">Move %1$s up</string>
+    <string name="ime_custom_keys_move_down">Move %1$s down</string>
+    <string name="ime_custom_keys_edit">Edit %1$s</string>
 
     <string name="models_explainer">Bigger models are more accurate but slower and larger to download. English-only models are smaller and faster; for other languages choose Base or larger — Tiny is weak.</string>
     <string name="standard_models">STANDARD MODELS</string>

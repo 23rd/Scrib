@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Одна звичайна кнопка клавіатури</string>
     <string name="ime_layout_buttons_none">Немає кнопок розкладок</string>
     <string name="ime_layout_buttons_on">Власні кнопки розкладок</string>
+    <string name="ime_custom_keys_title">Власні кнопки вставки</string>
+    <string name="ime_custom_keys_hint">Що завгодно для вставки одним натисканням — «.», «!», «?» або ціла фраза. Їхній порядок — це порядок кнопок.</string>
+    <string name="ime_custom_keys_add_hint">Нова кнопка, наприклад ?!</string>
+    <string name="ime_custom_keys_add">Додати</string>
+    <string name="ime_custom_keys_empty">Власних кнопок ще немає.</string>
+    <string name="ime_custom_keys_delete">Прибрати %1$s</string>
+    <string name="ime_custom_keys_move_up">Підняти %1$s вище</string>
+    <string name="ime_custom_keys_move_down">Опустити %1$s нижче</string>
+    <string name="ime_custom_keys_edit">Змінити %1$s</string>
     <string name="models_explainer">Більші моделі точніші, але повільніші й більші для завантаження. Моделі «лише англійська» менші й швидші; для інших мов беріть Base або більшу — Tiny слабенька.</string>
     <string name="standard_models">СТАНДАРТНІ МОДЕЛІ</string>
     <string name="size">розмір</string>

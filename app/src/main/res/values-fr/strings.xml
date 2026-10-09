@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Un bouton clavier générique</string>
     <string name="ime_layout_buttons_none">Aucun bouton de disposition</string>
     <string name="ime_layout_buttons_on">Boutons de disposition personnalisés</string>
+    <string name="ime_custom_keys_title">Touches d\'insertion personnalisées</string>
+    <string name="ime_custom_keys_hint">Tout ce que vous voulez insérer d\'un appui — « . », « ! », « ? » ou une phrase entière. Leur ordre est l\'ordre des touches.</string>
+    <string name="ime_custom_keys_add_hint">Nouvelle touche, ex. ?!</string>
+    <string name="ime_custom_keys_add">Ajouter</string>
+    <string name="ime_custom_keys_empty">Aucune touche personnalisée pour l\'instant.</string>
+    <string name="ime_custom_keys_delete">Retirer %1$s</string>
+    <string name="ime_custom_keys_move_up">Monter %1$s</string>
+    <string name="ime_custom_keys_move_down">Descendre %1$s</string>
+    <string name="ime_custom_keys_edit">Modifier %1$s</string>
     <string name="models_explainer">Les modèles plus grands sont plus précis mais plus lents et plus lourds à télécharger. Les modèles « anglais uniquement » sont plus petits et rapides ; pour les autres langues, choisissez Base ou plus grand — Tiny est faible.</string>
     <string name="standard_models">MODÈLES STANDARD</string>
     <string name="size">taille</string>

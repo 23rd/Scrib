@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Jeden ogólny przycisk klawiatury</string>
     <string name="ime_layout_buttons_none">Brak przycisków układów</string>
     <string name="ime_layout_buttons_on">Własne przyciski układów</string>
+    <string name="ime_custom_keys_title">Własne klawisze wstawiania</string>
+    <string name="ime_custom_keys_hint">Cokolwiek chcesz wstawić jednym dotknięciem — «.», «!», «?» albo całe zdanie. Ich kolejność to kolejność przycisków.</string>
+    <string name="ime_custom_keys_add_hint">Nowy klawisz, np. ?!</string>
+    <string name="ime_custom_keys_add">Dodaj</string>
+    <string name="ime_custom_keys_empty">Brak własnych klawiszy.</string>
+    <string name="ime_custom_keys_delete">Usuń %1$s</string>
+    <string name="ime_custom_keys_move_up">Przenieś %1$s w górę</string>
+    <string name="ime_custom_keys_move_down">Przenieś %1$s w dół</string>
+    <string name="ime_custom_keys_edit">Edytuj %1$s</string>
     <string name="models_explainer">Większe modele są dokładniejsze, ale wolniejsze i większe do pobrania. Modele «tylko angielski» są mniejsze i szybsze; dla innych języków wybierz Base lub większy — Tiny jest słaby.</string>
     <string name="standard_models">MODELE STANDARDOWE</string>
     <string name="size">rozmiar</string>

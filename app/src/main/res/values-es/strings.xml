@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Un botón de teclado genérico</string>
     <string name="ime_layout_buttons_none">Sin botones de distribución</string>
     <string name="ime_layout_buttons_on">Botones de distribución propios</string>
+    <string name="ime_custom_keys_title">Teclas de inserción propias</string>
+    <string name="ime_custom_keys_hint">Lo que quieras insertar con un toque: «.», «!», «?» o una frase entera. Su orden es el orden de los botones.</string>
+    <string name="ime_custom_keys_add_hint">Tecla nueva, p. ej. ?!</string>
+    <string name="ime_custom_keys_add">Añadir</string>
+    <string name="ime_custom_keys_empty">Aún no hay teclas propias.</string>
+    <string name="ime_custom_keys_delete">Quitar %1$s</string>
+    <string name="ime_custom_keys_move_up">Subir %1$s</string>
+    <string name="ime_custom_keys_move_down">Bajar %1$s</string>
+    <string name="ime_custom_keys_edit">Editar %1$s</string>
     <string name="models_explainer">Los modelos más grandes son más precisos pero más lentos y pesados de descargar. Los modelos «solo inglés» son más pequeños y rápidos; para otros idiomas elige Base o mayor — Tiny es débil.</string>
     <string name="standard_models">MODELOS ESTÁNDAR</string>
     <string name="size">tamaño</string>

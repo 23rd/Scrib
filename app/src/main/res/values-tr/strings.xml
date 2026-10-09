@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Tek genel klavye düğmesi</string>
     <string name="ime_layout_buttons_none">Düzen düğmesi yok</string>
     <string name="ime_layout_buttons_on">Özel düzen düğmeleri</string>
+    <string name="ime_custom_keys_title">Özel ekleme tuşları</string>
+    <string name="ime_custom_keys_hint">Tek dokunuşla eklemek istediğiniz her şey — «.», «!», «?» ya da tam bir cümle. Sıraları, tuşların sırasını belirler.</string>
+    <string name="ime_custom_keys_add_hint">Yeni tuş, örn. ?!</string>
+    <string name="ime_custom_keys_add">Ekle</string>
+    <string name="ime_custom_keys_empty">Henüz özel tuş yok.</string>
+    <string name="ime_custom_keys_delete">%1$s tuşunu kaldır</string>
+    <string name="ime_custom_keys_move_up">%1$s tuşunu yukarı taşı</string>
+    <string name="ime_custom_keys_move_down">%1$s tuşunu aşağı taşı</string>
+    <string name="ime_custom_keys_edit">%1$s düzenle</string>
     <string name="models_explainer">Daha büyük modeller daha doğrudur ama daha yavaş ve indirmesi daha büyüktür. «Yalnızca İngilizce» modeller daha küçük ve hızlıdır; diğer diller için Base veya daha büyüğünü seçin — Tiny zayıftır.</string>
     <string name="standard_models">STANDART MODELLER</string>
     <string name="size">boyut</string>

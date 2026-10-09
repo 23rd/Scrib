@@ -97,6 +97,15 @@
     <string name="ime_layout_buttons_off">Un pulsante generico per la tastiera</string>
     <string name="ime_layout_buttons_none">Nessun pulsante layout</string>
     <string name="ime_layout_buttons_on">Pulsanti layout personalizzati</string>
+    <string name="ime_custom_keys_title">Tasti di inserimento personalizzati</string>
+    <string name="ime_custom_keys_hint">Qualsiasi cosa da inserire con un tocco — «.», «!», «?» o un\'intera frase. Il loro ordine è l\'ordine dei tasti.</string>
+    <string name="ime_custom_keys_add_hint">Nuovo tasto, es. ?!</string>
+    <string name="ime_custom_keys_add">Aggiungi</string>
+    <string name="ime_custom_keys_empty">Nessun tasto personalizzato per ora.</string>
+    <string name="ime_custom_keys_delete">Rimuovi %1$s</string>
+    <string name="ime_custom_keys_move_up">Sposta %1$s su</string>
+    <string name="ime_custom_keys_move_down">Sposta %1$s giù</string>
+    <string name="ime_custom_keys_edit">Modifica %1$s</string>
     <string name="models_explainer">I modelli più grandi sono più precisi ma più lenti e pesanti da scaricare. I modelli «solo inglese» sono più piccoli e veloci; per altre lingue scegli Base o più grande — Tiny è debole.</string>
     <string name="standard_models">MODELLI STANDARD</string>
     <string name="size">dimensione</string>
