@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Wybierz plik audio lub wideo i transkrybuj go</string>
     <string name="history_section_title">Nagrania</string>
     <string name="history_saved">Zapisano w nagraniach.</string>
+    <string name="quick_access_title">Szybki dostęp</string>
+    <string name="quick_access_add">Dodaj do Startu</string>
+    <string name="quick_access_remove">Usuń ze Startu</string>
     <string name="record_and_transcribe">Nagraj i transkrybuj</string>
     <string name="transcribe_audio_file">Transkrybuj plik audio</string>
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>

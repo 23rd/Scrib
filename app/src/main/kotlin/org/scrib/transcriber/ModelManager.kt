@@ -18,6 +18,7 @@ object ModelManager {
     private const val KEY_EXTERNAL_SIZE = "externalModelSize"
     private const val KEY_SKIP_SILENCE = "skipSilence"
     private const val KEY_LIVE_STATS = "liveStats"
+    private const val KEY_PINNED = "pinnedModels"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
 
     const val EXTERNAL_PREFIX = "external:"
@@ -296,6 +297,19 @@ object ModelManager {
     fun setLiveStats(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_LIVE_STATS, enabled).apply()
+    }
+
+    fun pinnedModels(context: Context): Set<String> =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getStringSet(KEY_PINNED, emptySet()).orEmpty()
+
+    fun togglePinned(context: Context, fileName: String) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val pinned = prefs.getStringSet(KEY_PINNED, emptySet()).orEmpty().toMutableSet()
+        if (!pinned.add(fileName)) {
+            pinned.remove(fileName)
+        }
+        prefs.edit().putStringSet(KEY_PINNED, pinned).apply()
     }
 
     // The path to hand the engine, or null when silence is to be decoded along with everything else.

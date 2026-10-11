@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Eine Audio- oder Videodatei auswählen und transkribieren</string>
     <string name="history_section_title">Aufnahmen</string>
     <string name="history_saved">In Aufnahmen gespeichert.</string>
+    <string name="quick_access_title">Schnellzugriff</string>
+    <string name="quick_access_add">Zum Start hinzufügen</string>
+    <string name="quick_access_remove">Vom Start entfernen</string>
     <string name="record_and_transcribe">Aufnehmen und transkribieren</string>
     <string name="transcribe_audio_file">Audiodatei transkribieren</string>
     <string name="decoding_transcribing">Dekodieren &amp; Transkribieren auf dem Gerät…</string>

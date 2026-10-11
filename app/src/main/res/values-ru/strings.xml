@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Выберите аудио- или видеофайл и распознайте его</string>
     <string name="history_section_title">Записи</string>
     <string name="history_saved">Сохранено в записях.</string>
+    <string name="quick_access_title">Быстрый доступ</string>
+    <string name="quick_access_add">Добавить на главный</string>
+    <string name="quick_access_remove">Убрать с главного</string>
     <string name="record_and_transcribe">Записать и распознать</string>
     <string name="transcribe_audio_file">Распознать аудиофайл</string>
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>

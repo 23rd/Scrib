@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Scegli un file audio o video e trascrivilo</string>
     <string name="history_section_title">Registrazioni</string>
     <string name="history_saved">Salvato nelle registrazioni.</string>
+    <string name="quick_access_title">Accesso rapido</string>
+    <string name="quick_access_add">Aggiungi a Home</string>
+    <string name="quick_access_remove">Rimuovi da Home</string>
     <string name="record_and_transcribe">Registra e trascrivi</string>
     <string name="transcribe_audio_file">Trascrivi un file audio</string>
     <string name="decoding_transcribing">Decodifica e trascrizione sul dispositivo…</string>

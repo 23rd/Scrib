@@ -28,6 +28,9 @@
     <string name="file_entry_sub">Pick an audio or video file and transcribe it</string>
     <string name="history_section_title">Recordings</string>
     <string name="history_saved">Saved to recordings.</string>
+    <string name="quick_access_title">Quick access</string>
+    <string name="quick_access_add">Add to Home</string>
+    <string name="quick_access_remove">Remove from Home</string>
     <string name="record_and_transcribe">Record and transcribe</string>
     <string name="transcribe_audio_file">Transcribe an audio file</string>
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
