@@ -24,6 +24,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -567,10 +569,19 @@ internal fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (Str
         Column(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(row.name, fontSize = 16.5.sp, fontWeight = FontWeight.Bold, color = onBg, overflow = TextOverflow.Ellipsis)
-                        if (active) Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary)
-                        if (row.recommended && !active) Pill(stringResource(R.string.recommended).uppercase(), cs.primary, cs.onPrimary)
+                    @OptIn(ExperimentalLayoutApi::class)
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(
+                            row.name,
+                            fontSize = 16.5.sp, fontWeight = FontWeight.Bold, color = onBg,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                        if (active) Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary, Modifier.align(Alignment.CenterVertically))
+                        if (row.recommended && !active) Pill(stringResource(R.string.recommended).uppercase(), cs.primary, cs.onPrimary, Modifier.align(Alignment.CenterVertically))
                     }
                     Text("${row.badge} · $sizePart", fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = onBgVar, modifier = Modifier.padding(top = 4.dp))
                     if (row.state == RowState.Failed) {
@@ -622,8 +633,8 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
 }
 
 @Composable
-private fun Pill(text: String, bg: Color, fg: Color) {
-    Surface(color = bg, shape = RoundedCornerShape(20.dp)) {
+private fun Pill(text: String, bg: Color, fg: Color, modifier: Modifier = Modifier) {
+    Surface(color = bg, shape = RoundedCornerShape(20.dp), modifier = modifier) {
         Text(text, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = 0.4.sp, color = fg, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
     }
 }
