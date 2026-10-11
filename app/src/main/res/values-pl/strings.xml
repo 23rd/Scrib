@@ -16,6 +16,14 @@
     <string name="nudge_body">Brak jeszcze modelu mowy. Pobierz jeden — Base to dobry kompromis: mały rozmiar, solidna dokładność, działa w każdym języku.</string>
     <string name="nudge_remote_body">Scrib Remote nie trzyma na telefonie żadnego modelu. Wskaż mu poniżej serwer transkrypcji — własny lub dowolny zgodny z OpenAI — a dźwięk trafi tam.</string>
     <string name="download_named_size">Pobierz %1$s · ≈%2$d MB</string>
+    <string name="nav_home">Start</string>
+    <string name="nav_record">Nagraj</string>
+    <string name="nav_transcribe">Transkrybuj</string>
+    <string name="nav_keyboard">Klawiatura</string>
+    <string name="nav_settings">Ustawienia</string>
+    <string name="file_entry_sub">Wybierz plik audio lub wideo i transkrybuj go</string>
+    <string name="history_section_title">Nagrania</string>
+    <string name="history_saved">Zapisano w nagraniach.</string>
     <string name="record_and_transcribe">Nagraj i transkrybuj</string>
     <string name="transcribe_audio_file">Transkrybuj plik audio</string>
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>

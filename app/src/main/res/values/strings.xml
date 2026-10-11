@@ -20,6 +20,14 @@
     <string name="nudge_remote_body">Scrib Remote keeps no model on the phone. Point it at a transcription server below — your own, or any OpenAI-compatible one — and the audio is sent there.</string>
     <string name="download_named_size">Download %1$s · ≈%2$d MB</string>
 
+    <string name="nav_home">Home</string>
+    <string name="nav_record">Record</string>
+    <string name="nav_transcribe">Transcribe</string>
+    <string name="nav_keyboard">Keyboard</string>
+    <string name="nav_settings">Settings</string>
+    <string name="file_entry_sub">Pick an audio or video file and transcribe it</string>
+    <string name="history_section_title">Recordings</string>
+    <string name="history_saved">Saved to recordings.</string>
     <string name="record_and_transcribe">Record and transcribe</string>
     <string name="transcribe_audio_file">Transcribe an audio file</string>
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>

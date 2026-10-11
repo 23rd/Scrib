@@ -16,6 +16,14 @@
     <string name="nudge_body">Ancora nessun modello vocale. Scaricane uno — Base è una scelta equilibrata: download piccolo, buona precisione, funziona in qualsiasi lingua.</string>
     <string name="nudge_remote_body">Scrib Remote non tiene alcun modello sul telefono. Puntalo a un server di trascrizione qui sotto — il tuo o qualunque server compatibile con OpenAI — e l\'audio verrà inviato lì.</string>
     <string name="download_named_size">Scarica %1$s · ≈%2$d MB</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_record">Registra</string>
+    <string name="nav_transcribe">Trascrivi</string>
+    <string name="nav_keyboard">Tastiera</string>
+    <string name="nav_settings">Impostazioni</string>
+    <string name="file_entry_sub">Scegli un file audio o video e trascrivilo</string>
+    <string name="history_section_title">Registrazioni</string>
+    <string name="history_saved">Salvato nelle registrazioni.</string>
     <string name="record_and_transcribe">Registra e trascrivi</string>
     <string name="transcribe_audio_file">Trascrivi un file audio</string>
     <string name="decoding_transcribing">Decodifica e trascrizione sul dispositivo…</string>

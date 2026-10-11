@@ -57,6 +57,7 @@ data class ScribUiState(
     val benchmarkRuns: List<BenchmarkRun>,
     val benchmarkBatch: BenchmarkBatchState,
     val benchmarkModelCount: Int,
+    val history: List<TranscriptHistory.Entry>,
     val remoteHost: String?
 )
 
@@ -175,6 +176,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             benchmarkRuns = BenchmarkStore.load(ctx),
             benchmarkBatch = benchmarkBatch,
             benchmarkModelCount = if (BuildConfig.LOCAL_MODELS) installed.size + sherpaRows.size else 0,
+            history = history(),
             remoteHost = EndpointPlugins.plugin
                 ?.takeIf { it.isActive(ctx) }
                 ?.host(ctx)
@@ -529,6 +531,52 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     fun dismissTranscription() {
         TranscriptionRun.dismiss(ctx)
+    }
+
+    private var historyCache: List<TranscriptHistory.Entry>? = null
+
+    private fun history(): List<TranscriptHistory.Entry> =
+        historyCache ?: TranscriptHistory.load(ctx).also { historyCache = it }
+
+    fun saveTranscriptToHistory() {
+        val transcript = transcription.value ?: return
+        if (transcript.running || transcript.error != null || transcript.text.isBlank()) return
+        dismissTranscription()
+        viewModelScope.launch(Dispatchers.IO) {
+            TranscriptHistory.save(ctx, transcript)
+            historyCache = null
+            withContext(Dispatchers.Main) {
+                toast(R.string.history_saved)
+                push()
+            }
+        }
+    }
+
+    fun deleteHistoryEntry(id: String) {
+        TranscriptHistory.delete(ctx, id)
+        historyCache = null
+        push()
+    }
+
+    fun saveHistoryEntryToFile(id: String, uri: Uri) {
+        val text = history().firstOrNull { it.id == id }?.text ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val ok = try {
+                writeText(uri, text, "wt")
+                true
+            } catch (e: Throwable) {
+                try {
+                    writeText(uri, text, "w")
+                    true
+                } catch (e2: Throwable) {
+                    false
+                }
+            }
+            withContext(Dispatchers.Main) {
+                val msg = if (ok) R.string.transcript_saved else R.string.transcript_save_failed
+                Toast.makeText(ctx, str(msg), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private val recorder = VoiceRecorder(ctx)

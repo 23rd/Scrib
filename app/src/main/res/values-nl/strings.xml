@@ -16,6 +16,14 @@
     <string name="nudge_body">Nog geen spraakmodel. Download er een — Base is een goede balans: kleine download, degelijke nauwkeurigheid, werkt in elke taal.</string>
     <string name="nudge_remote_body">Scrib Remote bewaart geen model op de telefoon. Richt het hieronder op een transcriptieserver — de jouwe of een OpenAI-compatibele — en de audio gaat daarheen.</string>
     <string name="download_named_size">%1$s downloaden · ≈%2$d MB</string>
+    <string name="nav_home">Start</string>
+    <string name="nav_record">Opnemen</string>
+    <string name="nav_transcribe">Bestand</string>
+    <string name="nav_keyboard">Toetsenbord</string>
+    <string name="nav_settings">Instellingen</string>
+    <string name="file_entry_sub">Kies een audio- of videobestand en transcribeer het</string>
+    <string name="history_section_title">Opnames</string>
+    <string name="history_saved">Opgeslagen in opnames.</string>
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
