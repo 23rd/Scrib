@@ -181,7 +181,8 @@ class SherpaPluginImpl : SherpaPlugin {
                 row,
                 Actions(
                     onDownload = {}, onCancel = {}, onUse = onUse, onDelete = onDelete,
-                    onAddUrl = {}, onImport = { _, _ -> }, onSelfTest = {}
+                    onAddUrl = {}, onImport = { _, _ -> }, onSelfTest = {},
+                    onTogglePinned = {}
                 ),
                 onRequestDelete = onRequestDelete
             )
