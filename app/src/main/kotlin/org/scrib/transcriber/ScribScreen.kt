@@ -101,7 +101,8 @@ internal data class Actions(
     val onDelete: (String) -> Unit,
     val onAddUrl: (String) -> Unit,
     val onImport: (Uri, String?) -> Unit,
-    val onSelfTest: () -> Unit
+    val onSelfTest: () -> Unit,
+    val onTogglePinned: (String) -> Unit
 )
 
 private enum class ScribTab(val labelRes: Int, val icon: Int) {
@@ -146,11 +147,12 @@ fun ScribScreen(
     onSaveToHistory: () -> Unit,
     onDeleteHistory: (String) -> Unit,
     onSaveHistoryFile: (String, Uri) -> Unit,
+    onTogglePinned: (String) -> Unit,
     benchmarkRuns: List<BenchmarkRun>,
     onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
-    val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
+    val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest, onTogglePinned)
     var tab by rememberSaveable { mutableStateOf(ScribTab.Home) }
     var showAdd by remember { mutableStateOf(false) }
     var showLanguages by remember { mutableStateOf(false) }
@@ -333,23 +335,68 @@ private fun HomeTab(
             item {
                 ServiceCard(
                     glyph = "🎙",
-                    title = stringResource(R.string.record_and_transcribe),
-                    subtitle = recordHint(state.remoteHost)
+                    title = stringResource(R.string.record_and_transcribe)
                 ) { onRecord() }
             }
             item {
                 ServiceCard(
                     glyph = "📁",
-                    title = stringResource(R.string.transcribe_audio_file),
-                    subtitle = stringResource(R.string.file_entry_sub)
+                    title = stringResource(R.string.transcribe_audio_file)
                 ) { onPickFile() }
             }
-            item {
-                ServiceCard(
-                    glyph = "⌨",
-                    title = stringResource(R.string.ime_entry_title),
-                    subtitle = stringResource(R.string.ime_entry_sub)
-                ) { onOpenTab(ScribTab.Keyboard) }
+            val quick = (state.standard + state.custom + state.sherpaRows).filter { it.id in state.pinnedIds }
+            if (quick.isNotEmpty()) {
+                item {
+                    Text(
+                        stringResource(R.string.quick_access_title),
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, top = 14.dp, bottom = 8.dp)
+                    )
+                }
+                items(quick, key = { it.id }) { row ->
+                    QuickModelCard(row, actions)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickModelCard(row: ModelRow, actions: Actions) {
+    val cs = MaterialTheme.colorScheme
+    val active = row.state == RowState.Active
+    Surface(
+        color = if (active) cs.primaryContainer else cs.surfaceContainer,
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(if (active) 1.5.dp else 1.dp, if (active) cs.primary else Color.Transparent),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .clickableRow(RoundedCornerShape(16.dp)) { actions.onUse(row.id) }
+    ) {
+        Row(
+            Modifier.padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    row.name,
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                    color = if (active) cs.onPrimaryContainer else cs.onSurface,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    row.badge,
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium,
+                    color = if (active) cs.onPrimaryContainer.copy(alpha = 0.75f) else cs.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = { actions.onTogglePinned(row.id) }) {
+                Icon(
+                    painterResource(R.drawable.ic_star_filled),
+                    contentDescription = stringResource(R.string.quick_access_remove),
+                    tint = if (active) cs.primary else cs.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
@@ -867,7 +914,7 @@ private fun SingleCardColumn(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ServiceCard(glyph: String, title: String, subtitle: String, onClick: () -> Unit) {
+private fun ServiceCard(glyph: String, title: String, subtitle: String? = null, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
@@ -880,7 +927,9 @@ private fun ServiceCard(glyph: String, title: String, subtitle: String, onClick:
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text(subtitle, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+                if (subtitle != null) {
+                    Text(subtitle, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+                }
             }
             Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
@@ -1206,13 +1255,28 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
             TextButton(onClick = { actions.onCancel(row.id) }) { Text(stringResource(R.string.action_cancel), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
         }
         RowState.Installed -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+            PinToggle(row.pinned, row.id, actions)
             TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
             Spacer(Modifier.width(6.dp))
             Chip(stringResource(R.string.action_use), cs.primaryContainer, cs.onPrimaryContainer) { actions.onUse(row.id) }
         }
         RowState.Active -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            PinToggle(row.pinned, row.id, actions)
             TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer.copy(alpha = 0.85f)) }
         }
+    }
+}
+
+@Composable
+private fun PinToggle(pinned: Boolean, id: String, actions: Actions) {
+    val cs = MaterialTheme.colorScheme
+    IconButton(onClick = { actions.onTogglePinned(id) }) {
+        Icon(
+            painterResource(if (pinned) R.drawable.ic_star_filled else R.drawable.ic_star_outline),
+            contentDescription = stringResource(if (pinned) R.string.quick_access_remove else R.string.quick_access_add),
+            tint = if (pinned) cs.primary else cs.onSurfaceVariant,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 

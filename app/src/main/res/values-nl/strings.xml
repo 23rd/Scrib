@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Kies een audio- of videobestand en transcribeer het</string>
     <string name="history_section_title">Opnames</string>
     <string name="history_saved">Opgeslagen in opnames.</string>
+    <string name="quick_access_title">Snelle toegang</string>
+    <string name="quick_access_add">Aan start toevoegen</string>
+    <string name="quick_access_remove">Van start verwijderen</string>
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>

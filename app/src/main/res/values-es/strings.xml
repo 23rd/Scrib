@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Elige un archivo de audio o vídeo y transcríbelo</string>
     <string name="history_section_title">Grabaciones</string>
     <string name="history_saved">Guardado en grabaciones.</string>
+    <string name="quick_access_title">Acceso rápido</string>
+    <string name="quick_access_add">Añadir a Inicio</string>
+    <string name="quick_access_remove">Quitar de Inicio</string>
     <string name="record_and_transcribe">Grabar y transcribir</string>
     <string name="transcribe_audio_file">Transcribir un archivo de audio</string>
     <string name="decoding_transcribing">Decodificando y transcribiendo en el dispositivo…</string>

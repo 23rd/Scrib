@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         onSaveToHistory = vm::saveTranscriptToHistory,
                         onDeleteHistory = vm::deleteHistoryEntry,
                         onSaveHistoryFile = vm::saveHistoryEntryToFile,
+                        onTogglePinned = vm::togglePinned,
                         benchmarkRuns = state.benchmarkRuns,
                         onAbout = { showAbout = true }
                     )

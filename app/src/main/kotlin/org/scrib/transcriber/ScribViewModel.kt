@@ -35,7 +35,8 @@ data class ModelRow(
     val recommended: Boolean,
     val custom: Boolean,
     val state: RowState,
-    val progress: Int
+    val progress: Int,
+    val pinned: Boolean = false
 )
 
 data class ScribUiState(
@@ -58,6 +59,7 @@ data class ScribUiState(
     val benchmarkBatch: BenchmarkBatchState,
     val benchmarkModelCount: Int,
     val history: List<TranscriptHistory.Entry>,
+    val pinnedIds: Set<String>,
     val remoteHost: String?
 )
 
@@ -116,6 +118,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             emptySet()
         }
         val active = ModelManager.activeFileName(ctx)
+        val pinnedIds = ModelManager.pinnedModels(ctx)
         fun stateOf(f: String): RowState = when {
             downloads.containsKey(f) -> RowState.Downloading
             failed.contains(f) -> RowState.Failed
@@ -129,7 +132,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 multilingual = m.multilingual,
                 sizeMb = (m.approxBytes / 1_000_000).toInt(), tier = m.tier,
                 recommended = m.recommended, custom = false,
-                state = stateOf(m.fileName), progress = downloads[m.fileName]?.pct ?: 0
+                state = stateOf(m.fileName), progress = downloads[m.fileName]?.pct ?: 0,
+                pinned = m.fileName in pinnedIds
             )
         }
         val customFiles = LinkedHashSet<String>()
@@ -144,7 +148,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 badge = str(if (multi) R.string.badge_multilingual else R.string.badge_english_only),
                 multilingual = multi, sizeMb = 0,
                 tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
-                state = stateOf(f), progress = downloads[f]?.pct ?: 0
+                state = stateOf(f), progress = downloads[f]?.pct ?: 0,
+                pinned = f in pinnedIds
             )
         }.toMutableList()
         ModelManager.externalModel(ctx)?.let { (name, _) ->
@@ -156,12 +161,14 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                     multilingual = !ModelCatalog.isEnglishOnly(name),
                     sizeMb = (ModelManager.externalModelSize(ctx) / 1_000_000).toInt(),
                     tier = 3, recommended = false, custom = false,
-                    state = if (id == active) RowState.Active else RowState.Installed, progress = 0
+                    state = if (id == active) RowState.Active else RowState.Installed, progress = 0,
+                    pinned = id in pinnedIds
                 )
             )
         }
         val activeFriendly = ModelManager.activeDisplayName(ctx)
-        val sherpaRows = SherpaPlugins.plugin?.modelRows(ctx, active) ?: emptyList()
+        val sherpaRows = (SherpaPlugins.plugin?.modelRows(ctx, active) ?: emptyList())
+            .map { if (it.id in pinnedIds) it.copy(pinned = true) else it }
         val endpointReady = EndpointPlugins.plugin?.isActive(ctx) == true
         return ScribUiState(
             firstRun = !endpointReady && installed.isEmpty() && downloads.isEmpty() &&
@@ -177,6 +184,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             benchmarkBatch = benchmarkBatch,
             benchmarkModelCount = if (BuildConfig.LOCAL_MODELS) installed.size + sherpaRows.size else 0,
             history = history(),
+            pinnedIds = pinnedIds,
             remoteHost = EndpointPlugins.plugin
                 ?.takeIf { it.isActive(ctx) }
                 ?.host(ctx)
@@ -350,6 +358,11 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         ModelManager.setActive(ctx, fileName)
         releaseSwitchedAwayModel()
         statusMsg = ""; statusError = false
+        push()
+    }
+
+    fun togglePinned(fileName: String) {
+        ModelManager.togglePinned(ctx, fileName)
         push()
     }
 

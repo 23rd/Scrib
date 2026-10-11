@@ -24,6 +24,9 @@
     <string name="file_entry_sub">Bir ses veya video dosyası seçip yazıya dökün</string>
     <string name="history_section_title">Kayıtlar</string>
     <string name="history_saved">Kayıtlara eklendi.</string>
+    <string name="quick_access_title">Hızlı erişim</string>
+    <string name="quick_access_add">Ana sayfaya ekle</string>
+    <string name="quick_access_remove">Ana sayfadan çıkar</string>
     <string name="record_and_transcribe">Kaydet ve yazıya dök</string>
     <string name="transcribe_audio_file">Bir ses dosyasını yazıya dök</string>
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
