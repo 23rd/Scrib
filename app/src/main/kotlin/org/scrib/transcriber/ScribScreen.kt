@@ -7,6 +7,7 @@ import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.text.format.DateUtils
 import android.webkit.MimeTypeMap
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -35,13 +36,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
@@ -100,6 +104,14 @@ internal data class Actions(
     val onSelfTest: () -> Unit
 )
 
+private enum class ScribTab(val labelRes: Int, val icon: Int) {
+    Home(R.string.nav_home, R.drawable.ic_tab_home),
+    Record(R.string.nav_record, R.drawable.ic_tab_mic),
+    File(R.string.nav_transcribe, R.drawable.ic_tab_graphic_eq),
+    Keyboard(R.string.nav_keyboard, R.drawable.ic_tab_keyboard),
+    Settings(R.string.nav_settings, R.drawable.ic_tab_settings)
+}
+
 @Composable
 fun ScribScreen(
     state: ScribUiState,
@@ -131,16 +143,20 @@ fun ScribScreen(
     onDismissTranscription: () -> Unit,
     onSaveTranscript: (Uri) -> Unit,
     onTranscriptFormat: (TranscriptFormat) -> Unit,
+    onSaveToHistory: () -> Unit,
+    onDeleteHistory: (String) -> Unit,
+    onSaveHistoryFile: (String, Uri) -> Unit,
     benchmarkRuns: List<BenchmarkRun>,
     onAbout: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val actions = Actions(onDownload, onCancel, onUse, onDelete, onAddUrl, onImport, onSelfTest)
+    var tab by rememberSaveable { mutableStateOf(ScribTab.Home) }
     var showAdd by remember { mutableStateOf(false) }
     var showLanguages by remember { mutableStateOf(false) }
-    var showKeyboardLayouts by remember { mutableStateOf(false) }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var showBenchmarks by rememberSaveable { mutableStateOf(false) }
+    var openHistoryId by rememberSaveable { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
     var modelsExpanded by remember { mutableStateOf(SectionState.standardModels(context)) }
@@ -177,142 +193,72 @@ fun ScribScreen(
         }
     }
 
-    Column(Modifier.fillMaxSize().background(cs.background).systemBarsPadding()) {
-        AppBar(onAbout)
-        LazyColumn(
-            Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 28.dp)
-        ) {
-            item {
-                if (state.firstRun) NudgeCard(state, actions) else StatusCard(state)
-            }
-            if (!state.firstRun) {
-                item { RecordButton { microphone.launch(android.Manifest.permission.RECORD_AUDIO) } }
-                item { TranscribeFileButton { audioPicker.launch(arrayOf("audio/*", "video/*")) } }
-                item { KeyboardEntry(state.keyboardLayouts) { showKeyboardLayouts = true } }
-                if (BuildConfig.LOCAL_MODELS) {
-                    item { SkipSilenceEntry(state, onSkipSilence) }
-                }
-                item { LiveStatsEntry(state.liveStats, onLiveStats) }
-                item { DictionaryEntry(state.dictionaryEnabled) { openDictionary(context) } }
-                if (BuildConfig.LOCAL_MODELS) {
-                    item {
-                        BenchmarkEntry(benchmarkRuns) {
-                            if (BenchmarkStore.isFullscreen(context)) {
-                                context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
-                            } else {
-                                showBenchmarks = true
-                            }
-                        }
-                    }
-                }
-            }
-            if (BuildConfig.LOCAL_MODELS) {
-                item {
-                    Text(
-                        stringResource(R.string.models_explainer),
-                        fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                        lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
-                    )
-                }
-                item { LanguageEntry { showLanguages = true } }
-                item {
-                    StandardHeader(expanded = modelsExpanded, onToggle = {
+    BackHandler(tab != ScribTab.Home) { tab = ScribTab.Home }
+
+    Column(Modifier.fillMaxSize().background(cs.background)) {
+        Column(Modifier.weight(1f).statusBarsPadding()) {
+            AppBar(onAbout, showAbout = tab == ScribTab.Home || tab == ScribTab.Settings)
+            when (tab) {
+                ScribTab.Home -> HomeTab(
+                    state,
+                    actions,
+                    onOpenTab = { tab = it },
+                    onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
+                    onPickFile = { audioPicker.launch(arrayOf("audio/*", "video/*")) }
+                )
+                ScribTab.Record -> RecordTab(
+                    state,
+                    actions,
+                    onOpenTab = { tab = it },
+                    onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
+                    onOpenEntry = { openHistoryId = it.id },
+                    onDeleteEntry = onDeleteHistory
+                )
+                ScribTab.File -> FileTab(state, actions, onOpenTab = { tab = it }) { audioPicker.launch(arrayOf("audio/*", "video/*")) }
+                ScribTab.Keyboard -> KeyboardTab(state.keyboardLayouts, onConfigureKeyboardLayouts)
+                ScribTab.Settings -> SettingsTab(
+                    state = state,
+                    actions = actions,
+                    modelsExpanded = modelsExpanded,
+                    customExpanded = customExpanded,
+                    onToggleStandard = {
                         val next = !modelsExpanded
                         modelsExpanded = next
                         SectionState.setStandardModels(context, next)
-                    })
-                }
-                if (modelsExpanded) {
-                    items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions) { deleteTarget = it } }
-                }
-            }
-            if (sherpaPlugin != null) {
-                item {
-                    sherpaPlugin.SettingsBlocks(
-                        rows = state.sherpaRows,
-                        busy = state.sherpaBusy,
-                        onUse = actions.onUse,
-                        onDelete = actions.onDelete,
-                        onRequestDelete = { deleteTarget = it },
-                        onImportSherpa = onImportSherpa
-                    )
-                }
-            }
-            if (endpointPlugin != null) {
-                item { endpointPlugin.SettingsBlocks(onChanged = onEndpointChanged) }
-            }
-            if (BuildConfig.LOCAL_MODELS) {
-                item {
-                    CustomHeader(expanded = customExpanded, onToggle = {
+                    },
+                    onToggleCustom = {
                         val next = !customExpanded
                         customExpanded = next
                         SectionState.setCustomModels(context, next)
-                    })
-                }
-                if (customExpanded) {
-                    if (state.custom.isEmpty()) {
-                        item {
-                            Text(
-                                stringResource(R.string.custom_empty),
-                                fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
-                                lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
-                            )
+                    },
+                    sherpaPlugin = sherpaPlugin,
+                    endpointPlugin = endpointPlugin,
+                    onEndpointChanged = onEndpointChanged,
+                    onImportSherpa = onImportSherpa,
+                    onPickLanguage = { showLanguages = true },
+                    onAddCustom = { showAdd = true },
+                    onImportBin = { picker.launch(arrayOf("*/*")) },
+                    onImportExternal = { externalPicker.launch(arrayOf("*/*")) },
+                    onRequestDelete = { deleteTarget = it },
+                    onSkipSilence = onSkipSilence,
+                    onLiveStats = onLiveStats,
+                    onOpenDictionary = { openDictionary(context) },
+                    onOpenBenchmarks = {
+                        if (BenchmarkStore.isFullscreen(context)) {
+                            context.startActivity(Intent(context, BenchmarkHistoryActivity::class.java))
+                        } else {
+                            showBenchmarks = true
                         }
-                    } else {
-                        items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions) { deleteTarget = it } }
-                    }
-                }
-                item {
-                    Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        AddButton("+", stringResource(R.string.add_from_hf)) { showAdd = true }
-                        AddButton("↥", stringResource(R.string.import_bin)) { picker.launch(arrayOf("*/*")) }
-                        AddButton("↧", stringResource(R.string.import_external)) { externalPicker.launch(arrayOf("*/*")) }
-                    }
-                }
-            }
-            if (state.statusMsg.isNotEmpty()) {
-                item { StatusBox(state.statusMsg, state.statusError) }
-            }
-            if (BuildConfig.LOCAL_MODELS) {
-                item {
-                    Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
-                        TextButton(onClick = onSelfTest) {
-                            Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
-                        }
-                    }
-                }
-            }
-            if (BuildConfig.LOCAL_MODELS) {
-                item {
-                    BenchmarkBatchControl(
-                        state = state.benchmarkBatch,
-                        enabled = state.benchmarkModelCount > 0 &&
-                            !state.benchmarkBatch.running &&
-                            transcription == null && recording == null,
-                        onClick = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
-                        onCancel = onCancelBenchmark
-                    )
-                }
-                val batch = state.benchmarkBatch
-                if (batch.total > 0 && !batch.running &&
-                    (batch.completed > 0 || batch.failed > 0 || batch.cancelled)) {
-                    item {
-                        val text = when {
-                            batch.cancelled -> stringResource(R.string.benchmark_batch_cancelled, batch.completed, batch.total)
-                            batch.failed > 0 -> stringResource(
-                                R.string.benchmark_batch_partial,
-                                batch.completed - batch.failed,
-                                batch.total,
-                                batch.failed
-                            )
-                            else -> stringResource(R.string.benchmark_batch_done, batch.completed, batch.total)
-                        }
-                        StatusBox(text, batch.cancelled || batch.failed > 0)
-                    }
-                }
+                    },
+                    onSelfTest = onSelfTest,
+                    onBenchmarkFile = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
+                    onCancelBenchmark = onCancelBenchmark,
+                    transcription = transcription,
+                    recording = recording
+                )
             }
         }
+        BottomBar(tab) { tab = it }
     }
 
     if (showAdd) {
@@ -320,21 +266,6 @@ fun ScribScreen(
     }
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
-    }
-    if (showKeyboardLayouts) {
-        KeyboardLayoutsDialog(
-            settings = state.keyboardLayouts,
-            onDismiss = { showKeyboardLayouts = false },
-            onSave = { enabled, keys, customKeys ->
-                onConfigureKeyboardLayouts(enabled, keys, customKeys)
-                showKeyboardLayouts = false
-            },
-            onOpenSystemSettings = {
-                runCatching {
-                    context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
-                }
-            }
-        )
     }
     if (showBenchmarks) {
         BenchmarkHistoryDialog(
@@ -354,8 +285,17 @@ fun ScribScreen(
         transcription?.let { t ->
         TranscriptionDialog(
             t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
-            onSave = onSaveTranscript, onFormat = onTranscriptFormat
+            onSave = onSaveTranscript, onFormat = onTranscriptFormat, onSaveToHistory = onSaveToHistory
         )
+        }
+    }
+    openHistoryId?.let { id ->
+        state.history.firstOrNull { it.id == id }?.let { entry ->
+            HistoryEntryDialog(
+                entry,
+                onClose = { openHistoryId = null },
+                onSaveFile = { uri -> onSaveHistoryFile(id, uri) }
+            )
         }
     }
     deleteTarget?.let { target ->
@@ -371,7 +311,639 @@ fun ScribScreen(
 }
 
 @Composable
-private fun AppBar(onAbout: () -> Unit) {
+private fun HomeTab(
+    state: ScribUiState,
+    actions: Actions,
+    onOpenTab: (ScribTab) -> Unit,
+    onRecord: () -> Unit,
+    onPickFile: () -> Unit
+) {
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+    ) {
+        item {
+            if (state.firstRun) {
+                NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) })
+            } else {
+                StatusCard(state, onOpenSettings = { onOpenTab(ScribTab.Settings) })
+            }
+        }
+        if (!state.firstRun) {
+            item {
+                ServiceCard(
+                    glyph = "🎙",
+                    title = stringResource(R.string.record_and_transcribe),
+                    subtitle = recordHint(state.remoteHost)
+                ) { onRecord() }
+            }
+            item {
+                ServiceCard(
+                    glyph = "📁",
+                    title = stringResource(R.string.transcribe_audio_file),
+                    subtitle = stringResource(R.string.file_entry_sub)
+                ) { onPickFile() }
+            }
+            item {
+                ServiceCard(
+                    glyph = "⌨",
+                    title = stringResource(R.string.ime_entry_title),
+                    subtitle = stringResource(R.string.ime_entry_sub)
+                ) { onOpenTab(ScribTab.Keyboard) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecordTab(
+    state: ScribUiState,
+    actions: Actions,
+    onOpenTab: (ScribTab) -> Unit,
+    onRecord: () -> Unit,
+    onOpenEntry: (TranscriptHistory.Entry) -> Unit,
+    onDeleteEntry: (String) -> Unit
+) {
+    if (state.firstRun) {
+        SingleCardColumn { NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) }) }
+        return
+    }
+    val cs = MaterialTheme.colorScheme
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+    ) {
+        item { Spacer(Modifier.height(24.dp)) }
+        item { RecordButton(onRecord) }
+        item {
+            Text(
+                recordHint(state.remoteHost),
+                fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                lineHeight = 17.sp
+            )
+        }
+        if (state.history.isNotEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.history_section_title),
+                    fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                    color = cs.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 4.dp, top = 20.dp, bottom = 8.dp)
+                )
+            }
+            items(state.history, key = { it.id }) { entry ->
+                HistoryRowCard(entry, onOpen = { onOpenEntry(entry) }, onDelete = { onDeleteEntry(entry.id) })
+            }
+        }
+    }
+}
+
+@Composable
+private fun HistoryRowCard(entry: TranscriptHistory.Entry, onOpen: () -> Unit, onDelete: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onOpen)
+    ) {
+        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        entry.fileName,
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        historyTimestamp(entry.savedAtMs),
+                        fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant
+                    )
+                }
+                TextButton(onClick = onDelete) {
+                    Text(
+                        stringResource(R.string.action_delete),
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant
+                    )
+                }
+            }
+            Text(
+                entry.text,
+                fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                lineHeight = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+    }
+}
+
+private fun historyTimestamp(timestampMs: Long): String =
+    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(timestampMs))
+
+@Composable
+private fun FileTab(state: ScribUiState, actions: Actions, onOpenTab: (ScribTab) -> Unit, onPick: () -> Unit) {
+    if (state.firstRun) {
+        SingleCardColumn { NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) }) }
+        return
+    }
+    val cs = MaterialTheme.colorScheme
+    Column(
+        Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        TranscribeFileButton(onPick)
+        Text(
+            stringResource(R.string.transcribe_background_hint),
+            fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+            lineHeight = 17.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun KeyboardTab(
+    settings: KeyboardLayoutSettings,
+    onConfigureKeyboardLayouts: (Boolean, List<String>, List<String>) -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    var newKey by remember { mutableStateOf("") }
+    var editingKey by remember { mutableStateOf<String?>(null) }
+    var editText by remember { mutableStateOf("") }
+    val selectedKeys = settings.options.filter { it.selected }.map { it.key }
+    val customKeys = settings.customKeys
+    fun addNewKey() {
+        val value = newKey.replace("\r", "").replace("\n", "")
+        if (value.isBlank() || value in customKeys || customKeys.size >= KeyboardLayouts.MAX_CUSTOM_KEYS) {
+            return
+        }
+        onConfigureKeyboardLayouts(
+            settings.enabled,
+            selectedKeys,
+            listOf(value.take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)) + customKeys
+        )
+        newKey = ""
+    }
+    fun renameCustomKey(from: String, to: String) {
+        val value = to.replace("\r", "").replace("\n", "").take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+        if (value.isBlank() || (value in customKeys && value != from)) {
+            return
+        }
+        onConfigureKeyboardLayouts(settings.enabled, selectedKeys, customKeys.map { if (it == from) value else it })
+        editingKey = null
+    }
+    fun moveCustomKey(key: String, delta: Int) {
+        val index = customKeys.indexOf(key)
+        val to = index + delta
+        if (index < 0 || to !in customKeys.indices) {
+            return
+        }
+        onConfigureKeyboardLayouts(
+            settings.enabled,
+            selectedKeys,
+            customKeys.toMutableList().also { Collections.swap(it, index, to) }
+        )
+    }
+    val canAdd = newKey.isNotBlank() && newKey !in customKeys &&
+        customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp)
+    ) {
+        item {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    stringResource(R.string.ime_layout_buttons_show),
+                    modifier = Modifier.weight(1f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = cs.onSurface
+                )
+                Switch(
+                    checked = settings.enabled,
+                    onCheckedChange = { onConfigureKeyboardLayouts(it, selectedKeys, customKeys) }
+                )
+            }
+        }
+        item {
+            Column {
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    stringResource(R.string.ime_layout_buttons_hint),
+                    fontSize = 12.5.sp,
+                    color = cs.onSurfaceVariant,
+                    lineHeight = 17.sp
+                )
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+        if (settings.options.isEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.ime_layout_buttons_empty),
+                    fontSize = 13.sp,
+                    color = cs.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+            }
+        } else {
+            items(settings.options, key = { it.key }) { option ->
+                val selected = selectedKeys.contains(option.key)
+                val detail = buildString {
+                    append(option.imeLabel)
+                    if (option.languageTag.isNotBlank()) {
+                        append(" · ")
+                        append(option.languageTag)
+                    }
+                }
+                Surface(
+                    color = if (selected) cs.primaryContainer else cs.surface,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .selectable(
+                            selected = selected,
+                            role = Role.Checkbox,
+                            onClick = {
+                                onConfigureKeyboardLayouts(
+                                    settings.enabled,
+                                    if (selected) selectedKeys - option.key else selectedKeys + option.key,
+                                    customKeys
+                                )
+                            }
+                        )
+                ) {
+                    Row(
+                        Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            if (selected) "✓" else "",
+                            modifier = Modifier.width(22.dp),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = cs.primary
+                        )
+                        Text(
+                            option.shortLabel,
+                            modifier = Modifier.width(48.dp),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = if (selected) cs.primary else cs.onSurfaceVariant
+                        )
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                option.label,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = cs.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                detail,
+                                fontSize = 11.5.sp,
+                                color = cs.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        if (selected) {
+                            Text(
+                                (selectedKeys.indexOf(option.key) + 1).toString(),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = cs.primary
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+                Box(
+                    Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    TextButton(
+                        onClick = { onConfigureKeyboardLayouts(settings.enabled, emptyList(), customKeys) },
+                        enabled = selectedKeys.isNotEmpty()
+                    ) {
+                        Text(stringResource(R.string.ime_layout_buttons_clear), fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+        item {
+            OutlinedButton(
+                onClick = {
+                    runCatching {
+                        context.startActivity(Intent(android.provider.Settings.ACTION_INPUT_METHOD_SETTINGS))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.ime_layout_buttons_open), fontSize = 12.sp)
+            }
+        }
+        item {
+            Column {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    stringResource(R.string.ime_custom_keys_title),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = cs.onSurface
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.ime_custom_keys_hint),
+                    fontSize = 12.5.sp,
+                    color = cs.onSurfaceVariant,
+                    lineHeight = 17.sp
+                )
+                Spacer(Modifier.height(10.dp))
+            }
+        }
+        item {
+            AddKeyRow(
+                value = newKey,
+                onValueChange = {
+                    newKey = it.replace("\r", "").replace("\n", "")
+                        .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+                },
+                enabled = canAdd,
+                onAdd = { addNewKey() }
+            )
+        }
+        if (customKeys.isEmpty()) {
+            item {
+                Text(
+                    stringResource(R.string.ime_custom_keys_empty),
+                    fontSize = 13.sp,
+                    color = cs.onSurfaceVariant,
+                    lineHeight = 18.sp
+                )
+            }
+        } else {
+            items(customKeys, key = { it }) { key ->
+                val index = customKeys.indexOf(key)
+                val editing = editingKey == key
+                val cleaned = editText.replace("\r", "").replace("\n", "")
+                val confirmEnabled = cleaned.isNotBlank() &&
+                    (cleaned == key || cleaned !in customKeys)
+                CustomKeyRow(
+                    key = key,
+                    editing = editing,
+                    editText = editText,
+                    onEditTextChange = {
+                        editText = it.replace("\r", "").replace("\n", "")
+                            .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
+                    },
+                    confirmEnabled = confirmEnabled,
+                    onConfirmEdit = { renameCustomKey(key, editText) },
+                    actionsEnabled = editingKey == null,
+                    canMoveUp = index > 0,
+                    canMoveDown = index >= 0 && index < customKeys.lastIndex,
+                    onStartEdit = { editingKey = key; editText = key },
+                    onCancelEdit = { editingKey = null },
+                    onMoveUp = { moveCustomKey(key, -1) },
+                    onMoveDown = { moveCustomKey(key, 1) },
+                    onDelete = {
+                        onConfigureKeyboardLayouts(settings.enabled, selectedKeys, customKeys - key)
+                        if (editingKey == key) {
+                            editingKey = null
+                        }
+                    },
+                    modifier = Modifier.animateItem()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsTab(
+    state: ScribUiState,
+    actions: Actions,
+    modelsExpanded: Boolean,
+    customExpanded: Boolean,
+    onToggleStandard: () -> Unit,
+    onToggleCustom: () -> Unit,
+    sherpaPlugin: SherpaPlugin?,
+    endpointPlugin: EndpointPlugin?,
+    onEndpointChanged: () -> Unit,
+    onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
+    onPickLanguage: () -> Unit,
+    onAddCustom: () -> Unit,
+    onImportBin: () -> Unit,
+    onImportExternal: () -> Unit,
+    onRequestDelete: (String) -> Unit,
+    onSkipSilence: (Boolean) -> Unit,
+    onLiveStats: (Boolean) -> Unit,
+    onOpenDictionary: () -> Unit,
+    onOpenBenchmarks: () -> Unit,
+    onSelfTest: () -> Unit,
+    onBenchmarkFile: () -> Unit,
+    onCancelBenchmark: () -> Unit,
+    transcription: TranscribeUi?,
+    recording: RecordingUi?
+) {
+    val cs = MaterialTheme.colorScheme
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 28.dp)
+    ) {
+        if (state.firstRun) {
+            item { NudgeCard(state, actions) }
+        }
+        if (BuildConfig.LOCAL_MODELS) {
+            item {
+                Text(
+                    stringResource(R.string.models_explainer),
+                    fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                    lineHeight = 17.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 14.dp)
+                )
+            }
+            item { LanguageEntry(onPickLanguage) }
+            item { StandardHeader(expanded = modelsExpanded, onToggle = onToggleStandard) }
+            if (modelsExpanded) {
+                items(state.standard.size) { i -> ModelRowCard(state.standard[i], actions, onRequestDelete) }
+            }
+        }
+        if (sherpaPlugin != null) {
+            item {
+                sherpaPlugin.SettingsBlocks(
+                    rows = state.sherpaRows,
+                    busy = state.sherpaBusy,
+                    onUse = actions.onUse,
+                    onDelete = actions.onDelete,
+                    onRequestDelete = onRequestDelete,
+                    onImportSherpa = onImportSherpa
+                )
+            }
+        }
+        if (endpointPlugin != null) {
+            item { endpointPlugin.SettingsBlocks(onChanged = onEndpointChanged) }
+        }
+        if (BuildConfig.LOCAL_MODELS) {
+            item { CustomHeader(expanded = customExpanded, onToggle = onToggleCustom) }
+            if (customExpanded) {
+                if (state.custom.isEmpty()) {
+                    item {
+                        Text(
+                            stringResource(R.string.custom_empty),
+                            fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                            lineHeight = 19.sp, modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
+                } else {
+                    items(state.custom.size) { i -> ModelRowCard(state.custom[i], actions, onRequestDelete) }
+                }
+            }
+            item {
+                Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    AddButton("+", stringResource(R.string.add_from_hf), onAddCustom)
+                    AddButton("↥", stringResource(R.string.import_bin), onImportBin)
+                    AddButton("↧", stringResource(R.string.import_external), onImportExternal)
+                }
+            }
+        }
+        if (state.statusMsg.isNotEmpty()) {
+            item { StatusBox(state.statusMsg, state.statusError) }
+        }
+        if (BuildConfig.LOCAL_MODELS) {
+            item {
+                Box(Modifier.fillMaxWidth().padding(top = 8.dp), contentAlignment = Alignment.Center) {
+                    TextButton(onClick = onSelfTest) {
+                        Text(stringResource(R.string.run_self_test), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                    }
+                }
+            }
+            item {
+                BenchmarkBatchControl(
+                    state = state.benchmarkBatch,
+                    enabled = state.benchmarkModelCount > 0 &&
+                        !state.benchmarkBatch.running &&
+                        transcription == null && recording == null,
+                    onClick = onBenchmarkFile,
+                    onCancel = onCancelBenchmark
+                )
+            }
+            val batch = state.benchmarkBatch
+            if (batch.total > 0 && !batch.running &&
+                (batch.completed > 0 || batch.failed > 0 || batch.cancelled)) {
+                item {
+                    val text = when {
+                        batch.cancelled -> stringResource(R.string.benchmark_batch_cancelled, batch.completed, batch.total)
+                        batch.failed > 0 -> stringResource(
+                            R.string.benchmark_batch_partial,
+                            batch.completed - batch.failed,
+                            batch.total,
+                            batch.failed
+                        )
+                        else -> stringResource(R.string.benchmark_batch_done, batch.completed, batch.total)
+                    }
+                    StatusBox(text, batch.cancelled || batch.failed > 0)
+                }
+            }
+            item { SkipSilenceEntry(state, onSkipSilence) }
+        }
+        item { LiveStatsEntry(state.liveStats, onLiveStats) }
+        item { DictionaryEntry(state.dictionaryEnabled, onOpenDictionary) }
+        if (BuildConfig.LOCAL_MODELS) {
+            item { BenchmarkEntry(state.benchmarkRuns, onOpenBenchmarks) }
+        }
+    }
+}
+
+@Composable
+private fun SingleCardColumn(content: @Composable () -> Unit) {
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
+    ) {
+        item { content() }
+    }
+}
+
+@Composable
+private fun ServiceCard(glyph: String, title: String, subtitle: String, onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text(glyph, fontSize = 18.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(subtitle, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+            }
+            Spacer(Modifier.width(16.dp))
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun BottomBar(selected: ScribTab, onSelect: (ScribTab) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Column {
+        Box(Modifier.fillMaxWidth().height(1.dp).background(cs.outlineVariant))
+        Surface(color = cs.surfaceContainer) {
+            Row(Modifier.fillMaxWidth().navigationBarsPadding().height(64.dp)) {
+                ScribTab.entries.forEach { t ->
+                    val on = t == selected
+                    val columnInteraction = remember { MutableInteractionSource() }
+                    Column(
+                        Modifier.weight(1f).fillMaxHeight()
+                            .clickable(
+                                interactionSource = columnInteraction,
+                                indication = null
+                            ) { onSelect(t) },
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            Modifier
+                                .size(width = 48.dp, height = 32.dp)
+                                .clip(RoundedCornerShape(50))
+                                .background(if (on) cs.primaryContainer else Color.Transparent)
+                                .clickable { onSelect(t) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painterResource(t.icon),
+                                contentDescription = stringResource(t.labelRes),
+                                tint = if (on) cs.onPrimaryContainer else cs.onSurfaceVariant,
+                                modifier = Modifier.size(21.dp)
+                            )
+                        }
+                        Spacer(Modifier.height(3.dp))
+                        Text(
+                            stringResource(t.labelRes),
+                            fontSize = 10.sp, lineHeight = 11.sp,
+                            fontWeight = if (on) FontWeight.Bold else FontWeight.Medium,
+                            color = if (on) cs.primary else cs.onSurfaceVariant,
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun recordHint(remoteHost: String?): String =
+    if (remoteHost != null) stringResource(R.string.record_hint_remote, remoteHost)
+    else stringResource(R.string.record_hint)
+
+@Composable
+private fun AppBar(onAbout: () -> Unit, showAbout: Boolean) {
     val cs = MaterialTheme.colorScheme
     Row(
         Modifier.fillMaxWidth().padding(start = 20.dp, top = 10.dp, end = 8.dp, bottom = 12.dp),
@@ -385,8 +957,12 @@ private fun AppBar(onAbout: () -> Unit) {
         Spacer(Modifier.width(9.dp))
         Text(stringResource(R.string.app_name), fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = cs.onBackground, letterSpacing = (-0.6).sp)
         Spacer(Modifier.weight(1f))
-        TextButton(onClick = onAbout) {
-            Text(stringResource(R.string.about), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
+        Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.CenterEnd) {
+            if (showAbout) {
+                TextButton(onClick = onAbout) {
+                    Text(stringResource(R.string.about), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
+                }
+            }
         }
     }
 }
@@ -397,7 +973,7 @@ private fun Bar(h: androidx.compose.ui.unit.Dp, color: Color, alpha: Float) {
 }
 
 @Composable
-private fun StatusCard(state: ScribUiState) {
+private fun StatusCard(state: ScribUiState, onOpenSettings: (() -> Unit)? = null) {
     val cs = MaterialTheme.colorScheme
     Surface(color = cs.surfaceContainer, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 16.dp)) {
         Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
@@ -408,10 +984,14 @@ private fun StatusCard(state: ScribUiState) {
             Spacer(Modifier.height(10.dp))
             if (state.activeName != null) {
                 Text(state.activeName, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cs.onSurface, letterSpacing = (-0.5).sp)
-                Text(stringResource(R.string.ready_to_transcribe), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = cs.primary, modifier = Modifier.padding(top = 6.dp))
             } else {
                 Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.no_active_model else R.string.no_active_endpoint), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.pick_model_hint else R.string.pick_endpoint_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
+                if (onOpenSettings != null) {
+                    TextButton(onClick = onOpenSettings, modifier = Modifier.padding(top = 2.dp)) {
+                        Text(stringResource(R.string.nav_settings), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.primary)
+                    }
+                }
             }
             PrivacyLine(cs.onSurfaceVariant, topBorder = true, remoteHost = state.remoteHost)
         }
@@ -419,7 +999,7 @@ private fun StatusCard(state: ScribUiState) {
 }
 
 @Composable
-private fun NudgeCard(state: ScribUiState, actions: Actions) {
+private fun NudgeCard(state: ScribUiState, actions: Actions, onOpenSettings: (() -> Unit)? = null) {
     val cs = MaterialTheme.colorScheme
     val base = state.standard.firstOrNull { it.recommended }
     Surface(color = cs.primaryContainer, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 16.dp)) {
@@ -441,6 +1021,10 @@ private fun NudgeCard(state: ScribUiState, actions: Actions) {
                             fontSize = 14.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimary
                         )
                     }
+                }
+            } else if (onOpenSettings != null) {
+                TextButton(onClick = onOpenSettings, modifier = Modifier.padding(top = 8.dp)) {
+                    Text(stringResource(R.string.nav_settings), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.primary)
                 }
             }
             PrivacyLine(cs.onPrimaryContainer.copy(alpha = 0.9f), topBorder = false, remoteHost = null)
@@ -841,7 +1425,8 @@ private fun TranscriptionDialog(
     onCancel: () -> Unit,
     onClose: () -> Unit,
     onSave: (Uri) -> Unit,
-    onFormat: (TranscriptFormat) -> Unit
+    onFormat: (TranscriptFormat) -> Unit,
+    onSaveToHistory: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
@@ -895,38 +1480,108 @@ private fun TranscriptionDialog(
                     Spacer(Modifier.height(12.dp))
                     if (finished && t.segments.isNotEmpty()) {
                         FormatPicker(t.format, onFormat)
+                        Spacer(Modifier.height(10.dp))
+                    }
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                    ) {
+                        IconButton(onClick = { clipboard.setText(AnnotatedString(t.formatted)) }) {
+                            Icon(painterResource(R.drawable.ic_action_copy), stringResource(R.string.action_copy))
+                        }
+                        IconButton(onClick = {
+                            val send = Intent(Intent.ACTION_SEND)
+                                .setType("text/plain")
+                                .putExtra(Intent.EXTRA_TEXT, t.formatted)
+                                .putExtra(Intent.EXTRA_SUBJECT, baseName)
+                            context.startActivity(Intent.createChooser(send, null))
+                        }) {
+                            Icon(painterResource(R.drawable.ic_action_share), stringResource(R.string.action_share))
+                        }
+                        if (finished) {
+                            IconButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
+                                Icon(
+                                    painterResource(R.drawable.ic_action_save),
+                                    stringResource(R.string.action_save_ext, t.format.extension)
+                                )
+                            }
+                        }
                     }
                 }
             }
         },
         confirmButton = {
-            if (t.running) TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
-            else TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) }
-        },
-        dismissButton = {
-            if (hasText) {
-                Row {
-                    IconButton(onClick = { clipboard.setText(AnnotatedString(t.formatted)) }) {
+            if (t.running) {
+                TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            } else {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = onClose, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.action_close))
+                    }
+                    if (hasText) {
+                        Button(onClick = onSaveToHistory, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.action_save))
+                        }
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun HistoryEntryDialog(
+    entry: TranscriptHistory.Entry,
+    onClose: () -> Unit,
+    onSaveFile: (Uri) -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+    val baseName = entry.fileName.substringBeforeLast('.').ifBlank { "transcript" }
+    val saveContract = remember { CreateTranscriptDocument(null, transcriptMimeType(TranscriptFormat.TXT)) }
+    val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
+        if (uri != null) onSaveFile(uri)
+    }
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(entry.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        text = {
+            Column {
+                Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
+                    Text(entry.text, fontSize = 14.sp, lineHeight = 20.sp, color = cs.onSurface)
+                }
+                Spacer(Modifier.height(12.dp))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                ) {
+                    IconButton(onClick = { clipboard.setText(AnnotatedString(entry.text)) }) {
                         Icon(painterResource(R.drawable.ic_action_copy), stringResource(R.string.action_copy))
                     }
                     IconButton(onClick = {
                         val send = Intent(Intent.ACTION_SEND)
                             .setType("text/plain")
-                            .putExtra(Intent.EXTRA_TEXT, t.formatted)
+                            .putExtra(Intent.EXTRA_TEXT, entry.text)
                             .putExtra(Intent.EXTRA_SUBJECT, baseName)
                         context.startActivity(Intent.createChooser(send, null))
                     }) {
                         Icon(painterResource(R.drawable.ic_action_share), stringResource(R.string.action_share))
                     }
-                    if (finished) {
-                        IconButton(onClick = { saveLauncher.launch("$baseName.${t.format.extension}") }) {
-                            Icon(
-                                painterResource(R.drawable.ic_action_save),
-                                stringResource(R.string.action_save_ext, t.format.extension)
-                            )
-                        }
+                    IconButton(onClick = { saveLauncher.launch("$baseName.txt") }) {
+                        Icon(
+                            painterResource(R.drawable.ic_action_save),
+                            stringResource(R.string.action_save_ext, TranscriptFormat.TXT.extension)
+                        )
                     }
                 }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_close))
             }
         }
     )
@@ -1043,7 +1698,7 @@ private fun RunProgress(t: TranscribeUi) {
 @Composable
 private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat) -> Unit) {
     val cs = MaterialTheme.colorScheme
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
         TranscriptFormat.entries.forEach { format ->
             val on = format == selected
             Surface(
@@ -1076,38 +1731,6 @@ private fun LanguageEntry(onClick: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(stringResource(R.string.lang_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(R.string.lang_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
-            }
-            Spacer(Modifier.width(16.dp))
-            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
-        }
-    }
-}
-
-// The voice keyboard is useless until it is switched on in the system's own keyboard list, and
-// nothing in the app can do that on the user's behalf.
-@Composable
-private fun KeyboardEntry(settings: KeyboardLayoutSettings, onClick: () -> Unit) {
-    val cs = MaterialTheme.colorScheme
-    val layoutSubtitle = when {
-        !settings.enabled -> stringResource(R.string.ime_layout_buttons_off)
-        settings.options.none { it.selected } -> stringResource(R.string.ime_layout_buttons_none)
-        else -> stringResource(R.string.ime_layout_buttons_on)
-    } + if (settings.customKeys.isNotEmpty()) " · ✎" + settings.customKeys.size.toString() else ""
-    Surface(
-        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
-    ) {
-        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
-                Text("⌨", fontSize = 18.sp)
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.ime_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
-                Text(
-                    stringResource(R.string.ime_entry_sub) + " · " + layoutSubtitle,
-                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
-                )
             }
             Spacer(Modifier.width(16.dp))
             Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
@@ -1399,273 +2022,6 @@ private fun BenchmarkMetric(label: String, value: String, modifier: Modifier = M
             )
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-private fun KeyboardLayoutsDialog(
-    settings: KeyboardLayoutSettings,
-    onDismiss: () -> Unit,
-    onSave: (Boolean, List<String>, List<String>) -> Unit,
-    onOpenSystemSettings: () -> Unit
-) {
-    var enabled by remember(settings) { mutableStateOf(settings.enabled) }
-    var selectedKeys by remember(settings) {
-        mutableStateOf(settings.options.filter { it.selected }.map { it.key })
-    }
-    var customKeys by remember(settings) { mutableStateOf(settings.customKeys) }
-    var newKey by remember(settings) { mutableStateOf("") }
-    var editingKey by remember(settings) { mutableStateOf<String?>(null) }
-    var editText by remember(settings) { mutableStateOf("") }
-    fun addNewKey() {
-        val value = newKey.replace("\r", "").replace("\n", "")
-        if (value.isBlank() || value in customKeys || customKeys.size >= KeyboardLayouts.MAX_CUSTOM_KEYS) {
-            return
-        }
-        // The newest key goes on top: it is the one just typed, and the top is where the add row
-        // already is, so it is in sight without scrolling.
-        customKeys = listOf(value.take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)) + customKeys
-        newKey = ""
-    }
-    fun renameCustomKey(from: String, to: String) {
-        val value = to.replace("\r", "").replace("\n", "").take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
-        if (value.isBlank() || (value in customKeys && value != from)) {
-            return
-        }
-        customKeys = customKeys.map { if (it == from) value else it }
-        editingKey = null
-    }
-    fun moveCustomKey(key: String, delta: Int) {
-        val index = customKeys.indexOf(key)
-        val to = index + delta
-        if (index < 0 || to !in customKeys.indices) {
-            return
-        }
-        customKeys = customKeys.toMutableList().also { Collections.swap(it, index, to) }
-    }
-    val cs = MaterialTheme.colorScheme
-    val canAdd = newKey.isNotBlank() && newKey !in customKeys &&
-        customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.ime_layout_buttons_title)) },
-        text = {
-            // One flat list, not a list inside a scroll: a nested LazyColumn confuses item
-            // placement animations, and a moved row flies out of its strip.
-            LazyColumn {
-                item {
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            stringResource(R.string.ime_layout_buttons_show),
-                            modifier = Modifier.weight(1f),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = cs.onSurface
-                        )
-                        Switch(checked = enabled, onCheckedChange = { enabled = it })
-                    }
-                }
-                item {
-                    Column {
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            stringResource(R.string.ime_layout_buttons_hint),
-                            fontSize = 12.5.sp,
-                            color = cs.onSurfaceVariant,
-                            lineHeight = 17.sp
-                        )
-                        Spacer(Modifier.height(10.dp))
-                    }
-                }
-                if (settings.options.isEmpty()) {
-                    item {
-                        Text(
-                            stringResource(R.string.ime_layout_buttons_empty),
-                            fontSize = 13.sp,
-                            color = cs.onSurfaceVariant,
-                            lineHeight = 18.sp
-                        )
-                    }
-                } else {
-                    items(settings.options, key = { it.key }) { option ->
-                            val selected = selectedKeys.contains(option.key)
-                            val detail = buildString {
-                                append(option.imeLabel)
-                                if (option.languageTag.isNotBlank()) {
-                                    append(" · ")
-                                    append(option.languageTag)
-                                }
-                            }
-                            Surface(
-                                color = if (selected) cs.primaryContainer else cs.surface,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .selectable(
-                                        selected = selected,
-                                        role = Role.Checkbox,
-                                        onClick = {
-                                            selectedKeys = if (selected) {
-                                                selectedKeys - option.key
-                                            } else {
-                                                selectedKeys + option.key
-                                            }
-                                        }
-                                    )
-                            ) {
-                                Row(
-                                    Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        if (selected) "✓" else "",
-                                        modifier = Modifier.width(22.dp),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = cs.primary
-                                    )
-                                    Text(
-                                        option.shortLabel,
-                                        modifier = Modifier.width(48.dp),
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.ExtraBold,
-                                        color = if (selected) cs.primary else cs.onSurfaceVariant
-                                    )
-                                    Column(Modifier.weight(1f)) {
-                                        Text(
-                                            option.label,
-                                            fontSize = 14.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = cs.onSurface,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Text(
-                                            detail,
-                                            fontSize = 11.5.sp,
-                                            color = cs.onSurfaceVariant,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                    if (selected) {
-                                        Text(
-                                            (selectedKeys.indexOf(option.key) + 1).toString(),
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = cs.primary
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    item {
-                        Box(
-                            Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.CenterEnd
-                        ) {
-                            TextButton(
-                                onClick = { selectedKeys = emptyList() },
-                                enabled = selectedKeys.isNotEmpty()
-                            ) {
-                                Text(stringResource(R.string.ime_layout_buttons_clear), fontSize = 12.sp)
-                            }
-                        }
-                    }
-                }
-                item {
-                    OutlinedButton(
-                        onClick = onOpenSystemSettings,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.ime_layout_buttons_open), fontSize = 12.sp)
-                    }
-                }
-                item {
-                    Column {
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            stringResource(R.string.ime_custom_keys_title),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = cs.onSurface
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            stringResource(R.string.ime_custom_keys_hint),
-                            fontSize = 12.5.sp,
-                            color = cs.onSurfaceVariant,
-                            lineHeight = 17.sp
-                        )
-                        Spacer(Modifier.height(10.dp))
-                    }
-                }
-                item {
-                    AddKeyRow(
-                        value = newKey,
-                        onValueChange = {
-                            newKey = it.replace("\r", "").replace("\n", "")
-                                .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
-                        },
-                        enabled = canAdd,
-                        onAdd = { addNewKey() }
-                    )
-                }
-                if (customKeys.isEmpty()) {
-                    item {
-                        Text(
-                            stringResource(R.string.ime_custom_keys_empty),
-                            fontSize = 13.sp,
-                            color = cs.onSurfaceVariant,
-                            lineHeight = 18.sp
-                        )
-                    }
-                } else {
-                    items(customKeys, key = { it }) { key ->
-                        val index = customKeys.indexOf(key)
-                        val editing = editingKey == key
-                        val cleaned = editText.replace("\r", "").replace("\n", "")
-                        val confirmEnabled = cleaned.isNotBlank() &&
-                            (cleaned == key || cleaned !in customKeys)
-                        CustomKeyRow(
-                            key = key,
-                            editing = editing,
-                            editText = editText,
-                            onEditTextChange = {
-                                editText = it.replace("\r", "").replace("\n", "")
-                                    .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
-                            },
-                            confirmEnabled = confirmEnabled,
-                            onConfirmEdit = { renameCustomKey(key, editText) },
-                            actionsEnabled = editingKey == null,
-                            canMoveUp = index > 0,
-                            canMoveDown = index >= 0 && index < customKeys.lastIndex,
-                            onStartEdit = { editingKey = key; editText = key },
-                            onCancelEdit = { editingKey = null },
-                            onMoveUp = { moveCustomKey(key, -1) },
-                            onMoveDown = { moveCustomKey(key, 1) },
-                            onDelete = {
-                                customKeys = customKeys - key
-                                if (editingKey == key) {
-                                    editingKey = null
-                                }
-                            },
-                            modifier = Modifier.animateItem()
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onSave(enabled, selectedKeys, customKeys) }) {
-                Text(stringResource(R.string.action_save))
-            }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
-    )
 }
 
 // Every custom key occupies this height whether it is being read or edited, so switching one to

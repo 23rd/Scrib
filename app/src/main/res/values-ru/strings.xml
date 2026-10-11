@@ -16,6 +16,14 @@
     <string name="nudge_body">Модели ещё нет. Скачайте одну — Base хороший баланс: небольшой размер, приличная точность, работает на любом языке.</string>
     <string name="nudge_remote_body">Scrib Remote не хранит на телефоне модель. Укажите ниже сервер распознавания — свой или любой OpenAI-совместимый — и аудио уйдёт туда.</string>
     <string name="download_named_size">Скачать %1$s · ≈%2$d МБ</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_record">Запись</string>
+    <string name="nav_transcribe">Распознать</string>
+    <string name="nav_keyboard">Клавиатура</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="file_entry_sub">Выберите аудио- или видеофайл и распознайте его</string>
+    <string name="history_section_title">Записи</string>
+    <string name="history_saved">Сохранено в записях.</string>
     <string name="record_and_transcribe">Записать и распознать</string>
     <string name="transcribe_audio_file">Распознать аудиофайл</string>
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>
