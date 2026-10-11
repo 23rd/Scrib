@@ -107,6 +107,7 @@ fun ScribScreen(
     onDelete: (String) -> Unit,
     onAddUrl: (String) -> Unit,
     onImport: (Uri, String?) -> Unit,
+    onImportExternal: (Uri, String?) -> Unit,
     onSelfTest: () -> Unit,
     onBenchmarkFile: (Uri, String?) -> Unit,
     onCancelBenchmark: () -> Unit,
@@ -144,6 +145,9 @@ fun ScribScreen(
     var customExpanded by remember { mutableStateOf(SectionState.customModels(context)) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onImport(uri, queryDisplayName(context, uri))
+    }
+    val externalPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) onImportExternal(uri, queryDisplayName(context, uri))
     }
     val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onTranscribeFile(uri, queryDisplayName(context, uri))
@@ -261,6 +265,7 @@ fun ScribScreen(
                     Column(Modifier.padding(top = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         AddButton("+", stringResource(R.string.add_from_hf)) { showAdd = true }
                         AddButton("↥", stringResource(R.string.import_bin)) { picker.launch(arrayOf("*/*")) }
+                        AddButton("↧", stringResource(R.string.import_external)) { externalPicker.launch(arrayOf("*/*")) }
                     }
                 }
             }
@@ -356,7 +361,7 @@ fun ScribScreen(
         AlertDialog(
             onDismissRequest = { deleteTarget = null },
             title = { Text(stringResource(R.string.delete_model_q)) },
-            text = { Text(sherpaPlugin?.displayNameFor(context, target) ?: target) },
+            text = { Text(sherpaPlugin?.displayNameFor(context, target) ?: target.removePrefix(ModelManager.EXTERNAL_PREFIX)) },
             confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text(stringResource(R.string.action_delete)) } },
             dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) } }
         )

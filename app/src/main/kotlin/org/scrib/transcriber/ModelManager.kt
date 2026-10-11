@@ -2,6 +2,8 @@ package org.scrib.transcriber
 
 import android.content.Context
 import android.net.Uri
+import android.os.Environment
+import android.provider.DocumentsContract
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -11,9 +13,14 @@ object ModelManager {
     private const val MIN_VALID_SIZE = 1_000_000L
     private const val PREFS = "models"
     private const val KEY_ACTIVE = "activeModelFile"
+    private const val KEY_EXTERNAL_PATH = "externalModelPath"
+    private const val KEY_EXTERNAL_NAME = "externalModelName"
+    private const val KEY_EXTERNAL_SIZE = "externalModelSize"
     private const val KEY_SKIP_SILENCE = "skipSilence"
     private const val KEY_LIVE_STATS = "liveStats"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
+
+    const val EXTERNAL_PREFIX = "external:"
 
     // The VAD model is a fraction of the size of even the smallest speech one, so it cannot be
     // held to the same floor.
@@ -71,8 +78,14 @@ object ModelManager {
         }
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val stored = prefs.getString(KEY_ACTIVE, null)
-        if (stored != null && valid(fileFor(context, stored))) {
-            return stored
+        if (stored != null) {
+            if (stored.startsWith(EXTERNAL_PREFIX)) {
+                if (externalModel(context) != null) {
+                    return stored
+                }
+            } else if (valid(fileFor(context, stored))) {
+                return stored
+            }
         }
         val installed = installedFileNames(context)
         return installed.firstOrNull { it == LEGACY_MODEL } ?: installed.firstOrNull()
@@ -80,7 +93,7 @@ object ModelManager {
 
     fun activeModelFile(context: Context): File? {
         val name = activeFileName(context) ?: return null
-        if (SherpaPlugins.plugin?.selectedId(context) != null) {
+        if (SherpaPlugins.plugin?.selectedId(context) != null || name.startsWith(EXTERNAL_PREFIX)) {
             return null
         }
         return fileFor(context, name)
@@ -94,8 +107,94 @@ object ModelManager {
             return it
         }
         val name = activeFileName(context) ?: return null
+        if (name.startsWith(EXTERNAL_PREFIX)) {
+            return name.removePrefix(EXTERNAL_PREFIX)
+        }
         return ModelCatalog.byFileName(name)?.displayName
             ?: name.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf")
+    }
+
+    class ActiveModel internal constructor(val key: String, val path: String)
+
+    data class SharedModelUse(val name: String, val inPlace: Boolean)
+
+    fun externalModel(context: Context): Pair<String, String>? {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val path = prefs.getString(KEY_EXTERNAL_PATH, null) ?: return null
+        val name = prefs.getString(KEY_EXTERNAL_NAME, null) ?: return null
+        return name to path
+    }
+
+    fun externalModelSize(context: Context): Long =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getLong(KEY_EXTERNAL_SIZE, 0L)
+
+    fun useSharedModel(context: Context, uri: Uri, suggestedName: String?): SharedModelUse {
+        val path = sharedModelPath(context, uri)
+        if (path != null) {
+            val file = File(path)
+            if (file.isFile && file.canRead() && file.length() > MIN_VALID_SIZE) {
+                context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                    .putString(KEY_EXTERNAL_PATH, path)
+                    .putString(KEY_EXTERNAL_NAME, file.name)
+                    .putLong(KEY_EXTERNAL_SIZE, file.length())
+                    .apply()
+                setActive(context, EXTERNAL_PREFIX + file.name)
+                return SharedModelUse(file.name, true)
+            }
+        }
+        return SharedModelUse(importFromUri(context, uri, suggestedName), false)
+    }
+
+    private fun sharedModelPath(context: Context, uri: Uri): String? {
+        if (uri.authority == "com.android.externalstorage.documents") {
+            val parts = DocumentsContract.getDocumentId(uri).split(":", limit = 2)
+            if (parts.size == 2 && parts[0] == "primary") {
+                return File(Environment.getExternalStorageDirectory(), parts[1]).absolutePath
+            }
+        }
+        return try {
+            context.contentResolver.query(uri, arrayOf("_data"), null, null, null)?.use { cursor ->
+                val column = cursor.getColumnIndex("_data")
+                if (column >= 0 && cursor.moveToFirst()) cursor.getString(column) else null
+            }
+        } catch (ignore: Throwable) {
+            null
+        }
+    }
+
+    private fun clearExternalModel(context: Context) {
+        val name = externalModel(context)?.first ?: return
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .remove(KEY_EXTERNAL_PATH).remove(KEY_EXTERNAL_NAME).remove(KEY_EXTERNAL_SIZE).apply()
+        clearActiveSelection(context, EXTERNAL_PREFIX + name)
+    }
+
+    fun activeModelKey(context: Context): String? {
+        if (EndpointPlugins.plugin?.isActive(context) == true) {
+            return null
+        }
+        SherpaPlugins.plugin?.selectedId(context)?.let {
+            return it
+        }
+        val name = activeFileName(context) ?: return null
+        return if (name.startsWith(EXTERNAL_PREFIX)) name else fileFor(context, name).absolutePath
+    }
+
+    fun openActiveModel(context: Context): ActiveModel? {
+        val name = activeFileName(context) ?: return null
+        if (SherpaPlugins.plugin?.selectedId(context) != null) {
+            return null
+        }
+        if (name.startsWith(EXTERNAL_PREFIX)) {
+            val external = externalModel(context) ?: return null
+            val file = File(external.second)
+            if (!file.isFile || !file.canRead()) {
+                return null
+            }
+            return ActiveModel(name, external.second)
+        }
+        val path = fileFor(context, name).absolutePath
+        return ActiveModel(path, path)
     }
 
     internal fun storedActiveName(context: Context): String? =
@@ -118,6 +217,9 @@ object ModelManager {
             return plugin.hasActiveModel(context)
         }
         if (EndpointPlugins.plugin?.isActive(context) == true) {
+            return true
+        }
+        if (activeFileName(context)?.startsWith(EXTERNAL_PREFIX) == true) {
             return true
         }
         return activeModelFile(context) != null
@@ -143,6 +245,10 @@ object ModelManager {
 
     fun delete(context: Context, fileName: String) {
         if (SherpaPlugins.plugin?.deleteModel(context, fileName) == true) {
+            return
+        }
+        if (fileName.startsWith(EXTERNAL_PREFIX)) {
+            clearExternalModel(context)
             return
         }
         fileFor(context, fileName).delete()
@@ -216,9 +322,9 @@ object ModelManager {
         if (SherpaPlugins.plugin?.selectedId(context) != null) {
             return true
         }
-        val model = activeModelFile(context) ?: return true
+        val active = openActiveModel(context) ?: return true
         return try {
-            LocalModelsPlugins.plugin?.usesVadModel(model.absolutePath) ?: true
+            LocalModelsPlugins.plugin?.usesVadModel(active.path) ?: true
         } catch (ignore: Throwable) {
             true
         }

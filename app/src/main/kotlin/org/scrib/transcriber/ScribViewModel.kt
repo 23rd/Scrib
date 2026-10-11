@@ -145,13 +145,26 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
                 state = stateOf(f), progress = downloads[f]?.pct ?: 0
             )
+        }.toMutableList()
+        ModelManager.externalModel(ctx)?.let { (name, _) ->
+            val id = ModelManager.EXTERNAL_PREFIX + name
+            custom.add(
+                0,
+                ModelRow(
+                    id = id, name = name, badge = str(R.string.badge_external),
+                    multilingual = !ModelCatalog.isEnglishOnly(name),
+                    sizeMb = (ModelManager.externalModelSize(ctx) / 1_000_000).toInt(),
+                    tier = 3, recommended = false, custom = false,
+                    state = if (id == active) RowState.Active else RowState.Installed, progress = 0
+                )
+            )
         }
         val activeFriendly = ModelManager.activeDisplayName(ctx)
         val sherpaRows = SherpaPlugins.plugin?.modelRows(ctx, active) ?: emptyList()
         val endpointReady = EndpointPlugins.plugin?.isActive(ctx) == true
         return ScribUiState(
             firstRun = !endpointReady && installed.isEmpty() && downloads.isEmpty() &&
-                sherpaRows.isEmpty() && !sherpaBusy,
+                sherpaRows.isEmpty() && !sherpaBusy && ModelManager.externalModel(ctx) == null,
             activeName = activeFriendly, standard = standard, sherpaRows = sherpaRows, sherpaBusy = sherpaBusy, custom = custom,
             statusMsg = statusMsg, statusError = statusError,
             skipSilence = BuildConfig.LOCAL_MODELS && ModelManager.skipSilence(ctx), vadProgress = vadPct,
@@ -403,6 +416,25 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val name = withContext(Dispatchers.IO) { ModelManager.importFromUri(ctx, uri, suggestedName) }
                 statusMsg = str(R.string.status_imported, name); statusError = false
+            } catch (e: Throwable) {
+                statusMsg = str(R.string.status_import_failed, e.message ?: ""); statusError = true
+            }
+            push()
+        }
+    }
+
+    fun importExternalModel(uri: Uri, suggestedName: String?) {
+        if (BenchmarkBatchGate.isActive) return
+        viewModelScope.launch {
+            try {
+                val result = withContext(Dispatchers.IO) { ModelManager.useSharedModel(ctx, uri, suggestedName) }
+                releaseSwitchedAwayModel()
+                statusMsg = if (result.inPlace) {
+                    str(R.string.status_external_active, result.name)
+                } else {
+                    str(R.string.status_imported, result.name)
+                }
+                statusError = false
             } catch (e: Throwable) {
                 statusMsg = str(R.string.status_import_failed, e.message ?: ""); statusError = true
             }

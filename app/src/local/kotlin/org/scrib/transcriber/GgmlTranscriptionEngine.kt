@@ -158,9 +158,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 throw CancelledException()
             }
             val language = languageHint?.takeIf { it.isNotEmpty() }
-            val activePath = ModelManager.activeModelFile(appContext)?.absolutePath
-                ?: throw ModelNotAvailableException()
-            val alreadyLoaded = loadedPath == activePath && session != null
+            val activeKey = ModelManager.activeModelKey(appContext) ?: throw ModelNotAvailableException()
+            val alreadyLoaded = loadedPath == activeKey && session != null
             val beforeLoad = processMemory(appContext)
             val loadStartedAt = SystemClock.elapsedRealtime()
             val live = session()
@@ -339,18 +338,18 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
 
     @Synchronized
     private fun model(): TranscribeModel {
-        val file = ModelManager.activeModelFile(appContext) ?: throw ModelNotAvailableException()
-        val path = file.absolutePath
+        val key = ModelManager.activeModelKey(appContext) ?: throw ModelNotAvailableException()
         model?.let {
-            if (loadedPath == path) {
+            if (loadedPath == key) {
                 return it
             }
             releaseModel()
         }
-        return TranscribeModel.load(path).also {
-            model = it
-            loadedPath = path
-        }
+        val active = ModelManager.openActiveModel(appContext) ?: throw ModelNotAvailableException()
+        val loaded = TranscribeModel.load(active.path)
+        model = loaded
+        loadedPath = active.key
+        return loaded
     }
 
     private data class RunResult(val text: String, val segments: List<TranscribeSegmentData>)

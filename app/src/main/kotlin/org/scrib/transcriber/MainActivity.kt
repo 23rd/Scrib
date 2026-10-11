@@ -63,6 +63,7 @@ class MainActivity : ComponentActivity() {
                         onDelete = vm::delete,
                         onAddUrl = vm::addCustom,
                         onImport = vm::importModel,
+                        onImportExternal = vm::importExternalModel,
                         onSelfTest = vm::selfTest,
                         onBenchmarkFile = vm::benchmarkFile,
                         onCancelBenchmark = vm::cancelBenchmark,

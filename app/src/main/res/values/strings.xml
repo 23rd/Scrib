@@ -123,6 +123,7 @@
     <string name="badge_multilingual">multilingual</string>
     <string name="badge_english_only">English only</string>
     <string name="badge_custom">custom</string>
+    <string name="badge_external">shared</string>
     <string name="size_mb">≈%1$d MB</string>
     <string name="recommended">recommended</string>
     <string name="active_pill">✓ ACTIVE</string>
@@ -145,6 +146,7 @@
 
     <string name="add_from_hf">Add model from HuggingFace…</string>
     <string name="import_bin">Import model file from device…</string>
+    <string name="import_external">Use model from shared storage…</string>
     <string name="run_self_test">Run self-test on sample clip</string>
 
     <string name="delete_model_q">Delete model?</string>
@@ -189,6 +191,7 @@
     <string name="status_invalid_link">Invalid link</string>
     <string name="status_importing">Importing…</string>
     <string name="status_imported">Imported %1$s from device.</string>
+    <string name="status_external_active">Now using %1$s from shared storage.</string>
     <string name="status_import_failed">Import failed: %1$s</string>
     <string name="status_selftest_needs_model">Self-test needs an active model — tap Use on one first.</string>
     <string name="status_running_selftest">Running self-test…</string>

@@ -114,6 +114,7 @@
     <string name="badge_multilingual">multilingue</string>
     <string name="badge_english_only">solo inglese</string>
     <string name="badge_custom">personale</string>
+    <string name="badge_external">condiviso</string>
     <string name="size_mb">≈%1$d MB</string>
     <string name="recommended">consigliato</string>
     <string name="active_pill">✓ ATTIVO</string>
@@ -134,6 +135,7 @@
     <string name="transcript_save_failed">Impossibile salvare la trascrizione.</string>
     <string name="add_from_hf">Aggiungi modello da HuggingFace…</string>
     <string name="import_bin">Importa file del modello dal dispositivo…</string>
+    <string name="import_external">Usa modello dall\'archiviazione condivisa…</string>
     <string name="run_self_test">Autotest su clip di esempio</string>
     <string name="delete_model_q">Eliminare il modello?</string>
     <string name="lang_entry_title">Trova un modello per la tua lingua</string>
@@ -171,6 +173,7 @@
     <string name="status_invalid_link">Link non valido</string>
     <string name="status_importing">Importazione…</string>
     <string name="status_imported">%1$s importato dal dispositivo.</string>
+    <string name="status_external_active">Uso ora %1$s dall\'archiviazione condivisa.</string>
     <string name="status_import_failed">Importazione non riuscita: %1$s</string>
     <string name="status_selftest_needs_model">L\'autotest richiede un modello attivo — tocca prima «Usa».</string>
     <string name="status_running_selftest">Autotest in corso…</string>
