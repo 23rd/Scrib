@@ -23,7 +23,9 @@
     <string name="nav_settings">Ayarlar</string>
     <string name="file_entry_sub">Bir ses veya video dosyası seçip yazıya dökün</string>
     <string name="history_section_title">Kayıtlar</string>
-    <string name="history_saved">Kayıtlara eklendi.</string>
+    <string name="history_clear_all">Tümünü temizle</string>
+    <string name="history_clear_title">Tüm kayıtlar temizlensin mi?</string>
+    <string name="history_clear_message">Kaydedilen tüm transkriptler bu cihazdan kalıcı olarak silinecek.</string>
     <string name="quick_access_title">Hızlı erişim</string>
     <string name="quick_access_add">Ana sayfaya ekle</string>
     <string name="quick_access_remove">Ana sayfadan çıkar</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Cihazda çözülüyor ve yazıya dökülüyor…</string>
     <string name="transcribing_pct">Yazıya dökülüyor… %1$d%%</string>
     <string name="transcribing_pct_eta">Yazıya dökülüyor… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Dosya %1$d/%2$d</string>
     <string name="transcribe_stats_line">Toplam %1$s · çözme %2$s · yükleme %3$s · çıkarım %4$s · ses %5$s · RTF %6$s · PSS %7$s · zirve %8$s · boş RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
     <string name="transcribe_stats_model_memory">Model PSS %1$s · yükleme farkı %2$s</string>

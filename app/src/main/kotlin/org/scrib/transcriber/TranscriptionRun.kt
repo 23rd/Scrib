@@ -32,15 +32,49 @@ object TranscriptionRun {
     private val _state = MutableStateFlow<TranscribeUi?>(null)
     val state: StateFlow<TranscribeUi?> = _state
 
+    private val _historyUpdates = MutableStateFlow(0L)
+    val historyUpdates: StateFlow<Long> = _historyUpdates
+
     @Volatile
     private var token: CancellationToken? = null
 
     val running: Boolean get() = token != null
 
+    private val batchQueue = ArrayDeque<BatchItem>()
+    private var batchPosition = 0
+    private var batchTotal = 0
+    private var batchId = 0L
+
     // A recording has no place in the user's storage to point the save dialog at, and its file is
     // the app's own — hence source stays null there and onFinished cleans the file up.
     fun start(context: Context, uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}): Boolean =
         startInternal(context, uri, name, source, { onFinished() }, persistTranscript = true, allowBatch = false)
+
+    fun startFiles(context: Context, items: List<Pair<Uri, String>>): Boolean {
+        if (items.isEmpty()) return false
+        val id: Long
+        synchronized(this) {
+            if (token != null || BenchmarkBatchGate.isActive) return false
+            batchQueue.clear()
+            items.drop(1).forEach { batchQueue.addLast(BatchItem(it.first, it.second)) }
+            batchPosition = 0
+            batchTotal = items.size
+            id = ++batchId
+        }
+        val first = items.first()
+        val started = startInternal(
+            context, first.first, first.second, first.first,
+            onFinished = {}, persistTranscript = true, allowBatch = false,
+            batchIndex = 0, batchTotal = items.size, batchId = id
+        )
+        if (!started) {
+            synchronized(this) {
+                batchQueue.clear()
+                batchTotal = 0
+            }
+        }
+        return started
+    }
 
     fun startForBenchmark(
         context: Context,
@@ -65,7 +99,10 @@ object TranscriptionRun {
         source: Uri?,
         onFinished: (TranscriptionRunResult) -> Unit,
         persistTranscript: Boolean,
-        allowBatch: Boolean
+        allowBatch: Boolean,
+        batchIndex: Int = 0,
+        batchTotal: Int = 0,
+        batchId: Long = 0
     ): Boolean {
         val app = context.applicationContext
         val cancellation = CancellationToken()
@@ -83,7 +120,9 @@ object TranscriptionRun {
             running = true,
             error = null,
             sourceUri = source,
-            modelName = modelName
+            modelName = modelName,
+            batchIndex = batchIndex,
+            batchTotal = batchTotal
         )
         TranscriptionForegroundService.start(app)
         scope.launch {
@@ -214,7 +253,11 @@ object TranscriptionRun {
                     }
 
                     if (persistTranscript && segments.isNotEmpty()) {
-                        _state.value?.let { TranscriptStore.save(app, it) }
+                        _state.value?.let {
+                            TranscriptStore.save(app, it)
+                            TranscriptHistory.save(app, it)
+                            _historyUpdates.value += 1
+                        }
                     }
                     result = TranscriptionRunResult.SUCCESS
                 }
@@ -238,9 +281,30 @@ object TranscriptionRun {
                     if (token === cancellation) token = null
                 }
                 onFinished(result)
+                if (persistTranscript) chainBatch(app, batchId, result)
             }
         }
         return true
+    }
+
+    private fun chainBatch(context: Context, id: Long, last: TranscriptionRunResult) {
+        synchronized(this) {
+            if (id != batchId) {
+                return
+            }
+            val next = if (last == TranscriptionRunResult.CANCELLED) null else batchQueue.removeFirstOrNull()
+            if (next == null) {
+                batchQueue.clear()
+                batchTotal = 0
+                return
+            }
+            batchPosition += 1
+            startInternal(
+                context, next.uri, next.name, next.uri,
+                onFinished = {}, persistTranscript = true, allowBatch = false,
+                batchIndex = batchPosition, batchTotal = batchTotal, batchId = id
+            )
+        }
     }
 
     fun restore(context: Context) {
@@ -251,7 +315,11 @@ object TranscriptionRun {
     }
 
     fun cancel(context: Context) {
-        token?.cancel()
+        synchronized(this) {
+            token?.cancel()
+            batchQueue.clear()
+            batchTotal = 0
+        }
         TranscriptStore.clear(context.applicationContext)
         _state.value = null
     }
@@ -276,6 +344,8 @@ object TranscriptionRun {
 }
 
 private const val METRICS_INTERVAL_MS = 500L
+
+private data class BatchItem(val uri: Uri, val name: String)
 
 // Whisper reports how far through the audio it is, and it advances at a steady rate once the model
 // is warm — so the time the run has taken to cover the percent so far carries over to what is left.

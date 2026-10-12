@@ -23,7 +23,9 @@
     <string name="nav_settings">Ustawienia</string>
     <string name="file_entry_sub">Wybierz plik audio lub wideo i transkrybuj go</string>
     <string name="history_section_title">Nagrania</string>
-    <string name="history_saved">Zapisano w nagraniach.</string>
+    <string name="history_clear_all">Wyczyść wszystko</string>
+    <string name="history_clear_title">Wyczyścić wszystkie nagrania?</string>
+    <string name="history_clear_message">Wszystkie zapisane transkrypcje zostaną trwale usunięte z tego urządzenia.</string>
     <string name="quick_access_title">Szybki dostęp</string>
     <string name="quick_access_add">Dodaj do Startu</string>
     <string name="quick_access_remove">Usuń ze Startu</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Dekodowanie i transkrypcja na urządzeniu…</string>
     <string name="transcribing_pct">Transkrypcja… %1$d%%</string>
     <string name="transcribing_pct_eta">Transkrypcja… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Plik %1$d z %2$d</string>
     <string name="transcribe_stats_line">Łącznie %1$s · dekodowanie %2$s · ładowanie %3$s · wnioskowanie %4$s · audio %5$s · RTF %6$s · PSS %7$s · szczyt %8$s · wolny RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
     <string name="transcribe_stats_model_memory">PSS modelu %1$s · przyrost ładowania %2$s</string>

@@ -80,13 +80,13 @@ class MainActivity : ComponentActivity() {
                         onStopRecording = vm::stopRecording,
                         onCancelRecording = vm::cancelRecording,
                         transcription = transcription,
-                        onTranscribeFile = vm::transcribeFile,
+                        onTranscribeFiles = vm::transcribeFiles,
                         onCancelTranscription = vm::cancelTranscription,
                         onDismissTranscription = vm::dismissTranscription,
                         onSaveTranscript = vm::saveTranscript,
                         onTranscriptFormat = vm::setTranscriptFormat,
-                        onSaveToHistory = vm::saveTranscriptToHistory,
                         onDeleteHistory = vm::deleteHistoryEntry,
+                        onClearHistory = vm::clearHistory,
                         onSaveHistoryFile = vm::saveHistoryEntryToFile,
                         onTogglePinned = vm::togglePinned,
                         benchmarkRuns = state.benchmarkRuns,
@@ -127,22 +127,31 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // A file arriving through the system share sheet goes straight into transcription. Without a
-    // model there is nothing to run it with — the first-run screen then explains the download.
     private fun maybeTranscribeShared(intent: Intent?) {
-        if (intent?.action != Intent.ACTION_SEND) {
+        val uris = when (intent?.action) {
+            Intent.ACTION_SEND -> listOfNotNull(
+                if (Build.VERSION.SDK_INT >= 33) {
+                    intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
+                }
+            )
+            Intent.ACTION_SEND_MULTIPLE -> {
+                val shared: List<Uri>? = if (Build.VERSION.SDK_INT >= 33) {
+                    intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                } else {
+                    @Suppress("DEPRECATION")
+                    intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                }
+                shared.orEmpty()
+            }
+            else -> emptyList()
+        }
+        if (uris.isEmpty() || !ModelManager.hasActiveModel(this)) {
             return
         }
-        val uri = if (Build.VERSION.SDK_INT >= 33) {
-            intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri
-        } ?: return
-        if (!ModelManager.hasActiveModel(this)) {
-            return
-        }
-        sharedVm.transcribeFile(uri, queryDisplayName(this, uri))
+        sharedVm.transcribeFiles(uris.map { it to queryDisplayName(this, it) })
     }
 
     // An input method has no activity of its own to ask from, so the voice keyboard sends the user

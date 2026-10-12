@@ -80,14 +80,20 @@ class TranscriptionForegroundService : Service() {
 
     private fun progressLine(state: TranscribeUi?): String {
         val percent = state?.percent ?: -1
-        if (percent < 0) {
-            return getString(R.string.decoding_transcribing)
-        }
-        val eta = state?.etaMs
-        return if (eta == null) {
-            getString(R.string.transcribing_pct, percent)
+        val base = if (percent < 0) {
+            getString(R.string.decoding_transcribing)
         } else {
-            getString(R.string.transcribing_pct_eta, percent, remaining(this, eta))
+            val eta = state?.etaMs
+            if (eta == null) {
+                getString(R.string.transcribing_pct, percent)
+            } else {
+                getString(R.string.transcribing_pct_eta, percent, remaining(this, eta))
+            }
+        }
+        return if (state != null && state.batchTotal > 1) {
+            getString(R.string.transcribe_batch_position, state.batchIndex + 1, state.batchTotal) + " · " + base
+        } else {
+            base
         }
     }
 

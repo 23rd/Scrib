@@ -23,7 +23,9 @@
     <string name="nav_settings">Instellingen</string>
     <string name="file_entry_sub">Kies een audio- of videobestand en transcribeer het</string>
     <string name="history_section_title">Opnames</string>
-    <string name="history_saved">Opgeslagen in opnames.</string>
+    <string name="history_clear_all">Alles wissen</string>
+    <string name="history_clear_title">Alle opnames wissen?</string>
+    <string name="history_clear_message">Alle bewaarde transcripten worden definitief van dit apparaat verwijderd.</string>
     <string name="quick_access_title">Snelle toegang</string>
     <string name="quick_access_add">Aan start toevoegen</string>
     <string name="quick_access_remove">Van start verwijderen</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
     <string name="transcribing_pct">Transcriberen… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcriberen… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Bestand %1$d van %2$d</string>
     <string name="transcribe_stats_line">Totaal %1$s · decoderen %2$s · laden %3$s · inferentie %4$s · audio %5$s · RTF %6$s · PSS %7$s · piek %8$s · vrij RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
     <string name="transcribe_stats_model_memory">Model-PSS %1$s · laad-delta %2$s</string>

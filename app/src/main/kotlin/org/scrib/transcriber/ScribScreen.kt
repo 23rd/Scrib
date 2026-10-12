@@ -45,7 +45,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
@@ -139,13 +138,13 @@ fun ScribScreen(
     onStopRecording: () -> Unit,
     onCancelRecording: () -> Unit,
     transcription: TranscribeUi?,
-    onTranscribeFile: (Uri, String?) -> Unit,
+    onTranscribeFiles: (List<Pair<Uri, String?>>) -> Unit,
     onCancelTranscription: () -> Unit,
     onDismissTranscription: () -> Unit,
     onSaveTranscript: (Uri) -> Unit,
     onTranscriptFormat: (TranscriptFormat) -> Unit,
-    onSaveToHistory: () -> Unit,
     onDeleteHistory: (String) -> Unit,
+    onClearHistory: () -> Unit,
     onSaveHistoryFile: (String, Uri) -> Unit,
     onTogglePinned: (String) -> Unit,
     benchmarkRuns: List<BenchmarkRun>,
@@ -171,8 +170,10 @@ fun ScribScreen(
     val externalPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onImportExternal(uri, queryDisplayName(context, uri))
     }
-    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) onTranscribeFile(uri, queryDisplayName(context, uri))
+    val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        if (uris.isNotEmpty()) {
+            onTranscribeFiles(uris.map { it to queryDisplayName(context, it) })
+        }
     }
     val benchmarkPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -222,7 +223,8 @@ fun ScribScreen(
                     onOpenTab = { tab = it },
                     onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
                     onOpenEntry = { openHistoryId = it.id },
-                    onDeleteEntry = onDeleteHistory
+                    onDeleteEntry = onDeleteHistory,
+                    onClearHistory = onClearHistory
                 )
                 ScribTab.File -> FileTab(state, actions, onOpenTab = { tab = it }) { audioPicker.launch(arrayOf("audio/*", "video/*")) }
                 ScribTab.Keyboard -> KeyboardTab(state.keyboardLayouts, onConfigureKeyboardLayouts)
@@ -296,7 +298,7 @@ fun ScribScreen(
         transcription?.let { t ->
         TranscriptionDialog(
             t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
-            onSave = onSaveTranscript, onFormat = onTranscriptFormat, onSaveToHistory = onSaveToHistory
+            onSave = onSaveTranscript, onFormat = onTranscriptFormat
         )
         }
     }
@@ -430,13 +432,15 @@ private fun RecordTab(
     onOpenTab: (ScribTab) -> Unit,
     onRecord: () -> Unit,
     onOpenEntry: (TranscriptHistory.Entry) -> Unit,
-    onDeleteEntry: (String) -> Unit
+    onDeleteEntry: (String) -> Unit,
+    onClearHistory: () -> Unit
 ) {
     if (state.firstRun) {
         SingleCardColumn { NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) }) }
         return
     }
     val cs = MaterialTheme.colorScheme
+    var showClearConfirmation by rememberSaveable { mutableStateOf(false) }
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -452,17 +456,42 @@ private fun RecordTab(
         }
         if (state.history.isNotEmpty()) {
             item {
-                Text(
-                    stringResource(R.string.history_section_title),
-                    fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
-                    color = cs.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, top = 20.dp, bottom = 8.dp)
-                )
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.history_section_title),
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                        color = cs.onSurfaceVariant,
+                        modifier = Modifier.weight(1f).padding(start = 4.dp, top = 20.dp, bottom = 8.dp)
+                    )
+                    TextButton(onClick = { showClearConfirmation = true }) {
+                        Text(
+                            stringResource(R.string.history_clear_all),
+                            fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.error
+                        )
+                    }
+                }
             }
             items(state.history, key = { it.id }) { entry ->
                 HistoryRowCard(entry, onOpen = { onOpenEntry(entry) }, onDelete = { onDeleteEntry(entry.id) })
             }
         }
+    }
+    if (showClearConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirmation = false },
+            title = { Text(stringResource(R.string.history_clear_title)) },
+            text = { Text(stringResource(R.string.history_clear_message)) },
+            confirmButton = {
+                TextButton(onClick = { showClearConfirmation = false; onClearHistory() }) {
+                    Text(stringResource(R.string.history_clear_all), color = cs.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirmation = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            }
+        )
     }
 }
 
@@ -1512,8 +1541,7 @@ private fun TranscriptionDialog(
     onCancel: () -> Unit,
     onClose: () -> Unit,
     onSave: (Uri) -> Unit,
-    onFormat: (TranscriptFormat) -> Unit,
-    onSaveToHistory: () -> Unit
+    onFormat: (TranscriptFormat) -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
@@ -1536,6 +1564,13 @@ private fun TranscriptionDialog(
         title = { Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         text = {
             Column {
+                if (t.running && t.batchTotal > 1) {
+                    Text(
+                        stringResource(R.string.transcribe_batch_position, t.batchIndex + 1, t.batchTotal),
+                        fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = cs.primary
+                    )
+                    Spacer(Modifier.height(12.dp))
+                }
                 when {
                     t.error != null -> Text(t.error, fontSize = 13.sp, color = cs.error, lineHeight = 18.sp)
                     t.running && t.text.isEmpty() -> {
@@ -1603,15 +1638,8 @@ private fun TranscriptionDialog(
                     Text(stringResource(R.string.action_cancel))
                 }
             } else {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = onClose, modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.action_close))
-                    }
-                    if (hasText) {
-                        Button(onClick = onSaveToHistory, modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.action_save))
-                        }
-                    }
+                OutlinedButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.action_close))
                 }
             }
         }

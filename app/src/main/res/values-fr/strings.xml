@@ -23,7 +23,9 @@
     <string name="nav_settings">Réglages</string>
     <string name="file_entry_sub">Choisissez un fichier audio ou vidéo et transcrivez-le</string>
     <string name="history_section_title">Enregistrements</string>
-    <string name="history_saved">Ajouté aux enregistrements.</string>
+    <string name="history_clear_all">Tout effacer</string>
+    <string name="history_clear_title">Effacer tous les enregistrements ?</string>
+    <string name="history_clear_message">Toutes les transcriptions conservées seront définitivement supprimées de cet appareil.</string>
     <string name="quick_access_title">Accès rapide</string>
     <string name="quick_access_add">Ajouter à l\'accueil</string>
     <string name="quick_access_remove">Retirer de l\'accueil</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
     <string name="transcribing_pct">Transcription… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcription… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Fichier %1$d sur %2$d</string>
     <string name="transcribe_stats_line">Total %1$s · décodage %2$s · chargement %3$s · inférence %4$s · audio %5$s · RTF %6$s · PSS %7$s · pic %8$s · RAM libre %9$s</string>
     <string name="transcribe_stats_model">Modèle : %1$s</string>
     <string name="transcribe_stats_model_memory">PSS du modèle %1$s · delta de chargement %2$s</string>

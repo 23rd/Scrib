@@ -23,7 +23,9 @@
     <string name="nav_settings">Настройки</string>
     <string name="file_entry_sub">Выберите аудио- или видеофайл и распознайте его</string>
     <string name="history_section_title">Записи</string>
-    <string name="history_saved">Сохранено в записях.</string>
+    <string name="history_clear_all">Очистить всё</string>
+    <string name="history_clear_title">Очистить все записи?</string>
+    <string name="history_clear_message">Все сохранённые расшифровки будут безвозвратно удалены с этого устройства.</string>
     <string name="quick_access_title">Быстрый доступ</string>
     <string name="quick_access_add">Добавить на главный</string>
     <string name="quick_access_remove">Убрать с главного</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Декодирование и распознавание на устройстве…</string>
     <string name="transcribing_pct">Распознавание… %1$d%%</string>
     <string name="transcribing_pct_eta">Распознавание… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Файл %1$d из %2$d</string>
     <string name="transcribe_stats_line">Всего %1$s · декодирование %2$s · загрузка %3$s · распознавание %4$s · аудио %5$s · RTF %6$s · PSS %7$s · пик %8$s · свободно %9$s</string>
     <string name="transcribe_stats_model">Модель: %1$s</string>
     <string name="transcribe_stats_model_memory">PSS модели %1$s · прирост загрузки %2$s</string>

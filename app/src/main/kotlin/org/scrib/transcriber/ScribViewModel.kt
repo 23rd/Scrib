@@ -79,7 +79,9 @@ data class TranscribeUi(
     val format: TranscriptFormat = TranscriptFormat.TXT,
     // How far whisper is through the audio, or -1 while the file is still being decoded.
     val percent: Int = -1,
-    val etaMs: Long? = null
+    val etaMs: Long? = null,
+    val batchIndex: Int = 0,
+    val batchTotal: Int = 0
 ) {
     // What the screen shows and what Copy, Share and Save hand over. Falls back to the plain text
     // while the run is still going and when nothing was recognised.
@@ -492,10 +494,17 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 push()
             }
         }
+        viewModelScope.launch {
+            TranscriptionRun.historyUpdates.collect {
+                historyCache = null
+                push()
+            }
+        }
     }
 
-    fun transcribeFile(uri: Uri, displayName: String?) {
-        TranscriptionRun.start(ctx, uri, displayName ?: "audio", source = uri)
+    fun transcribeFiles(items: List<Pair<Uri, String?>>) {
+        if (items.isEmpty()) return
+        TranscriptionRun.startFiles(ctx, items.map { (uri, name) -> uri to (name ?: "audio") })
     }
 
     fun benchmarkFile(uri: Uri, displayName: String?) {
@@ -551,22 +560,14 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     private fun history(): List<TranscriptHistory.Entry> =
         historyCache ?: TranscriptHistory.load(ctx).also { historyCache = it }
 
-    fun saveTranscriptToHistory() {
-        val transcript = transcription.value ?: return
-        if (transcript.running || transcript.error != null || transcript.text.isBlank()) return
-        dismissTranscription()
-        viewModelScope.launch(Dispatchers.IO) {
-            TranscriptHistory.save(ctx, transcript)
-            historyCache = null
-            withContext(Dispatchers.Main) {
-                toast(R.string.history_saved)
-                push()
-            }
-        }
-    }
-
     fun deleteHistoryEntry(id: String) {
         TranscriptHistory.delete(ctx, id)
+        historyCache = null
+        push()
+    }
+
+    fun clearHistory() {
+        TranscriptHistory.clearAll(ctx)
         historyCache = null
         push()
     }

@@ -44,6 +44,14 @@ object TranscriptHistory {
         }
     }
 
+    fun clearAll(context: Context) {
+        try {
+            dir(context).listFiles()?.forEach { it.delete() }
+        } catch (e: Throwable) {
+            Log.w(LOG_TAG, "Couldn't clear the kept transcripts", e)
+        }
+    }
+
     private fun write(context: Context, entry: Entry) {
         try {
             val segments = JSONArray()

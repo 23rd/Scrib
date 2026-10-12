@@ -23,7 +23,9 @@
     <string name="nav_settings">Einstellungen</string>
     <string name="file_entry_sub">Eine Audio- oder Videodatei auswählen und transkribieren</string>
     <string name="history_section_title">Aufnahmen</string>
-    <string name="history_saved">In Aufnahmen gespeichert.</string>
+    <string name="history_clear_all">Alle löschen</string>
+    <string name="history_clear_title">Alle Aufnahmen löschen?</string>
+    <string name="history_clear_message">Alle gespeicherten Transkripte werden endgültig von diesem Gerät gelöscht.</string>
     <string name="quick_access_title">Schnellzugriff</string>
     <string name="quick_access_add">Zum Start hinzufügen</string>
     <string name="quick_access_remove">Vom Start entfernen</string>
@@ -32,6 +34,7 @@
     <string name="decoding_transcribing">Dekodieren &amp; Transkribieren auf dem Gerät…</string>
     <string name="transcribing_pct">Transkribieren… %1$d%%</string>
     <string name="transcribing_pct_eta">Transkribieren… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">Datei %1$d von %2$d</string>
     <string name="transcribe_stats_line">Gesamt %1$s · Dekodierung %2$s · Laden %3$s · Inferenz %4$s · Audio %5$s · RTF %6$s · PSS %7$s · Spitze %8$s · freier RAM %9$s</string>
     <string name="transcribe_stats_model">Modell: %1$s</string>
     <string name="transcribe_stats_model_memory">Modell-PSS %1$s · Lade-Delta %2$s</string>

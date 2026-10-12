@@ -27,7 +27,9 @@
     <string name="nav_settings">Settings</string>
     <string name="file_entry_sub">Pick an audio or video file and transcribe it</string>
     <string name="history_section_title">Recordings</string>
-    <string name="history_saved">Saved to recordings.</string>
+    <string name="history_clear_all">Clear all</string>
+    <string name="history_clear_title">Clear all recordings?</string>
+    <string name="history_clear_message">All kept transcripts will be permanently deleted from this device.</string>
     <string name="quick_access_title">Quick access</string>
     <string name="quick_access_add">Add to Home</string>
     <string name="quick_access_remove">Remove from Home</string>
@@ -36,6 +38,7 @@
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
     <string name="transcribing_pct">Transcribing… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribing… %1$d%% · %2$s</string>
+    <string name="transcribe_batch_position">File %1$d of %2$d</string>
     <string name="transcribe_stats_line">Total %1$s · decode %2$s · load %3$s · inference %4$s · audio %5$s · RTF %6$s · PSS %7$s · peak %8$s · free RAM %9$s</string>
     <string name="transcribe_stats_model">Model: %1$s</string>
     <string name="transcribe_stats_model_memory">Model PSS %1$s · load delta %2$s</string>
