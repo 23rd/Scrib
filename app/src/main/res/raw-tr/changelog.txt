@@ -1,0 +1,94 @@
+# 0.24
+• Ayarlara "Yenilikler ve değişiklik günlüğü" bölümü eklendi
+• Her güncellemeden sonra bir kez gösterilen sürüm notları eklendi
+# 0.23
+• Hızlı geçiş için modellerin Giriş sekmesine sabitlenmesi eklendi
+• Scrib giriş ekranının alt gezinme çubuğu eklendi
+• Modellerin paylaşılan depolamadan yüklenmesi eklendi
+• Sesli klavyeye özel ekleme tuşları eklendi
+• Uzun model adlarının yanında önerilen hapın kelime ortasından bölünmesi düzeltildi
+• Sözlük girdisi kopyasının örneği her dilde göstermesi düzeltildi
+# 0.22
+• Bilinmeyen model için uzak sunucunun no such endpoint yanıtlaması düzeltildi
+# 0.21
+• Yalnızca kendi sunucunuz üzerinden yazan üçüncü uygulama Scrib Remote eklendi
+• Üç yapının her mimarisi için apk eklendi
+• Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM ve daha fazlası için tek bir konuşma motoru eklendi
+• Android 14'ün altında sunucu üzerinden yazmanın başarısız olması düzeltildi
+• Sesli klavyeye hata nedeni eklendi
+# 0.20
+• Transkript metin düğmeleri simgelerle değiştirildi
+# 0.19
+• Sessizliği hiç kullanmayan modellerde sessiz atlama seçeneğinin gösterilmesi düzeltildi
+• Diskten eşlenen modellerde model belleğinin düşük görünmesi düzeltildi
+• Kelime değiştirmelerinin bölümler arasındaki boşluğu yemesi düzeltildi
+• Katlanmış model listelerinin hatırlanması eklendi
+• Okların indirme düğmesini sıkıştırması düzeltildi
+• İlerleme çubuklarının sonun ötesinde kalıntı göstermesi düzeltildi
+• Open Transcribe sözleşmesine zaman damgalı bölüm geri çağrıları eklendi
+# 0.18
+• Değiştirilen modellerin bellekte kalması düzeltildi
+# 0.17
+• Parakeet'in tepe bellek kullanımının kayıt süresine bağlı olması düzeltildi
+# 0.16
+• Canlı transkripsiyon performans metrikleri anahtarı eklendi
+# 0.15
+• Hafif F-Droid sürümünde değişiklik yok — bu sürüm yalnızca Scrib Max'ı etkiliyor
+# 0.14
+• Hafif F-Droid sürümünde değişiklik yok — bu sürüm yalnızca Scrib Max'ı etkiliyor
+# 0.13
+• Canlı transkripsiyon performans metrikleri eklendi
+• Kalıcı benchmark geçmişi ve karşılaştırma eklendi
+• Model yükleme ve bellek metrikleri eklendi
+• Benchmark geçmişi arayüzü iyileştirildi
+• Benchmark metrikleri rehberi ve çalışma zamanları eklendi
+• Toplu çalıştırıcı ve geçmiş eylemleri eklendi
+• Ses klavyesi ayarları ve metinleri iyileştirildi
+# 0.12
+• Hafif F-Droid sürümünde değişiklik yok — bu sürüm yalnızca Scrib Max'ı etkiliyor
+# 0.11
+• Hakkında ekranı artık gerçek uygulama sürümünü gösteriyor
+# 0.10
+• Sözlüğü içe ve dışa aktarma eklendi
+• Katlanabilir model bölümleri eklendi
+• Sesli klavyede etkin modelin gösterilmesi eklendi
+• Parakeet model desteği eklendi
+• İşlem sonlandıktan sonra bitmiş metnin korunması eklendi
+• Durdurmanın son sözcükleri kesmesi düzeltildi
+# 0.9
+• Sessizlikleri atlama eklendi: uzun duraklamalı kayıtlar daha çabuk biter
+• Uzun metinlere paragraf araları eklendi
+• İşlemcinizin desteklediği komutlar kullanılarak hız artırıldı
+• Birçok telefonda işlemci çekirdeklerinin yalnızca birkaçının kullanılması düzeltildi
+• Tüm işlemci mimarileri için evrensel indirme eklendi
+# 0.8
+• Herhangi bir uygulamaya dikte etmek için sesli klavye eklendi
+• Scrib'i klavye ayarlarından açın ve mikrofon tuşuna basın
+• Metin yazdığınız yere gelir, durunca klavyeniz geri döner
+# 0.7
+• Kalan süreyi gösteren ilerleme göstergesi eklendi
+• Yazıya dökme artık uygulamadan çıksanız da sürüyor
+• Yazıya dökme sırasında Kopyala ve Paylaş eklendi
+• Uzun kayıtlarda metnin güncellenmesi iyileştirildi
+# 0.6
+• Doğrudan mikrofondan yazıya döken ses kaydedici eklendi
+• Zaman damgalı SRT, VTT ve LRC yazı biçimleri eklendi
+# 0.5
+• Ses çözülürken yazıya dökme durdurulduğunda oluşan çökme düzeltildi
+# 0.4
+• Diğer uygulamalar için canlı yazıya dökme eklendi
+• GitHub sürümler sayfasına APK indirme eklendi
+# 0.3
+• Uzun kayıtlar yazıya dökülürken oluşan çökme düzeltildi
+• Uygulama, ses ve video dosyaları için sistem paylaşım menüsüne eklendi
+• Metni paylaşma ve .txt dosyası olarak kaydetme eklendi
+# 0.2
+• Açık temada görünmeyen gezinme düğmeleri düzeltildi
+• Uygulama simgesi ve afiş F-Droid sayfasına eklendi
+# 0.1
+İlk sürüm.
+• Açık Whisper modelleriyle cihazda ses yazıya dökme
+• Telefonunuzdaki herhangi bir ses dosyasını tamamen çevrimdışı yazıya dökün
+• Açık Open Transcribe sözleşmesi aracılığıyla diğer uygulamalar için çevrimdışı yazıya dökme motoru olarak çalışır
+• Model yöneticisi: ada veya dile göre indirme, özel model ekleme, .bin içe aktarma
+• 12 dilde mevcut

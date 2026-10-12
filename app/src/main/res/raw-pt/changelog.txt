@@ -1,0 +1,94 @@
+# 0.24
+• Adicionada uma secção de novidades e registo de alterações nas definições
+• Adicionadas notas de versão mostradas uma vez após cada atualização
+# 0.23
+• Adicionada a fixação de modelos no separador inicial para mudar rapidamente
+• Adicionada a barra de navegação inferior do ecrã inicial do Scrib
+• Adicionado o carregamento de modelos a partir do armazenamento partilhado
+• Adicionadas teclas de inserção personalizadas ao teclado de voz
+• Corrigida a pílula recomendada a partir a meio de palavra junto a nomes longos de modelos
+• Corrigida a cópia de entradas do dicionário a mostrar o exemplo em todos os idiomas
+# 0.22
+• Corrigido o endpoint remoto a responder no such endpoint para um modelo desconhecido
+# 0.21
+• Adicionado o Scrib Remote, um terceiro app que transcreve só pelo seu endpoint
+• Adicionados apk por arquitetura das três builds
+• Adicionado um motor de voz para Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM e mais
+• Corrigida a transcrição por endpoint falhando abaixo do Android 14
+• Adicionado o motivo da falha ao teclado de voz
+# 0.20
+• Substituídos os botões de texto da transcrição por ícones
+# 0.19
+• Corrigida oferta de pular silêncios em modelos que não usam isso
+• Corrigida memória do modelo exibida baixa em modelos mapeados do disco
+• Corrigidas substituições de palavras comendo o espaço entre segmentos
+• Adicionado lembrar das listas de modelos recolhidas
+• Corrigidas setas apertando o botão de download
+• Corrigidas barras de progresso mostrando um resto depois do fim
+• Adicionados callbacks de segmento com marca de tempo ao contrato do Open Transcribe
+# 0.18
+• Corrigida permanência na memória dos modelos substituídos
+# 0.17
+• Corrigido o pico de memória do Parakeet conforme a duração da gravação
+# 0.16
+• Adicionado interruptor de métricas de desempenho da transcrição ao vivo
+# 0.15
+• Sem alterações na versão leve do F-Droid — este lançamento afeta apenas o Scrib Max
+# 0.14
+• Sem alterações na versão leve do F-Droid — este lançamento afeta apenas o Scrib Max
+# 0.13
+• Adicionadas métricas de desempenho da transcrição ao vivo
+• Adicionados histórico persistente de benchmarks e comparação
+• Adicionadas métricas de carregamento e memória dos modelos
+• Melhorada a interface do histórico de benchmarks
+• Adicionados guia de métricas e horários das execuções
+• Adicionados executor em lote e ações de histórico
+• Melhoradas configurações e textos do teclado por voz
+# 0.12
+• Sem alterações na versão leve do F-Droid — este lançamento afeta apenas o Scrib Max
+# 0.11
+• A tela “Sobre” agora mostra a versão real do app
+# 0.10
+• Adicionadas a importação e a exportação do dicionário
+• Adicionadas seções de modelos recolhíveis
+• Adicionada a exibição do modelo ativo no teclado de voz
+• Adicionado o suporte a modelos Parakeet
+• Adicionada a preservação da transcrição concluída ao encerrar o processo
+• Corrigido o corte das palavras finais ao parar
+# 0.9
+• Adicionado o salto de silêncios: gravações com pausas longas terminam mais rápido
+• Adicionadas quebras de parágrafo nas transcrições longas
+• Velocidade melhorada usando as instruções que seu processador suporta
+• Corrigida a transcrição que usava apenas alguns núcleos em muitos celulares
+• Adicionado um download universal para todas as arquiteturas de processador
+# 0.8
+• Adicionado o teclado de voz para ditar em qualquer app
+• Ative o Scrib nas configurações de teclado e toque na tecla de microfone
+• O texto vai para onde você estava escrevendo e seu teclado volta ao parar
+# 0.7
+• Adicionado o indicador de progresso com o tempo restante
+• A transcrição agora continua mesmo se você sair do app
+• Adicionados Copiar e Compartilhar durante a transcrição
+• Melhorada a atualização do texto em gravações longas
+# 0.6
+• Adicionado um gravador de voz que transcreve direto do microfone
+• Adicionados os formatos de transcrição com marcação de tempo SRT, VTT e LRC
+# 0.5
+• Corrigida a falha ao interromper a transcrição durante a decodificação do áudio
+# 0.4
+• Adicionada a transcrição ao vivo para outros aplicativos
+• Adicionado o download do APK na página de versões do GitHub
+# 0.3
+• Corrigida a falha ao transcrever gravações longas
+• Adicionado o aplicativo ao menu de compartilhamento do sistema para arquivos de áudio e vídeo
+• Adicionado o compartilhamento da transcrição e o salvamento como arquivo .txt
+# 0.2
+• Corrigidos os botões de navegação invisíveis no tema claro
+• Adicionados o ícone do aplicativo e o banner na página do F-Droid
+# 0.1
+Primeira versão.
+• Transcrição de voz no dispositivo com modelos Whisper abertos
+• Transcreva qualquer arquivo de áudio do seu telefone, totalmente offline
+• Funciona como mecanismo de transcrição offline para outros apps pelo contrato aberto Open Transcribe
+• Gerenciador de modelos: baixe por nome ou por idioma, adicione modelos próprios, importe arquivos .bin
+• Disponível em 12 idiomas

@@ -1,0 +1,94 @@
+# 0.24
+• Dodano sekcję „Nowości i historia zmian" w ustawieniach
+• Dodano informacje o wydaniu pokazywane raz po każdej aktualizacji
+# 0.23
+• Dodano przypinanie modeli do zakładki głównej w celu szybkiego przełączania
+• Dodano dolny pasek nawigacyjny ekranu głównego Scrib
+• Dodano wczytywanie modeli z pamięci współdzielonej
+• Dodano własne klawisze wstawiania do klawiatury głosowej
+• Naprawiono łamanie zalecanej pigułki w połowie słowa obok długich nazw modeli
+• Naprawiono pokazywanie przykładu w kopii wpisu słownikowego w każdym języku
+# 0.22
+• Naprawiono odpowiadanie zdalnego endpointa no such endpoint dla nieznanego modelu
+# 0.21
+• Dodano Scrib Remote, trzecią aplikację transkrybującą wyłącznie przez własny endpoint
+• Dodano apk dla każdej architektury trzech kompilacji
+• Dodano jeden silnik mowy dla Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM i innych
+• Naprawiono transkrypcję przez endpoint poniżej Androida 14
+• Dodano przyczynę błędu do klawiatury głosowej
+# 0.20
+• Zastąpiono przyciski tekstowe transkrypcji ikonami
+# 0.19
+• Naprawiono proponowanie pomijania ciszy w modelach, które jej nie używają
+• Naprawiono zaniżone zużycie pamięci modeli mapowanych z dysku
+• Naprawiono połykanie spacji między segmentami przez podmiany słów
+• Dodano zapamiętywanie zwiniętych list modeli
+• Naprawiono strzałki zasłaniające przycisk pobierania
+• Naprawiono paski postępu pokazujące kawałek za końcem
+• Dodano znaczniki czasowe wywołań zwrotnych segmentów do kontraktu Open Transcribe
+# 0.18
+• Naprawiono pozostawanie w pamięci modeli zastąpionych
+# 0.17
+• Naprawiono szczytowe zużycie pamięci przez Parakeet zależne od długości nagrania
+# 0.16
+• Dodano przełącznik metryk wydajności transkrypcji na żywo
+# 0.15
+• Brak zmian w lekkiej wersji F-Droid — to wydanie dotyczy tylko Scrib Max
+# 0.14
+• Brak zmian w lekkiej wersji F-Droid — to wydanie dotyczy tylko Scrib Max
+# 0.13
+• Dodano metryki wydajności transkrypcji na żywo
+• Dodano trwałą historię benchmarków i porównanie
+• Dodano metryki ładowania modeli i pamięci
+• Ulepszono interfejs historii benchmarków
+• Dodano przewodnik metryk i znaczniki czasu
+• Dodano runner wsadowy i akcje historii
+• Ulepszono ustawienia i teksty klawiatury głosowej
+# 0.12
+• Brak zmian w lekkiej wersji F-Droid — to wydanie dotyczy tylko Scrib Max
+# 0.11
+• Ekran O aplikacji pokazuje teraz prawdziwą wersję
+# 0.10
+• Dodano import i eksport słownika
+• Dodano zwijane sekcje modeli
+• Dodano wyświetlanie aktywnego modelu w klawiaturze głosowej
+• Dodano obsługę modeli Parakeet
+• Dodano zachowywanie gotowej transkrypcji po zamknięciu procesu
+• Naprawiono ucinanie końcowych słów przez zatrzymanie
+# 0.9
+• Dodano pomijanie ciszy — nagrania z długimi pauzami kończą się szybciej
+• Dodano akapity w długich transkrypcjach
+• Przyspieszono działanie dzięki instrukcjom obsługiwanym przez procesor
+• Naprawiono transkrypcję, która na wielu telefonach używała tylko kilku rdzeni
+• Dodano uniwersalny plik do pobrania dla wszystkich architektur procesorów
+# 0.8
+• Dodano klawiaturę głosową do dyktowania w dowolnej aplikacji
+• Włącz Scrib w systemowych ustawieniach klawiatur i naciśnij klawisz mikrofonu
+• Tekst trafia tam, gdzie piszesz, a klawiatura wraca po zatrzymaniu
+# 0.7
+• Dodano wskaźnik postępu z pozostałym czasem
+• Transkrypcja działa teraz dalej po wyjściu z aplikacji
+• Dodano Kopiuj i Udostępnij w trakcie transkrypcji
+• Ulepszono aktualizowanie tekstu przy długich nagraniach
+# 0.6
+• Dodano dyktafon, który transkrybuje prosto z mikrofonu
+• Dodano formaty transkrypcji SRT, VTT i LRC ze znacznikami czasu
+# 0.5
+• Naprawiono awarię przy przerwaniu transkrypcji podczas dekodowania dźwięku
+# 0.4
+• Dodano transkrypcję na żywo dla innych aplikacji
+• Dodano pobieranie pliku APK ze strony wydań GitHuba
+# 0.3
+• Naprawiono awarię podczas transkrypcji długich nagrań
+• Dodano aplikację do systemowego menu udostępniania dla plików audio i wideo
+• Dodano udostępnianie transkrypcji i zapisywanie jej jako pliku .txt
+# 0.2
+• Naprawiono niewidoczne przyciski nawigacji w jasnym motywie
+• Dodano ikonę aplikacji i baner na stronie F-Droid
+# 0.1
+Pierwsze wydanie.
+• Transkrypcja mowy na urządzeniu z otwartymi modelami Whisper
+• Transkrybuj dowolny plik audio w telefonie, całkowicie offline
+• Działa jako offline'owy silnik transkrypcji dla innych aplikacji przez otwarty kontrakt Open Transcribe
+• Menedżer modeli: pobieranie po nazwie lub języku, dodawanie własnych modeli, import plików .bin
+• Dostępne w 12 językach

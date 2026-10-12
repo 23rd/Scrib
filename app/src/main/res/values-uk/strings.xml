@@ -222,4 +222,7 @@
     <string name="about_dev_h">Для розробників</string>
     <string name="about_dev_b">Будь-який застосунок може використовувати Scrib як офлайн-розпізнавач через відкритий контракт Open Transcribe (org.opentranscribe.api) — невеликий AIDL-сервіс, без SDK і без мережі. Контракт вендор-нейтральний, тож застосунки не прив’язані до Scrib: вони можуть під’єднати будь-який сумісний розпізнавач, установлений користувачем.</string>
     <string name="about_version">Версія %s</string>
+    <string name="whats_new_entry_title">Що нового та історія змін</string>
+    <string name="whats_new_entry_sub">Нотатки до попередніх версій</string>
+    <string name="whats_new_title">Що нового у %1$s</string>
 </resources>

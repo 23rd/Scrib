@@ -242,4 +242,7 @@
     <string name="about_dev_h">For developers</string>
     <string name="about_dev_b">Any app can use Scrib as an offline transcriber through the open Open Transcribe contract (org.opentranscribe.api) — a small AIDL service, no SDK and no network. The contract is vendor-neutral, so apps aren\'t tied to Scrib: they can bind any compatible transcriber the user has installed.</string>
     <string name="about_version">Version %s</string>
+    <string name="whats_new_entry_title">What\'s new and changelog</string>
+    <string name="whats_new_entry_sub">Release notes of past versions</string>
+    <string name="whats_new_title">What\'s new in %1$s</string>
 </resources>

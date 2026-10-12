@@ -1,0 +1,94 @@
+# 0.24
+• Added a What's new and changelog section in Settings
+• Added release notes shown once after each update
+# 0.23
+• Added pinning of models to Home tab for quick switching
+• Added bottom navigation bar of Scrib home screen
+• Added loading of models from shared storage
+• Added custom insert keys to voice keyboard
+• Fixed recommended pill breaking mid-word beside long model names
+• Fixed dictionary entry copy showing example in every locale
+# 0.22
+• Fixed remote endpoint answering no such endpoint for unknown model
+# 0.21
+• Added Scrib Remote, a third app that transcribes through your own endpoint and nothing else
+• Added per-architecture apks of three builds
+• Added one speech engine for Whisper, Parakeet, SenseVoice, Canary, Moonshine, GigaAM and more
+• Fixed endpoint transcription failing on Android below 14
+• Added the failure reason to the voice keyboard
+# 0.20
+• Replaced transcript text buttons with icon buttons
+# 0.19
+• Fixed silence skip offered for models that never use it
+• Fixed model memory reading low for models mapped from disk
+• Fixed word replacements eating the space between segments
+• Added remembering of folded model lists
+• Fixed arrows crowding the download button
+• Fixed progress bars showing a stub past the end
+• Added timed segment callbacks to the Open Transcribe contract
+# 0.18
+• Fixed switched-away models staying resident in memory
+# 0.17
+• Fixed Parakeet peak memory growing with recording length
+# 0.16
+• Added switch for live performance stats
+# 0.15
+• No changes to the lean F-Droid build — this release only touched Scrib Max
+# 0.14
+• No changes to the lean F-Droid build — this release only touched Scrib Max
+# 0.13
+• Added live transcription performance metrics
+• Added persistent benchmark history and comparison
+• Added model load and memory metrics
+• Improved benchmark history UI
+• Added benchmark metric guide and timestamps
+• Added batch runner and history actions
+• Improved voice keyboard settings and copy
+# 0.12
+• No changes to the lean F-Droid build — this release only touched Scrib Max
+# 0.11
+• About screen now shows the real app version
+# 0.10
+• Added import and export of word dictionary
+• Added collapsible model sections
+• Added showing of active model in voice keyboard
+• Added Parakeet model support
+• Added keeping of finished transcript after process death
+• Fixed stop tap cutting trailing words
+# 0.9
+• Added silence skipping so recordings with long pauses finish sooner
+• Added paragraph breaks to long transcripts
+• Improved speed by using the processor instructions your phone supports
+• Fixed transcription running on only a few of the processor cores on many phones
+• Added a universal download that runs on all processor architectures
+# 0.8
+• Added voice keyboard that dictates into any app
+• Switch Scrib on in system keyboard settings, then press the microphone key
+• Dictated text lands where you were writing, and your keyboard comes back when you stop
+# 0.7
+• Added transcription progress with estimated time left
+• Added background transcription that keeps running when you leave the app
+• Added Copy and Share while a transcription is still running
+• Improved transcript updates on long recordings
+# 0.6
+• Added a voice recorder that transcribes straight from the microphone
+• Added timestamped SRT, VTT and LRC transcript formats
+# 0.5
+• Fixed the crash when transcription was interrupted while decoding audio
+# 0.4
+• Added live transcription for other apps through the transcription API
+• Added APK downloads on the GitHub releases page
+# 0.3
+• Fixed the crash when transcribing long recordings
+• Added the app to the system share sheet for audio and video files
+• Added transcript sharing and saving as a .txt file
+# 0.2
+• Fixed the navigation bar buttons being invisible in the light theme
+• Added the app icon and banner to the F-Droid listing
+# 0.1
+First release.
+• On-device voice transcription with open Whisper models
+• Transcribe any audio file on your phone, fully offline
+• Works as an offline transcription engine for other apps via the open Open Transcribe contract
+• Model manager: download by name or by language, add custom models, import .bin files
+• Available in 12 languages

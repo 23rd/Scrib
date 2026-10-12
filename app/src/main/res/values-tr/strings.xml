@@ -222,4 +222,7 @@
     <string name="about_dev_h">Geliştiriciler için</string>
     <string name="about_dev_b">Herhangi bir uygulama, açık Open Transcribe sözleşmesi (org.opentranscribe.api) aracılığıyla Scrib\'i çevrimdışı yazıya dökücü olarak kullanabilir — küçük bir AIDL hizmeti, SDK ve ağ olmadan. Sözleşme sağlayıcıdan bağımsızdır, bu yüzden uygulamalar Scrib\'e bağlı değildir: kullanıcının kurduğu herhangi bir uyumlu yazıya dökücüyü bağlayabilirler.</string>
     <string name="about_version">Sürüm %s</string>
+    <string name="whats_new_entry_title">Yenilikler ve değişiklik günlüğü</string>
+    <string name="whats_new_entry_sub">Önceki sürümlerin sürüm notları</string>
+    <string name="whats_new_title">%1$s sürümündeki yenilikler</string>
 </resources>

@@ -222,4 +222,7 @@
     <string name="about_dev_h">Dla programistów</string>
     <string name="about_dev_b">Każda aplikacja może używać Scrib jako transkryptora offline przez otwarty kontrakt Open Transcribe (org.opentranscribe.api) — mała usługa AIDL, bez SDK i bez sieci. Kontrakt jest neutralny wobec dostawcy, więc aplikacje nie są powiązane ze Scrib: mogą podłączyć dowolny zgodny transkryptor zainstalowany przez użytkownika.</string>
     <string name="about_version">Wersja %s</string>
+    <string name="whats_new_entry_title">Nowości i historia zmian</string>
+    <string name="whats_new_entry_sub">Informacje o poprzednich wersjach</string>
+    <string name="whats_new_title">Nowości w wersji %1$s</string>
 </resources>

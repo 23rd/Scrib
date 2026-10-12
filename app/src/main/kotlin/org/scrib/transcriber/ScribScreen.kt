@@ -159,6 +159,8 @@ fun ScribScreen(
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var showBenchmarks by rememberSaveable { mutableStateOf(false) }
     var openHistoryId by rememberSaveable { mutableStateOf<String?>(null) }
+    var showChangelog by rememberSaveable { mutableStateOf(false) }
+    var showWhatsNew by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
     var modelsExpanded by remember { mutableStateOf(SectionState.standardModels(context)) }
@@ -192,6 +194,12 @@ fun ScribScreen(
     LaunchedEffect(started) {
         if (started && android.os.Build.VERSION.SDK_INT >= 33) {
             notifications.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (Changelog.shouldAnnounce(context)) {
+            showWhatsNew = true
         }
     }
 
@@ -252,6 +260,7 @@ fun ScribScreen(
                             showBenchmarks = true
                         }
                     },
+                    onOpenChangelog = { showChangelog = true },
                     onSelfTest = onSelfTest,
                     onBenchmarkFile = { benchmarkPicker.launch(arrayOf("audio/*", "video/*")) },
                     onCancelBenchmark = onCancelBenchmark,
@@ -309,6 +318,18 @@ fun ScribScreen(
             confirmButton = { TextButton(onClick = { onDelete(target); deleteTarget = null }) { Text(stringResource(R.string.action_delete)) } },
             dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text(stringResource(R.string.action_cancel)) } }
         )
+    }
+    if (showChangelog) {
+        ChangelogDialog(remember { Changelog.load(context) }, onDismiss = { showChangelog = false })
+    }
+    if (showWhatsNew) {
+        val release = remember { Changelog.load(context).firstOrNull() }
+        if (release != null) {
+            WhatsNewDialog(release, onClose = {
+                showWhatsNew = false
+                Changelog.markAnnounced(context)
+            })
+        }
     }
 }
 
@@ -789,6 +810,7 @@ private fun SettingsTab(
     onLiveStats: (Boolean) -> Unit,
     onOpenDictionary: () -> Unit,
     onOpenBenchmarks: () -> Unit,
+    onOpenChangelog: () -> Unit,
     onSelfTest: () -> Unit,
     onBenchmarkFile: () -> Unit,
     onCancelBenchmark: () -> Unit,
@@ -900,6 +922,7 @@ private fun SettingsTab(
         if (BuildConfig.LOCAL_MODELS) {
             item { BenchmarkEntry(state.benchmarkRuns, onOpenBenchmarks) }
         }
+        item { ChangelogEntry(onOpenChangelog) }
     }
 }
 
@@ -1962,6 +1985,73 @@ private fun BenchmarkHistoryDialog(
         },
         confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
     )
+}
+
+@Composable
+private fun ChangelogDialog(releases: List<Changelog.Release>, onDismiss: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = cs.background,
+        tonalElevation = 0.dp,
+        title = { Text(stringResource(R.string.whats_new_entry_title)) },
+        text = {
+            Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
+                releases.forEachIndexed { i, release ->
+                    Text(
+                        release.version,
+                        fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = cs.primary,
+                        modifier = Modifier.padding(top = if (i == 0) 0.dp else 14.dp, bottom = 4.dp)
+                    )
+                    release.lines.forEach { line ->
+                        Text(line, fontSize = 12.5.sp, lineHeight = 18.sp, color = cs.onSurfaceVariant)
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
+    )
+}
+
+@Composable
+private fun WhatsNewDialog(release: Changelog.Release, onClose: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onClose,
+        containerColor = cs.background,
+        tonalElevation = 0.dp,
+        title = { Text(stringResource(R.string.whats_new_title, release.version)) },
+        text = {
+            Column {
+                release.lines.forEach { line ->
+                    Text(line, fontSize = 13.sp, lineHeight = 19.sp, color = cs.onSurfaceVariant)
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.action_close)) } }
+    )
+}
+
+@Composable
+private fun ChangelogEntry(onClick: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+    ) {
+        Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("✨", fontSize = 18.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.whats_new_entry_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(stringResource(R.string.whats_new_entry_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp)
+            }
+            Spacer(Modifier.width(16.dp))
+            Text("›", fontSize = 22.sp, color = cs.onSurfaceVariant)
+        }
+    }
 }
 
 @Composable
