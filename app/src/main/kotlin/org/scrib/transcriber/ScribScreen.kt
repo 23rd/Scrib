@@ -1601,7 +1601,7 @@ private fun TranscriptionDialog(
                 if (hasText) {
                     Spacer(Modifier.height(12.dp))
                     if (finished && t.segments.isNotEmpty()) {
-                        FormatPicker(t.format, onFormat)
+                        FormatPicker(t.format, onFormat, t.segments.any { it.words.isNotEmpty() })
                         Spacer(Modifier.height(10.dp))
                     }
                     Row(
@@ -1811,10 +1811,18 @@ private fun RunProgress(t: TranscribeUi) {
 // Plain text, or one of the timestamped formats. The pick drives the view as well as the export,
 // so what is copied or saved is what was on screen.
 @Composable
-private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat) -> Unit) {
+private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat) -> Unit, hasWords: Boolean) {
     val cs = MaterialTheme.colorScheme
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
+    @OptIn(ExperimentalLayoutApi::class)
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         TranscriptFormat.entries.forEach { format ->
+            if (format == TranscriptFormat.WORDS && !hasWords) {
+                return@forEach
+            }
             val on = format == selected
             Surface(
                 color = if (on) cs.primary else cs.surfaceContainer,

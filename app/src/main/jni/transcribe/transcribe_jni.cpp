@@ -152,6 +152,8 @@ void fill_run_params(const loaded_model *meta, transcribe_run_params *params,
     }
     if (meta == nullptr || meta->max_timestamps == TRANSCRIBE_TIMESTAMPS_NONE) {
         params->timestamps = TRANSCRIBE_TIMESTAMPS_NONE;
+    } else if (meta->max_timestamps >= TRANSCRIBE_TIMESTAMPS_WORD) {
+        params->timestamps = TRANSCRIBE_TIMESTAMPS_WORD;
     } else {
         params->timestamps = TRANSCRIBE_TIMESTAMPS_SEGMENT;
     }
@@ -499,6 +501,74 @@ Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeSegmentBounds(JNIE
     jlongArray out = env->NewLongArray(static_cast<jsize>(bounds.size()));
     env->SetLongArrayRegion(out, 0, static_cast<jsize>(bounds.size()), bounds.data());
     return out;
+}
+
+JNIEXPORT jintArray JNICALL
+Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeSegmentWordRanges(JNIEnv *env, jobject,
+                                                              jlong sessionPtr,
+                                                              jint fromIndex) {
+    auto *live = reinterpret_cast<live_session *>(sessionPtr);
+    const jint count = live == nullptr ? 0 : transcribe_n_segments(live->session);
+    if (count <= fromIndex) {
+        return env->NewIntArray(0);
+    }
+    std::vector<jint> ranges;
+    ranges.reserve(static_cast<size_t>(count - fromIndex) * 2);
+    for (jint i = fromIndex; i < count; ++i) {
+        transcribe_segment segment;
+        transcribe_segment_init(&segment);
+        if (transcribe_get_segment(live->session, i, &segment) != TRANSCRIBE_OK) {
+            ranges.push_back(0);
+            ranges.push_back(0);
+            continue;
+        }
+        ranges.push_back(segment.first_word);
+        ranges.push_back(segment.n_words);
+    }
+    jintArray out = env->NewIntArray(static_cast<jsize>(ranges.size()));
+    env->SetIntArrayRegion(out, 0, static_cast<jsize>(ranges.size()), ranges.data());
+    return out;
+}
+
+JNIEXPORT jlongArray JNICALL
+Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeWordBounds(JNIEnv *env, jobject, jlong sessionPtr,
+                                                              jint fromIndex) {
+    auto *live = reinterpret_cast<live_session *>(sessionPtr);
+    const jint count = live == nullptr ? 0 : transcribe_n_words(live->session);
+    if (count <= fromIndex) {
+        return env->NewLongArray(0);
+    }
+    std::vector<jlong> bounds;
+    bounds.reserve(static_cast<size_t>(count - fromIndex) * 2);
+    for (jint i = fromIndex; i < count; ++i) {
+        transcribe_word word;
+        transcribe_word_init(&word);
+        if (transcribe_get_word(live->session, i, &word) != TRANSCRIBE_OK) {
+            bounds.push_back(0);
+            bounds.push_back(0);
+            continue;
+        }
+        bounds.push_back(static_cast<jlong>(word.t0_ms));
+        bounds.push_back(static_cast<jlong>(word.t1_ms));
+    }
+    jlongArray out = env->NewLongArray(static_cast<jsize>(bounds.size()));
+    env->SetLongArrayRegion(out, 0, static_cast<jsize>(bounds.size()), bounds.data());
+    return out;
+}
+
+JNIEXPORT jstring JNICALL
+Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeWordText(JNIEnv *env, jobject, jlong sessionPtr,
+                                                              jint index) {
+    auto *live = reinterpret_cast<live_session *>(sessionPtr);
+    if (live == nullptr) {
+        return nullptr;
+    }
+    transcribe_word word;
+    transcribe_word_init(&word);
+    if (transcribe_get_word(live->session, index, &word) != TRANSCRIBE_OK) {
+        return nullptr;
+    }
+    return word.text == nullptr ? nullptr : env->NewStringUTF(word.text);
 }
 
 JNIEXPORT jboolean JNICALL

@@ -8,8 +8,11 @@ data class TranscriptSegment(
     val startMs: Long,
     val endMs: Long,
     val text: String,
-    val startsParagraph: Boolean = false
+    val startsParagraph: Boolean = false,
+    val words: List<TranscriptWord> = emptyList()
 )
+
+data class TranscriptWord(val startMs: Long, val endMs: Long, val text: String)
 
 // A stretch of the recording that held speech, as heard by the VAD.
 data class SpeechSpan(val startMs: Long, val endMs: Long)
@@ -20,7 +23,8 @@ enum class TranscriptFormat(val extension: String) {
     TXT("txt"),
     SRT("srt"),
     VTT("vtt"),
-    LRC("lrc")
+    LRC("lrc"),
+    WORDS("txt")
 }
 
 fun List<TranscriptSegment>.format(format: TranscriptFormat): String = when (format) {
@@ -34,6 +38,17 @@ fun List<TranscriptSegment>.format(format: TranscriptFormat): String = when (for
     TranscriptFormat.LRC -> joinToString(separator = "\n", postfix = "\n") {
         "[${lrcClock(it.startMs)}] ${it.text.trim()}"
     }
+    TranscriptFormat.WORDS -> {
+        val hours = any { it.endMs >= 3_600_000 }
+        flatMap { it.words }.joinToString(separator = "\n", postfix = "\n") {
+            "${wordClock(it.startMs, hours)} --> ${wordClock(it.endMs, hours)} ${it.text.trim()}"
+        }
+    }
+}
+
+private fun wordClock(ms: Long, hours: Boolean): String {
+    val t = ms.coerceAtLeast(0)
+    return if (hours) clock(t, ',') else String.format(Locale.ROOT, "%02d:%02d,%03d", t / 60_000, t / 1000 % 60, t % 1000)
 }
 
 // A pause long enough to read as a change of speaker or of thought. Whisper's segment bounds are

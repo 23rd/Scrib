@@ -382,12 +382,18 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 return listOf(TranscriptSegment(originalMs(offset), originalMs(offset + length), replace(result.text)))
             }
             return segments.map { segment ->
-                val from = (offset * 1000L / SAMPLE_RATE) + segment.startMs
-                val to = (offset * 1000L / SAMPLE_RATE) + segment.endMs
+                val base = offset * 1000L / SAMPLE_RATE
                 TranscriptSegment(
-                    originalMsAt(from),
-                    originalMsAt(to),
-                    replace(segment.text)
+                    originalMsAt(base + segment.startMs),
+                    originalMsAt(base + segment.endMs),
+                    replace(segment.text),
+                    words = segment.words.map { word ->
+                        TranscriptWord(
+                            originalMsAt(base + word.startMs),
+                            originalMsAt(base + word.endMs),
+                            word.text
+                        )
+                    }
                 )
             }
         }

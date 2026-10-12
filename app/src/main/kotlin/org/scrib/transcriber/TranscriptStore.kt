@@ -15,13 +15,24 @@ object TranscriptStore {
         try {
             val segments = JSONArray()
             transcript.segments.forEach {
-                segments.put(
-                    JSONObject()
-                        .put(START, it.startMs)
-                        .put(END, it.endMs)
-                        .put(TEXT, it.text)
-                        .put(PARAGRAPH, it.startsParagraph)
-                )
+                val segment = JSONObject()
+                    .put(START, it.startMs)
+                    .put(END, it.endMs)
+                    .put(TEXT, it.text)
+                    .put(PARAGRAPH, it.startsParagraph)
+                if (it.words.isNotEmpty()) {
+                    val words = JSONArray()
+                    it.words.forEach { word ->
+                        words.put(
+                            JSONArray()
+                                .put(word.startMs)
+                                .put(word.endMs)
+                                .put(word.text)
+                        )
+                    }
+                    segment.put(WORDS, words)
+                }
+                segments.put(segment)
             }
             val json = JSONObject()
                 .put(NAME, transcript.fileName)
@@ -72,12 +83,21 @@ object TranscriptStore {
         val segments = ArrayList<TranscriptSegment>(array.length())
         for (i in 0 until array.length()) {
             val segment = array.getJSONObject(i)
+            val wordsJson = segment.optJSONArray(WORDS)
+            val words = ArrayList<TranscriptWord>(wordsJson?.length() ?: 0)
+            for (j in 0 until (wordsJson?.length() ?: 0)) {
+                val word = wordsJson?.optJSONArray(j) ?: continue
+                if (word.length() >= 3) {
+                    words.add(TranscriptWord(word.optLong(0), word.optLong(1), word.optString(2)))
+                }
+            }
             segments.add(
                 TranscriptSegment(
                     segment.optLong(START),
                     segment.optLong(END),
                     segment.optString(TEXT),
-                    segment.optBoolean(PARAGRAPH)
+                    segment.optBoolean(PARAGRAPH),
+                    words
                 )
             )
         }
@@ -125,4 +145,5 @@ object TranscriptStore {
     private const val START = "start"
     private const val END = "end"
     private const val PARAGRAPH = "paragraph"
+    private const val WORDS = "words"
 }

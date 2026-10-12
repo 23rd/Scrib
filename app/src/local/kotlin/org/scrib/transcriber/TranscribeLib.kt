@@ -20,7 +20,14 @@ class TranscribeModelInfo(
     val isUnbounded: Boolean = maxAudioMs <= 0L
 }
 
-class TranscribeSegmentData(val startMs: Long, val endMs: Long, val text: String)
+class TranscribeWordData(val startMs: Long, val endMs: Long, val text: String)
+
+class TranscribeSegmentData(
+    val startMs: Long,
+    val endMs: Long,
+    val text: String,
+    val words: List<TranscribeWordData> = emptyList()
+)
 
 class TranscribeAbort internal constructor(internal var ptr: Long) {
 
@@ -208,14 +215,33 @@ class TranscribeSession internal constructor(private var ptr: Long, private val 
             return emptyList()
         }
         val bounds = TranscribeLib.nativeSegmentBounds(ptr, 0)
+        val wordRanges = TranscribeLib.nativeSegmentWordRanges(ptr, 0)
+        val hasWords = wordRanges.any { it != 0 }
+        val wordBounds = if (hasWords) TranscribeLib.nativeWordBounds(ptr, 0) else LongArray(0)
         val segments = ArrayList<TranscribeSegmentData>(count)
         for (i in 0 until count) {
             val text = TranscribeLib.nativeSegmentText(ptr, i)?.takeIf { it.isNotBlank() } ?: continue
+            val words = ArrayList<TranscribeWordData>()
+            if (hasWords && i * 2 + 1 < wordRanges.size) {
+                val first = wordRanges[i * 2]
+                val wordCount = wordRanges[i * 2 + 1]
+                for (j in first until first + wordCount) {
+                    val wordText = TranscribeLib.nativeWordText(ptr, j) ?: continue
+                    words.add(
+                        TranscribeWordData(
+                            if (j * 2 + 1 < wordBounds.size) wordBounds[j * 2] else 0,
+                            if (j * 2 + 1 < wordBounds.size) wordBounds[j * 2 + 1] else 0,
+                            wordText
+                        )
+                    )
+                }
+            }
             segments.add(
                 TranscribeSegmentData(
                     if (i * 2 + 1 < bounds.size) bounds[i * 2] else 0,
                     if (i * 2 + 1 < bounds.size) bounds[i * 2 + 1] else 0,
-                    text
+                    text,
+                    words
                 )
             )
         }
@@ -322,6 +348,9 @@ private class TranscribeLib {
         external fun nativeSegmentCount(sessionPtr: Long): Int
         external fun nativeSegmentText(sessionPtr: Long, index: Int): String?
         external fun nativeSegmentBounds(sessionPtr: Long, fromIndex: Int): LongArray
+        external fun nativeSegmentWordRanges(sessionPtr: Long, fromIndex: Int): IntArray
+        external fun nativeWordText(sessionPtr: Long, index: Int): String?
+        external fun nativeWordBounds(sessionPtr: Long, fromIndex: Int): LongArray
         external fun nativeWasAborted(sessionPtr: Long): Boolean
 
         external fun nativeStreamBegin(
