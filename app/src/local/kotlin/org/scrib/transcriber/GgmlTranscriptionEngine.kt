@@ -210,7 +210,10 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit
     ): List<TranscriptSegment> {
-        val windows = (audio.sampleCount + window - 1) / window
+        var windows = (audio.sampleCount + window - 1) / window
+        if (windows > 1 && audio.sampleCount - (windows - 1) * window < MIN_TRANSCRIBABLE_WINDOW_SAMPLES) {
+            windows -= 1
+        }
         val segments = ArrayList<TranscriptSegment>(windows)
         val cumulative = StringBuilder()
         for (i in 0 until windows) {
@@ -218,7 +221,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 throw CancelledException()
             }
             val offset = i * window
-            val length = minOf(window, audio.sampleCount - offset)
+            val length = if (i == windows - 1) audio.sampleCount - offset else window
             onProgress(i * 100 / windows)
             val result = runUtterance(
                 live, info, audio, offset, length, language, abort,
@@ -461,5 +464,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         const val SAMPLE_RATE = 16000
 
         const val WINDOW_SAMPLES = SAMPLE_RATE * 30
+
+        const val MIN_TRANSCRIBABLE_WINDOW_SAMPLES = SAMPLE_RATE
     }
 }
