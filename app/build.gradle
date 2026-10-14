@@ -162,6 +162,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
+    testImplementation 'junit:junit:4.13.2'
     if (max) {
         if (!file('libs/sherpa-onnx.aar').exists()) {
             throw new GradleException("Missing app/libs/sherpa-onnx.aar — run scripts/download-sherpa-onnx.sh first")

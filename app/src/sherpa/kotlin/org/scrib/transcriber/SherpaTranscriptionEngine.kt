@@ -223,7 +223,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         if (cancellation.isCancelled) {
             throw CancelledException()
         }
-        return segments
+        return finishSegments(segments, emptyList())
     }
 
     private fun transcribeWithVad(
@@ -311,7 +311,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             throw CancelledException()
         }
         onProgress(100)
-        return markParagraphs(segments, speech)
+        return finishSegments(segments, speech)
     }
 
     private fun decodeWindow(samples: FloatArray, languageHint: String? = null): String {

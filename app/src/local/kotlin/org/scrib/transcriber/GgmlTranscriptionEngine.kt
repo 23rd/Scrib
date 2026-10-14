@@ -185,7 +185,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 throw CancelledException()
             }
             onProgress(100)
-            return markParagraphs(
+            return finishSegments(
                 audio.segmentsOf(result, 0, audio.sampleCount) { text ->
                     Dictionary.applyReplacements(appContext, text)
                 },
@@ -233,13 +233,13 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            for (segment in audio.segmentsOf(result, offset, length) { text ->
-                Dictionary.applyReplacements(appContext, text)
-            }) {
-                segments.add(if (segments.isEmpty()) segment else segment.copy(text = " ${segment.text}"))
-            }
+            segments.addAll(
+                audio.segmentsOf(result, offset, length) { text ->
+                    Dictionary.applyReplacements(appContext, text)
+                }
+            )
         }
-        return markParagraphs(segments, emptyList())
+        return finishSegments(segments, emptyList())
     }
 
     private fun runAudio(pcm: DecodedAudio, info: TranscribeModelInfo): RunAudio {
@@ -394,7 +394,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                         TranscriptWord(
                             originalMsAt(base + word.startMs),
                             originalMsAt(base + word.endMs),
-                            word.text
+                            replace(word.text)
                         )
                     }
                 )

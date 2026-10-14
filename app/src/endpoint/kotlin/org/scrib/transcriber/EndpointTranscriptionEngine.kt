@@ -158,61 +158,20 @@ class EndpointTranscriptionEngine(
 
     private fun segments(transcript: Transcript, audioDurationMs: Long): List<TranscriptSegment> {
         val text = transcript.text.trim()
-        val words = transcript.words
-        if (words.isEmpty()) {
-            return listOf(
-                TranscriptSegment(
-                    startMs = 0L,
-                    endMs = audioDurationMs,
-                    text = text,
-                    startsParagraph = true
-                )
+        val words = transcript.words.map { word ->
+            TranscriptWord(
+                word.startMs,
+                word.endMs,
+                Dictionary.applyReplacements(appContext, word.word)
             )
         }
-
-        val segments = ArrayList<TranscriptSegment>()
-        var lineStart = -1L
-        var lineEnd = -1L
-        var builder = StringBuilder()
-        var previousEnd = -1L
-
-        fun flush() {
-            if (builder.isEmpty()) {
-                return
-            }
-            segments.add(
-                TranscriptSegment(
-                    startMs = lineStart,
-                    endMs = lineEnd,
-                    text = builder.toString(),
-                    startsParagraph = previousEnd < 0L
-                )
-            )
-            builder = StringBuilder()
-            previousEnd = lineEnd
-        }
-
-        for (word in words) {
-            val gap = if (previousEnd < 0L) 0L else word.startMs - previousEnd
-            val tooLong = builder.isNotEmpty() && word.startMs - lineStart >= MAX_SEGMENT_MS
-            val wouldRunOver = builder.isNotEmpty() && builder.length + word.word.length + 1 > MAX_LINE_CHARS
-            if (builder.isNotEmpty() && (gap >= SEGMENT_GAP_MS || tooLong || wouldRunOver)) {
-                flush()
-            }
-            if (builder.isEmpty()) {
-                lineStart = word.startMs
-            }
-            if (builder.isNotEmpty()) {
-                builder.append(' ')
-            }
-            builder.append(word.word)
-            lineEnd = word.endMs
-        }
-        flush()
-
-        return segments.ifEmpty {
-            listOf(TranscriptSegment(0L, audioDurationMs, text, startsParagraph = true))
-        }
+        val rawSegment = TranscriptSegment(
+            startMs = words.firstOrNull()?.startMs ?: 0L,
+            endMs = words.lastOrNull()?.endMs ?: audioDurationMs,
+            text = Dictionary.applyReplacements(appContext, text),
+            words = words
+        )
+        return finishSegments(listOf(rawSegment))
     }
 
     private companion object {
@@ -223,15 +182,7 @@ class EndpointTranscriptionEngine(
         const val ENGINE_ID = "openai-compatible-endpoint"
         const val ENGINE_VERSION = "1"
 
-
         const val READ_TIMEOUT_MS = 600_000
-
-        const val SEGMENT_GAP_MS = 700L
-
-        const val MAX_LINE_CHARS = 84
-
-        const val MAX_SEGMENT_MS = 6000L
-
     }
 }
 

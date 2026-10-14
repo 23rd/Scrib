@@ -56,12 +56,229 @@ private fun wordClock(ms: Long, hours: Boolean): String {
 // break reads better than one dropped into the middle of a sentence.
 private const val PARAGRAPH_GAP_MS = 1500L
 
+internal const val SEGMENT_GAP_MS = 700L
+internal const val SOFT_MAX_SEGMENT_MS = 4000L
+internal const val MAX_SEGMENT_MS = 6000L
+internal const val MAX_LINE_CHARS = 84
+
+fun finishSegments(
+    segments: List<TranscriptSegment>,
+    speech: List<SpeechSpan> = emptyList(),
+    transformText: (String) -> String = { it }
+): List<TranscriptSegment> = markParagraphs(splitLongSegments(segments, transformText), speech)
+
+// Splits overlong segments (such as monolithic Parakeet windows) into subtitle-sized cues using
+// word timestamps when available, or punctuation/space boundaries when words are absent.
+fun splitLongSegments(
+    segments: List<TranscriptSegment>,
+    transformText: (String) -> String = { it }
+): List<TranscriptSegment> {
+    if (segments.isEmpty()) {
+        return emptyList()
+    }
+    val result = ArrayList<TranscriptSegment>(segments.size)
+    for (segment in segments) {
+        val split = splitSegment(segment, isFirstInTranscript = result.isEmpty(), transformText = transformText)
+        result.addAll(split)
+    }
+    return result
+}
+
+private fun splitSegment(
+    segment: TranscriptSegment,
+    isFirstInTranscript: Boolean,
+    transformText: (String) -> String
+): List<TranscriptSegment> {
+    return if (segment.words.isNotEmpty()) {
+        splitWords(segment, isFirstInTranscript, transformText)
+    } else {
+        splitTextFallback(segment, isFirstInTranscript, transformText)
+    }
+}
+
+private fun splitWords(
+    segment: TranscriptSegment,
+    isFirstInTranscript: Boolean,
+    transformText: (String) -> String
+): List<TranscriptSegment> {
+    val words = segment.words
+    if (words.isEmpty()) {
+        return splitTextFallback(segment, isFirstInTranscript, transformText)
+    }
+
+    val result = ArrayList<TranscriptSegment>()
+    val currentWords = ArrayList<TranscriptWord>()
+    var currentChars = 0
+
+    fun flush() {
+        if (currentWords.isEmpty()) {
+            return
+        }
+        val subStart = currentWords.first().startMs
+        val subEnd = currentWords.last().endMs
+        val rawText = transformText(currentWords.joinToString(" ") { it.text.trim() }.trim())
+        val isFirst = isFirstInTranscript && result.isEmpty()
+        val formattedText = if (isFirst) rawText else " $rawText"
+        val startsPara = if (result.isEmpty()) segment.startsParagraph else false
+        result.add(
+            TranscriptSegment(
+                startMs = subStart,
+                endMs = maxOf(subStart, subEnd),
+                text = formattedText,
+                startsParagraph = startsPara,
+                words = ArrayList(currentWords)
+            )
+        )
+        currentWords.clear()
+        currentChars = 0
+    }
+
+    for (word in words) {
+        val wordText = word.text.trim()
+        if (wordText.isEmpty()) {
+            continue
+        }
+
+        if (currentWords.isNotEmpty()) {
+            val previousEnd = currentWords.last().endMs
+            val gap = word.startMs - previousEnd
+            val currentDuration = previousEnd - currentWords.first().startMs
+            val totalDurationWithWord = word.endMs - currentWords.first().startMs
+            val wouldChars = currentChars + 1 + wordText.length
+
+            val previousText = currentWords.last().text.trim()
+            val endsSentence = previousText.endsWith('.') || previousText.endsWith('!') ||
+                previousText.endsWith('?') || previousText.endsWith(';') || previousText.endsWith(':')
+
+            val isGapBreak = gap >= SEGMENT_GAP_MS
+            val isDurationBreak = totalDurationWithWord > MAX_SEGMENT_MS
+            val isCharBreak = wouldChars > MAX_LINE_CHARS
+            val isSentenceBreak = currentDuration >= SOFT_MAX_SEGMENT_MS && endsSentence
+
+            if (isGapBreak || isDurationBreak || isCharBreak || isSentenceBreak) {
+                flush()
+            }
+        }
+
+        currentWords.add(word)
+        currentChars += if (currentWords.size == 1) wordText.length else 1 + wordText.length
+    }
+    flush()
+
+    return if (result.isEmpty()) {
+        splitTextFallback(segment, isFirstInTranscript, transformText)
+    } else {
+        result
+    }
+}
+
+private fun splitTextFallback(
+    segment: TranscriptSegment,
+    isFirstInTranscript: Boolean,
+    transformText: (String) -> String
+): List<TranscriptSegment> {
+    val trimmed = segment.text.trim()
+    if (trimmed.isEmpty()) {
+        return emptyList()
+    }
+    val duration = (segment.endMs - segment.startMs).coerceAtLeast(1L)
+    if (duration <= MAX_SEGMENT_MS && trimmed.length <= MAX_LINE_CHARS) {
+        val transformed = transformText(trimmed)
+        val text = if (isFirstInTranscript) transformed else " $transformed"
+        return listOf(segment.copy(text = text))
+    }
+
+    val result = ArrayList<TranscriptSegment>()
+    var start = 0
+    val totalLength = trimmed.length
+
+    while (start < totalLength) {
+        while (start < totalLength && trimmed[start].isWhitespace()) {
+            start++
+        }
+        if (start >= totalLength) break
+
+        val maxEnd = minOf(totalLength, start + MAX_LINE_CHARS)
+        var cut = -1
+
+        val remainingLen = totalLength - start
+        val estimatedRemainingMs = remainingLen.toLong() * duration / totalLength
+        if (remainingLen <= MAX_LINE_CHARS && estimatedRemainingMs <= MAX_SEGMENT_MS) {
+            cut = totalLength
+        } else {
+            val minChars = minOf(20, remainingLen)
+            val searchFrom = minOf(start + minChars, maxEnd)
+
+            for (i in maxEnd downTo searchFrom) {
+                val c = trimmed[i - 1]
+                if (c == '.' || c == '!' || c == '?' || c == '。' || c == '！' || c == '？') {
+                    if (i == totalLength || trimmed[i].isWhitespace() || c == '。' || c == '！' || c == '？') {
+                        cut = i
+                        break
+                    }
+                }
+            }
+
+            if (cut < 0) {
+                for (i in maxEnd downTo searchFrom) {
+                    val c = trimmed[i - 1]
+                    if (c == ',' || c == ';' || c == ':' || c == '，' || c == '、' || c == '；' || c == '：') {
+                        if (i == totalLength || trimmed[i].isWhitespace() || c == '，' || c == '、' || c == '；' || c == '：') {
+                            cut = i
+                            break
+                        }
+                    }
+                }
+            }
+
+            if (cut < 0) {
+                for (i in maxEnd downTo searchFrom) {
+                    if (trimmed[i - 1].isWhitespace()) {
+                        cut = i - 1
+                        break
+                    }
+                }
+            }
+
+            if (cut < 0) {
+                cut = maxEnd
+            }
+        }
+
+        val rawChunk = trimmed.substring(start, cut).trim()
+        val chunkText = transformText(rawChunk)
+        if (chunkText.isNotEmpty()) {
+            val chunkStartMs = segment.startMs + (start.toLong() * duration / totalLength)
+            val chunkEndMs = segment.startMs + (cut.toLong() * duration / totalLength)
+            val isFirst = isFirstInTranscript && result.isEmpty()
+            val text = if (isFirst) chunkText else " $chunkText"
+            val startsPara = if (result.isEmpty()) segment.startsParagraph else false
+            result.add(
+                TranscriptSegment(
+                    startMs = chunkStartMs,
+                    endMs = maxOf(chunkStartMs, chunkEndMs),
+                    text = text,
+                    startsParagraph = startsPara
+                )
+            )
+        }
+        start = cut
+    }
+
+    return if (result.isEmpty()) {
+        val transformed = transformText(trimmed)
+        listOf(segment.copy(text = if (isFirstInTranscript) transformed else " $transformed"))
+    } else {
+        result
+    }
+}
+
 // Decides which segments open a paragraph. Two sources, because they never both apply: with no
 // VAD the decoded segments carry the pauses between them, and the gap is the whole story. With a
 // VAD the segments run edge to edge — a removed silence lands inside one of them, never between
 // two — so the gap is always zero and whisper's own speech spans are what is left to read. Each
 // long enough silence breaks at the first segment that starts once the speech resumes.
-fun markParagraphs(segments: List<TranscriptSegment>, speech: List<SpeechSpan>): List<TranscriptSegment> {
+fun markParagraphs(segments: List<TranscriptSegment>, speech: List<SpeechSpan> = emptyList()): List<TranscriptSegment> {
     if (speech.isEmpty()) {
         return segments.mapIndexed { i, segment ->
             val gap = i > 0 && segment.startMs - segments[i - 1].endMs >= PARAGRAPH_GAP_MS
