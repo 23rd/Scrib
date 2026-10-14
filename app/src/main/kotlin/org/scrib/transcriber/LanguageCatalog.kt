@@ -8,9 +8,9 @@ data class LanguageOption(
 
 object LanguageCatalog {
 
-    private const val BASE_EN = "ggml-base.en-q5_1.bin"
-    private const val BASE = "ggml-base-q5_1.bin"
-    private const val SMALL = "ggml-small-q5_1.bin"
+    private const val BASE_EN = "ggml-base.en-q8_0.bin"
+    private const val BASE = "ggml-base-q8_0.bin"
+    private const val SMALL = "ggml-small-q8_0.bin"
 
     val LANGUAGES: List<LanguageOption> = listOf(
         LanguageOption(R.string.lang_english, BASE_EN, R.string.note_english_base),

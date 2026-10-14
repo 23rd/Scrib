@@ -47,14 +47,14 @@ object ModelCatalog {
     ) = WhisperModel(id, displayName, fileName, GGUF + id + "/resolve/main/" + fileName, approxBytes, multilingual, tier, recommended)
 
     val MODELS: List<WhisperModel> = listOf(
-        standard("tiny-q5_1", "Tiny", "ggml-tiny-q5_1.bin", 32_200_000, true, 1),
-        standard("base-q5_1", "Base", "ggml-base-q5_1.bin", 57_800_000, true, 2, recommended = true),
-        standard("small-q5_1", "Small", "ggml-small-q5_1.bin", 190_000_000, true, 3),
-        standard("medium-q5_0", "Medium", "ggml-medium-q5_0.bin", 539_000_000, true, 4),
-        standard("large-v3-turbo-q5_0", "Large v3 Turbo", "ggml-large-v3-turbo-q5_0.bin", 574_000_000, true, 5),
-        standard("tiny.en-q5_1", "Tiny (English)", "ggml-tiny.en-q5_1.bin", 32_200_000, false, 1),
-        standard("base.en-q5_1", "Base (English)", "ggml-base.en-q5_1.bin", 57_800_000, false, 2),
-        standard("small.en-q5_1", "Small (English)", "ggml-small.en-q5_1.bin", 190_000_000, false, 3),
+        standard("tiny-q8_0", "Tiny", "ggml-tiny-q8_0.bin", 43_500_000, true, 1),
+        standard("base-q8_0", "Base", "ggml-base-q8_0.bin", 81_800_000, true, 2, recommended = true),
+        standard("small-q8_0", "Small", "ggml-small-q8_0.bin", 264_500_000, true, 3),
+        standard("medium-q8_0", "Medium", "ggml-medium-q8_0.bin", 823_400_000, true, 4),
+        standard("large-v3-turbo-q8_0", "Large v3 Turbo", "ggml-large-v3-turbo-q8_0.bin", 874_200_000, true, 5),
+        standard("tiny.en-q8_0", "Tiny (English)", "ggml-tiny.en-q8_0.bin", 43_500_000, false, 1),
+        standard("base.en-q8_0", "Base (English)", "ggml-base.en-q8_0.bin", 81_800_000, false, 2),
+        standard("small.en-q8_0", "Small (English)", "ggml-small.en-q8_0.bin", 264_500_000, false, 3),
         // The families below are not whisper at all: one ggml library reads them all, one file is
         // the whole model, and the quant is part of the file name. Ordered by what a phone can
         // still run at a sensible pace, cheapest first.
