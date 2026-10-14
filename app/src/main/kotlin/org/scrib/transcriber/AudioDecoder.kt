@@ -11,6 +11,7 @@ import android.util.Log
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
@@ -22,6 +23,12 @@ class DecodedAudio(val samples: ByteBuffer, val sampleCount: Int)
 // Where converted 16 kHz mono samples go: a decoded file, or a live stream's pending window.
 interface PcmSink {
     fun add(sample: Float)
+
+    fun add(samples: FloatArray, count: Int) {
+        for (i in 0 until count) {
+            add(samples[i])
+        }
+    }
 }
 
 object AudioDecoder {
@@ -67,9 +74,7 @@ object AudioDecoder {
             val mime = format.getString(MediaFormat.KEY_MIME)!!
 
             val sink = SampleSink(initialCapacity(format))
-            val lock = Any()
-            var converter: ChunkConverter? = null
-            var finished = false
+            val pending = LinkedBlockingQueue<Chunk>(16)
             val done = CountDownLatch(1)
             val lastActivity = AtomicLong(System.nanoTime())
             val rate = intArrayOf(
@@ -87,7 +92,6 @@ object AudioDecoder {
             codec = MediaCodec.createDecoderByType(mime)
             codec.setCallback(object : MediaCodec.Callback() {
                 private var inputDone = false
-                private var scratch = ByteArray(0)
 
                 override fun onInputBufferAvailable(mc: MediaCodec, index: Int) {
                     lastActivity.set(System.nanoTime())
@@ -125,19 +129,10 @@ object AudioDecoder {
                         if (info.size > 0) {
                             val buffer = mc.getOutputBuffer(index)
                             if (buffer != null) {
-                                if (scratch.size < info.size) {
-                                    scratch = ByteArray(info.size)
-                                }
+                                val bytes = ByteArray(info.size)
                                 buffer.position(info.offset)
-                                buffer.get(scratch, 0, info.size)
-                                synchronized(lock) {
-                                    if (!finished) {
-                                        val active = converter ?: ChunkConverter(
-                                            rate[0], channels[0].coerceAtLeast(1), encoding[0], sink
-                                        ).also { converter = it }
-                                        active.feed(scratch, info.size)
-                                    }
-                                }
+                                buffer.get(bytes)
+                                pending.put(Chunk(bytes, info.size))
                             }
                         }
                         mc.releaseOutputBuffer(index, false)
@@ -147,7 +142,7 @@ object AudioDecoder {
                     } catch (t: Throwable) {
                         // Running out of memory on a callback thread must not crash the process;
                         // keep whatever is already decoded.
-                        Log.w(TAG, "PCM conversion failed", t)
+                        Log.w(TAG, "Handing the decoded chunk to the converter failed", t)
                         done.countDown()
                     }
                 }
@@ -172,23 +167,53 @@ object AudioDecoder {
             codec.configure(format, null, null, 0)
             codec.start()
 
-            cancellation?.onCancel { done.countDown() }
-            // No overall deadline: a long recording legitimately decodes for a long time. Give up
-            // only when the codec stops making progress altogether.
-            while (!done.await(1, TimeUnit.SECONDS)) {
-                if (cancellation?.isCancelled == true) {
-                    break
+            val consumer = Thread {
+                var active: ChunkConverter? = null
+                while (true) {
+                    val chunk = try {
+                        pending.take()
+                    } catch (e: InterruptedException) {
+                        break
+                    }
+                    if (chunk.size < 0) {
+                        break
+                    }
+                    try {
+                        val conv = active ?: ChunkConverter(
+                            rate[0], channels[0].coerceAtLeast(1), encoding[0], sink
+                        ).also { active = it }
+                        conv.feed(chunk.bytes, chunk.size)
+                    } catch (t: Throwable) {
+                        Log.w(TAG, "PCM conversion failed", t)
+                    }
                 }
-                if (System.nanoTime() - lastActivity.get() > STALL_TIMEOUT_NS) {
-                    Log.w(TAG, "Decoder stalled, keeping the decoded part")
-                    break
+                try {
+                    active?.flush()
+                } catch (t: Throwable) {
+                    Log.w(TAG, "PCM conversion failed", t)
                 }
             }
+            consumer.start()
 
-            synchronized(lock) {
-                finished = true
-                converter?.flush()
+            try {
+                cancellation?.onCancel { done.countDown() }
+                // No overall deadline: a long recording legitimately decodes for a long time. Give up
+                // only when the codec stops making progress altogether.
+                while (!done.await(1, TimeUnit.SECONDS)) {
+                    if (cancellation?.isCancelled == true) {
+                        break
+                    }
+                    if (System.nanoTime() - lastActivity.get() > STALL_TIMEOUT_NS) {
+                        Log.w(TAG, "Decoder stalled, keeping the decoded part")
+                        break
+                    }
+                }
+
+                pending.put(Chunk(ByteArray(0), -1))
+                consumer.join()
                 return sink.result()
+            } finally {
+                consumer.interrupt()
             }
         } finally {
             // Callbacks use the codec and the extractor from the decode thread. Raise the flag,
@@ -234,6 +259,8 @@ object AudioDecoder {
     private fun allocateSamples(samples: Int): ByteBuffer =
         ByteBuffer.allocateDirect(samples * 4).order(ByteOrder.nativeOrder())
 
+    private class Chunk(val bytes: ByteArray, val size: Int)
+
     // Accumulates the converted samples in native memory, sized up front from the track duration
     // so the usual case is a single allocation with no growth copies.
     private class SampleSink(initialCapacity: Int) : PcmSink {
@@ -246,20 +273,28 @@ object AudioDecoder {
 
         override fun add(sample: Float) {
             if (!floats.hasRemaining()) {
-                grow()
+                grow(1)
             }
             floats.put(sample)
         }
 
+        override fun add(samples: FloatArray, count: Int) {
+            if (floats.remaining() < count) {
+                grow(count)
+            }
+            floats.put(samples, 0, count)
+        }
+
         fun result() = DecodedAudio(buffer, floats.position())
 
-        private fun grow() {
+        private fun grow(need: Int) {
             val current = floats.position()
             if (current >= MAX_TOTAL_SAMPLES) {
                 throw RuntimeException("Audio is too long")
             }
             val next = allocateSamples(
-                (current * 2L)
+                (current.toLong() + need)
+                    .coerceAtLeast(current * 2L)
                     .coerceAtLeast(DEFAULT_CAPACITY_SAMPLES.toLong())
                     .coerceAtMost(MAX_TOTAL_SAMPLES.toLong())
                     .toInt()
@@ -296,6 +331,10 @@ object AudioDecoder {
         private var frames = 0L
         private var emitted = 0L
 
+        private var shorts = ShortArray(0)
+        private var floatSamples = FloatArray(0)
+        private var out = FloatArray(0)
+
         fun feed(bytes: ByteArray, length: Int) {
             var pos = 0
             if (carried > 0) {
@@ -306,12 +345,13 @@ object AudioDecoder {
                 if (carried < bytesPerFrame) {
                     return
                 }
-                pushFrame(carry, 0)
+                pushFrames(carry, 0, 1)
                 carried = 0
             }
-            while (pos + bytesPerFrame <= length) {
-                pushFrame(bytes, pos)
-                pos += bytesPerFrame
+            val frameCount = (length - pos) / bytesPerFrame
+            if (frameCount > 0) {
+                pushFrames(bytes, pos, frameCount)
+                pos += frameCount * bytesPerFrame
             }
             if (pos < length) {
                 System.arraycopy(bytes, pos, carry, 0, length - pos)
@@ -328,39 +368,60 @@ object AudioDecoder {
             }
         }
 
-        // Downmixes one frame and emits every 16 kHz sample whose linear-interpolation window is
-        // now complete. Only the previous mono sample is needed as history: an output between
+        // Downmixes whole frames and emits every 16 kHz sample whose linear-interpolation window
+        // is now complete. Only the previous mono sample is needed as history: an output between
         // source samples idx and idx+1 is emitted the moment idx+1 arrives.
-        private fun pushFrame(bytes: ByteArray, offset: Int) {
-            var acc = 0f
-            for (c in 0 until channels) {
-                acc += sampleAt(bytes, offset + c * bytesPerSample)
-            }
-            val cur = acc / channels
-            while (true) {
-                val srcPos = emitted * step
-                val idx = srcPos.toLong()
-                if (idx + 1 > frames) {
-                    break
+        private fun pushFrames(bytes: ByteArray, offset: Int, frameCount: Int) {
+            val sampleCount = frameCount * channels
+            if (floatInput) {
+                if (floatSamples.size < sampleCount) {
+                    floatSamples = FloatArray(sampleCount)
                 }
-                val frac = (srcPos - idx).toFloat()
-                sink.add(hist + (cur - hist) * frac)
-                emitted++
+                ByteBuffer.wrap(bytes, offset, sampleCount * 4)
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                    .asFloatBuffer()
+                    .get(floatSamples, 0, sampleCount)
+            } else {
+                if (shorts.size < sampleCount) {
+                    shorts = ShortArray(sampleCount)
+                }
+                ByteBuffer.wrap(bytes, offset, sampleCount * 2)
+                    .order(ByteOrder.LITTLE_ENDIAN)
+                    .asShortBuffer()
+                    .get(shorts, 0, sampleCount)
             }
-            hist = cur
-            frames++
-        }
-
-        private fun sampleAt(bytes: ByteArray, offset: Int): Float {
-            val lo = bytes[offset].toInt() and 0xff
-            val b1 = bytes[offset + 1].toInt() and 0xff
-            if (!floatInput) {
-                return ((b1 shl 8) or lo).toShort() / 32768f
+            val emittedMax = Math.ceil(frameCount / step).toInt() + 8
+            if (out.size < emittedMax) {
+                out = FloatArray(emittedMax)
             }
-            val bits = lo or (b1 shl 8) or
-                ((bytes[offset + 2].toInt() and 0xff) shl 16) or
-                ((bytes[offset + 3].toInt() and 0xff) shl 24)
-            return java.lang.Float.intBitsToFloat(bits)
+            var written = 0
+            var sample = 0
+            var frame = 0
+            while (frame < frameCount) {
+                var acc = 0f
+                for (c in 0 until channels) {
+                    acc += if (floatInput) floatSamples[sample + c] else shorts[sample + c] / 32768f
+                }
+                val cur = acc / channels
+                val total = frames + 1
+                while (true) {
+                    val srcPos = emitted * step
+                    val idx = srcPos.toLong()
+                    if (idx + 1 > total) {
+                        break
+                    }
+                    val frac = (srcPos - idx).toFloat()
+                    out[written++] = hist + (cur - hist) * frac
+                    emitted++
+                }
+                hist = cur
+                frames++
+                sample += channels
+                frame++
+            }
+            if (written > 0) {
+                sink.add(out, written)
+            }
         }
     }
 }
