@@ -77,7 +77,8 @@ android {
     if (local) {
         externalNativeBuild {
             cmake {
-                path file('../transcribe.cpp/CMakeLists.txt')
+                // transcribe.cpp plus llama.cpp
+                path file('src/main/jni/CMakeLists.txt')
             }
         }
     }

@@ -1,3 +1,6 @@
 [submodule "transcribe.cpp"]
 	path = transcribe.cpp
 	url = https://github.com/handy-computer/transcribe.cpp.git
+[submodule "llama.cpp"]
+	path = llama.cpp
+	url = https://github.com/ggml-org/llama.cpp.git

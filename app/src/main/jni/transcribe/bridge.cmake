@@ -15,9 +15,9 @@ add_library(scrib_transcribe SHARED
 target_compile_features(scrib_transcribe PRIVATE cxx_std_17)
 
 target_include_directories(scrib_transcribe PRIVATE
-    "${CMAKE_SOURCE_DIR}/include"
-    "${CMAKE_SOURCE_DIR}/src"
-    "${CMAKE_SOURCE_DIR}/ggml/include")
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ggml/include")
 
 set_target_properties(scrib_transcribe PROPERTIES
     CXX_VISIBILITY_PRESET hidden

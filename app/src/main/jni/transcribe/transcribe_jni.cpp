@@ -27,6 +27,7 @@
 #include "ggml.h"
 #include "ggml-backend.h"
 #include "gguf.h"
+#include "scrib_shared.h"
 
 #define TAG "ScribTranscribe"
 #define UNUSED(x) (void)(x)
@@ -47,7 +48,7 @@ static void bridge_log(transcribe_log_level level, const char *msg, void *user) 
     __android_log_write(priority, TAG, msg);
 }
 
-static void load_cpu_backend() {
+void load_cpu_backend() {
     static bool logging_set = false;
     if (!logging_set) {
         logging_set = true;
@@ -111,10 +112,6 @@ struct live_session {
     transcribe_session *session = nullptr;
 };
 
-struct abort_flag {
-    std::atomic<bool> cancelled{false};
-};
-
 std::string to_std(JNIEnv *env, jstring value) {
     if (value == nullptr) {
         return std::string();
@@ -160,11 +157,6 @@ void read_capabilities(loaded_model *out) {
     out->long_form = transcribe_model_supports(out->model, TRANSCRIBE_FEATURE_LONG_FORM);
 }
 
-bool abort_reached(void *user) {
-    auto *flag = static_cast<abort_flag *>(user);
-    return flag != nullptr && flag->cancelled.load();
-}
-
 void fill_run_params(const loaded_model *meta, transcribe_run_params *params,
                      const std::string &language, const std::string &prompt, int task) {
     transcribe_run_params_init(params);
@@ -193,6 +185,11 @@ void throw_status(JNIEnv *env, const char *what, transcribe_status status) {
     env->ThrowNew(env->FindClass("java/lang/RuntimeException"), message);
 }
 
+}
+
+bool abort_reached(void *user) {
+    auto *flag = static_cast<abort_flag *>(user);
+    return flag != nullptr && flag->cancelled.load();
 }
 
 extern "C" {
