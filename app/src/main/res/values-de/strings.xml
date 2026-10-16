@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Live-Leistungsstatistik</string>
     <string name="live_stats_entry_sub">Zeigt Tempo und Speicher beim Transkribieren.</string>
     <string name="live_stats_entry_on">Live — Zahlen aktualisieren sich im Lauf</string>
+    <string name="ime_stats_title">Statistik der Sprach-Tastatur</string>
+    <string name="ime_stats_sub">Sitzungen, Wörter und diktierte Zeit. Aus — nichts wird erfasst.</string>
+    <string name="ime_stats_line">%1$d Sitzungen · %2$d Wörter · %3$s diktiert</string>
     <string name="ime_label">Scrib Stimme</string>
     <string name="ime_entry_title">Sprachtastatur</string>
     <string name="ime_entry_sub">Diktiere in jede App</string>

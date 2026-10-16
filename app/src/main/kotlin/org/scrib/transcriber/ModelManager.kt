@@ -20,6 +20,10 @@ object ModelManager {
     private const val KEY_LIVE_STATS = "liveStats"
     private const val KEY_LANGUAGE = "language"
     private const val KEY_PINNED = "pinnedModels"
+    private const val KEY_KEYBOARD_STATS = "keyboardStats"
+    private const val KEY_KB_SESSIONS = "kbSessions"
+    private const val KEY_KB_WORDS = "kbWords"
+    private const val KEY_KB_TIME_MS = "kbTimeMs"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
 
     const val EXTERNAL_PREFIX = "external:"
@@ -298,6 +302,48 @@ object ModelManager {
     fun setLiveStats(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_LIVE_STATS, enabled).apply()
+    }
+
+    fun keyboardStats(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_KEYBOARD_STATS, false)
+
+    fun setKeyboardStats(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_KEYBOARD_STATS, enabled).apply()
+    }
+
+    data class KeyboardUsage(val sessions: Long, val words: Long, val timeMs: Long)
+
+    fun keyboardUsage(context: Context): KeyboardUsage {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        return KeyboardUsage(
+            sessions = prefs.getLong(KEY_KB_SESSIONS, 0),
+            words = prefs.getLong(KEY_KB_WORDS, 0),
+            timeMs = prefs.getLong(KEY_KB_TIME_MS, 0)
+        )
+    }
+
+    fun addKeyboardSession(context: Context) {
+        if (!keyboardStats(context)) return
+        addKeyboardCount(context, KEY_KB_SESSIONS, 1)
+    }
+
+    fun addKeyboardWords(context: Context, text: String) {
+        if (!keyboardStats(context)) return
+        val words = text.trim().split(Regex("\\s+")).count { it.isNotEmpty() }
+        if (words > 0) {
+            addKeyboardCount(context, KEY_KB_WORDS, words.toLong())
+        }
+    }
+
+    fun addKeyboardTime(context: Context, ms: Long) {
+        if (!keyboardStats(context) || ms <= 0) return
+        addKeyboardCount(context, KEY_KB_TIME_MS, ms)
+    }
+
+    private fun addKeyboardCount(context: Context, key: String, amount: Long) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        prefs.edit().putLong(key, prefs.getLong(key, 0) + amount).apply()
     }
 
     fun language(context: Context): String? =

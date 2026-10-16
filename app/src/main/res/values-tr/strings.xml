@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Canlı performans istatistikleri</string>
     <string name="live_stats_entry_sub">Yazıya dökme sırasında hız ve belleği gösterir.</string>
     <string name="live_stats_entry_on">Canlı — değerler işlem boyunca güncellenir</string>
+    <string name="ime_stats_title">Sesli klavye istatistikleri</string>
+    <string name="ime_stats_sub">Oturumlar, kelimeler ve dikte süresi. Kapalıyken hiçbir şey toplanmaz.</string>
+    <string name="ime_stats_line">%1$d oturum · %2$d kelime · %3$s dikte</string>
     <string name="ime_label">Scrib Ses</string>
     <string name="ime_entry_title">Sesli klavye</string>
     <string name="ime_entry_sub">Herhangi bir uygulamaya dikte edin</string>

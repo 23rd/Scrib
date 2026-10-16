@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Statistiche in tempo reale</string>
     <string name="live_stats_entry_sub">Mostra velocità e memoria durante la trascrizione.</string>
     <string name="live_stats_entry_on">In tempo reale — le cifre si aggiornano durante l’elaborazione</string>
+    <string name="ime_stats_title">Statistiche della tastiera vocale</string>
+    <string name="ime_stats_sub">Sessioni, parole e tempo di dettatura. Disattivato: non viene raccolto nulla.</string>
+    <string name="ime_stats_line">%1$d sessioni · %2$d parole · %3$s dettatura</string>
     <string name="ime_label">Scrib Voce</string>
     <string name="ime_entry_title">Tastiera vocale</string>
     <string name="ime_entry_sub">Detta in qualsiasi app</string>

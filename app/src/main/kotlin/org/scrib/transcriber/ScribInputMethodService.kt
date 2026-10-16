@@ -61,6 +61,8 @@ class ScribInputMethodService : InputMethodService() {
     // Bumped whenever a take ends, so a report from the one before it cannot reach the field.
     private var session = 0
 
+    private var takeStartMs = 0L
+
     private var notice: String? = null
     private var keyboardTargetsCache: List<KeyboardLayoutTarget>? = null
 
@@ -176,6 +178,8 @@ class ScribInputMethodService : InputMethodService() {
         }
         stream = audio
         microphone = capture
+        takeStartMs = System.currentTimeMillis()
+        ModelManager.addKeyboardSession(this)
         stage = Stage.Listening
         render()
     }
@@ -186,6 +190,7 @@ class ScribInputMethodService : InputMethodService() {
             return
         }
         stage = Stage.Finishing
+        ModelManager.addKeyboardTime(this, System.currentTimeMillis() - takeStartMs)
         render()
         main.postDelayed({
             if (stage == Stage.Finishing) {
@@ -201,6 +206,9 @@ class ScribInputMethodService : InputMethodService() {
         if (stage == Stage.Idle) {
             return
         }
+        if (stage == Stage.Listening) {
+            ModelManager.addKeyboardTime(this, System.currentTimeMillis() - takeStartMs)
+        }
         microphone?.stop()
         stream?.cancel()
         reset()
@@ -213,6 +221,7 @@ class ScribInputMethodService : InputMethodService() {
         stream = null
         microphone = null
         inserted = ""
+        takeStartMs = 0
         view?.resetMeter()
         releaseModel()
     }
@@ -320,6 +329,7 @@ class ScribInputMethodService : InputMethodService() {
         }
         connection.commitText(spaced(connection, delta), 1)
         inserted = text
+        ModelManager.addKeyboardWords(this, delta)
     }
 
     // A custom key inserts exactly what the user put there — no spacing, no tracking: it is

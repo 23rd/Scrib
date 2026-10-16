@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Statistiques en direct</string>
     <string name="live_stats_entry_sub">Affiche la vitesse et la mémoire pendant la transcription.</string>
     <string name="live_stats_entry_on">En direct — les chiffres évoluent pendant la transcription</string>
+    <string name="ime_stats_title">Statistiques du clavier vocal</string>
+    <string name="ime_stats_sub">Sessions, mots et temps de dictée. Désactivé : rien n\'est collecté.</string>
+    <string name="ime_stats_line">%1$d sessions · %2$d mots · %3$s dictées</string>
     <string name="ime_label">Scrib Voix</string>
     <string name="ime_entry_title">Clavier vocal</string>
     <string name="ime_entry_sub">Dictez dans n\'importe quelle appli</string>

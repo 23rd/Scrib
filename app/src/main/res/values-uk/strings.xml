@@ -92,6 +92,9 @@
     <string name="live_stats_entry_title">Статистика наживо</string>
     <string name="live_stats_entry_sub">Показує швидкість і пам’ять під час транскрибування.</string>
     <string name="live_stats_entry_on">Наживо — значення оновлюються під час розпізнавання</string>
+    <string name="ime_stats_title">Статистика голосової клавіатури</string>
+    <string name="ime_stats_sub">Сесії, слова та час диктування. Поки вимкнено — нічого не збирається.</string>
+    <string name="ime_stats_line">Сесій: %1$d · слів: %2$d · диктування: %3$s</string>
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосова клавіатура</string>
     <string name="ime_entry_sub">Диктуйте в будь-якому застосунку</string>

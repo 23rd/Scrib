@@ -70,6 +70,7 @@ class MainActivity : ComponentActivity() {
                         onPickLanguage = vm::setupForLanguage,
                         onSkipSilence = vm::setSkipSilence,
                         onLiveStats = vm::setLiveStats,
+                        onKeyboardStats = vm::setKeyboardStats,
                         onConfigureKeyboardLayouts = vm::setKeyboardLayouts,
                         onImportSherpa = vm::importSherpa,
                         sherpaPlugin = SherpaPlugins.plugin,

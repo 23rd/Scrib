@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Estatísticas ao vivo</string>
     <string name="live_stats_entry_sub">Mostra velocidade e memória durante a transcrição.</string>
     <string name="live_stats_entry_on">Ao vivo — os números são atualizados durante o processo</string>
+    <string name="ime_stats_title">Estatísticas do teclado de voz</string>
+    <string name="ime_stats_sub">Sessões, palavras e tempo de ditado. Desligado — nada é recolhido.</string>
+    <string name="ime_stats_line">%1$d sessões · %2$d palavras · %3$s a ditar</string>
     <string name="ime_label">Scrib Voz</string>
     <string name="ime_entry_title">Teclado de voz</string>
     <string name="ime_entry_sub">Dite em qualquer app</string>

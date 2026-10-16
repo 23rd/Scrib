@@ -51,6 +51,8 @@ data class ScribUiState(
     val skipSilence: Boolean,
     val vadSupported: Boolean,
     val liveStats: Boolean,
+    val keyboardStats: Boolean,
+    val keyboardUsage: ModelManager.KeyboardUsage,
     val keyboardLayouts: KeyboardLayoutSettings,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
     val vadProgress: Int,
@@ -180,6 +182,8 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             skipSilence = BuildConfig.LOCAL_MODELS && ModelManager.skipSilence(ctx), vadProgress = vadPct,
             vadSupported = BuildConfig.LOCAL_MODELS && ModelManager.activeModelUsesVad(ctx),
             liveStats = ModelManager.liveStats(ctx),
+            keyboardStats = ModelManager.keyboardStats(ctx),
+            keyboardUsage = ModelManager.keyboardUsage(ctx),
             keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
             benchmarkRuns = BenchmarkStore.load(ctx),
@@ -352,6 +356,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     fun setLiveStats(enabled: Boolean) {
         if (BenchmarkBatchGate.isActive) return
         ModelManager.setLiveStats(ctx, enabled)
+        push()
+    }
+
+    fun setKeyboardStats(enabled: Boolean) {
+        if (BenchmarkBatchGate.isActive) return
+        ModelManager.setKeyboardStats(ctx, enabled)
         push()
     }
 

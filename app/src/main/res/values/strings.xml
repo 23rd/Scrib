@@ -97,6 +97,9 @@
     <string name="live_stats_entry_title">Live performance stats</string>
     <string name="live_stats_entry_sub">Shows speed and memory while transcribing.</string>
     <string name="live_stats_entry_on">Live — figures update as the run goes</string>
+    <string name="ime_stats_title">Voice keyboard statistics</string>
+    <string name="ime_stats_sub">Sessions, words and time spent dictating. Off — nothing is collected.</string>
+    <string name="ime_stats_line">%1$d sessions · %2$d words · %3$s dictating</string>
 
     <string name="ime_label">Scrib Voice</string>
     <string name="ime_entry_title">Voice keyboard</string>

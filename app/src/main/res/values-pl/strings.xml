@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Statystyki na żywo</string>
     <string name="live_stats_entry_sub">Pokazuje szybkość i pamięć podczas transkrypcji.</string>
     <string name="live_stats_entry_on">Na żywo — wartości aktualizują się w trakcie</string>
+    <string name="ime_stats_title">Statystyki klawiatury głosowej</string>
+    <string name="ime_stats_sub">Sesje, słowa i czas dyktowania. Wyłączone — nic nie jest zbierane.</string>
+    <string name="ime_stats_line">Sesje: %1$d · słowa: %2$d · dyktowanie: %3$s</string>
     <string name="ime_label">Scrib Głos</string>
     <string name="ime_entry_title">Klawiatura głosowa</string>
     <string name="ime_entry_sub">Dyktuj w dowolnej aplikacji</string>

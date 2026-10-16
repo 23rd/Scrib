@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Live prestatiestatistieken</string>
     <string name="live_stats_entry_sub">Toont snelheid en geheugen tijdens het transcriberen.</string>
     <string name="live_stats_entry_on">Live — de cijfers lopen mee met de taak</string>
+    <string name="ime_stats_title">Statistieken spraaktoetsenbord</string>
+    <string name="ime_stats_sub">Sessies, woorden en dicteertijd. Uit — er wordt niets verzameld.</string>
+    <string name="ime_stats_line">%1$d sessies · %2$d woorden · %3$s gedicteerd</string>
     <string name="ime_label">Scrib Stem</string>
     <string name="ime_entry_title">Spraaktoetsenbord</string>
     <string name="ime_entry_sub">Dicteer in elke app</string>

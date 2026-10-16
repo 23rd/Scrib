@@ -91,6 +91,9 @@
     <string name="live_stats_entry_title">Статистика в реальном времени</string>
     <string name="live_stats_entry_sub">Показывает скорость и память при расшифровке.</string>
     <string name="live_stats_entry_on">В реальном времени — значения обновляются по ходу дела</string>
+    <string name="ime_stats_title">Статистика голосовой клавиатуры</string>
+    <string name="ime_stats_sub">Сессии, слова и время диктовки. Пока выключено — ничего не собирается.</string>
+    <string name="ime_stats_line">Сессий: %1$d · слов: %2$d · диктовки: %3$s</string>
     <string name="ime_label">Scrib Голос</string>
     <string name="ime_entry_title">Голосовая клавиатура</string>
     <string name="ime_entry_sub">Диктуйте в любом приложении</string>
