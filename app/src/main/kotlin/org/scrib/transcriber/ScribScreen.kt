@@ -297,7 +297,7 @@ fun ScribScreen(
     if (transcription != null && !state.benchmarkBatch.running) {
         transcription?.let { t ->
         TranscriptionDialog(
-            t, onCancel = onCancelTranscription, onClose = onDismissTranscription,
+            t, showStats = state.liveStats, onCancel = onCancelTranscription, onClose = onDismissTranscription,
             onSave = onSaveTranscript, onFormat = onTranscriptFormat
         )
         }
@@ -1538,6 +1538,7 @@ private fun transcriptMimeType(format: TranscriptFormat): String =
 @Composable
 private fun TranscriptionDialog(
     t: TranscribeUi,
+    showStats: Boolean,
     onCancel: () -> Unit,
     onClose: () -> Unit,
     onSave: (Uri) -> Unit,
@@ -1576,7 +1577,7 @@ private fun TranscriptionDialog(
                     t.running && t.text.isEmpty() -> {
                         Text(stringResource(R.string.decoding_transcribing), fontSize = 13.sp, color = cs.onSurfaceVariant)
                         Spacer(Modifier.height(12.dp))
-                        RunProgress(t)
+                        RunProgress(t, showStats)
                     }
                     else -> {
                         Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
@@ -1590,11 +1591,11 @@ private fun TranscriptionDialog(
                         }
                         if (t.running) {
                             Spacer(Modifier.height(12.dp))
-                            RunProgress(t)
+                            RunProgress(t, showStats)
                         }
                     }
                 }
-                if (!t.running && t.error == null && t.metrics.hasData) {
+                if (!t.running && t.error == null && showStats && t.metrics.hasData) {
                     Spacer(Modifier.height(8.dp))
                     StatsLine(t)
                 }
@@ -1774,7 +1775,7 @@ private fun rtfText(metrics: TranscriptionMetrics): String =
 // until then rather than sitting at a misleading zero. The line underneath doubles as the promise
 // that walking away is safe — the run keeps going in the notification.
 @Composable
-private fun RunProgress(t: TranscribeUi) {
+private fun RunProgress(t: TranscribeUi, showStats: Boolean) {
     val cs = MaterialTheme.colorScheme
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth()) {
@@ -1796,7 +1797,7 @@ private fun RunProgress(t: TranscribeUi) {
                 fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = cs.primary
             )
         }
-        if (t.metrics.hasData) {
+        if (showStats && t.metrics.hasData) {
             Spacer(Modifier.height(6.dp))
             StatsLine(t)
         }

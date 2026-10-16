@@ -18,6 +18,7 @@ object ModelManager {
     private const val KEY_EXTERNAL_SIZE = "externalModelSize"
     private const val KEY_SKIP_SILENCE = "skipSilence"
     private const val KEY_LIVE_STATS = "liveStats"
+    private const val KEY_LANGUAGE = "language"
     private const val KEY_PINNED = "pinnedModels"
     private const val LEGACY_MODEL = "ggml-tiny-q5_1.bin"
 
@@ -297,6 +298,14 @@ object ModelManager {
     fun setLiveStats(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_LIVE_STATS, enabled).apply()
+    }
+
+    fun language(context: Context): String? =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_LANGUAGE, null)
+
+    fun setLanguage(context: Context, code: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(KEY_LANGUAGE, code).apply()
     }
 
     fun pinnedModels(context: Context): Set<String> =

@@ -188,7 +188,7 @@ object TranscriptionRun {
                 val pfd = app.contentResolver.openFileDescriptor(uri, "r")
                     ?: throw RuntimeException(app.getString(R.string.transcribe_cant_open))
                 val segments = TranscriptionEngine.get(app).transcribeToSegments(
-                    pfd, "", cancellation,
+                    pfd, ModelManager.language(app), cancellation,
                     // Percent and ETA are cheap state writes. The figures are not re-read here: the
                     // ticker above already republishes them twice a second, and sampling the process
                     // once per progress tick doubles that cost for nothing a person can see.

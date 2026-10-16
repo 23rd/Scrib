@@ -157,13 +157,13 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
-            val language = languageHint?.takeIf { it.isNotEmpty() }
             val activeKey = ModelManager.activeModelKey(appContext) ?: throw ModelNotAvailableException()
             val alreadyLoaded = loadedPath == activeKey && session != null
             val beforeLoad = processMemory(appContext)
             val loadStartedAt = SystemClock.elapsedRealtime()
             val live = session()
             val info = model()!!.info
+            val hinted = languageHint?.takeIf { it.isNotEmpty() && it in info.languages }
             val afterLoad = processMemory(appContext)
             onModelLoad(
                 TranscriptionMetrics(
@@ -176,11 +176,11 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             val window = windowSamples(info)
             if (window in 1 until audio.sampleCount) {
                 return transcribeWindows(
-                    live, info, audio, window, language, abort, cancellation, onProgress, onPartial
+                    live, info, audio, window, hinted, abort, cancellation, onProgress, onPartial
                 )
             }
             onProgress(0)
-            val result = runUtterance(live, info, audio, 0, audio.sampleCount, language, abort, onPartial)
+            val result = runUtterance(live, info, audio, 0, audio.sampleCount, hinted, abort, onPartial)
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }

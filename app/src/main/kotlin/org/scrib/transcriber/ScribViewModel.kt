@@ -383,6 +383,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         if (BenchmarkBatchGate.isActive) return
         val f = language.recommendedFileName
         val model = ModelCatalog.byFileName(f) ?: return
+        ModelManager.setLanguage(ctx, language.code)
         val langName = str(language.nameRes)
         if (ModelManager.installedFileNames(ctx).contains(f)) {
             ModelManager.setActive(ctx, f)
