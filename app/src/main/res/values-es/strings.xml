@@ -143,6 +143,7 @@
     <string name="action_delete">Eliminar</string>
     <string name="action_use">Usar</string>
     <string name="action_close">Cerrar</string>
+    <string name="switch_model_title">Cambiar de modelo</string>
     <string name="action_save">Guardar</string>
     <string name="action_stop">Detener</string>
     <string name="action_copy">Copiar</string>

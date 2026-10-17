@@ -143,6 +143,7 @@
     <string name="action_delete">Verwijderen</string>
     <string name="action_use">Gebruiken</string>
     <string name="action_close">Sluiten</string>
+    <string name="switch_model_title">Model wisselen</string>
     <string name="action_save">Opslaan</string>
     <string name="action_stop">Stoppen</string>
     <string name="action_copy">Kopiëren</string>

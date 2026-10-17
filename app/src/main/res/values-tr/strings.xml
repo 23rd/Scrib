@@ -143,6 +143,7 @@
     <string name="action_delete">Sil</string>
     <string name="action_use">Kullan</string>
     <string name="action_close">Kapat</string>
+    <string name="switch_model_title">Model değiştir</string>
     <string name="action_save">Kaydet</string>
     <string name="action_stop">Durdur</string>
     <string name="action_copy">Kopyala</string>

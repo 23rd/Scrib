@@ -153,6 +153,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_use">Use</string>
     <string name="action_close">Close</string>
+    <string name="switch_model_title">Switch model</string>
     <string name="action_save">Save</string>
     <string name="action_stop">Stop</string>
     <string name="action_copy">Copy</string>

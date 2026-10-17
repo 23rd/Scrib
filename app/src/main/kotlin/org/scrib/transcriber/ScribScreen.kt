@@ -156,6 +156,9 @@ fun ScribScreen(
     var tab by rememberSaveable { mutableStateOf(ScribTab.Home) }
     var showAdd by remember { mutableStateOf(false) }
     var showLanguages by remember { mutableStateOf(false) }
+    var showSwitcher by rememberSaveable { mutableStateOf(false) }
+    val switchableModels = (state.standard + state.custom + state.sherpaRows)
+        .filter { it.state == RowState.Installed || it.state == RowState.Active }
     var deleteTarget by remember { mutableStateOf<String?>(null) }
     var showBenchmarks by rememberSaveable { mutableStateOf(false) }
     var openHistoryId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -216,7 +219,12 @@ fun ScribScreen(
                     actions,
                     onOpenTab = { tab = it },
                     onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
-                    onPickFile = { audioPicker.launch(arrayOf("audio/*", "video/*")) }
+                    onPickFile = { audioPicker.launch(arrayOf("audio/*", "video/*")) },
+                    onSwitchModel = if (switchableModels.size > 1) {
+                        { showSwitcher = true }
+                    } else {
+                        null
+                    }
                 )
                 ScribTab.Record -> RecordTab(
                     state,
@@ -282,6 +290,13 @@ fun ScribScreen(
     if (showLanguages) {
         LanguageDialog(onDismiss = { showLanguages = false }, onPick = { showLanguages = false; onPickLanguage(it) })
     }
+    if (showSwitcher) {
+        ModelSwitchDialog(
+            switchableModels,
+            onDismiss = { showSwitcher = false },
+            onUse = { showSwitcher = false; actions.onUse(it) }
+        )
+    }
     if (showBenchmarks) {
         BenchmarkHistoryDialog(
             benchmarkRuns,
@@ -343,7 +358,8 @@ private fun HomeTab(
     actions: Actions,
     onOpenTab: (ScribTab) -> Unit,
     onRecord: () -> Unit,
-    onPickFile: () -> Unit
+    onPickFile: () -> Unit,
+    onSwitchModel: (() -> Unit)?
 ) {
     LazyColumn(
         Modifier.fillMaxSize(),
@@ -353,7 +369,11 @@ private fun HomeTab(
             if (state.firstRun) {
                 NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) })
             } else {
-                StatusCard(state, onOpenSettings = { onOpenTab(ScribTab.Settings) })
+                StatusCard(
+                    state,
+                    onOpenSettings = { onOpenTab(ScribTab.Settings) },
+                    onSwitchModel = onSwitchModel
+                )
             }
         }
         if (!state.firstRun) {
@@ -1078,17 +1098,29 @@ private fun Bar(h: androidx.compose.ui.unit.Dp, color: Color, alpha: Float) {
 }
 
 @Composable
-private fun StatusCard(state: ScribUiState, onOpenSettings: (() -> Unit)? = null) {
+private fun StatusCard(state: ScribUiState, onOpenSettings: (() -> Unit)? = null, onSwitchModel: (() -> Unit)? = null) {
     val cs = MaterialTheme.colorScheme
     Surface(color = cs.surfaceContainer, shape = RoundedCornerShape(20.dp), modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 16.dp)) {
-        Column(Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(Modifier.size(9.dp).clip(RoundedCornerShape(50)).background(cs.primary))
-                Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.active_model else R.string.active_endpoint), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
-            }
-            Spacer(Modifier.height(10.dp))
+        Column(Modifier.padding(horizontal = 18.dp, vertical = 14.dp)) {
             if (state.activeName != null) {
-                Text(state.activeName, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = cs.onSurface, letterSpacing = (-0.5).sp)
+                val rowModifier = if (onSwitchModel != null) {
+                    Modifier.fillMaxWidth().clickableRow(RoundedCornerShape(12.dp), onSwitchModel)
+                } else {
+                    Modifier.fillMaxWidth()
+                }
+                Row(
+                    rowModifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Box(Modifier.size(9.dp).clip(RoundedCornerShape(50)).background(cs.primary))
+                    Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.active_model else R.string.active_endpoint), fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.7.sp, color = cs.onSurfaceVariant)
+                    Spacer(Modifier.weight(1f))
+                    Text(state.activeName, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (onSwitchModel != null) {
+                        Text("›", fontSize = 18.sp, color = cs.onSurfaceVariant)
+                    }
+                }
             } else {
                 Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.no_active_model else R.string.no_active_endpoint), fontSize = 19.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
                 Text(stringResource(if (BuildConfig.LOCAL_MODELS) R.string.pick_model_hint else R.string.pick_endpoint_hint), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, modifier = Modifier.padding(top = 5.dp))
@@ -2478,6 +2510,38 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Un
                         ) {
                             Text(stringResource(lang.nameRes), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
                             Text(stringResource(lang.noteRes), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) } }
+    )
+}
+
+@Composable
+private fun ModelSwitchDialog(rows: List<ModelRow>, onDismiss: () -> Unit, onUse: (String) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.switch_model_title)) },
+        text = {
+            Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                rows.forEach { row ->
+                    Row(
+                        Modifier.fillMaxWidth().clickableRow(RectangleShape) { onUse(row.id) }.padding(vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                row.name,
+                                fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface,
+                                maxLines = 1, overflow = TextOverflow.Ellipsis
+                            )
+                            Text(row.badge, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                        }
+                        if (row.state == RowState.Active) {
+                            Pill(stringResource(R.string.active_pill), cs.primary, cs.onPrimary)
                         }
                     }
                 }

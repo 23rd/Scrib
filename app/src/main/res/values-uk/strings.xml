@@ -144,6 +144,7 @@
     <string name="action_delete">Видалити</string>
     <string name="action_use">Вибрати</string>
     <string name="action_close">Закрити</string>
+    <string name="switch_model_title">Змінити модель</string>
     <string name="action_save">Зберегти</string>
     <string name="action_stop">Стоп</string>
     <string name="action_copy">Копіювати</string>

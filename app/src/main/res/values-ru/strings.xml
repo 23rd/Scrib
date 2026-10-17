@@ -143,6 +143,7 @@
     <string name="action_delete">Удалить</string>
     <string name="action_use">Выбрать</string>
     <string name="action_close">Закрыть</string>
+    <string name="switch_model_title">Сменить модель</string>
     <string name="action_save">Сохранить</string>
     <string name="action_stop">Стоп</string>
     <string name="action_copy">Копировать</string>
