@@ -237,4 +237,30 @@
     <string name="whats_new_entry_title">Что нового и история изменений</string>
     <string name="whats_new_entry_sub">Заметки о прошлых версиях</string>
     <string name="whats_new_title">Что нового в %1$s</string>
+
+    <string name="nav_translate">Перевод</string>
+    <string name="translate_nudge_action">Выбрать модель в настройках</string>
+    <string name="translate_no_model">Нет модели перевода</string>
+    <string name="translate_no_model_hint">Выберите одну в разделе «Модели перевода» в настройках.</string>
+    <string name="translate_nudge_title">Настройте перевод</string>
+    <string name="translate_nudge_body">Модели перевода пока нет. Выберите одну в разделе «Модели перевода» в настройках — Index-Translate 2B рекомендуемый выбор: обучена переводу, 150 языков, около 1,3 ГБ.</string>
+    <string name="translate_active_model">МОДЕЛЬ ПЕРЕВОДА</string>
+    <string name="translate_privacy">Текст переводится полностью на вашем телефоне — ничего не отправляется.</string>
+    <string name="translate_source_hint">Введите или вставьте текст либо возьмите расшифровку</string>
+    <string name="translate_use_latest">Взять последнюю расшифровку</string>
+    <string name="translate_pick_transcript">Выбрать расшифровку</string>
+    <string name="translate_from">С</string>
+    <string name="translate_to">На</string>
+    <string name="translate_action">Перевести</string>
+    <string name="translate_running">Перевод…</string>
+    <string name="translate_loading_model">Загрузка модели…</string>
+    <string name="translate_result">ПЕРЕВОД</string>
+    <string name="translate_stats">%1$s · %2$d токенов · %3$s токенов/с</string>
+    <string name="translate_models">МОДЕЛИ ПЕРЕВОДА</string>
+    <string name="translate_models_hint">Любая instruct-модель в формате GGUF, которую читает llama.cpp. Index-Translate и TranslateGemma обучены переводу и верно передают сложные слова; универсальные чат-модели меньше и быстрее.</string>
+    <string name="translate_error_no_model">Сначала скачайте модель перевода и нажмите «Использовать».</string>
+    <string name="translate_error_empty">Нечего переводить.</string>
+    <string name="translate_error_failed">Перевод не удался: %1$s</string>
+    <string name="translate_remote_unavailable">Scrib Remote не хранит модели на телефоне, поэтому перевод в этой сборке недоступен.</string>
+    <string name="translate_hf_body">Вставьте прямую ссылку на instruct-модель в формате GGUF, опубликованную для llama.cpp.</string>
 </resources>

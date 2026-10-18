@@ -10,6 +10,7 @@ object SectionState {
     private const val KEY_SHERPA = "sherpaModels"
     private const val KEY_CUSTOM = "customModels"
     private const val KEY_ENDPOINT = "remoteEndpoint"
+    private const val KEY_TRANSLATION = "translationModels"
 
     fun standardModels(context: Context): Boolean = read(context, KEY_STANDARD, true)
 
@@ -26,6 +27,10 @@ object SectionState {
     fun remoteEndpoint(context: Context): Boolean = read(context, KEY_ENDPOINT, true)
 
     fun setRemoteEndpoint(context: Context, expanded: Boolean) = write(context, KEY_ENDPOINT, expanded)
+
+    fun translationModels(context: Context): Boolean = read(context, KEY_TRANSLATION, true)
+
+    fun setTranslationModels(context: Context, expanded: Boolean) = write(context, KEY_TRANSLATION, expanded)
 
     private fun read(context: Context, key: String, fallback: Boolean): Boolean =
         context.applicationContext
