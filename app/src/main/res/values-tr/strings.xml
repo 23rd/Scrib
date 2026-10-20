@@ -160,6 +160,8 @@
     <string name="lang_entry_sub">Bir dil seçin — Scrib doğru modeli indirir</string>
     <string name="your_language">Diliniz</string>
     <string name="lang_dialog_hint">Tek bir çok dilli model ~99 dili kapsar — bu, iyi bir boyut seçip indirir.</string>
+    <string name="lang_auto">Otomatik algıla</string>
+    <string name="lang_auto_sub">Her klibin dilini algıla</string>
     <string name="hf_dialog_title">HuggingFace modeli</string>
     <string name="hf_dialog_body">Bir model dosyasına doğrudan bağlantı yapıştırın: eski bir Whisper .bin ya da herhangi bir ailenin .gguf dosyası.</string>
     <string name="lang_english">İngilizce</string>
@@ -185,6 +187,7 @@
     <string name="status_ready_active">%1$s hazır ve etkin.</string>
     <string name="status_lang_ready_active">%1$s: %2$s hazır ve etkin.</string>
     <string name="status_lang_downloading">%1$s: %2$s indiriliyor</string>
+    <string name="status_lang_auto">Dil otomatik olarak algılanacak.</string>
     <string name="status_ellipsis">%1$s…</string>
     <string name="status_pct">%1$s… %2$d%%</string>
     <string name="status_fetching_from">%1$s adresinden indiriliyor — uygulamaya kaydediliyor.</string>

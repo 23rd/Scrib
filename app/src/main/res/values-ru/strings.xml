@@ -160,6 +160,8 @@
     <string name="lang_entry_sub">Выберите язык — Scrib скачает нужную модель</string>
     <string name="your_language">Ваш язык</string>
     <string name="lang_dialog_hint">Одна многоязычная модель покрывает ~99 языков — Scrib подберёт подходящий размер и скачает.</string>
+    <string name="lang_auto">Определять автоматически</string>
+    <string name="lang_auto_sub">Определять язык каждого клипа</string>
     <string name="hf_dialog_title">Модель с HuggingFace</string>
     <string name="hf_dialog_body">Вставьте прямую ссылку на файл модели: старый Whisper .bin или .gguf любого семейства.</string>
     <string name="lang_english">Английский</string>
@@ -185,6 +187,7 @@
     <string name="status_ready_active">%1$s готова и активна.</string>
     <string name="status_lang_ready_active">%1$s: %2$s готова и активна.</string>
     <string name="status_lang_downloading">%1$s: загрузка %2$s</string>
+    <string name="status_lang_auto">Язык будет определяться автоматически.</string>
     <string name="status_ellipsis">%1$s…</string>
     <string name="status_pct">%1$s… %2$d%%</string>
     <string name="status_fetching_from">Загрузка с %1$s — сохранение в приложение.</string>

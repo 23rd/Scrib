@@ -354,6 +354,11 @@ object ModelManager {
             .putString(KEY_LANGUAGE, code).apply()
     }
 
+    fun clearLanguage(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .remove(KEY_LANGUAGE).apply()
+    }
+
     fun pinnedModels(context: Context): Set<String> =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .getStringSet(KEY_PINNED, emptySet()).orEmpty()

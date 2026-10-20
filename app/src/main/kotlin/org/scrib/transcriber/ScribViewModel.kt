@@ -389,8 +389,15 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         push()
     }
 
-    fun setupForLanguage(language: LanguageOption) {
+    fun setupForLanguage(language: LanguageOption?) {
         if (BenchmarkBatchGate.isActive) return
+        if (language == null) {
+            ModelManager.clearLanguage(ctx)
+            statusMsg = str(R.string.status_lang_auto)
+            statusError = false
+            push()
+            return
+        }
         val f = language.recommendedFileName
         val model = ModelCatalog.byFileName(f) ?: return
         ModelManager.setLanguage(ctx, language.code)

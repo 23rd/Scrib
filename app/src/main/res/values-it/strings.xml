@@ -160,6 +160,8 @@
     <string name="lang_entry_sub">Scegli una lingua — Scrib scarica il modello giusto</string>
     <string name="your_language">La tua lingua</string>
     <string name="lang_dialog_hint">Un modello multilingue copre ~99 lingue — questo sceglie una buona dimensione e la scarica.</string>
+    <string name="lang_auto">Rilevamento automatico</string>
+    <string name="lang_auto_sub">Rileva la lingua di ogni clip</string>
     <string name="hf_dialog_title">Modello da HuggingFace</string>
     <string name="hf_dialog_body">Incolla un link diretto a un file di modello: un vecchio .bin Whisper o un .gguf di qualsiasi famiglia.</string>
     <string name="lang_english">Inglese</string>
@@ -185,6 +187,7 @@
     <string name="status_ready_active">%1$s è pronto e attivo.</string>
     <string name="status_lang_ready_active">%1$s: %2$s è pronto e attivo.</string>
     <string name="status_lang_downloading">%1$s: download di %2$s</string>
+    <string name="status_lang_auto">La lingua verrà rilevata automaticamente.</string>
     <string name="status_ellipsis">%1$s…</string>
     <string name="status_pct">%1$s… %2$d%%</string>
     <string name="status_fetching_from">Download da %1$s — salvataggio nell\'app.</string>

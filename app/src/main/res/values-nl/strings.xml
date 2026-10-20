@@ -160,6 +160,8 @@
     <string name="lang_entry_sub">Kies een taal — Scrib downloadt het juiste model</string>
     <string name="your_language">Je taal</string>
     <string name="lang_dialog_hint">Eén meertalig model dekt ~99 talen — dit kiest een goede grootte en downloadt die.</string>
+    <string name="lang_auto">Automatisch detecteren</string>
+    <string name="lang_auto_sub">De taal van elke clip detecteren</string>
     <string name="hf_dialog_title">Model van HuggingFace</string>
     <string name="hf_dialog_body">Plak een directe link naar een modelbestand: een oude Whisper-.bin of een .gguf van elke familie.</string>
     <string name="lang_english">Engels</string>
@@ -185,6 +187,7 @@
     <string name="status_ready_active">%1$s is klaar en actief.</string>
     <string name="status_lang_ready_active">%1$s: %2$s is klaar en actief.</string>
     <string name="status_lang_downloading">%1$s: %2$s downloaden</string>
+    <string name="status_lang_auto">De taal wordt automatisch gedetecteerd.</string>
     <string name="status_ellipsis">%1$s…</string>
     <string name="status_pct">%1$s… %2$d%%</string>
     <string name="status_fetching_from">Downloaden van %1$s — opslaan in de app.</string>

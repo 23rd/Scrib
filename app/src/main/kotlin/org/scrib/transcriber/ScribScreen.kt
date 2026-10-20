@@ -125,7 +125,7 @@ fun ScribScreen(
     onSelfTest: () -> Unit,
     onBenchmarkFile: (Uri, String?) -> Unit,
     onCancelBenchmark: () -> Unit,
-    onPickLanguage: (LanguageOption) -> Unit,
+    onPickLanguage: (LanguageOption?) -> Unit,
     onSkipSilence: (Boolean) -> Unit,
     onLiveStats: (Boolean) -> Unit,
     onKeyboardStats: (Boolean) -> Unit,
@@ -2491,7 +2491,7 @@ private fun KeyActionButton(
 }
 
 @Composable
-private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Unit) {
+private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption?) -> Unit) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -2504,6 +2504,12 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption) -> Un
                 )
                 Spacer(Modifier.height(6.dp))
                 Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    Column(
+                        Modifier.fillMaxWidth().clickableRow(RectangleShape) { onPick(null) }.padding(vertical = 10.dp)
+                    ) {
+                        Text(stringResource(R.string.lang_auto), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = cs.onSurface)
+                        Text(stringResource(R.string.lang_auto_sub), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                    }
                     LanguageCatalog.LANGUAGES.forEach { lang ->
                         Column(
                             Modifier.fillMaxWidth().clickableRow(RectangleShape) { onPick(lang) }.padding(vertical = 10.dp)

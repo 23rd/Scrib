@@ -160,6 +160,8 @@
     <string name="lang_entry_sub">Escolha um idioma — o Scrib baixa o modelo certo</string>
     <string name="your_language">Seu idioma</string>
     <string name="lang_dialog_hint">Um modelo multilíngue cobre ~99 idiomas — isto escolhe um bom tamanho e baixa.</string>
+    <string name="lang_auto">Detecção automática</string>
+    <string name="lang_auto_sub">Detectar o idioma de cada clipe</string>
     <string name="hf_dialog_title">Modelo do HuggingFace</string>
     <string name="hf_dialog_body">Cole um link direto para um ficheiro de modelo: um .bin antigo do Whisper ou um .gguf de qualquer família.</string>
     <string name="lang_english">Inglês</string>
@@ -185,6 +187,7 @@
     <string name="status_ready_active">%1$s está pronto e ativo.</string>
     <string name="status_lang_ready_active">%1$s: %2$s está pronto e ativo.</string>
     <string name="status_lang_downloading">%1$s: baixando %2$s</string>
+    <string name="status_lang_auto">O idioma será detectado automaticamente.</string>
     <string name="status_ellipsis">%1$s…</string>
     <string name="status_pct">%1$s… %2$d%%</string>
     <string name="status_fetching_from">Baixando de %1$s — salvando no app.</string>
