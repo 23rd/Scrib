@@ -237,4 +237,30 @@
     <string name="whats_new_entry_title">Yenilikler ve değişiklik günlüğü</string>
     <string name="whats_new_entry_sub">Önceki sürümlerin sürüm notları</string>
     <string name="whats_new_title">%1$s sürümündeki yenilikler</string>
+
+    <string name="nav_translate">Çevir</string>
+    <string name="translate_nudge_action">Ayarlardan bir model seç</string>
+    <string name="translate_no_model">Çeviri modeli yok</string>
+    <string name="translate_no_model_hint">Ayarlar\'daki Çeviri modelleri bölümünden birini seç.</string>
+    <string name="translate_nudge_title">Çeviriyi ayarla</string>
+    <string name="translate_nudge_body">Henüz çeviri modeli yok. Ayarlar\'daki Çeviri modelleri bölümünden birini seç — Index-Translate 2B önerilen seçim: çeviri için eğitilmiş, 150 dil, yaklaşık 1,3 GB.</string>
+    <string name="translate_active_model">ÇEVİRİ MODELİ</string>
+    <string name="translate_privacy">Metin tamamen telefonunda çevrilir — hiçbir şey yüklenmez.</string>
+    <string name="translate_source_hint">Metin yaz ya da yapıştır, ya da bir dökümü al</string>
+    <string name="translate_use_latest">Son dökümü kullan</string>
+    <string name="translate_pick_transcript">Bir döküm seç</string>
+    <string name="translate_from">Kaynak</string>
+    <string name="translate_to">Hedef</string>
+    <string name="translate_action">Çevir</string>
+    <string name="translate_running">Çevriliyor…</string>
+    <string name="translate_loading_model">Model yükleniyor…</string>
+    <string name="translate_result">ÇEVİRİ</string>
+    <string name="translate_stats">%1$s · %2$d token · %3$s token/s</string>
+    <string name="translate_models">ÇEVİRİ MODELLERİ</string>
+    <string name="translate_models_hint">llama.cpp\'nin okuduğu GGUF biçimindeki herhangi bir instruct modeli. Index-Translate ve TranslateGemma çeviri için eğitilmiştir ve zor kelimeleri doğru çevirir; genel sohbet modelleri daha küçük ve hızlıdır.</string>
+    <string name="translate_error_no_model">Önce bir çeviri modeli indir ve Kullan\'a dokun.</string>
+    <string name="translate_error_empty">Çevrilecek bir şey yok.</string>
+    <string name="translate_error_failed">Çeviri başarısız: %1$s</string>
+    <string name="translate_remote_unavailable">Scrib Remote telefonda model tutmaz, bu yüzden bu sürümde çeviri yok.</string>
+    <string name="translate_hf_body">llama.cpp için yayımlanmış GGUF biçiminde bir instruct modeline doğrudan bağlantı yapıştır.</string>
 </resources>

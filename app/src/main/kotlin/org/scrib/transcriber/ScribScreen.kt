@@ -109,6 +109,7 @@ private enum class ScribTab(val labelRes: Int, val icon: Int) {
     Home(R.string.nav_home, R.drawable.ic_tab_home),
     Record(R.string.nav_record, R.drawable.ic_tab_mic),
     File(R.string.nav_transcribe, R.drawable.ic_tab_graphic_eq),
+    Translate(R.string.nav_translate, R.drawable.ic_tab_translate),
     Keyboard(R.string.nav_keyboard, R.drawable.ic_tab_keyboard),
     Settings(R.string.nav_settings, R.drawable.ic_tab_settings)
 }
@@ -169,6 +170,7 @@ fun ScribScreen(
     val context = LocalContext.current
     var modelsExpanded by remember { mutableStateOf(SectionState.standardModels(context)) }
     var customExpanded by remember { mutableStateOf(SectionState.customModels(context)) }
+    var translationExpanded by remember { mutableStateOf(SectionState.translationModels(context)) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) onImport(uri, queryDisplayName(context, uri))
     }
@@ -243,6 +245,7 @@ fun ScribScreen(
                     onClearHistory = onClearHistory
                 )
                 ScribTab.File -> FileTab(state, actions, onOpenTab = { tab = it }) { audioPicker.launch(arrayOf("audio/*", "video/*")) }
+                ScribTab.Translate -> TranslateTab(state.history, transcription, onOpenSettings = { tab = ScribTab.Settings })
                 ScribTab.Keyboard -> KeyboardTab(state.keyboardLayouts, onConfigureKeyboardLayouts)
                 ScribTab.Settings -> SettingsTab(
                     state = state,
@@ -258,6 +261,12 @@ fun ScribScreen(
                         val next = !customExpanded
                         customExpanded = next
                         SectionState.setCustomModels(context, next)
+                    },
+                    translationExpanded = translationExpanded,
+                    onToggleTranslation = {
+                        val next = !translationExpanded
+                        translationExpanded = next
+                        SectionState.setTranslationModels(context, next)
                     },
                     sherpaPlugin = sherpaPlugin,
                     endpointPlugin = endpointPlugin,
@@ -384,6 +393,9 @@ private fun HomeTab(
             }
         }
         if (!state.firstRun) {
+            if (BuildConfig.LOCAL_MODELS) {
+                item { TranslationStatusCard(onOpenSettings = { onOpenTab(ScribTab.Settings) }) }
+            }
             item {
                 ServiceCard(
                     glyph = "🎙",
@@ -857,6 +869,8 @@ private fun SettingsTab(
     customExpanded: Boolean,
     onToggleStandard: () -> Unit,
     onToggleCustom: () -> Unit,
+    translationExpanded: Boolean,
+    onToggleTranslation: () -> Unit,
     sherpaPlugin: SherpaPlugin?,
     endpointPlugin: EndpointPlugin?,
     onEndpointChanged: () -> Unit,
@@ -937,6 +951,7 @@ private fun SettingsTab(
                     AddButton("↧", stringResource(R.string.import_external), onImportExternal)
                 }
             }
+            item { TranslationModelsSection(expanded = translationExpanded, onToggle = onToggleTranslation) }
         }
         if (state.statusMsg.isNotEmpty()) {
             item { StatusBox(state.statusMsg, state.statusError) }
@@ -1291,7 +1306,7 @@ private fun QualityBars(tier: Int, active: Boolean) {
 }
 
 @Composable
-internal fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit) {
+internal fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit, showPin: Boolean = true) {
     val cs = MaterialTheme.colorScheme
     val active = row.state == RowState.Active
     val bg = if (active) cs.primaryContainer else cs.surface
@@ -1332,13 +1347,13 @@ internal fun ModelRowCard(row: ModelRow, actions: Actions, onRequestDelete: (Str
                 }
             }
             Spacer(Modifier.height(12.dp))
-            ActionZone(row, actions, onRequestDelete)
+            ActionZone(row, actions, onRequestDelete, showPin)
         }
     }
 }
 
 @Composable
-private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit) {
+private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String) -> Unit, showPin: Boolean) {
     val cs = MaterialTheme.colorScheme
     when (row.state) {
         RowState.NotDownloaded -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -1360,13 +1375,13 @@ private fun ActionZone(row: ModelRow, actions: Actions, onRequestDelete: (String
             TextButton(onClick = { actions.onCancel(row.id) }) { Text(stringResource(R.string.action_cancel), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
         }
         RowState.Installed -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-            PinToggle(row.pinned, row.id, actions)
+            if (showPin) PinToggle(row.pinned, row.id, actions)
             TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant) }
             Spacer(Modifier.width(6.dp))
             Chip(stringResource(R.string.action_use), cs.primaryContainer, cs.onPrimaryContainer) { actions.onUse(row.id) }
         }
         RowState.Active -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            PinToggle(row.pinned, row.id, actions)
+            if (showPin) PinToggle(row.pinned, row.id, actions)
             TextButton(onClick = { onRequestDelete(row.id) }) { Text(stringResource(R.string.action_delete), fontSize = 13.5.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer.copy(alpha = 0.85f)) }
         }
     }
@@ -1400,7 +1415,7 @@ private fun Chip(text: String, bg: Color, fg: Color, onClick: () -> Unit) {
 }
 
 @Composable
-private fun AddButton(glyph: String, label: String, onClick: () -> Unit) {
+internal fun AddButton(glyph: String, label: String, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surface, shape = RoundedCornerShape(16.dp), border = BorderStroke(1.dp, cs.outline),
@@ -2545,7 +2560,7 @@ private fun LanguageDialog(onDismiss: () -> Unit, onPick: (LanguageOption?) -> U
 }
 
 @Composable
-private fun ModelSwitchDialog(rows: List<ModelRow>, onDismiss: () -> Unit, onUse: (String) -> Unit) {
+internal fun ModelSwitchDialog(rows: List<ModelRow>, onDismiss: () -> Unit, onUse: (String) -> Unit) {
     val cs = MaterialTheme.colorScheme
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -2577,14 +2592,14 @@ private fun ModelSwitchDialog(rows: List<ModelRow>, onDismiss: () -> Unit, onUse
 }
 
 @Composable
-private fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+internal fun AddUrlDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit, bodyRes: Int = R.string.hf_dialog_body) {
     var text by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.hf_dialog_title)) },
         text = {
             Column {
-                Text(stringResource(R.string.hf_dialog_body), fontSize = 13.sp)
+                Text(stringResource(bodyRes), fontSize = 13.sp)
                 Spacer(Modifier.height(12.dp))
                 OutlinedTextField(value = text, onValueChange = { text = it }, singleLine = false, placeholder = { Text(stringResource(R.string.hf_placeholder)) })
             }

@@ -237,4 +237,30 @@
     <string name="whats_new_entry_title">Wat is er nieuw en wijzigingslogboek</string>
     <string name="whats_new_entry_sub">Uitgaveopmerkingen van eerdere versies</string>
     <string name="whats_new_title">Wat is er nieuw in %1$s</string>
+
+    <string name="nav_translate">Vertalen</string>
+    <string name="translate_nudge_action">Kies een model in Instellingen</string>
+    <string name="translate_no_model">Geen vertaalmodel</string>
+    <string name="translate_no_model_hint">Kies er een onder Vertaalmodellen in Instellingen.</string>
+    <string name="translate_nudge_title">Vertaling instellen</string>
+    <string name="translate_nudge_body">Nog geen vertaalmodel. Kies er een onder Vertaalmodellen in Instellingen — Index-Translate 2B is de aanbevolen keuze: getraind voor vertaling, 150 talen, ongeveer 1,3 GB.</string>
+    <string name="translate_active_model">VERTAALMODEL</string>
+    <string name="translate_privacy">De tekst wordt volledig op je telefoon vertaald — er wordt niets geüpload.</string>
+    <string name="translate_source_hint">Typ of plak tekst, of neem een transcript over</string>
+    <string name="translate_use_latest">Laatste transcript gebruiken</string>
+    <string name="translate_pick_transcript">Een transcript kiezen</string>
+    <string name="translate_from">Van</string>
+    <string name="translate_to">Naar</string>
+    <string name="translate_action">Vertalen</string>
+    <string name="translate_running">Vertalen…</string>
+    <string name="translate_loading_model">Model wordt geladen…</string>
+    <string name="translate_result">VERTALING</string>
+    <string name="translate_stats">%1$s · %2$d tokens · %3$s tokens/s</string>
+    <string name="translate_models">VERTAALMODELLEN</string>
+    <string name="translate_models_hint">Elk instruct-model in GGUF-formaat dat llama.cpp leest. Index-Translate en TranslateGemma zijn getraind voor vertaling en krijgen de lastige woorden goed; de algemene chatmodellen zijn kleiner en sneller.</string>
+    <string name="translate_error_no_model">Download eerst een vertaalmodel en tik op Gebruiken.</string>
+    <string name="translate_error_empty">Niets te vertalen.</string>
+    <string name="translate_error_failed">Vertalen mislukt: %1$s</string>
+    <string name="translate_remote_unavailable">Scrib Remote bewaart geen modellen op de telefoon, dus vertalen is in deze versie niet beschikbaar.</string>
+    <string name="translate_hf_body">Plak een directe link naar een instruct-model in GGUF-formaat, zoals gepubliceerd voor llama.cpp.</string>
 </resources>

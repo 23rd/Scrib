@@ -237,4 +237,30 @@
     <string name="whats_new_entry_title">Quoi de neuf et journal des modifications</string>
     <string name="whats_new_entry_sub">Notes de versions antérieures</string>
     <string name="whats_new_title">Nouveautés de %1$s</string>
+
+    <string name="nav_translate">Traduire</string>
+    <string name="translate_nudge_action">Choisir un modèle dans les réglages</string>
+    <string name="translate_no_model">Aucun modèle de traduction</string>
+    <string name="translate_no_model_hint">Choisissez-en un sous Modèles de traduction dans les réglages.</string>
+    <string name="translate_nudge_title">Configurer la traduction</string>
+    <string name="translate_nudge_body">Pas encore de modèle de traduction. Choisissez-en un sous Modèles de traduction dans les réglages — Index-Translate 2B est le choix recommandé : entraîné pour la traduction, 150 langues, environ 1,3 Go.</string>
+    <string name="translate_active_model">MODÈLE DE TRADUCTION</string>
+    <string name="translate_privacy">Le texte est traduit entièrement sur votre téléphone — rien n\'est envoyé.</string>
+    <string name="translate_source_hint">Saisissez ou collez du texte, ou reprenez une transcription</string>
+    <string name="translate_use_latest">Utiliser la dernière transcription</string>
+    <string name="translate_pick_transcript">Choisir une transcription</string>
+    <string name="translate_from">De</string>
+    <string name="translate_to">Vers</string>
+    <string name="translate_action">Traduire</string>
+    <string name="translate_running">Traduction…</string>
+    <string name="translate_loading_model">Chargement du modèle…</string>
+    <string name="translate_result">TRADUCTION</string>
+    <string name="translate_stats">%1$s · %2$d jetons · %3$s jetons/s</string>
+    <string name="translate_models">MODÈLES DE TRADUCTION</string>
+    <string name="translate_models_hint">Tout modèle instruct au format GGUF lu par llama.cpp. Index-Translate et TranslateGemma sont entraînés pour la traduction et rendent correctement les mots délicats ; les modèles de chat généraux sont plus petits et plus rapides.</string>
+    <string name="translate_error_no_model">Téléchargez d\'abord un modèle de traduction et appuyez sur Utiliser.</string>
+    <string name="translate_error_empty">Rien à traduire.</string>
+    <string name="translate_error_failed">Échec de la traduction : %1$s</string>
+    <string name="translate_remote_unavailable">Scrib Remote ne garde aucun modèle sur le téléphone ; la traduction n\'est donc pas disponible dans cette version.</string>
+    <string name="translate_hf_body">Collez un lien direct vers un modèle instruct au format GGUF, tel que publié pour llama.cpp.</string>
 </resources>

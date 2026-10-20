@@ -257,4 +257,30 @@
     <string name="whats_new_entry_title">What\'s new and changelog</string>
     <string name="whats_new_entry_sub">Release notes of past versions</string>
     <string name="whats_new_title">What\'s new in %1$s</string>
+
+    <string name="nav_translate">Translate</string>
+    <string name="translate_nudge_action">Choose a model in Settings</string>
+    <string name="translate_no_model">No translation model</string>
+    <string name="translate_no_model_hint">Pick one under Translation models in Settings.</string>
+    <string name="translate_nudge_title">Set up translation</string>
+    <string name="translate_nudge_body">No translation model yet. Pick one under Translation models in Settings — Index-Translate 2B is the recommended choice: trained for translation, 150 languages, about 1.3 GB.</string>
+    <string name="translate_active_model">TRANSLATION MODEL</string>
+    <string name="translate_privacy">Text is translated entirely on your phone — nothing is uploaded.</string>
+    <string name="translate_source_hint">Type or paste text, or take a transcript</string>
+    <string name="translate_use_latest">Use latest transcript</string>
+    <string name="translate_pick_transcript">Pick a transcript</string>
+    <string name="translate_from">From</string>
+    <string name="translate_to">To</string>
+    <string name="translate_action">Translate</string>
+    <string name="translate_running">Translating…</string>
+    <string name="translate_loading_model">Loading model…</string>
+    <string name="translate_result">TRANSLATION</string>
+    <string name="translate_stats">%1$s · %2$d tokens · %3$s tokens/s</string>
+    <string name="translate_models">TRANSLATION MODELS</string>
+    <string name="translate_models_hint">Any instruct model in GGUF format that llama.cpp reads. Index-Translate and TranslateGemma are trained for translation and get the tricky words right; the general chat models are smaller and faster.</string>
+    <string name="translate_error_no_model">Download a translation model first and tap Use.</string>
+    <string name="translate_error_empty">Nothing to translate.</string>
+    <string name="translate_error_failed">Translation failed: %1$s</string>
+    <string name="translate_remote_unavailable">Scrib Remote keeps no models on the phone, so translation is not available in this build.</string>
+    <string name="translate_hf_body">Paste a direct link to an instruct model in GGUF format, as published for llama.cpp.</string>
 </resources>
