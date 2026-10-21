@@ -1698,6 +1698,10 @@ private fun TranscriptionDialog(
                                     stringResource(R.string.action_save_ext, t.format.extension)
                                 )
                             }
+                            // hand the text to the Translate tab
+                            IconButton(onClick = { onClose(); AppNav.openTranslate(t.text) }, modifier = Modifier.testTag("scrib/transcription/translate")) {
+                                Icon(painterResource(R.drawable.ic_tab_translate), stringResource(R.string.action_translate))
+                            }
                         }
                     }
                 }
@@ -1761,6 +1765,9 @@ private fun HistoryEntryDialog(
                             painterResource(R.drawable.ic_action_save),
                             stringResource(R.string.action_save_ext, TranscriptFormat.TXT.extension)
                         )
+                    }
+                    IconButton(onClick = { onClose(); AppNav.openTranslate(entry.text) }) {
+                        Icon(painterResource(R.drawable.ic_tab_translate), stringResource(R.string.action_translate))
                     }
                 }
             }
