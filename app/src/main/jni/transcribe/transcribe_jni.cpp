@@ -4,6 +4,16 @@
 
 #include <dlfcn.h>
 
+#if defined(__aarch64__)
+#include <sys/auxv.h>
+#ifndef HWCAP2_I8MM
+#define HWCAP2_I8MM (1UL << 13)
+#endif
+#ifndef HWCAP2_BF16
+#define HWCAP2_BF16 (1UL << 14)
+#endif
+#endif
+
 #include <atomic>
 #include <cstdio>
 #include <cstring>
@@ -44,15 +54,32 @@ static void load_cpu_backend() {
         transcribe_log_set(bridge_log, nullptr);
     }
 
-    static const char *const backends[] = {
+    static const char *const base_backends[] = {
             "libggml-cpu-android_armv8.2_2.so",
             "libggml-cpu-android_armv8.0_1.so",
     };
 
+    const char *const *backends = base_backends;
+    size_t backend_count = sizeof(base_backends) / sizeof(base_backends[0]);
+
+#if defined(__aarch64__)
+    static const char *const i8mm_backends[] = {
+            "libggml-cpu-android_armv8.6_1.so",
+            base_backends[0],
+            base_backends[1],
+    };
+    unsigned long caps2 = getauxval(AT_HWCAP2);
+    if ((caps2 & (HWCAP2_I8MM | HWCAP2_BF16)) == (HWCAP2_I8MM | HWCAP2_BF16)) {
+        backends = i8mm_backends;
+        backend_count = sizeof(i8mm_backends) / sizeof(i8mm_backends[0]);
+        __android_log_print(ANDROID_LOG_INFO, TAG, "CPU reports i8mm and bf16, trying the matmul backend first");
+    }
+#endif
+
     if (ggml_backend_reg_count() > 0) {
         return;
     }
-    for (size_t i = 0; i < sizeof(backends) / sizeof(backends[0]); ++i) {
+    for (size_t i = 0; i < backend_count; ++i) {
         if (ggml_backend_load(backends[i]) != nullptr) {
             __android_log_print(ANDROID_LOG_INFO, TAG, "Loaded cpu backend %s", backends[i]);
             return;

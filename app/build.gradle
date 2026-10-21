@@ -125,7 +125,6 @@ android {
     packaging {
         jniLibs {
             excludes += ['**/libggml-cpu-android_armv8.2_1.so',
-                         '**/libggml-cpu-android_armv8.6*.so',
                          '**/libggml-cpu-android_armv9*.so']
         }
     }
