@@ -33,6 +33,7 @@ data class TranslationUi(
     val statusMsg: String,
     val statusError: Boolean,
     val run: TranslateRun?,
+    val history: List<TranslationHistory.Entry>,
 )
 
 class TranslationViewModel(app: Application) : AndroidViewModel(app) {
@@ -100,6 +101,7 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
             targetLanguage = TranslationModels.targetLanguage(ctx),
             statusMsg = statusMsg, statusError = statusError,
             run = run,
+            history = history(),
         )
     }
 
@@ -248,6 +250,10 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
                     result.text, running = false, error = null,
                     elapsedMs = SystemClock.elapsedRealtime() - start, tokens = result.tokens, modelName = modelName
                 )
+                if (result.text.isNotBlank()) {
+                    TranslationHistory.save(ctx, text, result.text, source.orEmpty(), target, modelName)
+                    historyCache = null
+                }
             } catch (e: CancelledException) {
                 run = run?.copy(running = false, loading = false, elapsedMs = SystemClock.elapsedRealtime() - start)
             } catch (e: Throwable) {
@@ -267,6 +273,23 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
     fun dismissRun() {
         if (run?.running == true) return
         run = null
+        push()
+    }
+
+    private var historyCache: List<TranslationHistory.Entry>? = null
+
+    private fun history(): List<TranslationHistory.Entry> =
+        historyCache ?: TranslationHistory.load(ctx).also { historyCache = it }
+
+    fun deleteHistoryEntry(id: String) {
+        TranslationHistory.delete(ctx, id)
+        historyCache = null
+        push()
+    }
+
+    fun clearHistory() {
+        TranslationHistory.clearAll(ctx)
+        historyCache = null
         push()
     }
 

@@ -263,4 +263,9 @@
     <string name="translate_error_failed">La traducción falló: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote no guarda modelos en el teléfono, así que la traducción no está disponible en esta versión.</string>
     <string name="translate_hf_body">Pega un enlace directo a un modelo instruct en formato GGUF, tal como se publica para llama.cpp.</string>
+    <string name="action_translate">Traducir</string>
+    <string name="translate_history_section">Traducciones</string>
+    <string name="translate_history_original">ORIGINAL</string>
+    <string name="translate_history_clear_title">¿Borrar todas las traducciones?</string>
+    <string name="translate_history_clear_message">Todas las traducciones guardadas se eliminarán permanentemente de este dispositivo.</string>
 </resources>

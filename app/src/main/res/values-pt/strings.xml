@@ -263,4 +263,9 @@
     <string name="translate_error_failed">A tradução falhou: %1$s</string>
     <string name="translate_remote_unavailable">O Scrib Remote não guarda modelos no telefone, então a tradução não está disponível nesta versão.</string>
     <string name="translate_hf_body">Cole um link direto para um modelo instruct no formato GGUF, conforme publicado para o llama.cpp.</string>
+    <string name="action_translate">Traduzir</string>
+    <string name="translate_history_section">Traduções</string>
+    <string name="translate_history_original">ORIGINAL</string>
+    <string name="translate_history_clear_title">Apagar todas as traduções?</string>
+    <string name="translate_history_clear_message">Todas as traduções guardadas serão excluídas permanentemente deste dispositivo.</string>
 </resources>

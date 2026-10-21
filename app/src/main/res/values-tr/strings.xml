@@ -263,4 +263,9 @@
     <string name="translate_error_failed">Çeviri başarısız: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote telefonda model tutmaz, bu yüzden bu sürümde çeviri yok.</string>
     <string name="translate_hf_body">llama.cpp için yayımlanmış GGUF biçiminde bir instruct modeline doğrudan bağlantı yapıştır.</string>
+    <string name="action_translate">Çevir</string>
+    <string name="translate_history_section">Çeviriler</string>
+    <string name="translate_history_original">ORİJİNAL</string>
+    <string name="translate_history_clear_title">Tüm çeviriler silinsin mi?</string>
+    <string name="translate_history_clear_message">Kaydedilen tüm çeviriler bu cihazdan kalıcı olarak silinecek.</string>
 </resources>

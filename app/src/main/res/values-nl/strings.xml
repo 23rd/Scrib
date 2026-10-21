@@ -263,4 +263,9 @@
     <string name="translate_error_failed">Vertalen mislukt: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote bewaart geen modellen op de telefoon, dus vertalen is in deze versie niet beschikbaar.</string>
     <string name="translate_hf_body">Plak een directe link naar een instruct-model in GGUF-formaat, zoals gepubliceerd voor llama.cpp.</string>
+    <string name="action_translate">Vertalen</string>
+    <string name="translate_history_section">Vertalingen</string>
+    <string name="translate_history_original">ORIGINEEL</string>
+    <string name="translate_history_clear_title">Alle vertalingen wissen?</string>
+    <string name="translate_history_clear_message">Alle bewaarde vertalingen worden permanent van dit apparaat verwijderd.</string>
 </resources>

@@ -283,4 +283,9 @@
     <string name="translate_error_failed">Translation failed: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote keeps no models on the phone, so translation is not available in this build.</string>
     <string name="translate_hf_body">Paste a direct link to an instruct model in GGUF format, as published for llama.cpp.</string>
+    <string name="action_translate">Translate</string>
+    <string name="translate_history_section">Translations</string>
+    <string name="translate_history_original">ORIGINAL</string>
+    <string name="translate_history_clear_title">Clear all translations?</string>
+    <string name="translate_history_clear_message">All kept translations will be permanently deleted from this device.</string>
 </resources>

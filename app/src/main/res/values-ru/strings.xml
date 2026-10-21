@@ -263,4 +263,9 @@
     <string name="translate_error_failed">Перевод не удался: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote не хранит модели на телефоне, поэтому перевод в этой сборке недоступен.</string>
     <string name="translate_hf_body">Вставьте прямую ссылку на instruct-модель в формате GGUF, опубликованную для llama.cpp.</string>
+    <string name="action_translate">Перевести</string>
+    <string name="translate_history_section">Переводы</string>
+    <string name="translate_history_original">ОРИГИНАЛ</string>
+    <string name="translate_history_clear_title">Удалить все переводы?</string>
+    <string name="translate_history_clear_message">Все сохранённые переводы будут безвозвратно удалены с этого устройства.</string>
 </resources>
