@@ -377,6 +377,7 @@ private fun HomeTab(
     onPickFile: () -> Unit,
     onSwitchModel: (() -> Unit)?
 ) {
+    val context = LocalContext.current
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -409,6 +410,40 @@ private fun HomeTab(
                     title = stringResource(R.string.transcribe_audio_file),
                     tag = "scrib/home/pick_file"
                 ) { onPickFile() }
+            }
+            if (BuildConfig.LOCAL_MODELS) {
+                item {
+                    ServiceCard(
+                        glyph = "🌐",
+                        title = stringResource(R.string.home_translate_text),
+                        tag = "scrib/home/translate"
+                    ) { onOpenTab(ScribTab.Translate) }
+                }
+                item {
+                    ServiceCard(
+                        glyph = "📋",
+                        title = stringResource(R.string.home_translate_clipboard),
+                        tag = "scrib/home/translate_clipboard"
+                    ) {
+                        val clip = context.getSystemService(android.content.ClipboardManager::class.java)
+                        val text = clip?.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+                        if (text.isNullOrBlank()) {
+                            android.widget.Toast.makeText(context, R.string.home_translate_clipboard_empty, android.widget.Toast.LENGTH_SHORT).show()
+                        } else {
+                            AppNav.openTranslate(text)
+                        }
+                    }
+                }
+                state.history.firstOrNull()?.let { latest ->
+                    item {
+                        ServiceCard(
+                            glyph = "🗒",
+                            title = stringResource(R.string.home_translate_latest),
+                            subtitle = latest.fileName,
+                            tag = "scrib/home/translate_latest"
+                        ) { AppNav.openTranslate(latest.text) }
+                    }
+                }
             }
             val quick = (state.standard + state.custom + state.sherpaRows).filter { it.id in state.pinnedIds }
             if (quick.isNotEmpty()) {

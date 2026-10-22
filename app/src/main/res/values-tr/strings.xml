@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Ayarlardan bir model seç</string>
     <string name="translate_no_model">Çeviri modeli yok</string>
     <string name="translate_no_model_hint">Ayarlar\'daki Çeviri modelleri bölümünden birini seç.</string>
+    <string name="home_translate_text">Metni çevir</string>
+    <string name="home_translate_clipboard">Panodaki metni çevir</string>
+    <string name="home_translate_latest">Son kaydı çevir</string>
+    <string name="home_translate_clipboard_empty">Panoda metin yok.</string>
     <string name="translate_nudge_title">Çeviriyi ayarla</string>
     <string name="translate_nudge_body">Henüz çeviri modeli yok. Ayarlar\'daki Çeviri modelleri bölümünden birini seç — Index-Translate 2B önerilen seçim: çeviri için eğitilmiş, 150 dil, yaklaşık 1,3 GB.</string>
     <string name="translate_active_model">ÇEVİRİ MODELİ</string>

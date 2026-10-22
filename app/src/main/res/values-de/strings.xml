@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Modell in den Einstellungen wählen</string>
     <string name="translate_no_model">Kein Übersetzungsmodell</string>
     <string name="translate_no_model_hint">Wähle eines unter „Übersetzungsmodelle“ in den Einstellungen.</string>
+    <string name="home_translate_text">Text übersetzen</string>
+    <string name="home_translate_clipboard">Text aus der Zwischenablage übersetzen</string>
+    <string name="home_translate_latest">Letzte Aufnahme übersetzen</string>
+    <string name="home_translate_clipboard_empty">Die Zwischenablage enthält keinen Text.</string>
     <string name="translate_nudge_title">Übersetzung einrichten</string>
     <string name="translate_nudge_body">Noch kein Übersetzungsmodell. Wähle eines unter „Übersetzungsmodelle“ in den Einstellungen — Index-Translate 2B ist die empfohlene Wahl: für Übersetzung trainiert, 150 Sprachen, etwa 1,3 GB.</string>
     <string name="translate_active_model">ÜBERSETZUNGSMODELL</string>

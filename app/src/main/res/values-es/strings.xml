@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Elegir un modelo en Ajustes</string>
     <string name="translate_no_model">Sin modelo de traducción</string>
     <string name="translate_no_model_hint">Elige uno en Modelos de traducción, en Ajustes.</string>
+    <string name="home_translate_text">Traducir texto</string>
+    <string name="home_translate_clipboard">Traducir el texto del portapapeles</string>
+    <string name="home_translate_latest">Traducir la última grabación</string>
+    <string name="home_translate_clipboard_empty">El portapapeles no contiene texto.</string>
     <string name="translate_nudge_title">Configurar la traducción</string>
     <string name="translate_nudge_body">Aún no hay modelo de traducción. Elige uno en Modelos de traducción, en Ajustes — Index-Translate 2B es la opción recomendada: entrenado para traducir, 150 idiomas, unos 1,3 GB.</string>
     <string name="translate_active_model">MODELO DE TRADUCCIÓN</string>

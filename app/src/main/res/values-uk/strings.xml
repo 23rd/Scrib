@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Вибрати модель у налаштуваннях</string>
     <string name="translate_no_model">Немає моделі перекладу</string>
     <string name="translate_no_model_hint">Виберіть одну в розділі «Моделі перекладу» в налаштуваннях.</string>
+    <string name="home_translate_text">Перекласти текст</string>
+    <string name="home_translate_clipboard">Перекласти текст із буфера обміну</string>
+    <string name="home_translate_latest">Перекласти останній запис</string>
+    <string name="home_translate_clipboard_empty">У буфері обміну немає тексту.</string>
     <string name="translate_nudge_title">Налаштуйте переклад</string>
     <string name="translate_nudge_body">Моделі перекладу ще немає. Виберіть одну в розділі «Моделі перекладу» в налаштуваннях — Index-Translate 2B рекомендований вибір: навчена перекладу, 150 мов, близько 1,3 ГБ.</string>
     <string name="translate_active_model">МОДЕЛЬ ПЕРЕКЛАДУ</string>

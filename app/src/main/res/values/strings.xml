@@ -262,6 +262,10 @@
     <string name="translate_nudge_action">Choose a model in Settings</string>
     <string name="translate_no_model">No translation model</string>
     <string name="translate_no_model_hint">Pick one under Translation models in Settings.</string>
+    <string name="home_translate_text">Translate text</string>
+    <string name="home_translate_clipboard">Translate clipboard text</string>
+    <string name="home_translate_latest">Translate the latest recording</string>
+    <string name="home_translate_clipboard_empty">The clipboard holds no text.</string>
     <string name="translate_nudge_title">Set up translation</string>
     <string name="translate_nudge_body">No translation model yet. Pick one under Translation models in Settings — Index-Translate 2B is the recommended choice: trained for translation, 150 languages, about 1.3 GB.</string>
     <string name="translate_active_model">TRANSLATION MODEL</string>

@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Choisir un modèle dans les réglages</string>
     <string name="translate_no_model">Aucun modèle de traduction</string>
     <string name="translate_no_model_hint">Choisissez-en un sous Modèles de traduction dans les réglages.</string>
+    <string name="home_translate_text">Traduire du texte</string>
+    <string name="home_translate_clipboard">Traduire le texte du presse-papiers</string>
+    <string name="home_translate_latest">Traduire le dernier enregistrement</string>
+    <string name="home_translate_clipboard_empty">Le presse-papiers ne contient pas de texte.</string>
     <string name="translate_nudge_title">Configurer la traduction</string>
     <string name="translate_nudge_body">Pas encore de modèle de traduction. Choisissez-en un sous Modèles de traduction dans les réglages — Index-Translate 2B est le choix recommandé : entraîné pour la traduction, 150 langues, environ 1,3 Go.</string>
     <string name="translate_active_model">MODÈLE DE TRADUCTION</string>

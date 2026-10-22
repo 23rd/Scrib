@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Kies een model in Instellingen</string>
     <string name="translate_no_model">Geen vertaalmodel</string>
     <string name="translate_no_model_hint">Kies er een onder Vertaalmodellen in Instellingen.</string>
+    <string name="home_translate_text">Tekst vertalen</string>
+    <string name="home_translate_clipboard">Tekst van het klembord vertalen</string>
+    <string name="home_translate_latest">Laatste opname vertalen</string>
+    <string name="home_translate_clipboard_empty">Het klembord bevat geen tekst.</string>
     <string name="translate_nudge_title">Vertaling instellen</string>
     <string name="translate_nudge_body">Nog geen vertaalmodel. Kies er een onder Vertaalmodellen in Instellingen — Index-Translate 2B is de aanbevolen keuze: getraind voor vertaling, 150 talen, ongeveer 1,3 GB.</string>
     <string name="translate_active_model">VERTAALMODEL</string>

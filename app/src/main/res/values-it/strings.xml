@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Scegli un modello nelle impostazioni</string>
     <string name="translate_no_model">Nessun modello di traduzione</string>
     <string name="translate_no_model_hint">Scegline uno in Modelli di traduzione nelle impostazioni.</string>
+    <string name="home_translate_text">Traduci testo</string>
+    <string name="home_translate_clipboard">Traduci il testo degli appunti</string>
+    <string name="home_translate_latest">Traduci l\'ultima registrazione</string>
+    <string name="home_translate_clipboard_empty">Gli appunti non contengono testo.</string>
     <string name="translate_nudge_title">Configura la traduzione</string>
     <string name="translate_nudge_body">Nessun modello di traduzione ancora. Scegline uno in Modelli di traduzione nelle impostazioni — Index-Translate 2B è la scelta consigliata: addestrato per la traduzione, 150 lingue, circa 1,3 GB.</string>
     <string name="translate_active_model">MODELLO DI TRADUZIONE</string>
