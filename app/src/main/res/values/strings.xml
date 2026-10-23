@@ -262,6 +262,10 @@
     <string name="translate_nudge_action">Choose a model in Settings</string>
     <string name="translate_no_model">No translation model</string>
     <string name="translate_no_model_hint">Pick one under Translation models in Settings.</string>
+    <string name="home_translate_text">Translate text</string>
+    <string name="home_translate_clipboard">Translate clipboard text</string>
+    <string name="home_translate_latest">Translate the latest recording</string>
+    <string name="home_translate_clipboard_empty">The clipboard holds no text.</string>
     <string name="translate_nudge_title">Set up translation</string>
     <string name="translate_nudge_body">No translation model yet. Pick one under Translation models in Settings — Index-Translate 2B is the recommended choice: trained for translation, 150 languages, about 1.3 GB.</string>
     <string name="translate_active_model">TRANSLATION MODEL</string>
@@ -283,4 +287,9 @@
     <string name="translate_error_failed">Translation failed: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote keeps no models on the phone, so translation is not available in this build.</string>
     <string name="translate_hf_body">Paste a direct link to an instruct model in GGUF format, as published for llama.cpp.</string>
+    <string name="action_translate">Translate</string>
+    <string name="translate_history_section">Translations</string>
+    <string name="translate_history_original">ORIGINAL</string>
+    <string name="translate_history_clear_title">Clear all translations?</string>
+    <string name="translate_history_clear_message">All kept translations will be permanently deleted from this device.</string>
 </resources>

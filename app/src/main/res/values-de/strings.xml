@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Modell in den Einstellungen wählen</string>
     <string name="translate_no_model">Kein Übersetzungsmodell</string>
     <string name="translate_no_model_hint">Wähle eines unter „Übersetzungsmodelle“ in den Einstellungen.</string>
+    <string name="home_translate_text">Text übersetzen</string>
+    <string name="home_translate_clipboard">Text aus der Zwischenablage übersetzen</string>
+    <string name="home_translate_latest">Letzte Aufnahme übersetzen</string>
+    <string name="home_translate_clipboard_empty">Die Zwischenablage enthält keinen Text.</string>
     <string name="translate_nudge_title">Übersetzung einrichten</string>
     <string name="translate_nudge_body">Noch kein Übersetzungsmodell. Wähle eines unter „Übersetzungsmodelle“ in den Einstellungen — Index-Translate 2B ist die empfohlene Wahl: für Übersetzung trainiert, 150 Sprachen, etwa 1,3 GB.</string>
     <string name="translate_active_model">ÜBERSETZUNGSMODELL</string>
@@ -263,4 +267,9 @@
     <string name="translate_error_failed">Übersetzung fehlgeschlagen: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote hält keine Modelle auf dem Telefon, daher ist Übersetzung in dieser Variante nicht verfügbar.</string>
     <string name="translate_hf_body">Füge einen direkten Link zu einem Instruct-Modell im GGUF-Format ein, wie es für llama.cpp veröffentlicht wird.</string>
+    <string name="action_translate">Übersetzen</string>
+    <string name="translate_history_section">Übersetzungen</string>
+    <string name="translate_history_original">ORIGINAL</string>
+    <string name="translate_history_clear_title">Alle Übersetzungen löschen?</string>
+    <string name="translate_history_clear_message">Alle gespeicherten Übersetzungen werden dauerhaft von diesem Gerät gelöscht.</string>
 </resources>

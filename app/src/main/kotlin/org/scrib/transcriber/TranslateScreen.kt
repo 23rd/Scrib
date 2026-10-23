@@ -82,8 +82,13 @@ internal fun TranslateTab(history: List<TranscriptHistory.Entry>, transcription:
     var showPick by remember { mutableStateOf(false) }
     var pickSource by remember { mutableStateOf(false) }
     var pickTarget by remember { mutableStateOf(false) }
+    var openEntry by remember { mutableStateOf<TranslationHistory.Entry?>(null) }
+    var showClearHistory by rememberSaveable { mutableStateOf(false) }
     val hasModel = ui.activeName != null
     LaunchedEffect(Unit) { vm.refresh() }
+    LaunchedEffect(AppNav.pendingTranslateText) {
+        AppNav.takePendingTranslateText()?.let { source = it }
+    }
 
     val latest = transcription?.takeIf { !it.running && it.error == null && it.text.isNotBlank() }?.text
         ?: history.firstOrNull()?.text
@@ -170,8 +175,42 @@ internal fun TranslateTab(history: List<TranscriptHistory.Entry>, transcription:
                 }, onDismiss = vm::dismissRun)
             }
         }
+        if (ui.history.isNotEmpty()) {
+            item {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.translate_history_section),
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp,
+                        color = cs.onSurfaceVariant,
+                        modifier = Modifier.weight(1f).padding(start = 4.dp, top = 20.dp, bottom = 8.dp)
+                    )
+                    TextButton(onClick = { showClearHistory = true }) {
+                        Text(stringResource(R.string.history_clear_all), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.error)
+                    }
+                }
+            }
+            items(ui.history, key = { "h-" + it.id }) { entry ->
+                TranslationRowCard(entry, onOpen = { openEntry = entry }, onDelete = { vm.deleteHistoryEntry(entry.id) })
+            }
+        }
     }
 
+    openEntry?.let { entry ->
+        TranslationEntryDialog(entry, onClose = { openEntry = null }, onReuse = { source = entry.source; openEntry = null })
+    }
+    if (showClearHistory) {
+        AlertDialog(
+            onDismissRequest = { showClearHistory = false },
+            title = { Text(stringResource(R.string.translate_history_clear_title)) },
+            text = { Text(stringResource(R.string.translate_history_clear_message)) },
+            confirmButton = {
+                TextButton(onClick = { showClearHistory = false; vm.clearHistory() }) {
+                    Text(stringResource(R.string.history_clear_all), color = cs.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { showClearHistory = false }) { Text(stringResource(R.string.action_cancel)) } }
+        )
+    }
     if (showPick) {
         TranscriptPickDialog(history, onDismiss = { showPick = false }) { showPick = false; source = it.text }
     }
@@ -452,5 +491,96 @@ private fun LanguagePickDialog(title: String, codes: List<String>, selected: Str
         },
         confirmButton = {},
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
+    )
+}
+
+@Composable
+private fun languagePair(entry: TranslationHistory.Entry): String {
+    val from = if (entry.sourceLanguage.isEmpty()) stringResource(R.string.lang_auto) else TranslationLanguages.displayName(entry.sourceLanguage)
+    val to = if (entry.targetLanguage.isEmpty()) "?" else TranslationLanguages.displayName(entry.targetLanguage)
+    return "$from → $to"
+}
+
+private fun historyStamp(ms: Long): String =
+    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(ms))
+
+@Composable
+private fun TranslationRowCard(entry: TranslationHistory.Entry, onOpen: () -> Unit, onDelete: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(16.dp)).clickable(onClick = onOpen)
+    ) {
+        Column(Modifier.padding(start = 16.dp, end = 4.dp, top = 12.dp, bottom = 6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        languagePair(entry),
+                        fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis
+                    )
+                    Text(historyStamp(entry.savedAtMs), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant)
+                }
+                TextButton(onClick = onDelete) {
+                    Text(stringResource(R.string.action_delete), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant)
+                }
+            }
+            Text(
+                entry.text,
+                fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
+                lineHeight = 17.sp, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TranslationEntryDialog(entry: TranslationHistory.Entry, onClose: () -> Unit, onReuse: () -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { Text(languagePair(entry), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        text = {
+            Column {
+                Column(Modifier.heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
+                    Text(stringResource(R.string.translate_result), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+                    Spacer(Modifier.height(4.dp))
+                    Text(entry.text, fontSize = 14.sp, lineHeight = 20.sp, color = cs.onSurface)
+                    if (entry.source.isNotBlank()) {
+                        Spacer(Modifier.height(14.dp))
+                        Text(stringResource(R.string.translate_history_original), fontSize = 11.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = cs.onSurfaceVariant)
+                        Spacer(Modifier.height(4.dp))
+                        Text(entry.source, fontSize = 13.sp, lineHeight = 18.sp, color = cs.onSurfaceVariant)
+                    }
+                }
+                entry.modelName?.let {
+                    Spacer(Modifier.height(8.dp))
+                    Text("${historyStamp(entry.savedAtMs)} · $it", fontSize = 11.5.sp, color = cs.onSurfaceVariant)
+                }
+                Spacer(Modifier.height(12.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)) {
+                    IconButton(onClick = { clipboard.setText(AnnotatedString(entry.text)) }) {
+                        Icon(painterResource(R.drawable.ic_action_copy), stringResource(R.string.action_copy))
+                    }
+                    IconButton(onClick = {
+                        val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, entry.text)
+                        context.startActivity(Intent.createChooser(send, null))
+                    }) {
+                        Icon(painterResource(R.drawable.ic_action_share), stringResource(R.string.action_share))
+                    }
+                    if (entry.source.isNotBlank()) {
+                        IconButton(onClick = onReuse) {
+                            Icon(painterResource(R.drawable.ic_tab_translate), stringResource(R.string.action_translate))
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.action_close)) }
+        }
     )
 }

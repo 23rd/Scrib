@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Kies een model in Instellingen</string>
     <string name="translate_no_model">Geen vertaalmodel</string>
     <string name="translate_no_model_hint">Kies er een onder Vertaalmodellen in Instellingen.</string>
+    <string name="home_translate_text">Tekst vertalen</string>
+    <string name="home_translate_clipboard">Tekst van het klembord vertalen</string>
+    <string name="home_translate_latest">Laatste opname vertalen</string>
+    <string name="home_translate_clipboard_empty">Het klembord bevat geen tekst.</string>
     <string name="translate_nudge_title">Vertaling instellen</string>
     <string name="translate_nudge_body">Nog geen vertaalmodel. Kies er een onder Vertaalmodellen in Instellingen — Index-Translate 2B is de aanbevolen keuze: getraind voor vertaling, 150 talen, ongeveer 1,3 GB.</string>
     <string name="translate_active_model">VERTAALMODEL</string>
@@ -263,4 +267,9 @@
     <string name="translate_error_failed">Vertalen mislukt: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote bewaart geen modellen op de telefoon, dus vertalen is in deze versie niet beschikbaar.</string>
     <string name="translate_hf_body">Plak een directe link naar een instruct-model in GGUF-formaat, zoals gepubliceerd voor llama.cpp.</string>
+    <string name="action_translate">Vertalen</string>
+    <string name="translate_history_section">Vertalingen</string>
+    <string name="translate_history_original">ORIGINEEL</string>
+    <string name="translate_history_clear_title">Alle vertalingen wissen?</string>
+    <string name="translate_history_clear_message">Alle bewaarde vertalingen worden permanent van dit apparaat verwijderd.</string>
 </resources>

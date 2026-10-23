@@ -242,6 +242,10 @@
     <string name="translate_nudge_action">Scegli un modello nelle impostazioni</string>
     <string name="translate_no_model">Nessun modello di traduzione</string>
     <string name="translate_no_model_hint">Scegline uno in Modelli di traduzione nelle impostazioni.</string>
+    <string name="home_translate_text">Traduci testo</string>
+    <string name="home_translate_clipboard">Traduci il testo degli appunti</string>
+    <string name="home_translate_latest">Traduci l\'ultima registrazione</string>
+    <string name="home_translate_clipboard_empty">Gli appunti non contengono testo.</string>
     <string name="translate_nudge_title">Configura la traduzione</string>
     <string name="translate_nudge_body">Nessun modello di traduzione ancora. Scegline uno in Modelli di traduzione nelle impostazioni — Index-Translate 2B è la scelta consigliata: addestrato per la traduzione, 150 lingue, circa 1,3 GB.</string>
     <string name="translate_active_model">MODELLO DI TRADUZIONE</string>
@@ -263,4 +267,9 @@
     <string name="translate_error_failed">Traduzione non riuscita: %1$s</string>
     <string name="translate_remote_unavailable">Scrib Remote non tiene modelli sul telefono, quindi la traduzione non è disponibile in questa versione.</string>
     <string name="translate_hf_body">Incolla un link diretto a un modello instruct in formato GGUF, come pubblicato per llama.cpp.</string>
+    <string name="action_translate">Traduci</string>
+    <string name="translate_history_section">Traduzioni</string>
+    <string name="translate_history_original">ORIGINALE</string>
+    <string name="translate_history_clear_title">Cancellare tutte le traduzioni?</string>
+    <string name="translate_history_clear_message">Tutte le traduzioni salvate verranno eliminate definitivamente da questo dispositivo.</string>
 </resources>
