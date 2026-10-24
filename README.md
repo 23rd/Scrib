@@ -99,6 +99,14 @@ Omit both flags and you get the lean Scrib that F-Droid builds. `-Pabis=` picks
 the architectures to compile and `-PabiSplits` adds one apk per architecture next
 to the universal one; the release workflow passes both.
 
+## Testing on a phone
+
+[scripts/onphone/README.md](scripts/onphone/README.md) documents the test
+harness: transcribing a file without the system file picker, navigating by
+resource-id tags, opening tabs and driving the app over adb, and following a
+run in logcat. The hooks behind it live in debug builds only — release
+artifacts carry none of it.
+
 ## Privacy
 
 By default transcription runs 100% on device: your voice messages never leave

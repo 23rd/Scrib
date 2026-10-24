@@ -6,5 +6,4 @@ local.properties
 captures/
 .externalNativeBuild/
 .cxx/
-.claude/
 app/libs/*.aar
