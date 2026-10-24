@@ -50,6 +50,9 @@ object TranscriptionRun {
     fun start(context: Context, uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}): Boolean =
         startInternal(context, uri, name, source, { onFinished() }, persistTranscript = true, allowBatch = false)
 
+    fun startEphemeral(context: Context, uri: Uri, name: String, source: Uri?): Boolean =
+        startInternal(context, uri, name, source, onFinished = {}, persistTranscript = false, allowBatch = false, ephemeral = true)
+
     fun startFiles(context: Context, items: List<Pair<Uri, String>>): Boolean {
         if (items.isEmpty()) return false
         val id: Long
@@ -100,6 +103,7 @@ object TranscriptionRun {
         onFinished: (TranscriptionRunResult) -> Unit,
         persistTranscript: Boolean,
         allowBatch: Boolean,
+        ephemeral: Boolean = false,
         batchIndex: Int = 0,
         batchTotal: Int = 0,
         batchId: Long = 0
@@ -124,7 +128,7 @@ object TranscriptionRun {
             batchIndex = batchIndex,
             batchTotal = batchTotal
         )
-        StateLog.log("run started: file=$name model=$modelName")
+        StateLog.log("run started: file=$name model=$modelName${if (ephemeral) " (ephemeral)" else ""}")
         TranscriptionForegroundService.start(app)
         scope.launch {
             val eta = EtaClock()
@@ -248,16 +252,18 @@ object TranscriptionRun {
                         modelMemoryDeltaMb = maxOf(0, settled.pssMb - initialMemory.pssMb)
                     }
                     publishMetrics()
-                    _state.value?.metrics?.let { metrics ->
-                        BenchmarkStore.record(
-                            app,
-                            BenchmarkRun(
-                                timestampMs = System.currentTimeMillis(),
-                                modelName = modelName,
-                                fileName = name,
-                                metrics = metrics
+                    if (!ephemeral) {
+                        _state.value?.metrics?.let { metrics ->
+                            BenchmarkStore.record(
+                                app,
+                                BenchmarkRun(
+                                    timestampMs = System.currentTimeMillis(),
+                                    modelName = modelName,
+                                    fileName = name,
+                                    metrics = metrics
+                                )
                             )
-                        )
+                        }
                     }
 
                     if (persistTranscript && segments.isNotEmpty()) {

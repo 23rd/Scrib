@@ -69,8 +69,16 @@ class TestCommandsReceiver : BroadcastReceiver() {
             log("transcribe refused: ${e.message}")
             return
         }
-        val started = TranscriptionRun.start(context, uri, name, uri)
-        log(if (started) "transcribe started: $name ($uri)" else "transcribe refused: busy")
+        val ephemeral = intent.getBooleanExtra("ephemeral", true)
+        val started = if (ephemeral) {
+            TranscriptionRun.startEphemeral(context, uri, name, uri)
+        } else {
+            TranscriptionRun.start(context, uri, name, uri)
+        }
+        log(
+            if (started) "transcribe started: $name ($uri)${if (ephemeral) " [ephemeral]" else ""}"
+            else "transcribe refused: busy"
+        )
         if (started) {
             try {
                 context.startActivity(

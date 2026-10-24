@@ -79,6 +79,10 @@ adb logcat -d -s scrib.state
 - `TRANSCRIBE --es path /android_asset/jfk.wav` — transcribe without any file delivery at
   all (the asset ships in local builds). A plain path must be inside the app's own dirs —
   deliver with `run-as cp` like `send-audio.sh` does. An in-flight run answers "busy".
+  Runs are ephemeral by default: the result lives in memory for the dialog, while history,
+  the stored last transcript and benchmarks stay untouched, so screen assertions against
+  counts do not flake between runs. `--ez ephemeral false` opts into the user-like path
+  that persists everything.
 - `IMPORT_MODEL --es path /data/data/org.scrib.transcriber.debug/files/model.gguf` — copies
   the file into the model dir (off the main thread; watch the tag for done/failed).
 
