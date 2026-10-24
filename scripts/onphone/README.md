@@ -25,6 +25,24 @@ The same file delivery works for anything that accepts a file: `run-as` puts it 
 `/data/data/<package>/files/<name>`, readable by the app as
 `file:///data/data/<package>/files/<name>` — no storage permissions or SAF involved.
 
+## Navigating by tags (resource-id)
+
+The main window exposes Compose tags as `resource-id` in the accessibility tree, so an agent
+can find and tap controls without screenshots or text guessing:
+
+```sh
+adb exec-out uiautomator dump /dev/tty | grep -o 'resource-id="scrib[^"]*"'
+# tap one: read its bounds="[l,t][r,b]" from the same dump and input tap the centre
+```
+
+Scheme: `scrib/tab/<home|record|file|keyboard|settings>` for the bottom navigation,
+`scrib/home/record`, `scrib/home/pick_file`, `scrib/home/active_model`,
+`scrib/transcribe/pick_file`, `scrib/record/button`, `scrib/appbar/about`.
+
+Dialogs open their own windows where the opt-in flag does not reach; navigate them by their
+text (`uiautomator dump` still lists every label). Tags appear without a package prefix —
+match `"scrib/..."` exactly, not `<package>:id/scrib/...`.
+
 ## Watching a run from the outside
 
 ```sh

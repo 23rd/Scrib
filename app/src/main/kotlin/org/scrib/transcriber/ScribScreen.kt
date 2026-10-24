@@ -75,6 +75,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.res.stringResource
@@ -380,13 +381,15 @@ private fun HomeTab(
             item {
                 ServiceCard(
                     glyph = "🎙",
-                    title = stringResource(R.string.record_and_transcribe)
+                    title = stringResource(R.string.record_and_transcribe),
+                    tag = "scrib/home/record"
                 ) { onRecord() }
             }
             item {
                 ServiceCard(
                     glyph = "📁",
-                    title = stringResource(R.string.transcribe_audio_file)
+                    title = stringResource(R.string.transcribe_audio_file),
+                    tag = "scrib/home/pick_file"
                 ) { onPickFile() }
             }
             val quick = (state.standard + state.custom + state.sherpaRows).filter { it.id in state.pinnedIds }
@@ -990,11 +993,19 @@ private fun SingleCardColumn(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun ServiceCard(glyph: String, title: String, subtitle: String? = null, onClick: () -> Unit) {
+private fun ServiceCard(
+    glyph: String,
+    title: String,
+    subtitle: String? = null,
+    tag: String? = null,
+    onClick: () -> Unit
+) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .then(if (tag != null) Modifier.testTag(tag) else Modifier)
+            .clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(Modifier.padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
@@ -1024,7 +1035,7 @@ private fun BottomBar(selected: ScribTab, onSelect: (ScribTab) -> Unit) {
                     val on = t == selected
                     val columnInteraction = remember { MutableInteractionSource() }
                     Column(
-                        Modifier.weight(1f).fillMaxHeight()
+                        Modifier.weight(1f).fillMaxHeight().testTag("scrib/tab/${t.name.lowercase()}")
                             .clickable(
                                 interactionSource = columnInteraction,
                                 indication = null
@@ -1084,7 +1095,7 @@ private fun AppBar(onAbout: () -> Unit, showAbout: Boolean) {
         Spacer(Modifier.weight(1f))
         Box(Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.CenterEnd) {
             if (showAbout) {
-                TextButton(onClick = onAbout) {
+                TextButton(onClick = onAbout, modifier = Modifier.testTag("scrib/appbar/about")) {
                     Text(stringResource(R.string.about), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = cs.primary)
                 }
             }
@@ -1104,7 +1115,7 @@ private fun StatusCard(state: ScribUiState, onOpenSettings: (() -> Unit)? = null
         Column(Modifier.padding(horizontal = 18.dp, vertical = 14.dp)) {
             if (state.activeName != null) {
                 val rowModifier = if (onSwitchModel != null) {
-                    Modifier.fillMaxWidth().clickableRow(RoundedCornerShape(12.dp), onSwitchModel)
+                    Modifier.fillMaxWidth().testTag("scrib/home/active_model").clickableRow(RoundedCornerShape(12.dp), onSwitchModel)
                 } else {
                     Modifier.fillMaxWidth()
                 }
@@ -1417,7 +1428,8 @@ private fun RecordButton(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.primary, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .testTag("scrib/record/button").clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
@@ -1489,7 +1501,8 @@ private fun TranscribeFileButton(onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.primaryContainer, shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp).clickableRow(RoundedCornerShape(16.dp), onClick)
+        modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp)
+            .testTag("scrib/transcribe/pick_file").clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
