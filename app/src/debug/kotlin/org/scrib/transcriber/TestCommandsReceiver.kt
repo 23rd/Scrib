@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Process
 import android.util.Log
 import java.io.File
 import java.util.concurrent.Executors
@@ -11,6 +13,13 @@ import java.util.concurrent.Executors
 class TestCommandsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (Build.VERSION.SDK_INT >= 34) {
+            val uid = sentFromUid
+            if (uid != Process.SHELL_UID && uid != Process.ROOT_UID && uid != Process.myUid()) {
+                log("dropped: sender uid $uid is not shell")
+                return
+            }
+        }
         val app = context.applicationContext
         when (intent.action?.removePrefix(ACTION_PREFIX) ?: return) {
             "STATE" -> reportState(app)

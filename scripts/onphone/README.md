@@ -82,6 +82,12 @@ adb logcat -d -s scrib.state
 - `IMPORT_MODEL --es path /data/data/org.scrib.transcriber.debug/files/model.gguf` — copies
   the file into the model dir (off the main thread; watch the tag for done/failed).
 
+Security posture: the receiver ships in debug artifacts only, and from Android 14 on it
+serves only adb sessions (shell/root uids). On older devices the sender of a broadcast is
+unknowable, so any local app could reach a debug build's receiver — accepted, since a
+debuggable APK is already a wide-open local surface (run-as, JDWP) and F-Droid ships only
+release builds.
+
 ## Watching a run from the outside
 
 The app narrates its lifecycle on the same `scrib.state` tag (debug builds only), so an agent
