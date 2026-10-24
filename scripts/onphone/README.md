@@ -80,6 +80,19 @@ adb logcat -d -s scrib.state
 
 ## Watching a run from the outside
 
+The app narrates its lifecycle on the same `scrib.state` tag (debug builds only), so an agent
+follows a run without polling the screen:
+
+```sh
+adb logcat -s scrib.state
+# run started: file=jfk.wav model=base-q5_1
+# run 25%: file=jfk.wav        (milestones every 25%)
+# run done: file=jfk.wav text=...     — or run failed: file=... error=... / run cancelled
+# model active: ggml-tiny-q5_1.bin
+```
+
+Plus the engine's own stream for lower-level checks:
+
 ```sh
 adb logcat -s ScribTranscribe     # engine progress
 adb logcat -d | grep -E "FATAL EXCEPTION|Process: org.scrib"   # crash check

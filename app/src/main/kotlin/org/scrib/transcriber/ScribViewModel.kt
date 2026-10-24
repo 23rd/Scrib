@@ -371,6 +371,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         releaseSwitchedAwayModel()
         statusMsg = ""; statusError = false
         push()
+        StateLog.log("model active: $fileName")
     }
 
     fun togglePinned(fileName: String) {

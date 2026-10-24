@@ -124,6 +124,7 @@ object TranscriptionRun {
             batchIndex = batchIndex,
             batchTotal = batchTotal
         )
+        StateLog.log("run started: file=$name model=$modelName")
         TranscriptionForegroundService.start(app)
         scope.launch {
             val eta = EtaClock()
@@ -184,6 +185,7 @@ object TranscriptionRun {
                 null
             }
             var result = TranscriptionRunResult.FAILED
+            var nextMilestone = 25
             try {
                 val pfd = app.contentResolver.openFileDescriptor(uri, "r")
                     ?: throw RuntimeException(app.getString(R.string.transcribe_cant_open))
@@ -195,6 +197,10 @@ object TranscriptionRun {
                     onProgress = { pct ->
                         val left = eta.mark(pct)
                         _state.update { it?.copy(percent = pct, etaMs = left) }
+                        if (pct >= nextMilestone) {
+                            nextMilestone += 25
+                            StateLog.log("run $pct%: file=$name")
+                        }
                     },
                     onPartial = { partial -> _state.update { it?.copy(text = partial) } },
                     onMetrics = { metrics ->
@@ -227,6 +233,7 @@ object TranscriptionRun {
                 if (cancellation.isCancelled) {
                     _state.value = null
                     result = TranscriptionRunResult.CANCELLED
+                    StateLog.log("run cancelled: file=$name")
                 } else {
                     _state.update {
                         it?.copy(
@@ -234,6 +241,7 @@ object TranscriptionRun {
                             segments = segments, running = false, percent = 100, etaMs = null
                         )
                     }
+                    StateLog.log("run done: file=$name text=${text.take(120)}")
                     val settled = processMemory(app)
                     synchronized(metricsLock) {
                         modelPssMb = settled.pssMb
@@ -265,6 +273,7 @@ object TranscriptionRun {
                 if (cancellation.isCancelled) {
                     _state.value = null
                     result = TranscriptionRunResult.CANCELLED
+                    StateLog.log("run cancelled: file=$name")
                 } else {
                     result = TranscriptionRunResult.FAILED
                     _state.update {
@@ -274,6 +283,7 @@ object TranscriptionRun {
                         )
                     }
                     publishMetrics()
+                    StateLog.log("run failed: file=$name error=${e.message}")
                 }
             } finally {
                 metricsJob?.cancelAndJoin()
