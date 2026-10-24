@@ -55,6 +55,10 @@ adb shell am start -W -n org.scrib.transcriber.debug/org.scrib.transcriber.MainA
 
 Names match the bottom tabs: `home`, `record`, `file` (transcription), `keyboard`, `settings`.
 
+One thing to expect on every launch after a finished run: the transcription dialog restores
+itself from the persisted transcript and sits on top of whatever tab was requested. Dismiss
+it with BACK (the dialog's Close works too) before asserting against the screen.
+
 ## Debug command receiver
 
 Debug builds carry an exported receiver answering four commands; every result lands on the
