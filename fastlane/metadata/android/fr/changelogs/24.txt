@@ -1,0 +1,10 @@
+• Ajout de la transcription par lots avec historique conservé et effaçable
+• Ajout du minutage par mot des transcriptions
+• Passage des modèles whisper au quant q8_0 plus rapide et activation d'i8mm
+• Ajout d'un indice de langue et d'une détection automatique qui évitent la détection à chaque exécution
+• Découpage des segments trop longs en pistes de la taille de sous-titres
+• Décodage audio accéléré par conversion en parallèle
+• Corrigé : parakeet échouait quand la dernière fenêtre était courte
+• Ajout du changement de modèle depuis l'écran d'accueil
+• Ajout d'un journal des modifications avec notes de version
+• Ajout de statistiques d'utilisation optionnelles du clavier vocal

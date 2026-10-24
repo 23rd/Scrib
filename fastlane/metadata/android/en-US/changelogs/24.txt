@@ -1,0 +1,10 @@
+• Added batch transcribing and a clearable history
+• Added word-level timing of transcripts
+• Switched whisper models to q8_0 and enabled i8mm kernels
+• Added a language hint and auto-detect to skip per-run detection
+• Split overlong segments into subtitle-sized cues
+• Sped up audio decoding with parallel conversion
+• Fixed parakeet failing on a short final window
+• Added model switching from the home screen
+• Added an in-app changelog with release notes
+• Added optional voice keyboard usage statistics

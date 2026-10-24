@@ -1,0 +1,10 @@
+• Geçmişi otomatik saklayan ve temizlenebilir toplu transkripsiyon eklendi
+• Transkriptlere kelime düzeyinde zamanlar eklendi
+• Whisper modelleri daha hızlı q8_0 kanta geçirildi ve i8mm etkinleştirildi
+• Her çalıştırmada algılamayı atlayan dil ipucu ve otomatik algılama eklendi
+• Fazla uzun bölümler altyazı boyutunda parçalara bölündü
+• Paralel dönüştürmeyle ses çözümü hızlandırıldı
+• Kısa son pencerede parakeet hatası düzeltildi
+• Ana ekrandan model değiştirme eklendi
+• Sürüm notlarıyla değişiklik günlüğü eklendi
+• Sesli klavye için isteğe bağlı kullanım istatistikleri eklendi

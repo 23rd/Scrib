@@ -1,6 +1,15 @@
 # 0.24
 • Aggiunta una sezione «Novità e registro delle modifiche» nelle impostazioni
 • Aggiunte note di versione mostrate una sola volta dopo ogni aggiornamento
+• Aggiunta trascrizione in batch con cronologia conservata e svuotabile
+• Aggiunti i tempi per parola delle trascrizioni
+• Passati i modelli whisper al quant q8_0 più veloce e attivato i8mm
+• Aggiunto suggerimento lingua e rilevamento automatico che saltano il rilevamento per esecuzione
+• Suddivisi i segmenti troppo lunghi in battute della dimensione dei sottotitoli
+• Decodifica audio più veloce con conversione in parallelo
+• Corretto parakeet che falliva con un'ultima finestra corta
+• Aggiunto cambio modello dalla schermata home
+• Aggiunte statistiche d'uso opzionali della tastiera vocale
 # 0.23
 • Aggiunto l'aggancio dei modelli alla scheda Home per cambiarli rapidamente
 • Aggiunta la barra di navigazione in basso alla schermata principale di Scrib

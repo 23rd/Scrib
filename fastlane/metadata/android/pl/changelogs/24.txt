@@ -1,0 +1,10 @@
+• Dodano transkrypcję wsadową z automatyczną i usuwalną historią
+• Dodane czasy na poziomie słów w transkrypcjach
+• Przełączono modele whisper na szybszy kwant q8_0 i włączono i8mm
+• Dodano podpowiedź języka i autodetekcję pomijające detekcję przy każdym uruchomieniu
+• Podzielono zbyt długie segmenty na fragmenty rozmiaru napisów
+• Przyspieszono dekodowanie dźwięku dzięki konwersji równoległej
+• Naprawiono błąd parakeet przy krótkim ostatnim oknie
+• Dodano przełączanie modeli z ekranu głównego
+• Dodano dziennik zmian z notatkami wersji
+• Dodano opcjonalne statystyki użycia klawiatury głosowej

@@ -1,6 +1,15 @@
 # 0.24
 • Añadida una sección de novedades y registro de cambios en los ajustes
 • Añadidas notas de versión que se muestran una vez tras cada actualización
+• Añadida transcripción por lotes con historial automático y borrable
+• Añadidos tiempos por palabra en las transcripciones
+• Cambiados los modelos whisper al cuant q8_0 más rápido y activado i8mm
+• Añadida pista de idioma y detección automática que omiten la detección por ejecución
+• Divididos los segmentos largos en bloques del tamaño de subtítulos
+• Acelerada la decodificación de audio con conversión en paralelo
+• Corregido que parakeet fallara con una ventana final corta
+• Añadido cambio de modelo desde la pantalla principal
+• Añadidas estadísticas de uso opcionales del teclado de voz
 # 0.23
 • Añadido fijar modelos en la pestaña de inicio para cambiarlos rápido
 • Añadida la barra de navegación inferior de la pantalla de inicio de Scrib

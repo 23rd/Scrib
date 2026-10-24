@@ -1,0 +1,10 @@
+• Stapeltranskription mit automatisch gespeichertem und löschbarem Verlauf hinzugefügt
+• Wortgenaue Zeitmarkierungen in Transkripten hinzugefügt
+• Whisper-Modelle auf das schnellere q8_0 umgestellt und i8mm-Kernel aktiviert
+• Sprachhinweis und automatische Erkennung hinzugefügt, die die Erkennung pro Lauf überspringen
+• Zu lange Segmente in untertitelgroße Abschnitte aufgeteilt
+• Audiodekodierung mit paralleler Konvertierung beschleunigt
+• Behoben, dass Parakeet bei kurzem letzten Fenster fehlschlug
+• Modellwechsel vom Startbildschirm hinzugefügt
+• Änderungsprotokoll mit Versionshinweisen hinzugefügt
+• Optionale Nutzungsstatistiken der Sprachtastatur hinzugefügt

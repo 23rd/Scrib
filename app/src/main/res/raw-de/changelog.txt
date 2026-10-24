@@ -1,6 +1,15 @@
 # 0.24
 • Abschnitt „Was ist neu und Änderungsprotokoll" in den Einstellungen hinzugefügt
 • Release-Hinweise hinzugefügt, die nach jedem Update einmal angezeigt werden
+• Stapeltranskription mit automatisch gespeichertem und löschbarem Verlauf hinzugefügt
+• Wortgenaue Zeitmarkierungen in Transkripten hinzugefügt
+• Whisper-Modelle auf das schnellere q8_0 umgestellt und i8mm-Kernel aktiviert
+• Sprachhinweis und automatische Erkennung hinzugefügt, die die Erkennung pro Lauf überspringen
+• Zu lange Segmente in untertitelgroße Abschnitte aufgeteilt
+• Audiodekodierung mit paralleler Konvertierung beschleunigt
+• Behoben, dass Parakeet bei kurzem letzten Fenster fehlschlug
+• Modellwechsel vom Startbildschirm hinzugefügt
+• Optionale Nutzungsstatistiken der Sprachtastatur hinzugefügt
 # 0.23
 • Anpinnen von Modellen auf dem Tab „Start" zum schnellen Wechseln hinzugefügt
 • Untere Navigationsleiste des Scrib-Startbildschirms hinzugefügt

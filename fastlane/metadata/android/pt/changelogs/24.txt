@@ -1,0 +1,10 @@
+• Adicionada transcrição em lote com histórico salvo automaticamente e apagável
+• Adicionados tempos por palavra nas transcrições
+• Trocados os modelos whisper pelo quant q8_0 mais rápido e ativado o i8mm
+• Adicionada dica de idioma e detecção automática que pulam a detecção por execução
+• Divididos os segmentos longos em blocos do tamanho de legendas
+• Acelerada a decodificação de áudio com conversão paralela
+• Corrigido o parakeet falhando numa janela final curta
+• Adicionada troca de modelo pela tela inicial
+• Adicionado changelog com notas de versão
+• Adicionadas estatísticas opcionais de uso do teclado de voz

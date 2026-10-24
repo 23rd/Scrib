@@ -1,0 +1,10 @@
+• Batchtranscriptie toegevoegd met automatisch bewaarde en wisbare geschiedenis
+• Woordniveautijden in transcripties toegevoegd
+• Whisper-modellen overgezet naar het snellere q8_0 en i8mm aangezet
+• Taalhint en automatische detectie toegevoegd die detectie per run overslaan
+• Te lange segmenten gesplitst in ondertitelgrote cues
+• Audiodecodering versneld met parallelle conversie
+• Opgelost dat parakeet faalde bij een kort laatste venster
+• Modelwisselen vanaf het startscherm toegevoegd
+• Changelog met versienotities toegevoegd
+• Optionele gebruikstatistieken van het spraaktoetsenbord toegevoegd

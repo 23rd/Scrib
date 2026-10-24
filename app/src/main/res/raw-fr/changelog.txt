@@ -1,6 +1,15 @@
 # 0.24
 • Ajout d'une section « Quoi de neuf et journal des modifications » dans les paramètres
 • Ajout de notes de version affichées une seule fois après chaque mise à jour
+• Ajout de la transcription par lots avec historique conservé et effaçable
+• Ajout du minutage par mot des transcriptions
+• Passage des modèles whisper au quant q8_0 plus rapide et activation d'i8mm
+• Ajout d'un indice de langue et d'une détection automatique qui évitent la détection à chaque exécution
+• Découpage des segments trop longs en pistes de la taille de sous-titres
+• Décodage audio accéléré par conversion en parallèle
+• Corrigé : parakeet échouait quand la dernière fenêtre était courte
+• Ajout du changement de modèle depuis l'écran d'accueil
+• Ajout de statistiques d'utilisation optionnelles du clavier vocal
 # 0.23
 • Ajout de l'épinglage de modèles dans l'onglet Accueil pour les changer rapidement
 • Ajout de la barre de navigation en bas de l'écran d'accueil de Scrib
