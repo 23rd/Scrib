@@ -55,6 +55,29 @@ adb shell am start -W -n org.scrib.transcriber.debug/org.scrib.transcriber.MainA
 
 Names match the bottom tabs: `home`, `record`, `file` (transcription), `keyboard`, `settings`.
 
+## Debug command receiver
+
+Debug builds carry an exported receiver answering four commands; every result lands on the
+`scrib.state` logcat tag. Broadcasts reach it only when the process is alive — this ColorOS
+ROM even blocks shell broadcasts into a background app — so start the activity first and
+target the receiver by component:
+
+```sh
+adb shell am start -W -n org.scrib.transcriber.debug/org.scrib.transcriber.MainActivity
+RCV=org.scrib.transcriber.debug/org.scrib.transcriber.TestCommandsReceiver
+adb shell am broadcast -n $RCV -a org.scrib.transcriber.test.STATE
+adb logcat -d -s scrib.state
+```
+
+- `STATE` — snapshot: package, active model, language, installed models, transcription run
+  (file, running, percent, error), history size.
+- `OPEN_TAB --es tab file` — same as the MainActivity extra.
+- `TRANSCRIBE --es path /android_asset/jfk.wav` — transcribe without any file delivery at
+  all (the asset ships in local builds). A plain path must be inside the app's own dirs —
+  deliver with `run-as cp` like `send-audio.sh` does. An in-flight run answers "busy".
+- `IMPORT_MODEL --es path /data/data/org.scrib.transcriber.debug/files/model.gguf` — copies
+  the file into the model dir (off the main thread; watch the tag for done/failed).
+
 ## Watching a run from the outside
 
 ```sh
