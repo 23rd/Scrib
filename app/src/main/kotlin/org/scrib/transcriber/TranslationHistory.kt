@@ -15,7 +15,9 @@ object TranslationHistory {
         val text: String,
         val sourceLanguage: String,
         val targetLanguage: String,
-        val modelName: String?
+        val modelName: String?,
+        // source language was auto detected
+        val detected: Boolean = false
     )
 
     fun save(
@@ -24,7 +26,8 @@ object TranslationHistory {
         text: String,
         sourceLanguage: String,
         targetLanguage: String,
-        modelName: String?
+        modelName: String?,
+        detected: Boolean = false
     ): Entry {
         val entry = Entry(
             id = System.currentTimeMillis().toString(36) + "-" + (0..9999).random(),
@@ -33,7 +36,8 @@ object TranslationHistory {
             text = text,
             sourceLanguage = sourceLanguage,
             targetLanguage = targetLanguage,
-            modelName = modelName
+            modelName = modelName,
+            detected = detected
         )
         write(context, entry)
         return entry
@@ -71,6 +75,7 @@ object TranslationHistory {
                 .put(FROM, entry.sourceLanguage)
                 .put(TO, entry.targetLanguage)
                 .put(MODEL, entry.modelName.orEmpty())
+                .put(DETECTED, entry.detected)
             dir(context).mkdirs()
             file(context, entry.id).writeText(json.toString())
         } catch (e: Throwable) {
@@ -91,7 +96,8 @@ object TranslationHistory {
             text = text,
             sourceLanguage = json.optString(FROM),
             targetLanguage = json.optString(TO),
-            modelName = json.optString(MODEL).takeIf { it.isNotBlank() }
+            modelName = json.optString(MODEL).takeIf { it.isNotBlank() },
+            detected = json.optBoolean(DETECTED)
         )
     }
 
@@ -108,4 +114,5 @@ object TranslationHistory {
     private const val FROM = "from"
     private const val TO = "to"
     private const val MODEL = "model"
+    private const val DETECTED = "detected"
 }

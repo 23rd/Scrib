@@ -22,7 +22,9 @@ data class TranslateRun(
     val tokens: Int,
     val modelName: String?,
     // true untill the first token arrives
-    val loading: Boolean = false
+    val loading: Boolean = false,
+    // detected source language when on auto
+    val detectedLanguage: String? = null
 )
 
 data class TranslationUi(
@@ -227,9 +229,12 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
         val token = CancellationToken()
         cancellation = token
         val modelName = TranslationModels.activeDisplayName(ctx)
-        val source = TranslationModels.sourceLanguage(ctx).ifEmpty { null }
+        val chosen = TranslationModels.sourceLanguage(ctx).ifEmpty { null }
+        // on auto, detect first so the model can be told
+        var detected = if (chosen == null) LanguageDetector.detect(text) else null
+        var source = chosen ?: detected
         val target = TranslationModels.targetLanguage(ctx)
-        run = TranslateRun("", running = true, error = null, elapsedMs = 0, tokens = 0, modelName = modelName, loading = true)
+        run = TranslateRun("", running = true, error = null, elapsedMs = 0, tokens = 0, modelName = modelName, loading = true, detectedLanguage = detected)
         push()
         val start = SystemClock.elapsedRealtime()
         translateJob = viewModelScope.launch(Dispatchers.Default) {
@@ -248,10 +253,11 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
                 }
                 run = TranslateRun(
                     result.text, running = false, error = null,
-                    elapsedMs = SystemClock.elapsedRealtime() - start, tokens = result.tokens, modelName = modelName
+                    elapsedMs = SystemClock.elapsedRealtime() - start, tokens = result.tokens, modelName = modelName,
+                    detectedLanguage = detected
                 )
                 if (result.text.isNotBlank()) {
-                    TranslationHistory.save(ctx, text, result.text, source.orEmpty(), target, modelName)
+                    TranslationHistory.save(ctx, text, result.text, source.orEmpty(), target, modelName, detected = chosen == null)
                     historyCache = null
                 }
             } catch (e: CancelledException) {

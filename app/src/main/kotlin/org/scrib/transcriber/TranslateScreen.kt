@@ -134,7 +134,7 @@ internal fun TranslateTab(history: List<TranscriptHistory.Entry>, transcription:
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 LanguageButton(
                     label = stringResource(R.string.translate_from),
-                    value = if (ui.sourceLanguage.isEmpty()) stringResource(R.string.lang_auto) else TranslationLanguages.displayName(ui.sourceLanguage),
+                    value = if (ui.sourceLanguage.isEmpty()) autoLabel(run?.detectedLanguage) else TranslationLanguages.displayName(ui.sourceLanguage),
                     enabled = !running,
                     modifier = Modifier.weight(1f)
                 ) { pickSource = true }
@@ -494,9 +494,20 @@ private fun LanguagePickDialog(title: String, codes: List<String>, selected: Str
     )
 }
 
+// "Auto-detect (German)" once detected
+@Composable
+private fun autoLabel(detected: String?): String {
+    val auto = stringResource(R.string.lang_auto)
+    return if (detected == null) auto else "$auto (${TranslationLanguages.displayName(detected)})"
+}
+
 @Composable
 private fun languagePair(entry: TranslationHistory.Entry): String {
-    val from = if (entry.sourceLanguage.isEmpty()) stringResource(R.string.lang_auto) else TranslationLanguages.displayName(entry.sourceLanguage)
+    val from = when {
+        entry.detected -> autoLabel(entry.sourceLanguage.ifEmpty { null })
+        entry.sourceLanguage.isEmpty() -> stringResource(R.string.lang_auto)
+        else -> TranslationLanguages.displayName(entry.sourceLanguage)
+    }
     val to = if (entry.targetLanguage.isEmpty()) "?" else TranslationLanguages.displayName(entry.targetLanguage)
     return "$from → $to"
 }
