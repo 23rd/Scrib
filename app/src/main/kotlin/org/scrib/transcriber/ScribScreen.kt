@@ -209,6 +209,12 @@ fun ScribScreen(
         }
     }
 
+    LaunchedEffect(AppNav.pendingTab) {
+        AppNav.takePendingTab()?.let { requested ->
+            ScribTab.entries.firstOrNull { it.name.equals(requested, ignoreCase = true) }?.let { tab = it }
+        }
+    }
+
     BackHandler(tab != ScribTab.Home) { tab = ScribTab.Home }
 
     Column(Modifier.fillMaxSize().background(cs.background)) {

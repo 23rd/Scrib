@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
         if (savedInstanceState == null) {
             maybeTranscribeShared(intent)
             takeMicrophoneRequest(intent)
+            takeOpenTabRequest(intent)
         }
         setContent {
             ScribTheme {
@@ -104,6 +105,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         takeMicrophoneRequest(intent)
+        takeOpenTabRequest(intent)
     }
 
     // Asked for here rather than where the intent arrives: a request made while the activity is
@@ -166,7 +168,14 @@ class MainActivity : ComponentActivity() {
         pendingMicrophone = true
     }
 
+    private fun takeOpenTabRequest(intent: Intent?) {
+        val name = intent?.getStringExtra(EXTRA_OPEN_TAB) ?: return
+        intent.removeExtra(EXTRA_OPEN_TAB)
+        AppNav.openTab(name)
+    }
+
     companion object {
         const val EXTRA_REQUEST_MICROPHONE = "org.scrib.transcriber.REQUEST_MICROPHONE"
+        const val EXTRA_OPEN_TAB = "org.scrib.transcriber.OPEN_TAB"
     }
 }

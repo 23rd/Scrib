@@ -43,6 +43,18 @@ Dialogs open their own windows where the opt-in flag does not reach; navigate th
 text (`uiautomator dump` still lists every label). Tags appear without a package prefix —
 match `"scrib/..."` exactly, not `<package>:id/scrib/...`.
 
+## Opening a tab directly (no bottom-bar taps)
+
+MainActivity reads a string extra naming the tab and lands there on launch — cold start or
+singleTop re-delivery to the running instance alike. Unknown names are ignored:
+
+```sh
+adb shell am start -W -n org.scrib.transcriber.debug/org.scrib.transcriber.MainActivity \
+    --es org.scrib.transcriber.OPEN_TAB settings
+```
+
+Names match the bottom tabs: `home`, `record`, `file` (transcription), `keyboard`, `settings`.
+
 ## Watching a run from the outside
 
 ```sh
