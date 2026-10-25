@@ -16,6 +16,9 @@ interface TranslationEngine {
         onPartial: (String) -> Unit
     ): TranslationResult
 
+    // asks the model which langauge it is, null if unknown
+    fun detectLanguage(modelPath: String, text: String, cancellation: CancellationToken): String?
+
     // frees the model, blocks while translating
     fun releaseModel()
 }

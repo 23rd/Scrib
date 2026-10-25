@@ -35,3 +35,15 @@ class LanguageDetectorTest {
         assertNull(LanguageDetector.detect("Zugausfall Büro"))
     }
 }
+
+class LanguageNamesTest {
+
+    @Test
+    fun englishNamesBecomeCodes() {
+        assertEquals("de", TranslationLanguages.codeForEnglishName("German"))
+        assertEquals("fi", TranslationLanguages.codeForEnglishName("The text is written in Finnish."))
+        assertEquals("sw", TranslationLanguages.codeForEnglishName("Swahili"))
+        assertEquals("zh", TranslationLanguages.codeForEnglishName("Chinese"))
+        assertNull(TranslationLanguages.codeForEnglishName("I am not sure."))
+    }
+}

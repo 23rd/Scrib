@@ -243,6 +243,13 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
                 // both models rarely fit, drop the speech one for now
                 TranscriptionEngine.releaseAll(ctx)
                 val engine = plugin.engine(ctx)
+                // word lists drew a blank, ask the model (not TranslateGemma, it only translates)
+                if (source == null && TranslationCatalog.promptStyleFor(java.io.File(path).name) != PromptStyle.TranslateGemma) {
+                    detected = runCatching { engine.detectLanguage(path, text, token) }.getOrNull()
+                    source = detected
+                    run = run?.copy(detectedLanguage = detected)
+                    push()
+                }
                 val result = engine.translate(path, text, source, target, token) { partial ->
                     val now = SystemClock.elapsedRealtime()
                     if (now - lastPush >= 80) {
