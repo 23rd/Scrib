@@ -81,4 +81,27 @@ object TranslationLanguages {
 
     fun englishName(code: String): String =
         java.util.Locale.forLanguageTag(code).getDisplayLanguage(java.util.Locale.ENGLISH)
+
+    // english name -> code for every langauge the phone knows
+    private val byEnglishName: Map<String, String> by lazy {
+        val map = HashMap<String, String>()
+        for (locale in java.util.Locale.getAvailableLocales()) {
+            val code = locale.language
+            if (code.isEmpty() || code.length > 3) continue
+            val name = locale.getDisplayLanguage(java.util.Locale.ENGLISH).lowercase()
+            if (name.isNotEmpty() && name != code) map.putIfAbsent(name, code)
+        }
+        map
+    }
+
+    fun codeForEnglishName(name: String): String? {
+        val cleaned = name.lowercase().replace(Regex("[^a-z ]"), " ").trim()
+        if (cleaned.isEmpty()) return null
+        byEnglishName[cleaned]?.let { return it }
+        // the name might be burried in a short sentance
+        for (word in cleaned.split(Regex("\\s+"))) {
+            byEnglishName[word]?.let { return it }
+        }
+        return null
+    }
 }

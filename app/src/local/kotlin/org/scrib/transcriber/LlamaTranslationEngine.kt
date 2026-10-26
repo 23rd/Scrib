@@ -74,6 +74,40 @@ class LlamaTranslationEngine : TranslationEngine {
     }
 
     @Synchronized
+    override fun detectLanguage(modelPath: String, text: String, cancellation: CancellationToken): String? {
+        if (cancellation.isCancelled) {
+            throw CancelledException()
+        }
+        val llm = model(modelPath)
+        val abort = TranscribeAbort.create()
+        try {
+            cancellation.onCancel { abort.cancel() }
+            val sample = text.trim().take(DETECT_SAMPLE_CHARS)
+            val prompt = "Which language is the following text written in? Answer with the English name of the language only.\n\n$sample"
+            val begun = llm.begin(prompt, 16, abort)
+            if (begun == -2) {
+                throw CancelledException()
+            }
+            if (begun < 0) {
+                return null
+            }
+            val bytes = ByteArrayOutputStream()
+            while (true) {
+                val piece = llm.next() ?: break
+                bytes.write(piece)
+            }
+            if (cancellation.isCancelled) {
+                throw CancelledException()
+            }
+            val answer = clean(String(bytes.toByteArray(), Charsets.UTF_8))
+            Log.i(TAG, "Language asked of the model: \"$answer\"")
+            return TranslationLanguages.codeForEnglishName(answer)
+        } finally {
+            abort.close()
+        }
+    }
+
+    @Synchronized
     override fun releaseModel() {
         model?.release()
         model = null
@@ -124,6 +158,7 @@ class LlamaTranslationEngine : TranslationEngine {
         private const val TAG = "ScribTranslate"
         private const val MAX_CHUNK_CHARS = 1500
         private const val MAX_ANSWER_TOKENS = 2048
+        private const val DETECT_SAMPLE_CHARS = 400
         private val THINK = Regex("(?s)<think>.*?</think>\\s*")
     }
 }
