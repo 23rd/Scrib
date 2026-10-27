@@ -85,7 +85,7 @@ internal fun TranslateTab(history: List<TranscriptHistory.Entry>, transcription:
     var openEntry by remember { mutableStateOf<TranslationHistory.Entry?>(null) }
     var showClearHistory by rememberSaveable { mutableStateOf(false) }
     val hasModel = ui.activeName != null
-    LaunchedEffect(Unit) { vm.refresh() }
+    LaunchedEffect(Unit) { vm.refresh(); vm.warmUp() }
     LaunchedEffect(AppNav.pendingTranslateText) {
         AppNav.takePendingTranslateText()?.let { source = it }
     }

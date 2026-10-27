@@ -108,6 +108,11 @@ class LlamaTranslationEngine : TranslationEngine {
     }
 
     @Synchronized
+    override fun preload(modelPath: String) {
+        model(modelPath)
+    }
+
+    @Synchronized
     override fun releaseModel() {
         model?.release()
         model = null

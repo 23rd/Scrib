@@ -11,6 +11,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             ScribTheme {
                 val vm: ScribViewModel = viewModel()
+                // preload the translation model if theres room
+                val translationVm: TranslationViewModel = viewModel()
+                LaunchedEffect(Unit) { translationVm.warmUp() }
                 val lifecycleOwner = LocalLifecycleOwner.current
                 DisposableEffect(lifecycleOwner) {
                     val observer = LifecycleEventObserver { _, event ->
