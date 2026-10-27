@@ -1027,6 +1027,7 @@ private fun SettingsTab(
                 }
             }
             item { SkipSilenceEntry(state, onSkipSilence) }
+            item { TranslationPreloadEntry() }
         }
         item { LiveStatsEntry(state.liveStats, onLiveStats) }
         item { KeyboardStatsEntry(state, onKeyboardStats) }

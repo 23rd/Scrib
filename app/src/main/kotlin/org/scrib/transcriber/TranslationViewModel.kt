@@ -36,6 +36,7 @@ data class TranslationUi(
     val statusError: Boolean,
     val run: TranslateRun?,
     val history: List<TranslationHistory.Entry>,
+    val preload: Boolean
 )
 
 class TranslationViewModel(app: Application) : AndroidViewModel(app) {
@@ -104,6 +105,7 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
             statusMsg = statusMsg, statusError = statusError,
             run = run,
             history = history(),
+            preload = TranslationModels.preload(ctx)
         )
     }
 
@@ -303,6 +305,12 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
                 warming = false
             }
         }
+    }
+
+    fun setPreload(enabled: Boolean) {
+        TranslationModels.setPreload(ctx, enabled)
+        push()
+        if (enabled) warmUp() else releaseEngine()
     }
 
     fun cancelTranslate() {

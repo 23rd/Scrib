@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Choisir un modèle dans les réglages</string>
     <string name="translate_no_model">Aucun modèle de traduction</string>
     <string name="translate_no_model_hint">Choisissez-en un sous Modèles de traduction dans les réglages.</string>
+    <string name="translate_preload_title">Précharger le modèle de traduction</string>
+    <string name="translate_preload_sub">Charge le modèle à l\'ouverture de l\'app, s\'il y a de la place, pour que la première traduction démarre aussitôt.</string>
+    <string name="translate_preload_on">Activé — chargé au démarrage si la mémoire le permet</string>
     <string name="home_translate_text">Traduire du texte</string>
     <string name="home_translate_clipboard">Traduire le texte du presse-papiers</string>
     <string name="home_translate_latest">Traduire le dernier enregistrement</string>

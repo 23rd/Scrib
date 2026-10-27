@@ -262,6 +262,9 @@
     <string name="translate_nudge_action">Choose a model in Settings</string>
     <string name="translate_no_model">No translation model</string>
     <string name="translate_no_model_hint">Pick one under Translation models in Settings.</string>
+    <string name="translate_preload_title">Preload translation model</string>
+    <string name="translate_preload_sub">Reads the model in when the app opens, if there is room, so the first translation starts at once.</string>
+    <string name="translate_preload_on">On — loaded at app start when memory allows</string>
     <string name="home_translate_text">Translate text</string>
     <string name="home_translate_clipboard">Translate clipboard text</string>
     <string name="home_translate_latest">Translate the latest recording</string>

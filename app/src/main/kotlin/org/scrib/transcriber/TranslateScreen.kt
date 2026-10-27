@@ -281,6 +281,35 @@ private fun NudgeCard(title: String, body: String, action: String, onAction: () 
     }
 }
 
+// settings toggle for preloading
+@Composable
+internal fun TranslationPreloadEntry() {
+    val cs = MaterialTheme.colorScheme
+    val vm: TranslationViewModel = viewModel()
+    val ui by vm.state.collectAsState()
+    val enabled = ui.preload
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).clip(RoundedCornerShape(16.dp)).clickable { vm.setPreload(!enabled) }
+    ) {
+        Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Icon(painterResource(R.drawable.ic_tab_translate), null, tint = cs.primary, modifier = Modifier.size(20.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.translate_preload_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface)
+                Text(
+                    stringResource(if (enabled) R.string.translate_preload_on else R.string.translate_preload_sub),
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Switch(checked = enabled, onCheckedChange = { vm.setPreload(it) })
+        }
+    }
+}
+
 // translation models section on the Settings tab
 @Composable
 internal fun TranslationModelsSection(expanded: Boolean, onToggle: () -> Unit) {

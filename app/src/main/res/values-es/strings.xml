@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Elegir un modelo en Ajustes</string>
     <string name="translate_no_model">Sin modelo de traducción</string>
     <string name="translate_no_model_hint">Elige uno en Modelos de traducción, en Ajustes.</string>
+    <string name="translate_preload_title">Precargar el modelo de traducción</string>
+    <string name="translate_preload_sub">Carga el modelo al abrir la app, si hay memoria, para que la primera traducción empiece al instante.</string>
+    <string name="translate_preload_on">Activado — se carga al abrir si la memoria lo permite</string>
     <string name="home_translate_text">Traducir texto</string>
     <string name="home_translate_clipboard">Traducir el texto del portapapeles</string>
     <string name="home_translate_latest">Traducir la última grabación</string>
