@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Modell in den Einstellungen wählen</string>
     <string name="translate_no_model">Kein Übersetzungsmodell</string>
     <string name="translate_no_model_hint">Wähle eines unter „Übersetzungsmodelle“ in den Einstellungen.</string>
+    <string name="translate_preload_title">Übersetzungsmodell vorladen</string>
+    <string name="translate_preload_sub">Lädt das Modell beim App-Start, wenn genug Speicher frei ist, damit die erste Übersetzung sofort beginnt.</string>
+    <string name="translate_preload_on">An — wird beim Start geladen, wenn der Speicher reicht</string>
     <string name="home_translate_text">Text übersetzen</string>
     <string name="home_translate_clipboard">Text aus der Zwischenablage übersetzen</string>
     <string name="home_translate_latest">Letzte Aufnahme übersetzen</string>

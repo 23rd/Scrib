@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Scegli un modello nelle impostazioni</string>
     <string name="translate_no_model">Nessun modello di traduzione</string>
     <string name="translate_no_model_hint">Scegline uno in Modelli di traduzione nelle impostazioni.</string>
+    <string name="translate_preload_title">Precarica il modello di traduzione</string>
+    <string name="translate_preload_sub">Carica il modello all\'apertura dell\'app, se c\'è spazio, così la prima traduzione parte subito.</string>
+    <string name="translate_preload_on">Attivo — caricato all\'avvio se la memoria lo consente</string>
     <string name="home_translate_text">Traduci testo</string>
     <string name="home_translate_clipboard">Traduci il testo degli appunti</string>
     <string name="home_translate_latest">Traduci l\'ultima registrazione</string>

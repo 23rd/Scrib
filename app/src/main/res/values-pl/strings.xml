@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Wybierz model w Ustawieniach</string>
     <string name="translate_no_model">Brak modelu tłumaczenia</string>
     <string name="translate_no_model_hint">Wybierz jeden w sekcji Modele tłumaczenia w Ustawieniach.</string>
+    <string name="translate_preload_title">Wczytuj model tłumaczenia z wyprzedzeniem</string>
+    <string name="translate_preload_sub">Wczytuje model przy otwarciu aplikacji, jeśli jest miejsce, aby pierwsze tłumaczenie zaczęło się od razu.</string>
+    <string name="translate_preload_on">Włączone — wczytywany przy starcie, gdy pozwala pamięć</string>
     <string name="home_translate_text">Przetłumacz tekst</string>
     <string name="home_translate_clipboard">Przetłumacz tekst ze schowka</string>
     <string name="home_translate_latest">Przetłumacz ostatnie nagranie</string>

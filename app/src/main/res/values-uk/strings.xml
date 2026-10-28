@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Вибрати модель у налаштуваннях</string>
     <string name="translate_no_model">Немає моделі перекладу</string>
     <string name="translate_no_model_hint">Виберіть одну в розділі «Моделі перекладу» в налаштуваннях.</string>
+    <string name="translate_preload_title">Попередньо завантажувати модель перекладу</string>
+    <string name="translate_preload_sub">Завантажує модель під час відкриття застосунку, якщо вистачає пам\'яті, щоб перший переклад починався одразу.</string>
+    <string name="translate_preload_on">Увімкнено — завантажується під час запуску, якщо дозволяє пам\'ять</string>
     <string name="home_translate_text">Перекласти текст</string>
     <string name="home_translate_clipboard">Перекласти текст із буфера обміну</string>
     <string name="home_translate_latest">Перекласти останній запис</string>

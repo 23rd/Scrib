@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Kies een model in Instellingen</string>
     <string name="translate_no_model">Geen vertaalmodel</string>
     <string name="translate_no_model_hint">Kies er een onder Vertaalmodellen in Instellingen.</string>
+    <string name="translate_preload_title">Vertaalmodel vooraf laden</string>
+    <string name="translate_preload_sub">Laadt het model bij het openen van de app, als er ruimte is, zodat de eerste vertaling meteen begint.</string>
+    <string name="translate_preload_on">Aan — geladen bij de start als het geheugen het toelaat</string>
     <string name="home_translate_text">Tekst vertalen</string>
     <string name="home_translate_clipboard">Tekst van het klembord vertalen</string>
     <string name="home_translate_latest">Laatste opname vertalen</string>

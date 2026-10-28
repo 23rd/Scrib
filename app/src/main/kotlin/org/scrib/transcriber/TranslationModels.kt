@@ -11,6 +11,7 @@ object TranslationModels {
     private const val KEY_ACTIVE = "activeModelFile"
     private const val KEY_SOURCE = "sourceLanguage"
     private const val KEY_TARGET = "targetLanguage"
+    private const val KEY_PRELOAD = "preload"
 
     // anything smaller is a broken download
     private const val MIN_VALID_SIZE = 10_000_000L
@@ -129,6 +130,13 @@ object TranslationModels {
 
     fun setSourceLanguage(context: Context, code: String) {
         prefs(context).edit().putString(KEY_SOURCE, code).apply()
+    }
+
+    // load the model at app start
+    fun preload(context: Context): Boolean = prefs(context).getBoolean(KEY_PRELOAD, false)
+
+    fun setPreload(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_PRELOAD, enabled).apply()
     }
 
     fun targetLanguage(context: Context): String =

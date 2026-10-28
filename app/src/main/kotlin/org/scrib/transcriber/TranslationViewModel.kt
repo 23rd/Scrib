@@ -36,6 +36,7 @@ data class TranslationUi(
     val statusError: Boolean,
     val run: TranslateRun?,
     val history: List<TranslationHistory.Entry>,
+    val preload: Boolean
 )
 
 class TranslationViewModel(app: Application) : AndroidViewModel(app) {
@@ -104,6 +105,7 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
             statusMsg = statusMsg, statusError = statusError,
             run = run,
             history = history(),
+            preload = TranslationModels.preload(ctx)
         )
     }
 
@@ -279,6 +281,38 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    @Volatile private var warming = false
+
+    // preload the model if theres enough spare ram
+    fun warmUp() {
+        if (!TranslationModels.preload(ctx)) return
+        if (warming || run?.running == true || TranscriptionRun.state.value?.running == true) return
+        val plugin = TranslationPlugins.plugin ?: return
+        val path = TranslationModels.activeModelPath(ctx) ?: return
+        val modelMb = java.io.File(path).length() / (1024L * 1024L)
+        val freeMb = processMemory(ctx).freeRamMb
+        if (freeMb < modelMb * 3 / 2 + WARM_UP_HEADROOM_MB) {
+            android.util.Log.i(TAG, "Not preloading: $freeMb MB free for a $modelMb MB model")
+            return
+        }
+        warming = true
+        viewModelScope.launch(Dispatchers.Default) {
+            try {
+                plugin.engine(ctx).preload(path)
+            } catch (e: Throwable) {
+                android.util.Log.w(TAG, "Preload failed", e)
+            } finally {
+                warming = false
+            }
+        }
+    }
+
+    fun setPreload(enabled: Boolean) {
+        TranslationModels.setPreload(ctx, enabled)
+        push()
+        if (enabled) warmUp() else releaseEngine()
+    }
+
     fun cancelTranslate() {
         cancellation?.cancel()
     }
@@ -310,6 +344,12 @@ class TranslationViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.Default) {
             runCatching { TranslationPlugins.plugin?.engine(ctx)?.releaseModel() }
         }
+    }
+
+    companion object {
+        private const val TAG = "ScribTranslate"
+        // headroom left for the rest of the system
+        private const val WARM_UP_HEADROOM_MB = 768L
     }
 
     override fun onCleared() {

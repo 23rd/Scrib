@@ -242,6 +242,9 @@
     <string name="translate_nudge_action">Ayarlardan bir model seç</string>
     <string name="translate_no_model">Çeviri modeli yok</string>
     <string name="translate_no_model_hint">Ayarlar\'daki Çeviri modelleri bölümünden birini seç.</string>
+    <string name="translate_preload_title">Çeviri modelini önceden yükle</string>
+    <string name="translate_preload_sub">Yer varsa modeli uygulama açılırken yükler, böylece ilk çeviri hemen başlar.</string>
+    <string name="translate_preload_on">Açık — bellek izin verirse başlangıçta yüklenir</string>
     <string name="home_translate_text">Metni çevir</string>
     <string name="home_translate_clipboard">Panodaki metni çevir</string>
     <string name="home_translate_latest">Son kaydı çevir</string>
