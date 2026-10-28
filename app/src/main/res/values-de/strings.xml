@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Keine Sprache erkannt.</string>
     <string name="transcribe_cant_open">Datei kann nicht geöffnet werden</string>
     <string name="transcribe_failed">Transkription fehlgeschlagen</string>
+    <string name="transcribe_decode_stopped">Dekodierung endete bei %1$s von %2$s: Der Rest der Aufnahme wurde nicht transkribiert.</string>
+    <string name="transcribe_decode_stopped_unknown">Dekodierung endete bei %1$s: Der Rest der Aufnahme wurde nicht transkribiert.</string>
     <string name="about_back">Zurück</string>
     <string name="about_tagline">Sprache-zu-Text auf dem Gerät. Dein Audio verlässt das Telefon nie.</string>
     <string name="about_tagline_remote">Spracherkennung über einen Server, den du selbst betreibst. Dein Audio wird dorthin hochgeladen.</string>

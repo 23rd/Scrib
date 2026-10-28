@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Nessun parlato riconosciuto.</string>
     <string name="transcribe_cant_open">Impossibile aprire il file</string>
     <string name="transcribe_failed">Trascrizione non riuscita</string>
+    <string name="transcribe_decode_stopped">La decodizzazione si è interrotta a %1$s di %2$s: il resto della registrazione non è stato trascritto.</string>
+    <string name="transcribe_decode_stopped_unknown">La decodizzazione si è interrotta a %1$s: il resto della registrazione non è stato trascritto.</string>
     <string name="about_back">Indietro</string>
     <string name="about_tagline">Da voce a testo sul dispositivo. Il tuo audio non lascia mai il telefono.</string>
     <string name="about_tagline_remote">Trascrizione vocale tramite un server che controlli tu. L\'audio viene caricato lì.</string>

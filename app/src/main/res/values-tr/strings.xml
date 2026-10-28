@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Konuşma algılanmadı.</string>
     <string name="transcribe_cant_open">Dosya açılamıyor</string>
     <string name="transcribe_failed">Yazıya dökme başarısız</string>
+    <string name="transcribe_decode_stopped">Çözme %1$s / %2$s noktasında durdu: kaydın geri kalanı yazıya dökülemedi.</string>
+    <string name="transcribe_decode_stopped_unknown">Çözme %1$s noktasında durdu: kaydın geri kalanı yazıya dökülemedi.</string>
     <string name="about_back">Geri</string>
     <string name="about_tagline">Cihazda konuşmadan metne. Sesiniz telefonu asla terk etmez.</string>
     <string name="about_tagline_remote">Kendi denetlediğiniz bir sunucu üzerinden konuşmadan metne. Sesiniz oraya gönderilir.</string>

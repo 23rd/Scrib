@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Nenhuma fala reconhecida.</string>
     <string name="transcribe_cant_open">Não foi possível abrir o arquivo</string>
     <string name="transcribe_failed">Falha na transcrição</string>
+    <string name="transcribe_decode_stopped">A descodificação parou em %1$s de %2$s: o resto da gravação não foi transcrito.</string>
+    <string name="transcribe_decode_stopped_unknown">A descodificação parou em %1$s: o resto da gravação não foi transcrito.</string>
     <string name="about_back">Voltar</string>
     <string name="about_tagline">Voz para texto no dispositivo. Seu áudio nunca sai do telefone.</string>
     <string name="about_tagline_remote">Transcrição de voz por um servidor que você controla. O áudio é enviado para ele.</string>

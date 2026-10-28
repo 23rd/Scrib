@@ -84,58 +84,62 @@ class EndpointTranscriptionEngine(
                 throw CancelledException()
             }
             val pcm = try {
-                AudioDecoder.decodeToPcm16kMono(audio, cancellation)
+                AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
             } catch (e: CancelledException) {
                 throw e
             } catch (e: Throwable) {
                 throw DecodeException(e.message ?: "Cannot decode the audio")
             }
-            if (cancellation.isCancelled) {
-                throw CancelledException()
-            }
-            if (pcm.sampleCount == 0) {
-                throw DecodeException("No audio decoded")
-            }
+            try {
+                if (cancellation.isCancelled) {
+                    throw CancelledException()
+                }
+                if (pcm.sampleCount == 0) {
+                    throw DecodeException("No audio decoded")
+                }
 
-            val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
-            val decodeMs = SystemClock.elapsedRealtime() - startedAt
-            onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
-            onProgress(0)
+                val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
+                val decodeMs = SystemClock.elapsedRealtime() - startedAt
+                onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+                onProgress(0)
 
-            val wav = try {
-                WavWriter.encode(pcm.samples, pcm.sampleCount, SAMPLE_RATE)
-            } catch (e: IllegalArgumentException) {
-                throw DecodeException(e.message ?: "Recording is too long")
-            }
-            if (cancellation.isCancelled) {
-                throw CancelledException()
-            }
+                val wav = try {
+                    WavWriter.encode(pcm.samples, pcm.sampleCount, SAMPLE_RATE)
+                } catch (e: IllegalArgumentException) {
+                    throw DecodeException(e.message ?: "Recording is too long")
+                }
+                if (cancellation.isCancelled) {
+                    throw CancelledException()
+                }
 
-            onProgress(20)
-            val transcript = try {
-                transport.transcribe(settings, wav, languageHint, null, cancellation)
-            } catch (e: CancelledException) {
-                throw e
-            } catch (e: Throwable) {
-                Log.w(TAG, "Request failed ($target, ${wav.size} bytes): ${e.message}", e)
-                throw e
-            }
-            val elapsedMs = SystemClock.elapsedRealtime() - startedAt
-            onProgress(100)
-            onMetrics(
-                TranscriptionMetrics(
-                    audioDurationMs = audioDurationMs,
-                    decodeMs = decodeMs,
-                    inferenceMs = elapsedMs - decodeMs,
-                    totalMs = elapsedMs
+                onProgress(20)
+                val transcript = try {
+                    transport.transcribe(settings, wav, languageHint, null, cancellation)
+                } catch (e: CancelledException) {
+                    throw e
+                } catch (e: Throwable) {
+                    Log.w(TAG, "Request failed ($target, ${wav.size} bytes): ${e.message}", e)
+                    throw e
+                }
+                val elapsedMs = SystemClock.elapsedRealtime() - startedAt
+                onProgress(100)
+                onMetrics(
+                    TranscriptionMetrics(
+                        audioDurationMs = audioDurationMs,
+                        decodeMs = decodeMs,
+                        inferenceMs = elapsedMs - decodeMs,
+                        totalMs = elapsedMs
+                    )
                 )
-            )
 
-            val trimmed = transcript.text.trim()
-            if (trimmed.isEmpty()) {
-                return emptyList()
+                val trimmed = transcript.text.trim()
+                if (trimmed.isEmpty()) {
+                    return emptyList()
+                }
+                return segments(transcript, audioDurationMs)
+            } finally {
+                pcm.close()
             }
-            return segments(transcript, audioDurationMs)
         } finally {
             try {
                 audio.close()

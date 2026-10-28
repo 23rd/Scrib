@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Nie rozpoznano mowy.</string>
     <string name="transcribe_cant_open">Nie można otworzyć pliku</string>
     <string name="transcribe_failed">Błąd transkrypcji</string>
+    <string name="transcribe_decode_stopped">Dekodowanie zatrzymało się na %1$s z %2$s: reszta nagrania nie została transkrybowana.</string>
+    <string name="transcribe_decode_stopped_unknown">Dekodowanie zatrzymało się na %1$s: reszta nagrania nie została transkrybowana.</string>
     <string name="about_back">Wstecz</string>
     <string name="about_tagline">Mowa na tekst na urządzeniu. Twój dźwięk nigdy nie opuszcza telefonu.</string>
     <string name="about_tagline_remote">Rozpoznawanie mowy przez serwer, który kontrolujesz. Dźwięk trafia do niego.</string>

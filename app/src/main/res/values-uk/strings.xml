@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Мовлення не розпізнано.</string>
     <string name="transcribe_cant_open">Не вдалося відкрити файл</string>
     <string name="transcribe_failed">Помилка розпізнавання</string>
+    <string name="transcribe_decode_stopped">Декодування зупинилося на %1$s з %2$s: решта запису не була розпізнана.</string>
+    <string name="transcribe_decode_stopped_unknown">Декодування зупинилося на %1$s: решта запису не була розпізнана.</string>
     <string name="about_back">Назад</string>
     <string name="about_tagline">Розпізнавання мовлення на пристрої. Ваше аудіо ніколи не залишає телефон.</string>
     <string name="about_tagline_remote">Розпізнавання мовлення через сервер, яким володієте ви. Звук надсилається туди.</string>

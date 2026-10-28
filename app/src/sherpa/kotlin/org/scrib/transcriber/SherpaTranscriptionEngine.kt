@@ -91,27 +91,31 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 throw CancelledException()
             }
             val decodeStartedAt = SystemClock.elapsedRealtime()
-            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation)
-            val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
-            if (cancellation.isCancelled) {
-                throw CancelledException()
+            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
+            try {
+                val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
+                if (cancellation.isCancelled) {
+                    throw CancelledException()
+                }
+                if (pcm.sampleCount == 0) {
+                    throw DecodeException("No audio decoded")
+                }
+                val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
+                onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+                return transcribePcm(
+                    pcm.samples,
+                    pcm.sampleCount,
+                    languageHint,
+                    cancellation,
+                    onProgress,
+                    onPartial,
+                    onMetrics,
+                    audioDurationMs,
+                    decodeMs
+                )
+            } finally {
+                pcm.close()
             }
-            if (pcm.sampleCount == 0) {
-                throw DecodeException("No audio decoded")
-            }
-            val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
-            onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
-            return transcribePcm(
-                pcm.samples,
-                pcm.sampleCount,
-                languageHint,
-                cancellation,
-                onProgress,
-                onPartial,
-                onMetrics,
-                audioDurationMs,
-                decodeMs
-            )
         } finally {
             try {
                 audio.close()

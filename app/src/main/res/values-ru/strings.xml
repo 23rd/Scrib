@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Речь не распознана.</string>
     <string name="transcribe_cant_open">Не удалось открыть файл</string>
     <string name="transcribe_failed">Ошибка распознавания</string>
+    <string name="transcribe_decode_stopped">Декодирование остановилось на %1$s из %2$s: остальная часть записи не была распознана.</string>
+    <string name="transcribe_decode_stopped_unknown">Декодирование остановилось на %1$s: остальная часть записи не была распознана.</string>
     <string name="about_back">Назад</string>
     <string name="about_tagline">Распознавание речи на устройстве. Ваше аудио не покидает телефон.</string>
     <string name="about_tagline_remote">Распознавание речи через сервер, которым владеете вы. Аудио уходит туда.</string>

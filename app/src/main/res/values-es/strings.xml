@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">No se reconoció voz.</string>
     <string name="transcribe_cant_open">No se puede abrir el archivo</string>
     <string name="transcribe_failed">Error de transcripción</string>
+    <string name="transcribe_decode_stopped">La decodificación se detuvo en %1$s de %2$s: el resto de la grabación no se transcribió.</string>
+    <string name="transcribe_decode_stopped_unknown">La decodificación se detuvo en %1$s: el resto de la grabación no se transcribió.</string>
     <string name="about_back">Atrás</string>
     <string name="about_tagline">Voz a texto en el dispositivo. Tu audio nunca sale del teléfono.</string>
     <string name="about_tagline_remote">Transcripción de voz mediante un servidor que controlas tú. El audio se sube a él.</string>

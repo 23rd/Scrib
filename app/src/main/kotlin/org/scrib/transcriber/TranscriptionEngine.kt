@@ -84,6 +84,25 @@ class ModelNotAvailableException(message: String? = null) : RuntimeException(mes
 
 class DecodeException(message: String) : RuntimeException(message)
 
+// Decoding ended before the source did: codec failure, converter failure, a stall. Carries how
+// much audio made it through and what the container promised, so the run can say where it
+// stopped instead of presenting a silent cutoff as a complete transcription.
+class DecodeStoppedException(val decodedMs: Long, val totalMs: Long, cause: Throwable?) : RuntimeException(decodeStoppedMessage(decodedMs, totalMs), cause)
+
+private fun decodeStoppedMessage(decodedMs: Long, totalMs: Long): String {
+    val decoded = elapsedOf(decodedMs)
+    return if (totalMs > 0L) {
+        "Audio decoding stopped at $decoded of ${elapsedOf(totalMs)}"
+    } else {
+        "Audio decoding stopped at $decoded"
+    }
+}
+
+fun elapsedOf(ms: Long): String {
+    val seconds = (ms / 1000).coerceAtLeast(0)
+    return String.format(java.util.Locale.ROOT, "%d:%02d", seconds / 60, seconds % 60)
+}
+
 fun transcriptionError(type: Byte, message: String? = null): TranscriptionError {
     val error = TranscriptionError()
     error.type = type

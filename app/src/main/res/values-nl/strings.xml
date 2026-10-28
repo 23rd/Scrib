@@ -213,6 +213,8 @@
     <string name="transcribe_no_speech">Geen spraak herkend.</string>
     <string name="transcribe_cant_open">Kan het bestand niet openen</string>
     <string name="transcribe_failed">Transcriptie mislukt</string>
+    <string name="transcribe_decode_stopped">Decoderen gestopt bij %1$s van %2$s: de rest van de opname is niet getranscribeerd.</string>
+    <string name="transcribe_decode_stopped_unknown">Decoderen gestopt bij %1$s: de rest van de opname is niet getranscribeerd.</string>
     <string name="about_back">Terug</string>
     <string name="about_tagline">Spraak-naar-tekst op het apparaat. Je audio verlaat nooit de telefoon.</string>
     <string name="about_tagline_remote">Spraak-naar-tekst via een server die je zelf beheert. Je audio wordt daarheen gestuurd.</string>

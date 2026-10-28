@@ -275,6 +275,24 @@ object TranscriptionRun {
                     }
                     result = TranscriptionRunResult.SUCCESS
                 }
+            } catch (e: DecodeStoppedException) {
+                if (cancellation.isCancelled) {
+                    _state.value = null
+                    result = TranscriptionRunResult.CANCELLED
+                    StateLog.log("run cancelled: file=$name")
+                } else {
+                    result = TranscriptionRunResult.FAILED
+                    val message = if (e.totalMs > 0L) {
+                        app.getString(R.string.transcribe_decode_stopped, elapsedOf(e.decodedMs), elapsedOf(e.totalMs))
+                    } else {
+                        app.getString(R.string.transcribe_decode_stopped_unknown, elapsedOf(e.decodedMs))
+                    }
+                    _state.update {
+                        it?.copy(running = false, etaMs = null, error = message)
+                    }
+                    publishMetrics()
+                    StateLog.log("run failed: file=$name error=$message")
+                }
             } catch (e: Throwable) {
                 if (cancellation.isCancelled) {
                     _state.value = null

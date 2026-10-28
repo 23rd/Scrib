@@ -232,6 +232,8 @@
     <string name="transcribe_no_speech">No speech recognized.</string>
     <string name="transcribe_cant_open">Can\'t open the file</string>
     <string name="transcribe_failed">Transcription failed</string>
+    <string name="transcribe_decode_stopped">Decoding stopped at %1$s of %2$s: the rest of the recording was not transcribed.</string>
+    <string name="transcribe_decode_stopped_unknown">Decoding stopped at %1$s: the rest of the recording was not transcribed.</string>
 
     <string name="about_back">Back</string>
     <string name="about_tagline">On-device speech-to-text. Your audio never leaves your phone.</string>

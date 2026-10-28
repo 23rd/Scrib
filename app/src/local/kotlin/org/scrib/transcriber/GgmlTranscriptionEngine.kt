@@ -82,58 +82,62 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 throw CancelledException()
             }
             val decodeStartedAt = SystemClock.elapsedRealtime()
-            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation)
-            val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
-            if (cancellation.isCancelled) {
-                throw CancelledException()
-            }
-            if (pcm.sampleCount == 0) {
-                throw DecodeException("No audio decoded")
-            }
-            val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
-            onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
-            var modelLoadMs = 0L
-            var modelPssMb = 0
-            var modelMemoryDeltaMb = 0
-            val inferenceStartedAt = SystemClock.elapsedRealtime()
-            fun reportProgress(percent: Int) {
-                onProgress(percent)
-                onMetrics(
-                    TranscriptionMetrics(
-                        audioDurationMs = audioDurationMs,
-                        decodeMs = decodeMs,
-                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
-                        modelLoadMs = modelLoadMs,
-                        modelPssMb = modelPssMb,
-                        modelMemoryDeltaMb = modelMemoryDeltaMb
+            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
+            try {
+                val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
+                if (cancellation.isCancelled) {
+                    throw CancelledException()
+                }
+                if (pcm.sampleCount == 0) {
+                    throw DecodeException("No audio decoded")
+                }
+                val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
+                onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+                var modelLoadMs = 0L
+                var modelPssMb = 0
+                var modelMemoryDeltaMb = 0
+                val inferenceStartedAt = SystemClock.elapsedRealtime()
+                fun reportProgress(percent: Int) {
+                    onProgress(percent)
+                    onMetrics(
+                        TranscriptionMetrics(
+                            audioDurationMs = audioDurationMs,
+                            decodeMs = decodeMs,
+                            inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                            modelLoadMs = modelLoadMs,
+                            modelPssMb = modelPssMb,
+                            modelMemoryDeltaMb = modelMemoryDeltaMb
+                        )
                     )
-                )
-            }
-            return try {
-                transcribePcm(
-                    pcm,
-                    languageHint,
-                    cancellation,
-                    ::reportProgress,
-                    onPartial,
-                    onModelLoad = { metrics ->
-                        modelLoadMs = metrics.modelLoadMs
-                        modelPssMb = metrics.modelPssMb
-                        modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
-                        onMetrics(metrics)
-                    }
-                )
+                }
+                return try {
+                    transcribePcm(
+                        pcm,
+                        languageHint,
+                        cancellation,
+                        ::reportProgress,
+                        onPartial,
+                        onModelLoad = { metrics ->
+                            modelLoadMs = metrics.modelLoadMs
+                            modelPssMb = metrics.modelPssMb
+                            modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
+                            onMetrics(metrics)
+                        }
+                    )
+                } finally {
+                    onMetrics(
+                        TranscriptionMetrics(
+                            audioDurationMs = audioDurationMs,
+                            decodeMs = decodeMs,
+                            inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                            modelLoadMs = modelLoadMs,
+                            modelPssMb = modelPssMb,
+                            modelMemoryDeltaMb = modelMemoryDeltaMb
+                        )
+                    )
+                }
             } finally {
-                onMetrics(
-                    TranscriptionMetrics(
-                        audioDurationMs = audioDurationMs,
-                        decodeMs = decodeMs,
-                        inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
-                        modelLoadMs = modelLoadMs,
-                        modelPssMb = modelPssMb,
-                        modelMemoryDeltaMb = modelMemoryDeltaMb
-                    )
-                )
+                pcm.close()
             }
         } finally {
             try {
@@ -263,8 +267,14 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             "Skipping silence: ${spans.size} stretch(es), ${(speech / 1000).toInt()}s of " +
                 "${pcm.sampleCount * 1000L / SAMPLE_RATE / 1000}s"
         )
-        return RunAudio.compact(pcm.samples, pcm.sampleCount, spans)
-            ?: RunAudio.whole(pcm.samples, pcm.sampleCount)
+        // Packing speech into its own buffer needs one more native allocation on top of the
+        // decoded audio; failing that must degrade to transcribing everything, not kill the run.
+        return try {
+            RunAudio.compact(pcm.samples, pcm.sampleCount, spans)
+        } catch (e: Throwable) {
+            Log.w("GgmlEngine", "Packing the speech spans failed, transcribing everything", e)
+            null
+        } ?: RunAudio.whole(pcm.samples, pcm.sampleCount)
     }
 
     private fun runUtterance(
