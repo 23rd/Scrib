@@ -23,7 +23,6 @@
     <string name="nav_settings">Налаштування</string>
     <string name="file_entry_sub">Виберіть аудіо- або відеофайл і розпізнайте його</string>
     <string name="history_section_title">Записи</string>
-    <string name="history_saved">Збережено в записях.</string>
     <string name="history_clear_all">Очистити все</string>
     <string name="history_clear_title">Очистити всі записи?</string>
     <string name="history_clear_message">Усі збережені розшифровки буде безповоротно видалено з цього пристрою.</string>
