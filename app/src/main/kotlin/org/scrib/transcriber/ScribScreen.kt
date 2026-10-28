@@ -1992,7 +1992,7 @@ private fun KeyboardStatsEntry(state: ScribUiState, onToggle: (Boolean) -> Unit)
     ) {
         Row(Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
-                Text("🎙", fontSize = 18.sp)
+                Text("📊", fontSize = 18.sp)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
