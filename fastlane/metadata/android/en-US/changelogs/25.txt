@@ -1,0 +1,1 @@
+• Fixed transcription of long recordings stopping at twenty minutes

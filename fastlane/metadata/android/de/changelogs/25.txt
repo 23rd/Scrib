@@ -1,0 +1,1 @@
+• Behoben, dass die Transkription langer Aufnahmen nach zwanzig Minuten abbrach

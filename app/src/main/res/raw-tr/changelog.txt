@@ -1,3 +1,5 @@
+# 0.25
+• Uzun kayıtlarda yazıya dökmenin yirmi dakikada durması düzeltildi
 # 0.24
 • Ayarlara "Yenilikler ve değişiklik günlüğü" bölümü eklendi
 • Her güncellemeden sonra bir kez gösterilen sürüm notları eklendi

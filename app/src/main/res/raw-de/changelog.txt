@@ -1,3 +1,5 @@
+# 0.25
+• Behoben, dass die Transkription langer Aufnahmen nach zwanzig Minuten abbrach
 # 0.24
 • Abschnitt „Was ist neu und Änderungsprotokoll" in den Einstellungen hinzugefügt
 • Release-Hinweise hinzugefügt, die nach jedem Update einmal angezeigt werden
