@@ -1,0 +1,1 @@
+• Adicionada duração configurável de segmentos no contrato de streaming do Open Transcribe v4 para legendas mais rápidas

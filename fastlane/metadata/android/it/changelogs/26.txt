@@ -1,0 +1,1 @@
+• Aggiunta durata configurabile dei segmenti nel contratto di streaming Open Transcribe v4 per sottotitoli più rapidi

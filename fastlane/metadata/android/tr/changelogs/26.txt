@@ -1,0 +1,1 @@
+• Daha hızlı altyazı akışı için Open Transcribe v4 akış sözleşmesine yapılandırılabilir segment süresi eklendi

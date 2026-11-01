@@ -1,3 +1,5 @@
+# 0.26
+• Added configurable segment duration to Open Transcribe v4 streaming contract for faster subtitle delivery
 # 0.25
 • Fixed transcription of long recordings stopping at twenty minutes
 # 0.24

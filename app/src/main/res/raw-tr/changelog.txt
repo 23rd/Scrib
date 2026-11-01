@@ -1,3 +1,5 @@
+# 0.26
+• Daha hızlı altyazı akışı için Open Transcribe v4 akış sözleşmesine yapılandırılabilir segment süresi eklendi
 # 0.25
 • Uzun kayıtlarda yazıya dökmenin yirmi dakikada durması düzeltildi
 # 0.24

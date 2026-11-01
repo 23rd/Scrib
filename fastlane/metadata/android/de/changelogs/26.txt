@@ -1,0 +1,1 @@
+• Konfigurierbare Segmentdauer im Open Transcribe v4 Streaming-Vertrag für schnellere Untertitelausgabe hinzugefügt

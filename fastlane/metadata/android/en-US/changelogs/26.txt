@@ -1,0 +1,1 @@
+• Added configurable segment duration to Open Transcribe v4 streaming contract for faster subtitle delivery

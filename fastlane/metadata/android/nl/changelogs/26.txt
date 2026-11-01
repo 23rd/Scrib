@@ -1,0 +1,1 @@
+• Instelbare segmentduur in het Open Transcribe v4-streamingcontract toegevoegd voor snellere ondertiteling

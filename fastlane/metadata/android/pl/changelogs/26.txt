@@ -1,0 +1,1 @@
+• Dodano konfigurowalną długość segmentu w kontrakcie strumieniowym Open Transcribe v4 dla szybszego dostarczania napisów
