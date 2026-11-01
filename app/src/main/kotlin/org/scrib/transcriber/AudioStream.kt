@@ -45,6 +45,7 @@ class AudioStream(
         .order(ByteOrder.nativeOrder())
     private val segmentFloats: FloatBuffer = segment.asFloatBuffer()
 
+    private val maxSegmentSamples: Int
     private val death = IBinder.DeathRecipient { cancel() }
 
     // Guarded by lock.
@@ -72,6 +73,12 @@ class AudioStream(
         require(channels in 1..MAX_INPUT_CHANNELS) { "Unsupported channel count $channels" }
         converter = AudioDecoder.ChunkConverter(rate, channels, AudioFormat.ENCODING_PCM_16BIT, pending)
         language = request?.languageHint?.takeIf { it.isNotEmpty() }
+        val maxDurationMs = request?.maxSegmentDurationMs ?: 0
+        maxSegmentSamples = if (maxDurationMs > 0) {
+            (maxDurationMs.toLong() * SAMPLE_RATE / 1000L).toInt().coerceIn(MIN_SEGMENT_SAMPLES, MAX_SEGMENT_SAMPLES)
+        } else {
+            MAX_SEGMENT_SAMPLES
+        }
     }
 
     fun start(onClosed: () -> Unit = {}) {
@@ -153,7 +160,7 @@ class AudioStream(
                         if (ended) {
                             last = pending.count == 0
                             if (!last) {
-                                length = take(pending.count.coerceAtMost(MAX_SEGMENT_SAMPLES))
+                                length = take(pending.count.coerceAtMost(maxSegmentSamples))
                                 last = pending.count == 0
                             }
                             break
@@ -236,8 +243,8 @@ class AudioStream(
             val position = scannedFrames * FRAME_SAMPLES
             val paused = silenceFrames >= SILENCE_FRAMES &&
                 speechFrames >= MIN_SPEECH_FRAMES &&
-                position >= MIN_SEGMENT_SAMPLES
-            if (paused || position >= MAX_SEGMENT_SAMPLES) {
+                position >= minOf(MIN_SEGMENT_SAMPLES, maxSegmentSamples)
+            if (paused || position >= maxSegmentSamples) {
                 return position
             }
         }

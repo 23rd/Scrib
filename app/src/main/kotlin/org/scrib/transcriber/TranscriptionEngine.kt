@@ -53,7 +53,7 @@ interface TranscriptionEngine {
     fun capabilities(): TranscriberCapabilities
 
     companion object {
-        const val CONTRACT_VERSION = 3
+        const val CONTRACT_VERSION = 4
 
         fun releaseAll(context: Context) {
             val app = context.applicationContext

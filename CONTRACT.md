@@ -15,7 +15,7 @@ expected, not a bug: they are separately installable apps with different model s
 `getCapabilities()` is the way to tell them apart — a client that wants a specific model family can
 match on it instead of hardcoding a package name.
 
-Contract version: **3**
+Contract version: **4**
 
 ## Why this exists
 
@@ -140,6 +140,9 @@ of this document throws `RemoteException` for the unknown method.
 - `StreamRequest.sampleRate` — of the PCM the client will write; **0 means 16000**. The service
   resamples, so a client should send what it captures rather than converting first.
 - `StreamRequest.channels` — **0 means mono**; multi-channel input is downmixed.
+- `StreamRequest.maxSegmentDurationMs` — upper bound on the audio duration decoded in one cut, in
+  milliseconds; **0 means default** (up to 20000 ms, or natural pause detection). Allows streaming
+  clients (such as video subtitle generators) to force shorter utterance cuts when audio has no pauses.
 - `TranscriberCapabilities.contractVersion` — the version of this document the service implements.
 - `TranscriberCapabilities.supportedLanguages` — ISO 639-1 codes, or null when unspecified.
 - `TranscriberCapabilities.modelReady` — false when the service still needs to fetch a model, so the
@@ -182,6 +185,10 @@ version 2 service untouched, and a version 2 client falls back to files when `st
 Version 3 appended `onTranscriptionSegment` to the callback — the only change — so a version ≤2
 client keeps working against a version 3 service untouched (the calls are dropped), and only a
 client that wants timed segments has to implement the new method.
+
+Version 4 appended `maxSegmentDurationMs` to `StreamRequest` — so a version ≤3 client continues to
+work against a version 4 service untouched (reading 0 as default), and low-latency callers can
+request shorter transcription intervals.
 
 Bump `contractVersion` whenever anything is appended.
 
