@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
                         onSaveTranscript = vm::saveTranscript,
                         onTranscriptFormat = vm::setTranscriptFormat,
                         onDeleteHistory = vm::deleteHistoryEntry,
+                        onRenameHistory = vm::renameHistoryEntry,
                         onClearHistory = vm::clearHistory,
                         onSaveHistoryFile = vm::saveHistoryEntryToFile,
                         onTogglePinned = vm::togglePinned,

@@ -26,6 +26,8 @@
     <string name="history_clear_all">Alle löschen</string>
     <string name="history_clear_title">Alle Aufnahmen löschen?</string>
     <string name="history_clear_message">Alle gespeicherten Transkripte werden endgültig von diesem Gerät gelöscht.</string>
+    <string name="history_rename">Umbenennen</string>
+    <string name="history_rename_title">Aufnahme umbenennen</string>
     <string name="quick_access_title">Schnellzugriff</string>
     <string name="quick_access_add">Zum Start hinzufügen</string>
     <string name="quick_access_remove">Vom Start entfernen</string>

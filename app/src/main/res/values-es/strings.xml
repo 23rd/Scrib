@@ -26,6 +26,8 @@
     <string name="history_clear_all">Borrar todo</string>
     <string name="history_clear_title">¿Borrar todas las grabaciones?</string>
     <string name="history_clear_message">Todas las transcripciones guardadas se eliminarán definitivamente de este dispositivo.</string>
+    <string name="history_rename">Cambiar nombre</string>
+    <string name="history_rename_title">Cambiar el nombre de la grabación</string>
     <string name="quick_access_title">Acceso rápido</string>
     <string name="quick_access_add">Añadir a Inicio</string>
     <string name="quick_access_remove">Quitar de Inicio</string>

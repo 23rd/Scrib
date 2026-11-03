@@ -26,6 +26,8 @@
     <string name="history_clear_all">Cancella tutto</string>
     <string name="history_clear_title">Cancellare tutte le registrazioni?</string>
     <string name="history_clear_message">Tutte le trascrizioni salvate verranno eliminate definitivamente da questo dispositivo.</string>
+    <string name="history_rename">Rinomina</string>
+    <string name="history_rename_title">Rinomina la registrazione</string>
     <string name="quick_access_title">Accesso rapido</string>
     <string name="quick_access_add">Aggiungi a Home</string>
     <string name="quick_access_remove">Rimuovi da Home</string>

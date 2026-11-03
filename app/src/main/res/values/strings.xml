@@ -30,6 +30,8 @@
     <string name="history_clear_all">Clear all</string>
     <string name="history_clear_title">Clear all recordings?</string>
     <string name="history_clear_message">All kept transcripts will be permanently deleted from this device.</string>
+    <string name="history_rename">Rename</string>
+    <string name="history_rename_title">Rename recording</string>
     <string name="quick_access_title">Quick access</string>
     <string name="quick_access_add">Add to Home</string>
     <string name="quick_access_remove">Remove from Home</string>

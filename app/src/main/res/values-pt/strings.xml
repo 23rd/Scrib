@@ -26,6 +26,8 @@
     <string name="history_clear_all">Limpar tudo</string>
     <string name="history_clear_title">Limpar todas as gravações?</string>
     <string name="history_clear_message">Todas as transcrições salvas serão excluídas permanentemente deste dispositivo.</string>
+    <string name="history_rename">Renomear</string>
+    <string name="history_rename_title">Renomear gravação</string>
     <string name="quick_access_title">Acesso rápido</string>
     <string name="quick_access_add">Adicionar ao Início</string>
     <string name="quick_access_remove">Remover do Início</string>

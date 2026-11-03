@@ -14,7 +14,8 @@ object TranscriptHistory {
         val fileName: String,
         val modelName: String?,
         val text: String,
-        val segments: List<TranscriptSegment>
+        val segments: List<TranscriptSegment>,
+        val title: String? = null
     )
 
     fun save(context: Context, transcript: TranscribeUi): Entry {
@@ -44,6 +45,12 @@ object TranscriptHistory {
         }
     }
 
+    // A blank title drops the custom name, the row falls back to the file name.
+    fun rename(context: Context, id: String, title: String) {
+        val entry = runCatching { read(file(context, id)) }.getOrNull() ?: return
+        write(context, entry.copy(title = title.trim().takeIf { it.isNotBlank() }))
+    }
+
     fun clearAll(context: Context) {
         try {
             dir(context).listFiles()?.forEach { it.delete() }
@@ -68,6 +75,7 @@ object TranscriptHistory {
                 .put(ID, entry.id)
                 .put(SAVED_AT, entry.savedAtMs)
                 .put(NAME, entry.fileName)
+                .put(TITLE, entry.title.orEmpty())
                 .put(MODEL, entry.modelName.orEmpty())
                 .put(TEXT, entry.text)
                 .put(SEGMENTS, segments)
@@ -103,7 +111,8 @@ object TranscriptHistory {
             fileName = json.optString(NAME),
             modelName = json.optString(MODEL).takeIf { it.isNotBlank() },
             text = text,
-            segments = segments
+            segments = segments,
+            title = json.optString(TITLE).takeIf { it.isNotBlank() }
         )
     }
 
@@ -116,6 +125,7 @@ object TranscriptHistory {
     private const val ID = "id"
     private const val SAVED_AT = "savedAt"
     private const val NAME = "name"
+    private const val TITLE = "title"
     private const val MODEL = "model"
     private const val TEXT = "text"
     private const val SEGMENTS = "segments"

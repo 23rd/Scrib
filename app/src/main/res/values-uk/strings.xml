@@ -26,6 +26,8 @@
     <string name="history_clear_all">Очистити все</string>
     <string name="history_clear_title">Очистити всі записи?</string>
     <string name="history_clear_message">Усі збережені розшифровки буде безповоротно видалено з цього пристрою.</string>
+    <string name="history_rename">Перейменувати</string>
+    <string name="history_rename_title">Перейменувати запис</string>
     <string name="quick_access_title">Швидкий доступ</string>
     <string name="quick_access_add">Додати на головний</string>
     <string name="quick_access_remove">Прибрати з головного</string>

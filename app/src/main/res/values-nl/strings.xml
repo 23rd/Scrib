@@ -26,6 +26,8 @@
     <string name="history_clear_all">Alles wissen</string>
     <string name="history_clear_title">Alle opnames wissen?</string>
     <string name="history_clear_message">Alle bewaarde transcripten worden definitief van dit apparaat verwijderd.</string>
+    <string name="history_rename">Hernoemen</string>
+    <string name="history_rename_title">Opname hernoemen</string>
     <string name="quick_access_title">Snelle toegang</string>
     <string name="quick_access_add">Aan start toevoegen</string>
     <string name="quick_access_remove">Van start verwijderen</string>

@@ -585,6 +585,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         push()
     }
 
+    fun renameHistoryEntry(id: String, title: String) {
+        TranscriptHistory.rename(ctx, id, title)
+        historyCache = null
+        push()
+    }
+
     fun clearHistory() {
         TranscriptHistory.clearAll(ctx)
         historyCache = null

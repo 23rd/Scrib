@@ -26,6 +26,8 @@
     <string name="history_clear_all">Wyczyść wszystko</string>
     <string name="history_clear_title">Wyczyścić wszystkie nagrania?</string>
     <string name="history_clear_message">Wszystkie zapisane transkrypcje zostaną trwale usunięte z tego urządzenia.</string>
+    <string name="history_rename">Zmień nazwę</string>
+    <string name="history_rename_title">Zmień nazwę nagrania</string>
     <string name="quick_access_title">Szybki dostęp</string>
     <string name="quick_access_add">Dodaj do Startu</string>
     <string name="quick_access_remove">Usuń ze Startu</string>

@@ -26,6 +26,8 @@
     <string name="history_clear_all">Tümünü temizle</string>
     <string name="history_clear_title">Tüm kayıtlar temizlensin mi?</string>
     <string name="history_clear_message">Kaydedilen tüm transkriptler bu cihazdan kalıcı olarak silinecek.</string>
+    <string name="history_rename">Yeniden adlandır</string>
+    <string name="history_rename_title">Kaydı yeniden adlandır</string>
     <string name="quick_access_title">Hızlı erişim</string>
     <string name="quick_access_add">Ana sayfaya ekle</string>
     <string name="quick_access_remove">Ana sayfadan çıkar</string>

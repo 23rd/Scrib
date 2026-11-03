@@ -146,6 +146,7 @@ fun ScribScreen(
     onSaveTranscript: (Uri) -> Unit,
     onTranscriptFormat: (TranscriptFormat) -> Unit,
     onDeleteHistory: (String) -> Unit,
+    onRenameHistory: (String, String) -> Unit,
     onClearHistory: () -> Unit,
     onSaveHistoryFile: (String, Uri) -> Unit,
     onTogglePinned: (String) -> Unit,
@@ -240,6 +241,7 @@ fun ScribScreen(
                     onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
                     onOpenEntry = { openHistoryId = it.id },
                     onDeleteEntry = onDeleteHistory,
+                    onRenameEntry = onRenameHistory,
                     onClearHistory = onClearHistory
                 )
                 ScribTab.File -> FileTab(state, actions, onOpenTab = { tab = it }) { audioPicker.launch(arrayOf("audio/*", "video/*")) }
@@ -464,6 +466,7 @@ private fun RecordTab(
     onRecord: () -> Unit,
     onOpenEntry: (TranscriptHistory.Entry) -> Unit,
     onDeleteEntry: (String) -> Unit,
+    onRenameEntry: (String, String) -> Unit,
     onClearHistory: () -> Unit
 ) {
     if (state.firstRun) {
@@ -472,6 +475,7 @@ private fun RecordTab(
     }
     val cs = MaterialTheme.colorScheme
     var showClearConfirmation by rememberSaveable { mutableStateOf(false) }
+    var renameTargetId by rememberSaveable { mutableStateOf<String?>(null) }
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp)
@@ -503,8 +507,22 @@ private fun RecordTab(
                 }
             }
             items(state.history, key = { it.id }) { entry ->
-                HistoryRowCard(entry, onOpen = { onOpenEntry(entry) }, onDelete = { onDeleteEntry(entry.id) })
+                HistoryRowCard(
+                    entry,
+                    onOpen = { onOpenEntry(entry) },
+                    onRename = { renameTargetId = entry.id },
+                    onDelete = { onDeleteEntry(entry.id) }
+                )
             }
+        }
+    }
+    renameTargetId?.let { id ->
+        state.history.firstOrNull { it.id == id }?.let { entry ->
+            RenameDialog(
+                entry,
+                onDismiss = { renameTargetId = null },
+                onRename = { renameTargetId = null; onRenameEntry(id, it) }
+            )
         }
     }
     if (showClearConfirmation) {
@@ -527,7 +545,12 @@ private fun RecordTab(
 }
 
 @Composable
-private fun HistoryRowCard(entry: TranscriptHistory.Entry, onOpen: () -> Unit, onDelete: () -> Unit) {
+private fun HistoryRowCard(
+    entry: TranscriptHistory.Entry,
+    onOpen: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit
+) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
@@ -537,13 +560,19 @@ private fun HistoryRowCard(entry: TranscriptHistory.Entry, onOpen: () -> Unit, o
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        entry.fileName,
+                        entry.title ?: entry.fileName,
                         fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface,
                         maxLines = 1, overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         historyTimestamp(entry.savedAtMs),
                         fontSize = 12.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant
+                    )
+                }
+                TextButton(onClick = onRename) {
+                    Text(
+                        stringResource(R.string.history_rename),
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold, color = cs.onSurfaceVariant
                     )
                 }
                 TextButton(onClick = onDelete) {
@@ -561,6 +590,29 @@ private fun HistoryRowCard(entry: TranscriptHistory.Entry, onOpen: () -> Unit, o
             )
         }
     }
+}
+
+@Composable
+private fun RenameDialog(entry: TranscriptHistory.Entry, onDismiss: () -> Unit, onRename: (String) -> Unit) {
+    var name by remember(entry.id) { mutableStateOf(entry.title ?: entry.fileName) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.history_rename_title)) },
+        text = {
+            OutlinedTextField(
+                value = name,
+                onValueChange = { name = it },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onRename(name) }) { Text(stringResource(R.string.action_save)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        }
+    )
 }
 
 private fun historyTimestamp(timestampMs: Long): String =
@@ -1711,14 +1763,17 @@ private fun HistoryEntryDialog(
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
-    val baseName = entry.fileName.substringBeforeLast('.').ifBlank { "transcript" }
+    // A custom title stands in for the file name everywhere the transcript is named: the dialog
+    // header and the names offered to Share/Save.
+    val displayName = entry.title ?: entry.fileName
+    val baseName = (entry.title ?: entry.fileName.substringBeforeLast('.')).ifBlank { "transcript" }
     val saveContract = remember { CreateTranscriptDocument(null, transcriptMimeType(TranscriptFormat.TXT)) }
     val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
         if (uri != null) onSaveFile(uri)
     }
     AlertDialog(
         onDismissRequest = onClose,
-        title = { Text(entry.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        title = { Text(displayName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         text = {
             Column {
                 Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
