@@ -1,3 +1,5 @@
+# 0.27
+• Añadido renombrado de transcripciones guardadas
 # 0.26
 • Añadida duración configurable de segmentos en el contrato de streaming Open Transcribe v4 para subtítulos más rápidos
 # 0.25

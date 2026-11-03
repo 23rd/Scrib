@@ -1,3 +1,5 @@
+# 0.27
+• Ajout du renommage des transcriptions conservées
 # 0.26
 • Ajout de la durée configurable des segments au contrat de streaming Open Transcribe v4 pour des sous-titres plus rapides
 # 0.25

@@ -1,3 +1,5 @@
+# 0.27
+• Added renaming of kept transcripts
 # 0.26
 • Added configurable segment duration to Open Transcribe v4 streaming contract for faster subtitle delivery
 # 0.25
