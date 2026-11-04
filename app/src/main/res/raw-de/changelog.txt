@@ -1,4 +1,5 @@
 # 0.27
+• Behoben, dass das Ende einer Aufnahme gelegentlich aus dem Transkript fehlte
 • Umbenennen gespeicherter Transkripte hinzugefügt
 # 0.26
 • Konfigurierbare Segmentdauer im Open Transcribe v4 Streaming-Vertrag für schnellere Untertitelausgabe hinzugefügt

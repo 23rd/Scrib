@@ -1,4 +1,5 @@
 # 0.27
+• Opgelost dat het einde van een opname soms ontbrak in het transcript
 • Hernoemen van bewaarde transcripten toegevoegd
 # 0.26
 • Instelbare segmentduur in het Open Transcribe v4-streamingcontract toegevoegd voor snellere ondertiteling

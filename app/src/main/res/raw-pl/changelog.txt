@@ -1,4 +1,5 @@
 # 0.27
+• Naprawiono sporadyczne znikanie końcówki nagrania z transkrypcji
 • Dodano zmianę nazwy zapisanych transkrypcji
 # 0.26
 • Dodano konfigurowalną długość segmentu w kontrakcie strumieniowym Open Transcribe v4 dla szybszego dostarczania napisów

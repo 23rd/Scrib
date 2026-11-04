@@ -1,4 +1,5 @@
 # 0.27
+• Risolta la perdita occasionale della coda di una registrazione nella trascrizione
 • Aggiunta la ridenominazione delle trascrizioni conservate
 # 0.26
 • Aggiunta durata configurabile dei segmenti nel contratto di streaming Open Transcribe v4 per sottotitoli più rapidi

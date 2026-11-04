@@ -1,4 +1,5 @@
 # 0.27
+• Fixed the tail of a recording occasionally going missing from the transcript
 • Added renaming of kept transcripts
 # 0.26
 • Added configurable segment duration to Open Transcribe v4 streaming contract for faster subtitle delivery

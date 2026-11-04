@@ -264,9 +264,13 @@ object AudioDecoder {
                         }
                     }
 
-                    // A consumer that died on a failure leaves the bounded queue full — clear it,
-                    // or putting the stop marker here would block on nobody draining it.
-                    pending.clear()
+                    // A consumer that died on a failure leaves the bounded queue full — clear it
+                    // there, or putting the stop marker would block on nobody draining it. On a
+                    // healthy stop the marker goes in behind whatever is still queued, so the
+                    // consumer drains the real tail before it sees the marker.
+                    if (failure.get() != null) {
+                        pending.clear()
+                    }
                     pending.put(Chunk(ByteArray(0), -1))
                     consumer.join()
                     if (cancellation?.isCancelled == true) {

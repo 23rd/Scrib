@@ -1,4 +1,5 @@
 # 0.27
+• Corrigido o final de uma gravação ocasionalmente ausente da transcrição
 • Adicionada a renomeação de transcrições salvas
 # 0.26
 • Adicionada duração configurável de segmentos no contrato de streaming do Open Transcribe v4 para legendas mais rápidas

@@ -1,4 +1,5 @@
 # 0.27
+• Kaydın sonunun bazen transkriptten eksik kalması düzeltildi
 • Kaydedilen transkriptleri yeniden adlandırma eklendi
 # 0.26
 • Daha hızlı altyazı akışı için Open Transcribe v4 akış sözleşmesine yapılandırılabilir segment süresi eklendi
