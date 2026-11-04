@@ -1,0 +1,2 @@
+• Corrigé : la fin d'un enregistrement manquait parfois à la transcription
+• Ajout de la transcription d'une plage de temps choisie d'un fichier

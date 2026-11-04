@@ -1,0 +1,2 @@
+• Corregido que el final de una grabación faltara a veces en la transcripción
+• Añadida la transcripción de un intervalo de tiempo elegido de un archivo

@@ -1,0 +1,2 @@
+• Fixed the tail of a recording occasionally going missing from the transcript
+• Added transcribing a chosen time range of a file

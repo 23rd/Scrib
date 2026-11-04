@@ -1,0 +1,2 @@
+• Kaydın sonunun bazen transkriptten eksik kalması düzeltildi
+• Dosyanın seçilen bir zaman aralığını yazıya dökme eklendi

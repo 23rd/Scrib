@@ -1,6 +1,7 @@
-# 0.27
+# 0.28
 • Corregido que el final de una grabación faltara a veces en la transcripción
 • Añadida la transcripción de un intervalo de tiempo elegido de un archivo
+# 0.27
 • Añadido renombrado de transcripciones guardadas
 # 0.26
 • Añadida duración configurable de segmentos en el contrato de streaming Open Transcribe v4 para subtítulos más rápidos

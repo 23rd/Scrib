@@ -1,0 +1,2 @@
+• Risolta la perdita occasionale della coda di una registrazione nella trascrizione
+• Aggiunta la trascrizione di un intervallo di tempo scelto di un file

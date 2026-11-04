@@ -1,0 +1,2 @@
+• Corrigido o final de uma gravação ocasionalmente ausente da transcrição
+• Adicionada a transcrição de um intervalo de tempo escolhido de um arquivo

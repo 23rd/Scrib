@@ -1,0 +1,2 @@
+• Naprawiono sporadyczne znikanie końcówki nagrania z transkrypcji
+• Dodano transkrypcję wybranego przedziału czasu pliku
