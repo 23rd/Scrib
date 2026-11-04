@@ -34,13 +34,17 @@ interface TranscriptionEngine {
         cancellation: CancellationToken
     )
 
+    // With a range, an engine that honors it decodes only [startMs, endMs) and returns segment
+    // timestamps in ORIGINAL file time; an engine that ignores the range returns whole-file audio
+    // and the run layer filters its output — which stays correct, only slower.
     fun transcribeToSegments(
         audio: ParcelFileDescriptor,
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit = {},
         onPartial: (String) -> Unit,
-        onMetrics: (TranscriptionMetrics) -> Unit = {}
+        onMetrics: (TranscriptionMetrics) -> Unit = {},
+        range: AudioRange? = null
     ): List<TranscriptSegment>
 
     // The caller starts the returned stream and feeds it PCM as it is captured.

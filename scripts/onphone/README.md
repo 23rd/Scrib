@@ -83,6 +83,10 @@ adb logcat -d -s scrib.state
   the stored last transcript and benchmarks stay untouched, so screen assertions against
   counts do not flake between runs. `--ez ephemeral false` opts into the user-like path
   that persists everything.
+- `TRANSCRIBE --es path … --el start_ms 1000 --el end_ms 5000` — transcribe only the
+  half-open [start_ms, end_ms) stretch of the file; the transcript's timestamps stay in
+  original file time. Absent or negative extras mean the whole file, and an end at or
+  before the start falls back to the whole file with a line on the log.
 - `IMPORT_MODEL --es path /data/data/org.scrib.transcriber.debug/files/model.gguf` — copies
   the file into the model dir (off the main thread; watch the tag for done/failed).
 

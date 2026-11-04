@@ -78,11 +78,14 @@ object AudioDecoder {
     // downmixed and resampled as it arrives — the raw stream is never buffered anywhere, so the
     // memory needed does not depend on the source rate or channel count. A decode that stops
     // before the source's end raises DecodeStoppedException: a silent partial result would look
-    // exactly like a transcription that lost its tail.
+    // exactly like a transcription that lost its tail. With a range, only [startMs, endMs) is
+    // decoded; the samples start at startMs of the original file, and reaching endMs is an
+    // intended end, not an early stop.
     fun decodeToPcm16kMono(
         pfd: ParcelFileDescriptor,
         cancellation: CancellationToken? = null,
-        scratchDir: File? = null
+        scratchDir: File? = null,
+        range: AudioRange? = null
     ): DecodedAudio {
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
@@ -104,18 +107,35 @@ object AudioDecoder {
             }
             val format = inputFormat ?: throw RuntimeException("No audio track found")
             val mime = format.getString(MediaFormat.KEY_MIME)!!
-            val trackDurationMs = if (format.containsKey(MediaFormat.KEY_DURATION)) {
-                (format.getLong(MediaFormat.KEY_DURATION) / 1000L).coerceAtLeast(0L)
+            val trackDurationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) {
+                format.getLong(MediaFormat.KEY_DURATION).coerceAtLeast(0L)
             } else {
                 0L
             }
+            // Gates in the file's own time scale. The output gate is the truth for the start: the
+            // seek is only a hint and may land early, dropping what comes before the range.
+            val startUs = (range?.startMs?.coerceAtLeast(0L) ?: 0L) * 1000L
+            val endUs = range?.endMs?.coerceAtLeast(0L)?.let { it * 1000L } ?: Long.MAX_VALUE
+            if (range != null) {
+                extractor.seekTo(startUs, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+            }
+            // What a stopped decode should blame: the range when one is set, else the whole file.
+            val stopTotalMs = if (range == null) trackDurationUs / 1000L else (endUs - startUs) / 1000L
 
-            val sink = openSink(format, scratchDir)
+            // The sink is sized for what will be decoded, not for the whole file: a one-minute
+            // range of a nine-hour recording must not reserve nine hours of buffer or space.
+            val sizeCapUs = when {
+                range == null -> -1L
+                trackDurationUs in 1 until endUs - startUs -> trackDurationUs
+                else -> endUs - startUs
+            }
+            val sink = openSink(format, scratchDir, sizeCapUs)
             try {
                 val pending = LinkedBlockingQueue<Chunk>(16)
                 val done = CountDownLatch(1)
                 val lastActivity = AtomicLong(System.nanoTime())
                 val outputEos = AtomicBoolean(false)
+                val intendedEnd = AtomicBoolean(false)
                 val failure = AtomicReference<Throwable>()
                 val rate = intArrayOf(
                     if (format.containsKey(MediaFormat.KEY_SAMPLE_RATE)) format.getInteger(MediaFormat.KEY_SAMPLE_RATE) else TARGET_RATE
@@ -144,6 +164,11 @@ object AudioDecoder {
                             if (size < 0) {
                                 mc.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
                                 inputDone = true
+                            } else if (extractor.sampleTime >= endUs) {
+                                // Past the requested range nothing later can matter: end the
+                                // stream here instead of feeding the codec to the real EOF.
+                                mc.queueInputBuffer(index, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                                inputDone = true
                             } else {
                                 mc.queueInputBuffer(index, 0, size, extractor.sampleTime, 0)
                                 extractor.advance()
@@ -167,6 +192,20 @@ object AudioDecoder {
                             return
                         }
                         try {
+                            if (info.presentationTimeUs < startUs || info.presentationTimeUs >= endUs) {
+                                // Before the requested start the buffer is dropped; at or past
+                                // the end the decode is over by plan — an intended stop that must
+                                // not surface as DecodeStoppedException below.
+                                mc.releaseOutputBuffer(index, false)
+                                if (info.presentationTimeUs >= endUs) {
+                                    intendedEnd.set(true)
+                                }
+                                if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                                    outputEos.set(true)
+                                    done.countDown()
+                                }
+                                return
+                            }
                             if (info.size > 0) {
                                 val buffer = mc.getOutputBuffer(index)
                                 if (buffer != null) {
@@ -277,10 +316,12 @@ object AudioDecoder {
                         return sink.result()
                     }
                     failure.get()?.let {
-                        throw DecodeStoppedException(sink.sampleCount().toLong() * 1000L / TARGET_RATE, trackDurationMs, it)
+                        throw DecodeStoppedException(sink.sampleCount().toLong() * 1000L / TARGET_RATE, stopTotalMs, it)
                     }
-                    if (!outputEos.get()) {
-                        throw DecodeStoppedException(sink.sampleCount().toLong() * 1000L / TARGET_RATE, trackDurationMs, null)
+                    // A range decode ends when the output passes endMs — intendedEnd — with the
+                    // codec's own EOS often never reaching us.
+                    if (!outputEos.get() && !intendedEnd.get()) {
+                        throw DecodeStoppedException(sink.sampleCount().toLong() * 1000L / TARGET_RATE, stopTotalMs, null)
                     }
                     return sink.result()
                 } finally {
@@ -308,10 +349,38 @@ object AudioDecoder {
         }
     }
 
+    // The audio track's own duration in ms, or null when the container does not say. A cheap
+    // read of the track metadata — no decoding — so the range dialog can bound its slider.
+    fun probeDurationMs(pfd: ParcelFileDescriptor): Long? {
+        val extractor = MediaExtractor()
+        try {
+            extractor.setDataSource(pfd.fileDescriptor)
+            for (i in 0 until extractor.trackCount) {
+                val format = extractor.getTrackFormat(i)
+                val mime = format.getString(MediaFormat.KEY_MIME) ?: continue
+                if (mime.startsWith("audio/")) {
+                    extractor.selectTrack(i)
+                    if (!format.containsKey(MediaFormat.KEY_DURATION)) {
+                        return null
+                    }
+                    return format.getLong(MediaFormat.KEY_DURATION) / 1000L
+                }
+            }
+            return null
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not probe the audio duration", e)
+            return null
+        } finally {
+            extractor.release()
+        }
+    }
+
     // A long recording decodes into a scratch file, and a killed process can leave one behind;
     // nothing else writes into this directory with these names, so a day is a safe age cutoff.
-    private fun openSink(format: MediaFormat, scratchDir: File?): DecodeSink {
-        val estimated = initialCapacity(format)
+    // capUs bounds what will be decoded (-1 when unbounded), so a ranged decode does not size
+    // its buffer for the whole file.
+    private fun openSink(format: MediaFormat, scratchDir: File?, capUs: Long = -1L): DecodeSink {
+        val estimated = initialCapacity(format, capUs)
         if (scratchDir == null || estimated <= SINK_FILE_THRESHOLD_SAMPLES) {
             return InMemorySampleSink(estimated)
         }
@@ -332,8 +401,13 @@ object AudioDecoder {
         }
     }
 
-    private fun initialCapacity(format: MediaFormat): Int {
-        val durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else -1L
+    private fun initialCapacity(format: MediaFormat, capUs: Long = -1L): Int {
+        var durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else -1L
+        if (capUs in 0 until durationUs) {
+            durationUs = capUs
+        } else if (durationUs <= 0 && capUs >= 0) {
+            durationUs = capUs
+        }
         if (durationUs <= 0) {
             return DEFAULT_CAPACITY_SAMPLES
         }

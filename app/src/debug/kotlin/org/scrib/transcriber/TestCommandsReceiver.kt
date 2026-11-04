@@ -70,13 +70,27 @@ class TestCommandsReceiver : BroadcastReceiver() {
             return
         }
         val ephemeral = intent.getBooleanExtra("ephemeral", true)
+        // Absent or negative extras mean the whole file; a span with nothing in it is refused.
+        val range = run {
+            val startMs = intent.getLongExtra("start_ms", -1L)
+            val endMs = intent.getLongExtra("end_ms", -1L)
+            if (startMs >= 0 && endMs > startMs) {
+                AudioRange(startMs, endMs)
+            } else {
+                if (startMs >= 0 || endMs >= 0) {
+                    log("transcribe: ignoring invalid range start=$startMs end=$endMs")
+                }
+                null
+            }
+        }
         val started = if (ephemeral) {
-            TranscriptionRun.startEphemeral(context, uri, name, uri)
+            TranscriptionRun.startEphemeral(context, uri, name, uri, range = range)
         } else {
-            TranscriptionRun.start(context, uri, name, uri)
+            TranscriptionRun.start(context, uri, name, uri, range = range)
         }
         log(
-            if (started) "transcribe started: $name ($uri)${if (ephemeral) " [ephemeral]" else ""}"
+            if (started) "transcribe started: $name ($uri)${if (ephemeral) " [ephemeral]" else ""}" +
+                (range?.let { " range=${it.startMs}-${it.endMs}ms" } ?: "")
             else "transcribe refused: busy"
         )
         if (started) {

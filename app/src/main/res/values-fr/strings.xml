@@ -33,6 +33,12 @@
     <string name="quick_access_remove">Retirer de l\'accueil</string>
     <string name="record_and_transcribe">Enregistrer et transcrire</string>
     <string name="transcribe_audio_file">Transcrire un fichier audio</string>
+    <string name="transcribe_audio_range">Transcrire une plage de temps</string>
+    <string name="range_probing">Lecture de l\'enregistrement…</string>
+    <string name="range_start">Début</string>
+    <string name="range_end">Fin</string>
+    <string name="range_transcribe_button">Transcrire la plage</string>
+    <string name="range_whole_button">Transcrire tout le fichier</string>
     <string name="decoding_transcribing">Décodage et transcription sur l\'appareil…</string>
     <string name="transcribing_pct">Transcription… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcription… %1$d%% · %2$s</string>

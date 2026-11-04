@@ -84,14 +84,15 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
-        onMetrics: (TranscriptionMetrics) -> Unit
+        onMetrics: (TranscriptionMetrics) -> Unit,
+        range: AudioRange?
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
             val decodeStartedAt = SystemClock.elapsedRealtime()
-            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
+            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir, range)
             try {
                 val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
                 if (cancellation.isCancelled) {
@@ -102,6 +103,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 }
                 val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
                 onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+                // The recognizer only saw the range's audio, so its timestamps count from the
+                // range's start; adding it once puts them back in original file time.
                 return transcribePcm(
                     pcm.samples,
                     pcm.sampleCount,
@@ -112,7 +115,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                     onMetrics,
                     audioDurationMs,
                     decodeMs
-                )
+                ).rebasedToOriginal(range)
             } finally {
                 pcm.close()
             }

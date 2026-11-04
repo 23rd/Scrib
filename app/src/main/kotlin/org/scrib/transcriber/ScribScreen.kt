@@ -51,6 +51,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -93,6 +94,8 @@ import java.util.Collections
 import java.util.Date
 import java.util.Locale
 import kotlin.math.sqrt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 internal data class Actions(
     val onDownload: (String) -> Unit,
@@ -140,7 +143,7 @@ fun ScribScreen(
     onStopRecording: () -> Unit,
     onCancelRecording: () -> Unit,
     transcription: TranscribeUi?,
-    onTranscribeFiles: (List<Pair<Uri, String?>>) -> Unit,
+    onTranscribeFiles: (List<Pair<Uri, String?>>, AudioRange?) -> Unit,
     onCancelTranscription: () -> Unit,
     onDismissTranscription: () -> Unit,
     onSaveTranscript: (Uri) -> Unit,
@@ -178,7 +181,17 @@ fun ScribScreen(
     }
     val audioPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (uris.isNotEmpty()) {
-            onTranscribeFiles(uris.map { it to queryDisplayName(context, it) })
+            onTranscribeFiles(uris.map { it to queryDisplayName(context, it) }, null)
+        }
+    }
+    // The range affordance shares the plain picker's menu; a single file opens the range dialog,
+    // several files fall back to the plain whole-file pick.
+    var rangeTarget by remember { mutableStateOf<Pair<Uri, String?>?>(null) }
+    val rangePicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+        when (uris.size) {
+            1 -> rangeTarget = uris[0] to queryDisplayName(context, uris[0])
+            0 -> {}
+            else -> onTranscribeFiles(uris.map { it to queryDisplayName(context, it) }, null)
         }
     }
     val benchmarkPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -228,6 +241,7 @@ fun ScribScreen(
                     onOpenTab = { tab = it },
                     onRecord = { microphone.launch(android.Manifest.permission.RECORD_AUDIO) },
                     onPickFile = { audioPicker.launch(arrayOf("audio/*", "video/*")) },
+                    onPickRange = { rangePicker.launch(arrayOf("audio/*", "video/*")) },
                     onSwitchModel = if (switchableModels.size > 1) {
                         { showSwitcher = true }
                     } else {
@@ -244,7 +258,12 @@ fun ScribScreen(
                     onRenameEntry = onRenameHistory,
                     onClearHistory = onClearHistory
                 )
-                ScribTab.File -> FileTab(state, actions, onOpenTab = { tab = it }) { audioPicker.launch(arrayOf("audio/*", "video/*")) }
+                ScribTab.File -> FileTab(
+                    state, actions,
+                    onOpenTab = { tab = it },
+                    onPick = { audioPicker.launch(arrayOf("audio/*", "video/*")) },
+                    onPickRange = { rangePicker.launch(arrayOf("audio/*", "video/*")) }
+                )
                 ScribTab.Keyboard -> KeyboardTab(state.keyboardLayouts, onConfigureKeyboardLayouts)
                 ScribTab.Settings -> SettingsTab(
                     state = state,
@@ -320,6 +339,20 @@ fun ScribScreen(
     recording?.let { r ->
         RecordingDialog(r, remoteHost = state.remoteHost, onStop = onStopRecording, onCancel = onCancelRecording)
     }
+    rangeTarget?.let { target ->
+        RangeDialog(
+            target.first,
+            onDismiss = { rangeTarget = null },
+            onTranscribeRange = { range ->
+                rangeTarget = null
+                onTranscribeFiles(listOf(target), range)
+            },
+            onTranscribeWhole = {
+                rangeTarget = null
+                onTranscribeFiles(listOf(target), null)
+            }
+        )
+    }
     if (transcription != null && !state.benchmarkBatch.running) {
         transcription?.let { t ->
         TranscriptionDialog(
@@ -368,6 +401,7 @@ private fun HomeTab(
     onOpenTab: (ScribTab) -> Unit,
     onRecord: () -> Unit,
     onPickFile: () -> Unit,
+    onPickRange: () -> Unit,
     onSwitchModel: (() -> Unit)?
 ) {
     LazyColumn(
@@ -399,6 +433,13 @@ private fun HomeTab(
                     title = stringResource(R.string.transcribe_audio_file),
                     tag = "scrib/home/pick_file"
                 ) { onPickFile() }
+            }
+            item {
+                ServiceCard(
+                    glyph = "⏱",
+                    title = stringResource(R.string.transcribe_audio_range),
+                    tag = "scrib/home/pick_range"
+                ) { onPickRange() }
             }
             val quick = (state.standard + state.custom + state.sherpaRows).filter { it.id in state.pinnedIds }
             if (quick.isNotEmpty()) {
@@ -619,7 +660,13 @@ private fun historyTimestamp(timestampMs: Long): String =
     DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(timestampMs))
 
 @Composable
-private fun FileTab(state: ScribUiState, actions: Actions, onOpenTab: (ScribTab) -> Unit, onPick: () -> Unit) {
+private fun FileTab(
+    state: ScribUiState,
+    actions: Actions,
+    onOpenTab: (ScribTab) -> Unit,
+    onPick: () -> Unit,
+    onPickRange: () -> Unit
+) {
     if (state.firstRun) {
         SingleCardColumn { NudgeCard(state, actions, onOpenSettings = { onOpenTab(ScribTab.Settings) }) }
         return
@@ -630,7 +677,8 @@ private fun FileTab(state: ScribUiState, actions: Actions, onOpenTab: (ScribTab)
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TranscribeFileButton(onPick)
+        TranscribeFileButton(stringResource(R.string.transcribe_audio_file), "scrib/transcribe/pick_file", onPick)
+        TranscribeFileButton(stringResource(R.string.transcribe_audio_range), "scrib/transcribe/pick_range", onPickRange)
         Text(
             stringResource(R.string.transcribe_background_hint),
             fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant,
@@ -1555,19 +1603,155 @@ private fun elapsed(ms: Long): String {
 }
 
 @Composable
-private fun TranscribeFileButton(onClick: () -> Unit) {
+private fun TranscribeFileButton(label: String, tag: String, onClick: () -> Unit) {
     val cs = MaterialTheme.colorScheme
     Surface(
         color = cs.primaryContainer, shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth().padding(bottom = 14.dp)
-            .testTag("scrib/transcribe/pick_file").clickableRow(RoundedCornerShape(16.dp), onClick)
+            .testTag(tag).clickableRow(RoundedCornerShape(16.dp), onClick)
     ) {
         Row(
             Modifier.padding(horizontal = 16.dp, vertical = 15.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
         ) {
-            Text(stringResource(R.string.transcribe_audio_file), fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
+            Text(label, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = cs.onPrimaryContainer)
         }
+    }
+}
+
+// Choosing the stretch of a recording to transcribe. The container's own duration bounds the
+// slider; the slider and the two fields are views of one range, so every edit keeps the others
+// current. When the container does not say how long the file is, only the fields remain.
+@Composable
+private fun RangeDialog(
+    uri: Uri,
+    onDismiss: () -> Unit,
+    onTranscribeRange: (AudioRange) -> Unit,
+    onTranscribeWhole: () -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    val context = LocalContext.current
+    var probing by remember { mutableStateOf(true) }
+    var durationMs by remember { mutableStateOf<Long?>(null) }
+    var bounds by remember { mutableStateOf(0L to 0L) }
+    var startText by remember { mutableStateOf("") }
+    var endText by remember { mutableStateOf("") }
+
+    LaunchedEffect(uri) {
+        durationMs = withContext(Dispatchers.IO) {
+            runCatching {
+                context.contentResolver.openFileDescriptor(uri, "r")?.use { AudioDecoder.probeDurationMs(it) }
+            }.getOrNull()
+        }
+        durationMs?.let { duration ->
+            bounds = 0L to duration
+            startText = formatRangeField(0L)
+            endText = formatRangeField(duration)
+        }
+        probing = false
+    }
+
+    fun moveSlider(value: ClosedFloatingPointRange<Float>) {
+        bounds = value.start.toLong() to value.endInclusive.toLong()
+        startText = formatRangeField(bounds.first)
+        endText = formatRangeField(bounds.second)
+    }
+
+    // A parsed field snaps the range and reformats the other field; the edited one stays as
+    // typed. With a known duration the bounds can never invert, because the slider is showing.
+    fun applyField(start: Boolean, raw: String) {
+        val ms = parseRangeField(raw) ?: return
+        val clamped = durationMs?.let { ms.coerceIn(0L, it) } ?: ms.coerceAtLeast(0L)
+        bounds = if (start) {
+            (if (durationMs != null) clamped.coerceAtMost(bounds.second) else clamped) to bounds.second
+        } else {
+            bounds.first to (if (durationMs != null) clamped.coerceAtLeast(bounds.first) else clamped)
+        }
+        if (start) endText = formatRangeField(bounds.second) else startText = formatRangeField(bounds.first)
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.transcribe_audio_range)) },
+        text = {
+            Column {
+                if (probing) {
+                    Text(
+                        stringResource(R.string.range_probing),
+                        fontSize = 12.5.sp, color = cs.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(10.dp))
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Spacer(Modifier.height(10.dp))
+                }
+                val known = durationMs
+                if (known != null) {
+                    RangeSlider(
+                        value = bounds.first.toFloat()..bounds.second.toFloat(),
+                        onValueChange = { moveSlider(it) },
+                        valueRange = 0f..known.toFloat(),
+                        modifier = Modifier.fillMaxWidth().testTag("scrib/range/slider")
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    OutlinedTextField(
+                        value = startText,
+                        onValueChange = { applyField(true, it) },
+                        label = { Text(stringResource(R.string.range_start)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { startText = formatRangeField(bounds.first) }),
+                        modifier = Modifier.weight(1f).testTag("scrib/range/start")
+                    )
+                    OutlinedTextField(
+                        value = endText,
+                        onValueChange = { applyField(false, it) },
+                        label = { Text(stringResource(R.string.range_end)) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { endText = formatRangeField(bounds.second) }),
+                        modifier = Modifier.weight(1f).testTag("scrib/range/end")
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = bounds.first < bounds.second,
+                onClick = { onTranscribeRange(AudioRange(bounds.first, bounds.second)) },
+                modifier = Modifier.fillMaxWidth().testTag("scrib/range/transcribe_range")
+            ) {
+                Text(stringResource(R.string.range_transcribe_button))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onTranscribeWhole,
+                modifier = Modifier.fillMaxWidth().testTag("scrib/range/transcribe_all")
+            ) {
+                Text(stringResource(R.string.range_whole_button))
+            }
+        }
+    )
+}
+
+// The dialog's fields speak h:mm:ss and accept plain mm:ss; the root locale keeps the digits
+// parseable whatever the phone prefers to display.
+private fun formatRangeField(ms: Long): String {
+    val seconds = (ms / 1000).coerceAtLeast(0)
+    return String.format(Locale.ROOT, "%d:%02d:%02d", seconds / 3_600, seconds / 60 % 60, seconds % 60)
+}
+
+private fun parseRangeField(raw: String): Long? {
+    val parts = raw.trim().split(':')
+    if (parts.size < 2 || parts.size > 3) {
+        return null
+    }
+    val numbers = parts.map { it.toLongOrNull()?.takeIf { n -> n >= 0 } ?: return null }
+    return when (numbers.size) {
+        2 -> numbers[0] * 60_000 + numbers[1] * 1_000
+        else -> numbers[0] * 3_600_000 + numbers[1] * 60_000 + numbers[2] * 1_000
     }
 }
 
@@ -1669,7 +1853,17 @@ private fun TranscriptionDialog(
     val timed = t.format != TranscriptFormat.TXT && t.segments.isNotEmpty()
     AlertDialog(
         onDismissRequest = { if (!t.running) onClose() },
-        title = { Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        title = {
+            Column {
+                Text(t.fileName, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (t.range != null) {
+                    Text(
+                        elapsed(t.range.startMs) + " – " + elapsed(t.range.endMs),
+                        fontSize = 12.5.sp, fontWeight = FontWeight.Medium, color = cs.onSurfaceVariant
+                    )
+                }
+            }
+        },
         text = {
             Column {
                 if (t.running && t.batchTotal > 1) {

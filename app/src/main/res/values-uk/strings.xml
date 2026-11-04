@@ -33,6 +33,12 @@
     <string name="quick_access_remove">Прибрати з головного</string>
     <string name="record_and_transcribe">Записати й розпізнати</string>
     <string name="transcribe_audio_file">Розпізнати аудіофайл</string>
+    <string name="transcribe_audio_range">Розпізнати вибраний відрізок</string>
+    <string name="range_probing">Читання запису…</string>
+    <string name="range_start">Початок</string>
+    <string name="range_end">Кінець</string>
+    <string name="range_transcribe_button">Розпізнати відрізок</string>
+    <string name="range_whole_button">Розпізнати весь файл</string>
     <string name="decoding_transcribing">Декодування й розпізнавання на пристрої…</string>
     <string name="transcribing_pct">Розпізнавання… %1$d%%</string>
     <string name="transcribing_pct_eta">Розпізнавання… %1$d%% · %2$s</string>

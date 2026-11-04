@@ -76,7 +76,8 @@ class EndpointTranscriptionEngine(
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
-        onMetrics: (TranscriptionMetrics) -> Unit
+        onMetrics: (TranscriptionMetrics) -> Unit,
+        range: AudioRange?
     ): List<TranscriptSegment> {
         val startedAt = SystemClock.elapsedRealtime()
         try {
@@ -84,7 +85,7 @@ class EndpointTranscriptionEngine(
                 throw CancelledException()
             }
             val pcm = try {
-                AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
+                AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir, range)
             } catch (e: CancelledException) {
                 throw e
             } catch (e: Throwable) {
@@ -136,7 +137,9 @@ class EndpointTranscriptionEngine(
                 if (trimmed.isEmpty()) {
                     return emptyList()
                 }
-                return segments(transcript, audioDurationMs)
+                // The server only saw the range's audio, so its timestamps count from the range's
+                // start; adding it once puts them back in original file time.
+                return segments(transcript, audioDurationMs).rebasedToOriginal(range)
             } finally {
                 pcm.close()
             }

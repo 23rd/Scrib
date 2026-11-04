@@ -75,14 +75,15 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
-        onMetrics: (TranscriptionMetrics) -> Unit
+        onMetrics: (TranscriptionMetrics) -> Unit,
+        range: AudioRange?
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
                 throw CancelledException()
             }
             val decodeStartedAt = SystemClock.elapsedRealtime()
-            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir)
+            val pcm = AudioDecoder.decodeToPcm16kMono(audio, cancellation, appContext.cacheDir, range)
             try {
                 val decodeMs = SystemClock.elapsedRealtime() - decodeStartedAt
                 if (cancellation.isCancelled) {
@@ -122,7 +123,10 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                             modelPssMb = metrics.modelPssMb
                             modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
                             onMetrics(metrics)
-                        }
+                        },
+                        // The decoded buffer starts at this moment of the original file; RunAudio
+                        // adds it once, where buffer-relative times turn into original ones.
+                        rangeStartMs = range?.startMs?.coerceAtLeast(0L) ?: 0L
                     )
                 } finally {
                     onMetrics(
@@ -153,7 +157,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
-        onModelLoad: (TranscriptionMetrics) -> Unit
+        onModelLoad: (TranscriptionMetrics) -> Unit,
+        rangeStartMs: Long
     ): List<TranscriptSegment> {
         val abort = TranscribeAbort.create()
         cancellation.onCancel { abort.cancel() }
@@ -176,7 +181,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     modelMemoryDeltaMb = if (alreadyLoaded) 0 else maxOf(0, afterLoad.pssMb - beforeLoad.pssMb)
                 )
             )
-            val audio = runAudio(pcm, info)
+            val audio = runAudio(pcm, info, rangeStartMs)
             val window = windowSamples(info)
             if (window in 1 until audio.sampleCount) {
                 return transcribeWindows(
@@ -246,20 +251,20 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         return finishSegments(segments, emptyList())
     }
 
-    private fun runAudio(pcm: DecodedAudio, info: TranscribeModelInfo): RunAudio {
+    private fun runAudio(pcm: DecodedAudio, info: TranscribeModelInfo, rangeStartMs: Long): RunAudio {
         val path = ModelManager.vadModelPath(appContext)
         if (path == null || info.streaming || !ModelManager.activeModelUsesVad(appContext)) {
-            return RunAudio.whole(pcm.samples, pcm.sampleCount)
+            return RunAudio.whole(pcm.samples, pcm.sampleCount, rangeStartMs)
         }
-        val vad = TranscribeVad.open(path) ?: return RunAudio.whole(pcm.samples, pcm.sampleCount)
+        val vad = TranscribeVad.open(path) ?: return RunAudio.whole(pcm.samples, pcm.sampleCount, rangeStartMs)
         val spans = try {
             vad.spans(pcm.samples, pcm.sampleCount)
         } catch (e: Throwable) {
             Log.w("GgmlEngine", "Silence skipping failed, transcribing everything", e)
-            return RunAudio.whole(pcm.samples, pcm.sampleCount)
+            return RunAudio.whole(pcm.samples, pcm.sampleCount, rangeStartMs)
         }
         if (spans.isEmpty()) {
-            return RunAudio.whole(pcm.samples, pcm.sampleCount)
+            return RunAudio.whole(pcm.samples, pcm.sampleCount, rangeStartMs)
         }
         val speech = spans.sumOf { (it.endMs - it.startMs).toDouble() }
         Log.d(
@@ -270,11 +275,11 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         // Packing speech into its own buffer needs one more native allocation on top of the
         // decoded audio; failing that must degrade to transcribing everything, not kill the run.
         return try {
-            RunAudio.compact(pcm.samples, pcm.sampleCount, spans)
+            RunAudio.compact(pcm.samples, pcm.sampleCount, spans, rangeStartMs)
         } catch (e: Throwable) {
             Log.w("GgmlEngine", "Packing the speech spans failed, transcribing everything", e)
             null
-        } ?: RunAudio.whole(pcm.samples, pcm.sampleCount)
+        } ?: RunAudio.whole(pcm.samples, pcm.sampleCount, rangeStartMs)
     }
 
     private fun runUtterance(
@@ -365,11 +370,14 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         return loaded
     }
 
-    private data class RunResult(val text: String, val segments: List<TranscribeSegmentData>)
+    // internal only so the range re-base stays unit-testable without a loaded model.
+    internal data class RunResult(val text: String, val segments: List<TranscribeSegmentData>)
 
-    private class RunAudio private constructor(
+    // internal only so the range re-base stays unit-testable without a loaded model.
+    internal class RunAudio private constructor(
         private val samples: ByteBuffer,
         val sampleCount: Int,
+        private val baseMs: Long,
         private val spanStarts: IntArray?,
         private val spanOffsets: IntArray?
     ) {
@@ -413,9 +421,15 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
 
         private fun originalMs(sample: Int): Long = originalMsAt(sample.toLong() * 1000L / SAMPLE_RATE)
 
+        // Every segment and word timestamp passes through here exactly once. baseMs — where the
+        // decoded buffer begins in the original file — is added here and nowhere else, after the
+        // VAD spans have folded buffer time back to decoded-file time.
         private fun originalMsAt(ms: Long): Long {
-            val starts = spanStarts ?: return ms
-            val offsets = spanOffsets ?: return ms
+            val starts = spanStarts
+            val offsets = spanOffsets
+            if (starts == null || offsets == null) {
+                return baseMs + ms
+            }
             val sample = (ms * SAMPLE_RATE / 1000).coerceIn(0, sampleCount.toLong())
             var span = 0
             for (i in starts.indices) {
@@ -425,16 +439,18 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     break
                 }
             }
-            return offsets[span] * 1000L / SAMPLE_RATE + (sample - starts[span]) * 1000L / SAMPLE_RATE
+            return baseMs + offsets[span] * 1000L / SAMPLE_RATE + (sample - starts[span]) * 1000L / SAMPLE_RATE
         }
 
         companion object {
-            fun whole(samples: ByteBuffer, sampleCount: Int) = RunAudio(samples, sampleCount, null, null)
+            fun whole(samples: ByteBuffer, sampleCount: Int, baseMs: Long = 0L) =
+                RunAudio(samples, sampleCount, baseMs, null, null)
 
             fun compact(
                 samples: ByteBuffer,
                 sampleCount: Int,
-                spans: List<VadSpan>
+                spans: List<VadSpan>,
+                baseMs: Long = 0L
             ): RunAudio? {
                 val source = samples.duplicate().order(ByteOrder.nativeOrder()).asFloatBuffer()
                 val bounds = ArrayList<IntArray>(spans.size)
@@ -463,7 +479,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     target.put(at, source, from, to - from)
                     at += to - from
                 }
-                return RunAudio(packed, at, starts, offsets)
+                return RunAudio(packed, at, baseMs, starts, offsets)
             }
         }
     }

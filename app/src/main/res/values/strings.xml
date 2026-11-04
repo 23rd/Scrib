@@ -37,6 +37,12 @@
     <string name="quick_access_remove">Remove from Home</string>
     <string name="record_and_transcribe">Record and transcribe</string>
     <string name="transcribe_audio_file">Transcribe an audio file</string>
+    <string name="transcribe_audio_range">Transcribe a time range</string>
+    <string name="range_probing">Reading the recording…</string>
+    <string name="range_start">Start</string>
+    <string name="range_end">End</string>
+    <string name="range_transcribe_button">Transcribe range</string>
+    <string name="range_whole_button">Transcribe whole file</string>
     <string name="decoding_transcribing">Decoding &amp; transcribing on-device…</string>
     <string name="transcribing_pct">Transcribing… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcribing… %1$d%% · %2$s</string>

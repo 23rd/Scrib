@@ -83,7 +83,9 @@ data class TranscribeUi(
     val percent: Int = -1,
     val etaMs: Long? = null,
     val batchIndex: Int = 0,
-    val batchTotal: Int = 0
+    val batchTotal: Int = 0,
+    // The stretch of the file this run covers, or null for the whole recording.
+    val range: AudioRange? = null
 ) {
     // What the screen shows and what Copy, Share and Save hand over. Falls back to the plain text
     // while the run is still going and when nothing was recognised.
@@ -521,9 +523,9 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun transcribeFiles(items: List<Pair<Uri, String?>>) {
+    fun transcribeFiles(items: List<Pair<Uri, String?>>, range: AudioRange? = null) {
         if (items.isEmpty()) return
-        TranscriptionRun.startFiles(ctx, items.map { (uri, name) -> uri to (name ?: "audio") })
+        TranscriptionRun.startFiles(ctx, items.map { (uri, name) -> uri to (name ?: "audio") }, range)
     }
 
     fun benchmarkFile(uri: Uri, displayName: String?) {
@@ -660,7 +662,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             file.delete()
             toast(R.string.record_empty); return
         }
-        TranscriptionRun.start(ctx, Uri.fromFile(file), file.nameWithoutExtension, source = null) { file.delete() }
+        TranscriptionRun.start(ctx, Uri.fromFile(file), file.nameWithoutExtension, source = null, onFinished = { file.delete() })
     }
 
     fun cancelRecording() {

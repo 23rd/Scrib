@@ -47,13 +47,27 @@ object TranscriptionRun {
 
     // A recording has no place in the user's storage to point the save dialog at, and its file is
     // the app's own — hence source stays null there and onFinished cleans the file up.
-    fun start(context: Context, uri: Uri, name: String, source: Uri?, onFinished: () -> Unit = {}): Boolean =
-        startInternal(context, uri, name, source, { onFinished() }, persistTranscript = true, allowBatch = false)
+    fun start(
+        context: Context,
+        uri: Uri,
+        name: String,
+        source: Uri?,
+        onFinished: () -> Unit = {},
+        range: AudioRange? = null
+    ): Boolean = startInternal(context, uri, name, source, { onFinished() }, persistTranscript = true, allowBatch = false, range = range)
 
-    fun startEphemeral(context: Context, uri: Uri, name: String, source: Uri?): Boolean =
-        startInternal(context, uri, name, source, onFinished = {}, persistTranscript = false, allowBatch = false, ephemeral = true)
+    fun startEphemeral(
+        context: Context,
+        uri: Uri,
+        name: String,
+        source: Uri?,
+        range: AudioRange? = null
+    ): Boolean =
+        startInternal(context, uri, name, source, onFinished = {}, persistTranscript = false, allowBatch = false, ephemeral = true, range = range)
 
-    fun startFiles(context: Context, items: List<Pair<Uri, String>>): Boolean {
+    // A range belongs to one file, so only the first item of a batch can carry one; the rest
+    // transcribe whole.
+    fun startFiles(context: Context, items: List<Pair<Uri, String>>, range: AudioRange? = null): Boolean {
         if (items.isEmpty()) return false
         val id: Long
         synchronized(this) {
@@ -68,7 +82,7 @@ object TranscriptionRun {
         val started = startInternal(
             context, first.first, first.second, first.first,
             onFinished = {}, persistTranscript = true, allowBatch = false,
-            batchIndex = 0, batchTotal = items.size, batchId = id
+            batchIndex = 0, batchTotal = items.size, batchId = id, range = range
         )
         if (!started) {
             synchronized(this) {
@@ -106,7 +120,8 @@ object TranscriptionRun {
         ephemeral: Boolean = false,
         batchIndex: Int = 0,
         batchTotal: Int = 0,
-        batchId: Long = 0
+        batchId: Long = 0,
+        range: AudioRange? = null
     ): Boolean {
         val app = context.applicationContext
         val cancellation = CancellationToken()
@@ -126,9 +141,13 @@ object TranscriptionRun {
             sourceUri = source,
             modelName = modelName,
             batchIndex = batchIndex,
-            batchTotal = batchTotal
+            batchTotal = batchTotal,
+            range = range
         )
-        StateLog.log("run started: file=$name model=$modelName${if (ephemeral) " (ephemeral)" else ""}")
+        StateLog.log(
+            "run started: file=$name model=$modelName${if (ephemeral) " (ephemeral)" else ""}" +
+                (range?.let { " range=${it.startMs}-${it.endMs}ms" } ?: "")
+        )
         TranscriptionForegroundService.start(app)
         scope.launch {
             val eta = EtaClock()
@@ -193,7 +212,7 @@ object TranscriptionRun {
             try {
                 val pfd = app.contentResolver.openFileDescriptor(uri, "r")
                     ?: throw RuntimeException(app.getString(R.string.transcribe_cant_open))
-                val segments = TranscriptionEngine.get(app).transcribeToSegments(
+                val decoded = TranscriptionEngine.get(app).transcribeToSegments(
                     pfd, ModelManager.language(app), cancellation,
                     // Percent and ETA are cheap state writes. The figures are not re-read here: the
                     // ticker above already republishes them twice a second, and sampling the process
@@ -231,8 +250,12 @@ object TranscriptionRun {
                                 modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
                             }
                         }
-                    }
+                    },
+                    range = range
                 )
+                // An engine that honors the range never reports outside it; the filter is the net
+                // for engines that ignore the range — correct output, wasted compute.
+                val segments = if (range == null) decoded else decoded.filter { it.overlapsRange(range) }
                 val text = segments.format(TranscriptFormat.TXT)
                 if (cancellation.isCancelled) {
                     _state.value = null
@@ -336,7 +359,7 @@ object TranscriptionRun {
             startInternal(
                 context, next.uri, next.name, next.uri,
                 onFinished = {}, persistTranscript = true, allowBatch = false,
-                batchIndex = batchPosition, batchTotal = batchTotal, batchId = id
+                batchIndex = batchPosition, batchTotal = batchTotal, batchId = id, range = next.range
             )
         }
     }
@@ -379,7 +402,7 @@ object TranscriptionRun {
 
 private const val METRICS_INTERVAL_MS = 500L
 
-private data class BatchItem(val uri: Uri, val name: String)
+private data class BatchItem(val uri: Uri, val name: String, val range: AudioRange? = null)
 
 // Whisper reports how far through the audio it is, and it advances at a steady rate once the model
 // is warm — so the time the run has taken to cover the percent so far carries over to what is left.

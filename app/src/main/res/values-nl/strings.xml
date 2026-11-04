@@ -33,6 +33,12 @@
     <string name="quick_access_remove">Van start verwijderen</string>
     <string name="record_and_transcribe">Opnemen en transcriberen</string>
     <string name="transcribe_audio_file">Een audiobestand transcriberen</string>
+    <string name="transcribe_audio_range">Een tijdbereik transcriberen</string>
+    <string name="range_probing">Opname wordt gelezen…</string>
+    <string name="range_start">Begin</string>
+    <string name="range_end">Einde</string>
+    <string name="range_transcribe_button">Bereik transcriberen</string>
+    <string name="range_whole_button">Hele bestand transcriberen</string>
     <string name="decoding_transcribing">Decoderen en transcriberen op het apparaat…</string>
     <string name="transcribing_pct">Transcriberen… %1$d%%</string>
     <string name="transcribing_pct_eta">Transcriberen… %1$d%% · %2$s</string>
