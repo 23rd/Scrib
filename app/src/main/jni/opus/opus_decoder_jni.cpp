@@ -31,9 +31,10 @@ enum Status : jint {
     STATUS_SEEK_FAILED = 4,
 };
 
-static ssize_t stream_read(void *stream, unsigned char *ptr, opus_int32 size) {
+static int stream_read(void *stream, unsigned char *ptr, opus_int32 size) {
     int fd = (int)(intptr_t)stream;
-    return read(fd, ptr, (size_t)size);
+    // ssize_t narrows to int on 64-bit ABIs; reads are bounded by opus_int32.
+    return (int)read(fd, ptr, (size_t)size);
 }
 
 static int stream_seek(void *stream, opus_int64 offset, int whence) {
