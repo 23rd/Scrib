@@ -1,14 +1,21 @@
 package org.scrib.transcriber
 
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Build
+import android.os.IBinder
+import android.os.ParcelFileDescriptor
 import android.os.Process
 import android.util.Log
 import java.io.File
 import java.util.concurrent.Executors
+import org.opentranscribe.api.ITranscriptionCallback
+import org.opentranscribe.api.ITranscriptionService
+import org.opentranscribe.api.TranscriptionRequest
 
 class TestCommandsReceiver : BroadcastReceiver() {
 
@@ -26,6 +33,7 @@ class TestCommandsReceiver : BroadcastReceiver() {
             "OPEN_TAB" -> openTab(app, intent)
             "TRANSCRIBE" -> startTranscription(app, intent)
             "IMPORT_MODEL" -> importModel(app, intent)
+            "API_TRANSCRIBE" -> apiTranscribe(app, intent)
             else -> log("unknown command ${intent.action}")
         }
     }
@@ -135,6 +143,71 @@ class TestCommandsReceiver : BroadcastReceiver() {
         raw.startsWith("content://") || raw.startsWith("file://") -> Uri.parse(raw)
         raw.startsWith("/android_asset/") -> Uri.parse("file:///android_asset/${raw.removePrefix("/android_asset/")}")
         else -> Uri.fromFile(File(raw))
+    }
+
+    // Binds to another app's service as a genuine cross-process client and hands it a range
+    // request, so the AIDL surface is exercised through real Binder marshalling. Extras: target
+    // (package), path (a file inside THIS app's own dirs), start_ms, end_ms. Every callback lands
+    // on the scrib.state tag; the terminal one unbinds and closes the descriptor.
+    private fun apiTranscribe(context: Context, intent: Intent) {
+        val target = intent.getStringExtra("target") ?: run { log("api: no target extra"); return }
+        val path = intent.getStringExtra("path") ?: run { log("api: no path extra"); return }
+        val startMs = intent.getLongExtra("start_ms", 0L)
+        val endMs = intent.getLongExtra("end_ms", 0L)
+        val file = File(path)
+        if (!file.exists()) {
+            log("api: no such file: $path")
+            return
+        }
+        var session: ParcelFileDescriptor? = null
+        var connection: ServiceConnection? = null
+        fun settle() {
+            runCatching { session?.close() }
+            connection?.let { runCatching { context.unbindService(it) } }
+        }
+        val callback = object : ITranscriptionCallback.Stub() {
+            override fun onTranscriptionProgress(text: String?) {
+                log("api: progress: ${text?.take(60)}")
+            }
+
+            override fun onTranscriptionResult(text: String?) {
+                log("api: result: ${text?.take(160)}")
+                settle()
+            }
+
+            override fun onTranscriptionSegment(startMs: Long, endMs: Long, text: String?) {
+                log("api: segment $startMs-$endMs: $text")
+            }
+
+            override fun onTranscriptionError(error: org.opentranscribe.api.TranscriptionError?) {
+                log("api: error type=${error?.type} message=${error?.message}")
+                settle()
+            }
+        }
+        val serviceIntent = Intent("org.opentranscribe.api.ITranscriptionService").setPackage(target)
+        connection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName, binder: IBinder) {
+                try {
+                    val service = ITranscriptionService.Stub.asInterface(binder)
+                    log("api: contractVersion=${service.capabilities.contractVersion}")
+                    val request = TranscriptionRequest()
+                    request.fileName = file.name
+                    request.startMs = startMs
+                    request.endMs = endMs
+                    session = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+                    service.transcribe(session, request, callback)
+                } catch (e: Exception) {
+                    log("api: failed: $e")
+                    settle()
+                }
+            }
+
+            override fun onServiceDisconnected(name: ComponentName) {
+            }
+        }
+        if (!context.bindService(serviceIntent, connection!!, Context.BIND_AUTO_CREATE)) {
+            log("api: cannot bind to $target")
+        }
     }
 
     companion object {

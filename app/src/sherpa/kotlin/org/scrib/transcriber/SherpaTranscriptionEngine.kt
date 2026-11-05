@@ -40,6 +40,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         cancellation: CancellationToken
     ) {
         try {
+            val range = request.rangeOrNull()
             val segments = transcribeToSegments(
                 audio,
                 request?.languageHint,
@@ -49,8 +50,9 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                         callback.onTranscriptionProgress(partial)
                     } catch (ignore: Exception) {
                     }
-                }
-            )
+                },
+                range = range
+            ).filterOverlapping(range)
             callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {

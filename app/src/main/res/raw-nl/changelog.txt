@@ -1,7 +1,7 @@
 # 0.28
 • Opgelost dat het einde van een opname soms ontbrak in het transcript
 • Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd
-• Geen wijzigingen voor de lichte F-Droid-versie — het snelle pad zit alleen in Scrib Max
+• Ondersteuning voor een tijdbereik toegevoegd aan de Open Transcribe API
 • Toegevoegd: transcriberen van een gekozen tijdbereik van een bestand
 # 0.27
 • Hernoemen van bewaarde transcripten toegevoegd

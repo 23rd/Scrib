@@ -57,7 +57,7 @@ interface TranscriptionEngine {
     fun capabilities(): TranscriberCapabilities
 
     companion object {
-        const val CONTRACT_VERSION = 4
+        const val CONTRACT_VERSION = 5
 
         fun releaseAll(context: Context) {
             val app = context.applicationContext
@@ -113,6 +113,29 @@ fun transcriptionError(type: Byte, message: String? = null): TranscriptionError 
     error.message = message
     return error
 }
+
+// The API's optional time range (contract v5) mapped onto the internal AudioRange. endMs at or
+// below zero means the whole file — also what a version ≤4 client sends implicitly, because the
+// generated reader leaves appended fields at 0. startMs below zero clamps to the beginning. A
+// range with nothing in it is a caller bug and fails the request loudly rather than decoding
+// something the caller did not ask for.
+fun TranscriptionRequest?.rangeOrNull(): AudioRange? {
+    val endMs = this?.endMs ?: 0L
+    if (endMs <= 0L) {
+        return null
+    }
+    val startMs = (this?.startMs ?: 0L).coerceAtLeast(0L)
+    if (endMs <= startMs) {
+        throw IllegalArgumentException("endMs ($endMs) must be after startMs ($startMs)")
+    }
+    return AudioRange(startMs, endMs)
+}
+
+// The contract promise for a range: only the segments overlapping it are returned, timestamps
+// still in original file time. Straddling segments stay. Engines that honor the range in the
+// decoder re-filter nothing but straddlers; engines that ignore it are corrected here.
+fun List<TranscriptSegment>.filterOverlapping(range: AudioRange?): List<TranscriptSegment> =
+    if (range == null) this else filter { it.overlapsRange(range) }
 
 // One timed callback per decoded segment, so clients can show subtitles. Sent right before the
 // terminal result; a client built against an older contract simply never receives them.

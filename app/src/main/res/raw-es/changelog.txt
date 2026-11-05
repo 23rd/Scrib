@@ -1,7 +1,7 @@
 # 0.28
 • Corregido que el final de una grabación faltara a veces en la transcripción
 • Añadida la decodificación nativa de Opus en Scrib Max, los archivos largos se transcriben varias veces más rápido
-• Sin cambios en la versión ligera de F-Droid — la vía rápida solo está en Scrib Max
+• Añadido soporte de intervalo de tiempo a la API Open Transcribe
 • Añadida la transcripción de un intervalo de tiempo elegido de un archivo
 # 0.27
 • Añadido renombrado de transcripciones guardadas

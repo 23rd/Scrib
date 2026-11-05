@@ -4,4 +4,6 @@ parcelable TranscriptionRequest {
     @nullable String fileName;
     @nullable String mimeType;
     @nullable String languageHint;
+    long startMs;
+    long endMs;
 }

@@ -87,6 +87,13 @@ adb logcat -d -s scrib.state
   half-open [start_ms, end_ms) stretch of the file; the transcript's timestamps stay in
   original file time. Absent or negative extras mean the whole file, and an end at or
   before the start falls back to the whole file with a line on the log.
+- `API_TRANSCRIBE --es target <package> --es path … [--el start_ms --el end_ms]` — bind to
+  `<package>`'s Open Transcribe service as a real cross-process client (contract v5) and
+  transcribe the file, optionally as a time range. The path must be inside THIS app's own
+  dirs (deliver with `run-as cp`), since this app opens the descriptor it hands over. Logs
+  `api: contractVersion=N` and every callback (`api: segment/start/end/error`) on the tag;
+  the terminal callback unbinds. Both apps must be debug builds with a model ready on the
+  service side.
 - `IMPORT_MODEL --es path /data/data/org.scrib.transcriber.debug/files/model.gguf` — copies
   the file into the model dir (off the main thread; watch the tag for done/failed).
 

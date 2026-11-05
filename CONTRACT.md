@@ -15,7 +15,7 @@ expected, not a bug: they are separately installable apps with different model s
 `getCapabilities()` is the way to tell them apart — a client that wants a specific model family can
 match on it instead of hardcoding a package name.
 
-Contract version: **4**
+Contract version: **5**
 
 ## Why this exists
 
@@ -135,6 +135,13 @@ of this document throws `RemoteException` for the unknown method.
   then detect the format itself.
 - `TranscriptionRequest.languageHint` — ISO 639-1 code (`ru`, `en`). **Empty or null means
   auto-detect.**
+- `TranscriptionRequest.startMs` — start of a time range to transcribe, in milliseconds from the
+  beginning of the audio; **0 means the beginning**. Ignored unless `endMs` is positive.
+- `TranscriptionRequest.endMs` — end of the time range, exclusive, in the same scale; **0 means the
+  whole file**, which is also what a version ≤4 client sends implicitly. Only the segments
+  overlapping the range are returned, with timestamps still measured from the beginning of the full
+  audio; a segment straddling the boundary is kept. `endMs` at or before `startMs` (while positive)
+  fails the request with `UNEXPECTED`.
 - `StreamRequest.languageHint` — the same, but a stream that auto-detects pins the language it
   settled on for the whole stream rather than re-deciding at every pause.
 - `StreamRequest.sampleRate` — of the PCM the client will write; **0 means 16000**. The service
@@ -189,6 +196,11 @@ client that wants timed segments has to implement the new method.
 Version 4 appended `maxSegmentDurationMs` to `StreamRequest` — so a version ≤3 client continues to
 work against a version 4 service untouched (reading 0 as default), and low-latency callers can
 request shorter transcription intervals.
+
+Version 5 appended `startMs` and `endMs` to `TranscriptionRequest` — so a version ≤4 client keeps
+working against a version 5 service untouched (reading 0, the whole file), and a version 5 client
+sending a range to a version ≤4 service simply gets the whole file back, because the older service
+stops reading before the trailing fields. No capability check is needed in either direction.
 
 Bump `contractVersion` whenever anything is appended.
 

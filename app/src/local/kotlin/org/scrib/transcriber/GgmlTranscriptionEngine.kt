@@ -30,6 +30,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         cancellation: CancellationToken
     ) {
         try {
+            val range = request.rangeOrNull()
             val segments = transcribeToSegments(
                 audio,
                 request?.languageHint,
@@ -39,8 +40,9 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                         callback.onTranscriptionProgress(partial)
                     } catch (ignore: Exception) {
                     }
-                }
-            )
+                },
+                range = range
+            ).filterOverlapping(range)
             callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
         } catch (e: CancelledException) {
