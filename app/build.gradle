@@ -62,7 +62,10 @@ android {
                               '-DTRANSCRIBE_BUILD_TOOLS=OFF',
                               '-DTRANSCRIBE_INSTALL=OFF',
                               '-DTRANSCRIBE_USE_OPENMP=OFF',
-                              '-DTRANSCRIBE_USE_SYSTEM_BLAS=OFF'
+                              '-DTRANSCRIBE_USE_SYSTEM_BLAS=OFF',
+                              // The vendored Opus decoder is a Scrib Max feature; the lean
+                              // F-Droid build does not compile or ship it.
+                              '-DSCRIB_MAX=' + (max ? 'ON' : 'OFF')
                 }
             }
         }

@@ -1,5 +1,7 @@
 # 0.28
 • Kaydın sonunun bazen transkriptten eksik kalması düzeltildi
+• Scrib Max'a yerel Opus kod çözme eklendi, uzun dosyalar çok daha hızlı yazıya dökülüyor
+• Hafif F-Droid sürümünde değişiklik yok — hızlı yol yalnızca Scrib Max'ta
 • Dosyanın seçilen bir zaman aralığını yazıya dökme eklendi
 # 0.27
 • Kaydedilen transkriptleri yeniden adlandırma eklendi

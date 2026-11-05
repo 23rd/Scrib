@@ -1,5 +1,7 @@
 # 0.28
 • Corrigé : la fin d'un enregistrement manquait parfois à la transcription
+• Ajout du décodage natif des fichiers Opus dans Scrib Max, la transcription des longs fichiers est plusieurs fois plus rapide
+• Aucun changement pour la version F-Droid légère — le chemin rapide n'existe que dans Scrib Max
 • Ajout de la transcription d'une plage de temps choisie d'un fichier
 # 0.27
 • Ajout du renommage des transcriptions conservées

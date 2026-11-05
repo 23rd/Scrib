@@ -52,6 +52,10 @@ object AudioDecoder {
     private const val TAG = "AudioDecoder"
     private const val TARGET_RATE = 16000
 
+    // Opus decodes to 48 kHz by spec, whatever rate the source was recorded at.
+    private const val OPUS_RATE = 48000
+    private const val OPUS_SAMPLES_PER_MS = 48L
+
     // ~9 hours; keeps the backing buffer's byte size within Int range.
     private const val MAX_TOTAL_SAMPLES = 512_000_000
 
@@ -73,20 +77,23 @@ object AudioDecoder {
     private const val DRAIN_TIMEOUT_SECONDS = 5L
 
     // Decodes whatever the platform supports (Opus/OGG voice notes, AAC/MP4 round videos) from the
-    // file descriptor into 16 kHz mono float32 PCM. Uses async MediaCodec so decoding runs at the
-    // codec's full speed instead of polling with per-packet timeouts. Each output chunk is
-    // downmixed and resampled as it arrives — the raw stream is never buffered anywhere, so the
-    // memory needed does not depend on the source rate or channel count. A decode that stops
-    // before the source's end raises DecodeStoppedException: a silent partial result would look
-    // exactly like a transcription that lost its tail. With a range, only [startMs, endMs) is
-    // decoded; the samples start at startMs of the original file, and reaching endMs is an
-    // intended end, not an early stop.
+    // file descriptor into 16 kHz mono float32 PCM. Ogg Opus files take the native opusfile path
+    // when libscrib_opus ships in the build; everything else, and every native failure before
+    // decoding starts, falls back to the platform MediaCodec path below. Uses async MediaCodec so
+    // decoding runs at the codec's full speed instead of polling with per-packet timeouts. Each
+    // output chunk is downmixed and resampled as it arrives — the raw stream is never buffered
+    // anywhere, so the memory needed does not depend on the source rate or channel count. A decode
+    // that stops before the source's end raises DecodeStoppedException: a silent partial result
+    // would look exactly like a transcription that lost its tail. With a range, only
+    // [startMs, endMs) is decoded; the samples start at startMs of the original file, and reaching
+    // endMs is an intended end, not an early stop.
     fun decodeToPcm16kMono(
         pfd: ParcelFileDescriptor,
         cancellation: CancellationToken? = null,
         scratchDir: File? = null,
         range: AudioRange? = null
     ): DecodedAudio {
+        decodeWithNativeOpus(pfd, cancellation, scratchDir, range)?.let { return it }
         val extractor = MediaExtractor()
         var codec: MediaCodec? = null
         var handler: Handler? = null
@@ -129,7 +136,7 @@ object AudioDecoder {
                 trackDurationUs in 1 until endUs - startUs -> trackDurationUs
                 else -> endUs - startUs
             }
-            val sink = openSink(format, scratchDir, sizeCapUs)
+            val sink = openSink(trackDurationUs, scratchDir, sizeCapUs)
             try {
                 val pending = LinkedBlockingQueue<Chunk>(16)
                 val done = CountDownLatch(1)
@@ -349,6 +356,58 @@ object AudioDecoder {
         }
     }
 
+    // Ogg Opus skips MediaCodec when the native decoder ships in the build: on slow SoCs the
+    // per-packet async codec path costs more CPU than the decode itself (issue 41 evidence in
+    // TODO.md). Returns null — and the caller falls back to MediaCodec — when the file is not an
+    // Ogg Opus stream or the decoder is absent (Remote builds). Once the decoder has opened the
+    // file, a failure surfaces as an exception instead of a silent retry, the same contract the
+    // MediaCodec path keeps.
+    private fun decodeWithNativeOpus(
+        pfd: ParcelFileDescriptor,
+        cancellation: CancellationToken?,
+        scratchDir: File?,
+        range: AudioRange?
+    ): DecodedAudio? {
+        if (!OpusNative.available) {
+            return null
+        }
+        val probeFd = dupFd(pfd) ?: return null
+        // The probe owns probeFd and closes it on every path.
+        val totalSamples = OpusNative.nativeProbeTotalSamples(probeFd)
+        if (totalSamples < 0) {
+            return null
+        }
+        val startSample = (range?.startMs?.coerceAtLeast(0L) ?: 0L) * OPUS_SAMPLES_PER_MS
+        val endSample = range?.endMs?.coerceAtLeast(0L)?.let { it * OPUS_SAMPLES_PER_MS } ?: Long.MAX_VALUE
+        val stopTotalMs = if (range == null) {
+            totalSamples / OPUS_SAMPLES_PER_MS
+        } else {
+            (endSample - startSample) / OPUS_SAMPLES_PER_MS
+        }
+        // The decoder owns decodeFd and closes it on every exit path.
+        val decodeFd = dupFd(pfd) ?: return null
+        val durationUs = if (totalSamples > 0) totalSamples * 1_000_000L / OPUS_RATE else -1L
+        val spanUs = if (range == null) -1L else (endSample - startSample) * 1_000_000L / OPUS_RATE
+        val sink = openSink(durationUs, scratchDir, spanUs)
+        val bridge = NativeOpusBridge(sink, cancellation)
+        try {
+            val status = OpusNative.nativeDecode16kMono(decodeFd, startSample, endSample, bridge)
+            bridge.failure?.let {
+                throw DecodeStoppedException(sink.sampleCount().toLong() * 1000L / TARGET_RATE, stopTotalMs, it)
+            }
+            return when (status) {
+                OpusNative.STATUS_OK, OpusNative.STATUS_CANCELLED -> sink.result()
+                OpusNative.STATUS_DECODE_STOPPED -> throw DecodeStoppedException(
+                    sink.sampleCount().toLong() * 1000L / TARGET_RATE, stopTotalMs, null
+                )
+                else -> throw DecodeException("Native Opus decoder failed (status $status)")
+            }
+        } catch (t: Throwable) {
+            sink.discard()
+            throw t
+        }
+    }
+
     // The audio track's own duration in ms, or null when the container does not say. A cheap
     // read of the track metadata — no decoding — so the range dialog can bound its slider.
     fun probeDurationMs(pfd: ParcelFileDescriptor): Long? {
@@ -379,8 +438,8 @@ object AudioDecoder {
     // nothing else writes into this directory with these names, so a day is a safe age cutoff.
     // capUs bounds what will be decoded (-1 when unbounded), so a ranged decode does not size
     // its buffer for the whole file.
-    private fun openSink(format: MediaFormat, scratchDir: File?, capUs: Long = -1L): DecodeSink {
-        val estimated = initialCapacity(format, capUs)
+    private fun openSink(durationUs: Long, scratchDir: File?, capUs: Long = -1L): DecodeSink {
+        val estimated = initialCapacity(durationUs, capUs)
         if (scratchDir == null || estimated <= SINK_FILE_THRESHOLD_SAMPLES) {
             return InMemorySampleSink(estimated)
         }
@@ -401,17 +460,17 @@ object AudioDecoder {
         }
     }
 
-    private fun initialCapacity(format: MediaFormat, capUs: Long = -1L): Int {
-        var durationUs = if (format.containsKey(MediaFormat.KEY_DURATION)) format.getLong(MediaFormat.KEY_DURATION) else -1L
-        if (capUs in 0 until durationUs) {
-            durationUs = capUs
-        } else if (durationUs <= 0 && capUs >= 0) {
-            durationUs = capUs
+    private fun initialCapacity(durationUs: Long, capUs: Long = -1L): Int {
+        var duration = durationUs
+        if (capUs in 0 until duration) {
+            duration = capUs
+        } else if (duration <= 0 && capUs >= 0) {
+            duration = capUs
         }
-        if (durationUs <= 0) {
+        if (duration <= 0) {
             return DEFAULT_CAPACITY_SAMPLES
         }
-        val estimated = durationUs / 1_000_000.0 * TARGET_RATE
+        val estimated = duration / 1_000_000.0 * TARGET_RATE
         return (estimated * 1.02 + 2 * TARGET_RATE).toLong()
             .coerceAtMost(MAX_TOTAL_SAMPLES.toLong())
             .toInt()
@@ -576,6 +635,70 @@ object AudioDecoder {
             }
             file.delete()
         }
+    }
+
+    // JNI surface for libscrib_opus, the opusfile-based Ogg/Opus decoder. The library ships with
+    // Scrib Max builds only; lean and Remote builds probe false and stay on MediaCodec. Status
+    // codes are mirrored by the STATUS_ enum in opus_decoder_jni.cpp.
+    private object OpusNative {
+        val available: Boolean = try {
+            System.loadLibrary("scrib_opus")
+            true
+        } catch (t: Throwable) {
+            Log.w(TAG, "Native Opus decoder unavailable", t)
+            false
+        }
+
+        const val STATUS_OK = 0
+        const val STATUS_CANCELLED = 1
+        const val STATUS_DECODE_STOPPED = 2
+
+        // Total PCM samples the file decodes to at 48 kHz, 0 when the container does not say,
+        // -1 when the file is not an Ogg Opus stream or cannot be opened. Owns and closes fd.
+        external fun nativeProbeTotalSamples(fd: Int): Long
+
+        // Decodes [startSample, endSample) into 16 kHz mono chunks delivered to bridge.onChunk
+        // on the calling thread. Returns one of the STATUS_ codes; owns and closes fd.
+        external fun nativeDecode16kMono(
+            fd: Int,
+            startSample: Long,
+            endSample: Long,
+            bridge: NativeOpusBridge
+        ): Int
+    }
+
+    // The native decoder calls back on the caller's thread with converted 16 kHz mono chunks;
+    // returning false stops the decode. A sink failure is stored and rethrown by the caller
+    // rather than carried through JNI, where it would resurface as a generic native error.
+    private class NativeOpusBridge(
+        private val sink: DecodeSink,
+        private val cancellation: CancellationToken?
+    ) {
+        var failure: Throwable? = null
+            private set
+
+        fun onChunk(samples: FloatArray, count: Int): Boolean {
+            if (failure != null || cancellation?.isCancelled == true) {
+                return false
+            }
+            try {
+                sink.add(samples, count)
+            } catch (t: Throwable) {
+                failure = t
+                return false
+            }
+            return true
+        }
+    }
+
+    // A dup shares the caller's file description, so its offset moves under the decoder's
+    // seeks — the same effect the MediaExtractor path already has on the descriptor. The
+    // engines never read the source again after decode, and the original fd is not closed.
+    private fun dupFd(pfd: ParcelFileDescriptor): Int? = try {
+        ParcelFileDescriptor.dup(pfd.fileDescriptor).detachFd()
+    } catch (t: Throwable) {
+        Log.w(TAG, "Could not duplicate the audio file descriptor", t)
+        null
     }
 
     // Converts decoder output chunks (interleaved PCM at the source rate) into 16 kHz mono

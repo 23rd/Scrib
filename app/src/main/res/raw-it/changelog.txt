@@ -1,5 +1,7 @@
 # 0.28
 • Risolta la perdita occasionale della coda di una registrazione nella trascrizione
+• Aggiunta la decodifica nativa dei file Opus in Scrib Max, i file lunghi vengono trascritti molte volte più velocemente
+• Nessuna modifica alla versione leggera di F-Droid — il percorso veloce è solo in Scrib Max
 • Aggiunta la trascrizione di un intervallo di tempo scelto di un file
 # 0.27
 • Aggiunta la ridenominazione delle trascrizioni conservate
