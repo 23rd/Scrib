@@ -1,7 +1,8 @@
-# 0.28
-• Kaydın sonunun bazen transkriptten eksik kalması düzeltildi
+# 0.29
 • Scrib Max'a yerel Opus kod çözme eklendi, uzun dosyalar çok daha hızlı yazıya dökülüyor
 • Open Transcribe API'sine zaman aralığı desteği eklendi
+# 0.28
+• Kaydın sonunun bazen transkriptten eksik kalması düzeltildi
 • Dosyanın seçilen bir zaman aralığını yazıya dökme eklendi
 # 0.27
 • Kaydedilen transkriptleri yeniden adlandırma eklendi

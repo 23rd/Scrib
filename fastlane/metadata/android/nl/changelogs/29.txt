@@ -1,0 +1,2 @@
+• Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd
+• Ondersteuning voor een tijdbereik toegevoegd aan de Open Transcribe API

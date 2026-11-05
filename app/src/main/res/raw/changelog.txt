@@ -1,7 +1,8 @@
-# 0.28
-• Fixed the tail of a recording occasionally going missing from the transcript
+# 0.29
 • Added native Opus decoding in Scrib Max, long files now transcribe several times faster
 • Added time range support to the Open Transcribe API
+# 0.28
+• Fixed the tail of a recording occasionally going missing from the transcript
 • Added transcribing a chosen time range of a file
 # 0.27
 • Added renaming of kept transcripts

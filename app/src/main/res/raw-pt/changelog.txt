@@ -1,7 +1,8 @@
-# 0.28
-• Corrigido o final de uma gravação ocasionalmente ausente da transcrição
+# 0.29
 • Adicionada a decodificação nativa de Opus no Scrib Max, arquivos longos são transcritos várias vezes mais rápido
 • Adicionado suporte a intervalo de tempo na API Open Transcribe
+# 0.28
+• Corrigido o final de uma gravação ocasionalmente ausente da transcrição
 • Adicionada a transcrição de um intervalo de tempo escolhido de um arquivo
 # 0.27
 • Adicionada a renomeação de transcrições salvas

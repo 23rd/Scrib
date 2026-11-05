@@ -1,7 +1,8 @@
-# 0.28
-• Corrigé : la fin d'un enregistrement manquait parfois à la transcription
+# 0.29
 • Ajout du décodage natif des fichiers Opus dans Scrib Max, la transcription des longs fichiers est plusieurs fois plus rapide
 • Ajout de la prise en charge d'une plage de temps dans l'API Open Transcribe
+# 0.28
+• Corrigé : la fin d'un enregistrement manquait parfois à la transcription
 • Ajout de la transcription d'une plage de temps choisie d'un fichier
 # 0.27
 • Ajout du renommage des transcriptions conservées

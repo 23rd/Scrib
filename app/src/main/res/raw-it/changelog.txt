@@ -1,7 +1,8 @@
-# 0.28
-• Risolta la perdita occasionale della coda di una registrazione nella trascrizione
+# 0.29
 • Aggiunta la decodifica nativa dei file Opus in Scrib Max, i file lunghi vengono trascritti molte volte più velocemente
 • Aggiunto il supporto all'intervallo di tempo nell'API Open Transcribe
+# 0.28
+• Risolta la perdita occasionale della coda di una registrazione nella trascrizione
 • Aggiunta la trascrizione di un intervallo di tempo scelto di un file
 # 0.27
 • Aggiunta la ridenominazione delle trascrizioni conservate

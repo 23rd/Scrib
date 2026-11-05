@@ -1,7 +1,8 @@
-# 0.28
-• Opgelost dat het einde van een opname soms ontbrak in het transcript
+# 0.29
 • Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd
 • Ondersteuning voor een tijdbereik toegevoegd aan de Open Transcribe API
+# 0.28
+• Opgelost dat het einde van een opname soms ontbrak in het transcript
 • Toegevoegd: transcriberen van een gekozen tijdbereik van een bestand
 # 0.27
 • Hernoemen van bewaarde transcripten toegevoegd

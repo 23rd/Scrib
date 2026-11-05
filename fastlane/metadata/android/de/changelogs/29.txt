@@ -1,0 +1,2 @@
+• Native Dekodierung von Opus-Dateien in Scrib Max hinzugefügt, lange Dateien werden ein Vielfaches schneller transkribiert
+• Zeitbereich-Unterstützung für die Open Transcribe API hinzugefügt

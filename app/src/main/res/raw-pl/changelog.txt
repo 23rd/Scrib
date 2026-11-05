@@ -1,7 +1,8 @@
-# 0.28
-• Naprawiono sporadyczne znikanie końcówki nagrania z transkrypcji
+# 0.29
 • Dodano natywne dekodowanie Opus w Scrib Max, długie pliki są transkrybowane kilkukrotnie szybciej
 • Dodano obsługę przedziału czasu w API Open Transcribe
+# 0.28
+• Naprawiono sporadyczne znikanie końcówki nagrania z transkrypcji
 • Dodano transkrypcję wybranego przedziału czasu pliku
 # 0.27
 • Dodano zmianę nazwy zapisanych transkrypcji
