@@ -21,6 +21,7 @@ object ModelManager {
     private const val KEY_LANGUAGE = "language"
     private const val KEY_PINNED = "pinnedModels"
     private const val KEY_KEYBOARD_STATS = "keyboardStats"
+    private const val KEY_KEYBOARD_AUTO_LISTEN = "keyboardAutoListen"
     private const val KEY_KB_SESSIONS = "kbSessions"
     private const val KEY_KB_WORDS = "kbWords"
     private const val KEY_KB_TIME_MS = "kbTimeMs"
@@ -310,6 +311,14 @@ object ModelManager {
     fun setKeyboardStats(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
             .putBoolean(KEY_KEYBOARD_STATS, enabled).apply()
+    }
+
+    fun keyboardAutoListen(context: Context): Boolean =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_KEYBOARD_AUTO_LISTEN, false)
+
+    fun setKeyboardAutoListen(context: Context, enabled: Boolean) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putBoolean(KEY_KEYBOARD_AUTO_LISTEN, enabled).apply()
     }
 
     data class KeyboardUsage(val sessions: Long, val words: Long, val timeMs: Long)

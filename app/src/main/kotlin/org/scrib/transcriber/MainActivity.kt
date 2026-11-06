@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                         onSkipSilence = vm::setSkipSilence,
                         onLiveStats = vm::setLiveStats,
                         onKeyboardStats = vm::setKeyboardStats,
+                        onKeyboardAutoListen = vm::setKeyboardAutoListen,
                         onConfigureKeyboardLayouts = vm::setKeyboardLayouts,
                         onImportSherpa = vm::importSherpa,
                         sherpaPlugin = SherpaPlugins.plugin,
