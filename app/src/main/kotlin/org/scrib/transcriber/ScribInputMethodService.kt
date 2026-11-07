@@ -338,7 +338,7 @@ class ScribInputMethodService : InputMethodService() {
         if (snippet.isEmpty()) {
             return
         }
-        currentInputConnection?.commitText(snippet, 1)
+        currentInputConnection?.commitText(KeyboardLayouts.insertText(snippet), 1)
     }
 
     // Dictation lands wherever the cursor was left, which is often right after a word.
@@ -562,8 +562,9 @@ class ScribInputMethodService : InputMethodService() {
     }
 
     private fun pill(snippet: String): TextView {
+        val label = KeyboardLayouts.labelRes(snippet)?.let { context.getString(it) } ?: snippet
         val pill = TextView(context)
-        pill.text = snippet
+        pill.text = label
         pill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
         pill.setTextColor(color(R.color.ime_on_surface_variant))
         pill.gravity = Gravity.CENTER
@@ -579,7 +580,7 @@ class ScribInputMethodService : InputMethodService() {
             setColor(color(R.color.ime_surface))
             setStroke(dp(1), color(R.color.ime_outline))
         }
-        pill.contentDescription = snippet
+        pill.contentDescription = label
         pill.setOnClickListener { onCustomKey(snippet) }
         return pill
     }

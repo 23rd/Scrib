@@ -1,4 +1,5 @@
 # 0.29
+• Özel ekleme tuşları için Boşluk ve Enter tuşları eklendi
 • Scrib Max'a yerel Opus kod çözme eklendi, uzun dosyalar çok daha hızlı yazıya dökülüyor
 • Open Transcribe API'sine zaman aralığı desteği eklendi
 # 0.28

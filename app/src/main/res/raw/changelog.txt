@@ -1,4 +1,5 @@
 # 0.29
+• Added Space and Enter keys for custom insert keys
 • Added native Opus decoding in Scrib Max, long files now transcribe several times faster
 • Added time range support to the Open Transcribe API
 # 0.28

@@ -1,4 +1,5 @@
 # 0.29
+• Añadidas las teclas de espacio e Intro para las teclas de inserción propias
 • Añadida la decodificación nativa de Opus en Scrib Max, los archivos largos se transcriben varias veces más rápido
 • Añadido soporte de intervalo de tiempo a la API Open Transcribe
 # 0.28

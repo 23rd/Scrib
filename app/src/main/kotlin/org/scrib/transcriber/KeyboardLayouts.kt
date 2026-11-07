@@ -58,6 +58,21 @@ object KeyboardLayouts {
     const val MAX_CUSTOM_KEYS = 50
     const val MAX_CUSTOM_KEY_LENGTH = 64
 
+    // The two special custom keys. Enter is stored as the two-character backslash-n sequence,
+    // because a real newline cannot survive the newline record separator.
+    const val SPACE_KEY = " "
+    const val ENTER_KEY = "\\n"
+
+    fun insertText(key: String): String =
+        if (key == ENTER_KEY) "\n" else key
+
+    fun labelRes(key: String): Int? =
+        when (key) {
+            SPACE_KEY -> R.string.ime_custom_key_space_name
+            ENTER_KEY -> R.string.ime_custom_key_enter_name
+            else -> null
+        }
+
     fun settings(context: Context): KeyboardLayoutSettings {
         val selectedKeys = savedKeys(context)
         val selected = selectedKeys.toSet()
@@ -125,19 +140,23 @@ object KeyboardLayouts {
             .apply()
     }
 
-    private fun normalizeCustomKeys(keys: List<String>): List<String> =
+    internal fun normalizeCustomKeys(keys: List<String>): List<String> =
         keys.map { it.replace("\r", "").replace("\n", "") }
-            .filter { it.isNotBlank() }
+            .filter { it.isNotEmpty() }
             .map { if (it.length > MAX_CUSTOM_KEY_LENGTH) it.take(MAX_CUSTOM_KEY_LENGTH) else it }
             .distinct()
             .take(MAX_CUSTOM_KEYS)
 
     private fun savedCustomKeys(context: Context): List<String> =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY_CUSTOM_KEYS, "")
-            .orEmpty()
-            .split(TARGET_SEPARATOR)
+        parseCustomKeys(
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getString(KEY_CUSTOM_KEYS, "").orEmpty()
+        )
+
+    internal fun parseCustomKeys(saved: String): List<String> =
+        saved.split(TARGET_SEPARATOR)
             .map { it.replace("\r", "") }
-            .filter { it.isNotBlank() }
+            .filter { it.isNotEmpty() }
             .distinct()
             .take(MAX_CUSTOM_KEYS)
 

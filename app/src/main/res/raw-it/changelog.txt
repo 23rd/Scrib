@@ -1,4 +1,5 @@
 # 0.29
+• Aggiunti i tasti Spazio e Invio per i tasti di inserimento personalizzati
 • Aggiunta la decodifica nativa dei file Opus in Scrib Max, i file lunghi vengono trascritti molte volte più velocemente
 • Aggiunto il supporto all'intervallo di tempo nell'API Open Transcribe
 # 0.28

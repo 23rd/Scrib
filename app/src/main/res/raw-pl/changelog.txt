@@ -1,4 +1,5 @@
 # 0.29
+• Dodano klawisze spacji i Enter dla własnych klawiszy wstawiania
 • Dodano natywne dekodowanie Opus w Scrib Max, długie pliki są transkrybowane kilkukrotnie szybciej
 • Dodano obsługę przedziału czasu w API Open Transcribe
 # 0.28

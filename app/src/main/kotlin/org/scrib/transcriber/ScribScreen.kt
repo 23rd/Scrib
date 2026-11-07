@@ -700,21 +700,26 @@ private fun KeyboardTab(
     var editText by remember { mutableStateOf("") }
     val selectedKeys = settings.options.filter { it.selected }.map { it.key }
     val customKeys = settings.customKeys
-    fun addNewKey() {
-        val value = newKey.replace("\r", "").replace("\n", "")
-        if (value.isBlank() || value in customKeys || customKeys.size >= KeyboardLayouts.MAX_CUSTOM_KEYS) {
-            return
+    fun addCustomKey(value: String): Boolean {
+        val cleaned = value.replace("\r", "").replace("\n", "")
+        if (cleaned.isEmpty() || cleaned in customKeys || customKeys.size >= KeyboardLayouts.MAX_CUSTOM_KEYS) {
+            return false
         }
         onConfigureKeyboardLayouts(
             settings.enabled,
             selectedKeys,
-            listOf(value.take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)) + customKeys
+            listOf(cleaned.take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)) + customKeys
         )
-        newKey = ""
+        return true
+    }
+    fun addNewKey() {
+        if (addCustomKey(newKey)) {
+            newKey = ""
+        }
     }
     fun renameCustomKey(from: String, to: String) {
         val value = to.replace("\r", "").replace("\n", "").take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
-        if (value.isBlank() || (value in customKeys && value != from)) {
+        if (value.isEmpty() || (value in customKeys && value != from)) {
             return
         }
         onConfigureKeyboardLayouts(settings.enabled, selectedKeys, customKeys.map { if (it == from) value else it })
@@ -732,7 +737,11 @@ private fun KeyboardTab(
             customKeys.toMutableList().also { Collections.swap(it, index, to) }
         )
     }
-    val canAdd = newKey.isNotBlank() && newKey !in customKeys &&
+    val canAdd = newKey.isNotEmpty() && newKey !in customKeys &&
+        customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
+    val canAddSpace = KeyboardLayouts.SPACE_KEY !in customKeys &&
+        customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
+    val canAddEnter = KeyboardLayouts.ENTER_KEY !in customKeys &&
         customKeys.size < KeyboardLayouts.MAX_CUSTOM_KEYS
     LazyColumn(
         Modifier.fillMaxSize(),
@@ -900,7 +909,11 @@ private fun KeyboardTab(
                         .take(KeyboardLayouts.MAX_CUSTOM_KEY_LENGTH)
                 },
                 enabled = canAdd,
-                onAdd = { addNewKey() }
+                spaceEnabled = canAddSpace,
+                enterEnabled = canAddEnter,
+                onAdd = { addNewKey() },
+                onAddSpace = { addCustomKey(KeyboardLayouts.SPACE_KEY) },
+                onAddEnter = { addCustomKey(KeyboardLayouts.ENTER_KEY) }
             )
         }
         if (customKeys.isEmpty()) {
@@ -917,7 +930,7 @@ private fun KeyboardTab(
                 val index = customKeys.indexOf(key)
                 val editing = editingKey == key
                 val cleaned = editText.replace("\r", "").replace("\n", "")
-                val confirmEnabled = cleaned.isNotBlank() &&
+                val confirmEnabled = cleaned.isNotEmpty() &&
                     (cleaned == key || cleaned !in customKeys)
                 CustomKeyRow(
                     key = key,
@@ -2560,7 +2573,11 @@ private fun AddKeyRow(
     value: String,
     onValueChange: (String) -> Unit,
     enabled: Boolean,
-    onAdd: () -> Unit
+    spaceEnabled: Boolean,
+    enterEnabled: Boolean,
+    onAdd: () -> Unit,
+    onAddSpace: () -> Unit,
+    onAddEnter: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     Surface(
@@ -2587,6 +2604,18 @@ private fun AddKeyRow(
                 tint = cs.primary,
                 enabled = enabled,
                 onClick = onAdd
+            )
+            Spacer(Modifier.width(2.dp))
+            KeyWordButton(
+                label = stringResource(R.string.ime_custom_key_space_name),
+                enabled = spaceEnabled,
+                onClick = onAddSpace
+            )
+            Spacer(Modifier.width(2.dp))
+            KeyWordButton(
+                label = stringResource(R.string.ime_custom_key_enter_name),
+                enabled = enterEnabled,
+                onClick = onAddEnter
             )
         }
     }
@@ -2658,6 +2687,8 @@ private fun CustomKeyRow(
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
+    val labelRes = KeyboardLayouts.labelRes(key)
+    val label = labelRes?.let { stringResource(it) } ?: key
     Surface(
         color = cs.surface,
         shape = RoundedCornerShape(14.dp),
@@ -2699,7 +2730,7 @@ private fun CustomKeyRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    key,
+                    label,
                     modifier = Modifier.weight(1f),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -2709,25 +2740,27 @@ private fun CustomKeyRow(
                 )
                 KeyActionButton(
                     icon = R.drawable.ic_chevron_up,
-                    description = stringResource(R.string.ime_custom_keys_move_up, key),
+                    description = stringResource(R.string.ime_custom_keys_move_up, label),
                     enabled = actionsEnabled && canMoveUp,
                     onClick = onMoveUp
                 )
                 KeyActionButton(
                     icon = R.drawable.ic_chevron_down,
-                    description = stringResource(R.string.ime_custom_keys_move_down, key),
+                    description = stringResource(R.string.ime_custom_keys_move_down, label),
                     enabled = actionsEnabled && canMoveDown,
                     onClick = onMoveDown
                 )
-                KeyActionButton(
-                    icon = R.drawable.ic_edit,
-                    description = stringResource(R.string.ime_custom_keys_edit, key),
-                    enabled = actionsEnabled,
-                    onClick = onStartEdit
-                )
+                if (labelRes == null) {
+                    KeyActionButton(
+                        icon = R.drawable.ic_edit,
+                        description = stringResource(R.string.ime_custom_keys_edit, label),
+                        enabled = actionsEnabled,
+                        onClick = onStartEdit
+                    )
+                }
                 KeyActionButton(
                     icon = R.drawable.ic_close,
-                    description = stringResource(R.string.ime_custom_keys_delete, key),
+                    description = stringResource(R.string.ime_custom_keys_delete, label),
                     enabled = actionsEnabled,
                     onClick = onDelete
                 )
@@ -2754,6 +2787,30 @@ private fun KeyActionButton(
             contentDescription = description,
             tint = tint,
             modifier = Modifier.size(22.dp)
+        )
+    }
+}
+
+// The word-labelled sibling of KeyActionButton for the two special keys: their labels are words,
+// so the button widens to hold them instead of clipping like a fixed icon slot would.
+@Composable
+private fun KeyWordButton(
+    label: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 12.dp)
+    ) {
+        Text(
+            label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+                .copy(alpha = if (enabled) 1f else 0.38f)
         )
     }
 }
