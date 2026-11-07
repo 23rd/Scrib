@@ -1,0 +1,1 @@
+• Dodano klawisze spacji i Enter dla własnych klawiszy wstawiania

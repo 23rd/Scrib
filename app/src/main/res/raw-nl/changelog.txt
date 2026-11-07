@@ -1,5 +1,6 @@
-# 0.29
+# 0.30
 • Spatie en Enter als eigen toetsen toegevoegd
+# 0.29
 • Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd
 • Ondersteuning voor een tijdbereik toegevoegd aan de Open Transcribe API
 # 0.28
