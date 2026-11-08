@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The endpoint address is the user's own: a self-hosted server on a LAN or VPN
+     usually speaks plain HTTP and offers a certificate the user installed rather
+     than one from a public authority. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

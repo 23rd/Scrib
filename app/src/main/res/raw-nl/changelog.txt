@@ -1,4 +1,5 @@
 # 0.30
+• Gewone HTTP-endpoints en door de gebruiker geïnstalleerde certificaten toegestaan voor zelf gehoste servers
 • Spatie en Enter als eigen toetsen toegevoegd
 # 0.29
 • Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd

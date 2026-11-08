@@ -1,4 +1,5 @@
 # 0.30
+• Zezwolono na zwykłe połączenia HTTP i certyfikaty instalowane przez użytkownika dla serwerów własnych
 • Dodano klawisze spacji i Enter dla własnych klawiszy wstawiania
 # 0.29
 • Dodano natywne dekodowanie Opus w Scrib Max, długie pliki są transkrybowane kilkukrotnie szybciej

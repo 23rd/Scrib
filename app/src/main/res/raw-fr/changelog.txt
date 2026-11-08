@@ -1,4 +1,5 @@
 # 0.30
+• Autorisation des endpoints en HTTP simple et des certificats installés par l'utilisateur pour les serveurs auto-hébergés
 • Ajout des touches Espace et Entrée pour les touches d'insertion personnalisées
 # 0.29
 • Ajout du décodage natif des fichiers Opus dans Scrib Max, la transcription des longs fichiers est plusieurs fois plus rapide

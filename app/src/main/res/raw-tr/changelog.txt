@@ -1,4 +1,5 @@
 # 0.30
+• Kendi sunucularımız için düz HTTP uç noktalarına ve kullanıcı tarafından yüklenen sertifikalara izin verildi
 • Özel ekleme tuşları için Boşluk ve Enter tuşları eklendi
 # 0.29
 • Scrib Max'a yerel Opus kod çözme eklendi, uzun dosyalar çok daha hızlı yazıya dökülüyor

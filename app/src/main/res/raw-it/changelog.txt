@@ -1,4 +1,5 @@
 # 0.30
+• Consentiti endpoint HTTP in chiaro e certificati installati dall'utente per server self-hosted
 • Aggiunti i tasti Spazio e Invio per i tasti di inserimento personalizzati
 # 0.29
 • Aggiunta la decodifica nativa dei file Opus in Scrib Max, i file lunghi vengono trascritti molte volte più velocemente
