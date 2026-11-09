@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • Le délai d'attente des endpoints s'adapte à la durée de l'enregistrement pour que les serveurs lents puissent terminer les longs enregistrements
 • Autorisation des endpoints en HTTP simple et des certificats installés par l'utilisateur pour les serveurs auto-hébergés
+# 0.30
 • Ajout des touches Espace et Entrée pour les touches d'insertion personnalisées
 # 0.29
 • Ajout du décodage natif des fichiers Opus dans Scrib Max, la transcription des longs fichiers est plusieurs fois plus rapide

@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • De lees-timeout voor endpoints schaalt mee met de opnamelengte zodat trage servers lange opnames kunnen afwerken
 • Gewone HTTP-endpoints en door de gebruiker geïnstalleerde certificaten toegestaan voor zelf gehoste servers
+# 0.30
 • Spatie en Enter als eigen toetsen toegevoegd
 # 0.29
 • Native Opus-decodering toegevoegd in Scrib Max, lange bestanden worden vele malen sneller getranscribeerd

@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • Limit czasu odczytu endpointów skaluje się z długością nagrania, więc wolne serwery dokańczają długie nagrania
 • Zezwolono na zwykłe połączenia HTTP i certyfikaty instalowane przez użytkownika dla serwerów własnych
+# 0.30
 • Dodano klawisze spacji i Enter dla własnych klawiszy wstawiania
 # 0.29
 • Dodano natywne dekodowanie Opus w Scrib Max, długie pliki są transkrybowane kilkukrotnie szybciej

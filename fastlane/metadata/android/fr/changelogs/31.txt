@@ -1,0 +1,2 @@
+• Le délai d'attente des endpoints s'adapte à la durée de l'enregistrement pour que les serveurs lents puissent terminer les longs enregistrements
+• Autorisation des endpoints en HTTP simple et des certificats installés par l'utilisateur pour les serveurs auto-hébergés

@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • Il timeout di lettura degli endpoint scala con la durata della registrazione per consentire ai server lenti di completare le registrazioni lunghe
 • Consentiti endpoint HTTP in chiaro e certificati installati dall'utente per server self-hosted
+# 0.30
 • Aggiunti i tasti Spazio e Invio per i tasti di inserimento personalizzati
 # 0.29
 • Aggiunta la decodifica nativa dei file Opus in Scrib Max, i file lunghi vengono trascritti molte volte più velocemente

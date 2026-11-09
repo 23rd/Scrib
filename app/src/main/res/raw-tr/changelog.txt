@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • Uç nokta okuma zaman aşımı kayıt uzunluğuna göre ölçeklenir, böylece yavaş sunucular uzun kayıtları tamamlayabilir
 • Kendi sunucularımız için düz HTTP uç noktalarına ve kullanıcı tarafından yüklenen sertifikalara izin verildi
+# 0.30
 • Özel ekleme tuşları için Boşluk ve Enter tuşları eklendi
 # 0.29
 • Scrib Max'a yerel Opus kod çözme eklendi, uzun dosyalar çok daha hızlı yazıya dökülüyor

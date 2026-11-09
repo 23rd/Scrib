@@ -1,6 +1,7 @@
-# 0.30
+# 0.31
 • O tempo limite de leitura dos endpoints escala com a duração da gravação para que servidores lentos concluam gravações longas
 • Permitidos endpoints HTTP simples e certificados instalados pelo usuário para servidores auto-hospedados
+# 0.30
 • Adicionadas as teclas Espaço e Enter para as teclas de inserção próprias
 # 0.29
 • Adicionada a decodificação nativa de Opus no Scrib Max, arquivos longos são transcritos várias vezes mais rápido

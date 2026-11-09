@@ -1,0 +1,2 @@
+• Il timeout di lettura degli endpoint scala con la durata della registrazione per consentire ai server lenti di completare le registrazioni lunghe
+• Consentiti endpoint HTTP in chiaro e certificati installati dall'utente per server self-hosted

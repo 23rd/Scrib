@@ -1,0 +1,2 @@
+• Uç nokta okuma zaman aşımı kayıt uzunluğuna göre ölçeklenir, böylece yavaş sunucular uzun kayıtları tamamlayabilir
+• Kendi sunucularımız için düz HTTP uç noktalarına ve kullanıcı tarafından yüklenen sertifikalara izin verildi
