@@ -190,8 +190,6 @@ class EndpointTranscriptionEngine(
 
         const val ENGINE_ID = "openai-compatible-endpoint"
         const val ENGINE_VERSION = "1"
-
-        const val READ_TIMEOUT_MS = 600_000
     }
 }
 

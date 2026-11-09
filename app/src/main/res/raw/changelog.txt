@@ -1,4 +1,5 @@
 # 0.30
+• Scaled the endpoint read timeout with the recording length so slow servers can finish long recordings
 • Allowed plain-HTTP endpoints and user-installed certificates for self-hosted servers
 • Added Space and Enter keys for custom insert keys
 # 0.29

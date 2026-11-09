@@ -1,4 +1,5 @@
 # 0.30
+• O tempo limite de leitura dos endpoints escala com a duração da gravação para que servidores lentos concluam gravações longas
 • Permitidos endpoints HTTP simples e certificados instalados pelo usuário para servidores auto-hospedados
 • Adicionadas as teclas Espaço e Enter para as teclas de inserção próprias
 # 0.29

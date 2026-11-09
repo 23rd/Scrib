@@ -1,4 +1,5 @@
 # 0.30
+• Lese-Timeout für Endpunkte skaliert mit der Aufnahmelänge, damit langsame Server lange Aufnahmen verarbeiten können
 • Einfache HTTP-Endpunkte und nutzerinstallierte Zertifikate für selbst gehostete Server erlaubt
 • Leertaste und Enter als eigene Einfüge-Tasten hinzugefügt
 # 0.29

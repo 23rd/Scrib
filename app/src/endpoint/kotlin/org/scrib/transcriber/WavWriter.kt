@@ -51,6 +51,25 @@ object WavWriter {
         return encode(allocateZeros(count), count, sampleRate)
     }
 
+    fun durationMs(wav: ByteArray): Long {
+        val dataBytes = (wav.size - HEADER_BYTES).coerceAtLeast(0)
+        val byteRate = readIntLe(wav, 28)
+        if (byteRate <= 0) {
+            return 0
+        }
+        return dataBytes * 1000L / byteRate
+    }
+
+    private fun readIntLe(bytes: ByteArray, offset: Int): Int {
+        if (bytes.size < offset + 4) {
+            return 0
+        }
+        return (bytes[offset].toInt() and 0xff) or
+            ((bytes[offset + 1].toInt() and 0xff) shl 8) or
+            ((bytes[offset + 2].toInt() and 0xff) shl 16) or
+            ((bytes[offset + 3].toInt() and 0xff) shl 24)
+    }
+
     private fun allocateZeros(count: Int): ByteBuffer {
         val buffer = ByteBuffer.allocateDirect(count * 4).order(ByteOrder.nativeOrder())
         val floats = buffer.asFloatBuffer()

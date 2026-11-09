@@ -62,7 +62,11 @@ class CloudflareTransport : EndpointTransport {
             "https://api.cloudflare.com/client/v4/accounts/$account/ai/run/$model$language"
         }
 
-        val connection = EndpointHttp.open(url, settings.apiKey)
+        val connection = EndpointHttp.open(
+            url,
+            settings.apiKey,
+            EndpointHttp.readTimeoutMs(WavWriter.durationMs(wav))
+        )
         try {
             connection.requestMethod = "POST"
             connection.doOutput = true

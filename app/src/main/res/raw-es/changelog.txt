@@ -1,4 +1,5 @@
 # 0.30
+• El timeout de lectura de los endpoints escala con la duración de la grabación para que los servidores lentos terminen las grabaciones largas
 • Permitidos los endpoints HTTP sin cifrar y los certificados instalados por el usuario para servidores autohospedados
 • Añadidas las teclas de espacio e Intro para las teclas de inserción propias
 # 0.29

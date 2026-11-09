@@ -22,7 +22,11 @@ class OpenAiTransport : EndpointTransport {
     ): Transcript {
         val boundary = "----ScribBoundary${java.util.UUID.randomUUID().toString().replace("-", "")}"
         val url = settings.transcriptionsUrl
-        val connection = EndpointHttp.open(url, settings.apiKey)
+        val connection = EndpointHttp.open(
+            url,
+            settings.apiKey,
+            EndpointHttp.readTimeoutMs(WavWriter.durationMs(wav))
+        )
         try {
             val model = field(boundary, "model", settings.model)
             val language = languageHint?.takeIf { it.isNotEmpty() }?.let { field(boundary, "language", it) }
@@ -90,14 +94,18 @@ object EndpointHttp {
 
     const val READ_TIMEOUT_MS = 600_000
 
+    fun readTimeoutMs(audioDurationMs: Long): Int =
+        maxOf(READ_TIMEOUT_MS.toLong(), audioDurationMs * 3L)
+            .coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+
     const val USER_AGENT = "Scrib"
 
     const val ERROR_BODY_CHARS = 200
 
-    fun open(url: String, apiKey: String): HttpURLConnection {
+    fun open(url: String, apiKey: String, readTimeoutMs: Int = READ_TIMEOUT_MS): HttpURLConnection {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = CONNECT_TIMEOUT_MS
-        connection.readTimeout = READ_TIMEOUT_MS
+        connection.readTimeout = readTimeoutMs
         connection.instanceFollowRedirects = true
         connection.useCaches = false
         connection.setRequestProperty("Authorization", "Bearer $apiKey")

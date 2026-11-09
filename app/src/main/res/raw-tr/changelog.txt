@@ -1,4 +1,5 @@
 # 0.30
+• Uç nokta okuma zaman aşımı kayıt uzunluğuna göre ölçeklenir, böylece yavaş sunucular uzun kayıtları tamamlayabilir
 • Kendi sunucularımız için düz HTTP uç noktalarına ve kullanıcı tarafından yüklenen sertifikalara izin verildi
 • Özel ekleme tuşları için Boşluk ve Enter tuşları eklendi
 # 0.29

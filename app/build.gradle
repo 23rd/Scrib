@@ -155,6 +155,11 @@ android {
         debug {
             kotlin.srcDirs += 'src/debug/kotlin'
         }
+        test {
+            if (max || remote) {
+                kotlin.srcDirs += 'src/endpoint/test/kotlin'
+            }
+        }
     }
 }
 
