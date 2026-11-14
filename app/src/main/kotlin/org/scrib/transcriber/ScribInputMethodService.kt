@@ -65,6 +65,7 @@ class ScribInputMethodService : InputMethodService() {
 
     private var notice: String? = null
     private var keyboardTargetsCache: List<KeyboardLayoutTarget>? = null
+    private var modelChoicesCache: List<ModelManager.ModelChoice>? = null
 
     private companion object {
         const val LINGER_AFTER_STOP_MS = 250L
@@ -79,6 +80,7 @@ class ScribInputMethodService : InputMethodService() {
         fresh.onKeyboardLayout = { target -> leave(target) }
         fresh.onBackspace = { sendDownUpKeyEvents(KeyEvent.KEYCODE_DEL) }
         fresh.onCustomKey = { snippet -> insertCustom(snippet) }
+        fresh.onModel = { key -> selectModel(key) }
         view = fresh
         return fresh
     }
@@ -89,6 +91,7 @@ class ScribInputMethodService : InputMethodService() {
         super.onStartInputView(info, restarting)
         notice = null
         keyboardTargetsCache = null
+        modelChoicesCache = null
         render()
     }
 
@@ -103,6 +106,7 @@ class ScribInputMethodService : InputMethodService() {
     override fun onWindowShown() {
         super.onWindowShown()
         keyboardTargetsCache = null
+        modelChoicesCache = null
         render()
         paintSystemKeys()
     }
@@ -151,6 +155,18 @@ class ScribInputMethodService : InputMethodService() {
                 Stage.Finishing -> Unit
             }
         }
+    }
+
+    // A model picked here is the one the next take loads: the engine reads the active model for
+    // every utterance, so nothing has to be reopened or restarted.
+    private fun selectModel(key: String) {
+        if (stage != Stage.Idle) {
+            return
+        }
+        ModelManager.setActive(this, key)
+        modelChoicesCache = null
+        StateLog.log("ime model active: $key")
+        render()
     }
 
     private fun listen() {
@@ -400,9 +416,15 @@ class ScribInputMethodService : InputMethodService() {
             listening = stage == Stage.Listening,
             enabled = stage != Stage.Finishing,
             modelName = ModelManager.activeDisplayName(this),
+            models = if (stage == Stage.Idle) modelChoices() else emptyList(),
             keyboardTargets = keyboardTargets(),
             customKeys = KeyboardLayouts.customKeys(this)
         )
+    }
+
+    private fun modelChoices(): List<ModelManager.ModelChoice> {
+        modelChoicesCache?.let { return it }
+        return ModelManager.switchableModels(this).also { modelChoicesCache = it }
     }
 
     private fun keyboardTargets(): List<KeyboardLayoutTarget> {
@@ -420,9 +442,12 @@ class ScribInputMethodService : InputMethodService() {
     var onKeyboardLayout: (KeyboardLayoutTarget) -> Unit = {}
     var onBackspace: () -> Unit = {}
     var onCustomKey: (String) -> Unit = {}
+    var onModel: (String) -> Unit = {}
 
     private val status = TextView(context)
     private val model = TextView(context)
+    private val modelScroller = HorizontalScrollView(context)
+    private val modelKeys = LinearLayout(context)
     private val meter = LevelMeter(context)
     private val record = RoundKey(context, filled = true)
     private val keyboard = RoundKey(context, filled = false)
@@ -439,6 +464,8 @@ class ScribInputMethodService : InputMethodService() {
     private var targetKeys: List<String>? = null
     private var snippets: List<String>? = null
     private var customScrollRestored = false
+    private var choices: List<ModelManager.ModelChoice> = emptyList()
+    private var modelsOpen = false
 
     init {
         orientation = VERTICAL
@@ -455,8 +482,23 @@ class ScribInputMethodService : InputMethodService() {
         model.gravity = Gravity.CENTER
         model.setTextColor(quietColor)
         model.alpha = 0.75f
-        addView(model, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+        model.isClickable = false
+        model.setOnClickListener { toggleModels() }
+        addView(model, LayoutParams(LayoutParams.MATCH_PARENT, dp(32)).apply {
             topMargin = dp(2)
+        })
+
+        modelKeys.orientation = HORIZONTAL
+        modelKeys.gravity = Gravity.CENTER
+        modelScroller.apply {
+            isHorizontalScrollBarEnabled = false
+            isFillViewport = true
+            overScrollMode = View.OVER_SCROLL_NEVER
+            visibility = GONE
+            addView(modelKeys, FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+        }
+        addView(modelScroller, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+            topMargin = dp(8)
         })
 
         meter.color = color(R.color.ime_primary)
@@ -512,13 +554,23 @@ class ScribInputMethodService : InputMethodService() {
         listening: Boolean,
         enabled: Boolean,
         modelName: String?,
+        models: List<ModelManager.ModelChoice>,
         keyboardTargets: List<KeyboardLayoutTarget>,
         customKeys: List<String>
     ) {
         status.text = message
         status.setTextColor(if (alert) alertColor else quietColor)
-        model.text = modelName ?: ""
-        model.visibility = if (modelName.isNullOrEmpty()) View.GONE else View.VISIBLE
+        val switchable = models.size > 1
+        model.text = when {
+            modelName.isNullOrEmpty() -> ""
+            switchable -> "$modelName  ▾"
+            else -> modelName
+        }
+        model.visibility = if (model.text.isEmpty()) View.GONE else View.VISIBLE
+        model.isClickable = switchable
+        model.alpha = if (switchable) 1f else 0.75f
+        model.contentDescription = if (switchable) context.getString(R.string.switch_model_title) else null
+        updateModels(models)
         record.glyph = if (listening) RoundKey.Glyph.Stop else RoundKey.Glyph.Mic
         record.contentDescription = context.getString(if (listening) R.string.action_stop else R.string.ime_speak)
         record.isEnabled = enabled
@@ -526,6 +578,70 @@ class ScribInputMethodService : InputMethodService() {
         meter.alpha = if (listening) 1f else 0.4f
         updateKeyboardKeys(keyboardTargets)
         updateCustomKeys(customKeys)
+    }
+
+    // The whole list is one row of pills under the current model, opened by tapping that name and
+    // closed by picking from it, so switching costs one gesture and never takes the field away.
+    private fun updateModels(models: List<ModelManager.ModelChoice>) {
+        if (models == choices) {
+            return
+        }
+        choices = models
+        modelKeys.removeAllViews()
+        if (models.size <= 1) {
+            closeModels()
+            return
+        }
+        models.forEach { choice ->
+            modelKeys.addView(modelPill(choice), LayoutParams(LayoutParams.WRAP_CONTENT, dp(36)).apply {
+                rightMargin = dp(8)
+            })
+        }
+    }
+
+    private fun modelPill(choice: ModelManager.ModelChoice): TextView {
+        val active = choice.current
+        val pill = TextView(context)
+        pill.text = if (active) "✓ ${choice.name}" else choice.name
+        pill.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+        pill.setTextColor(color(if (active) R.color.ime_on_primary else R.color.ime_on_surface_variant))
+        pill.gravity = Gravity.CENTER
+        pill.maxLines = 1
+        pill.ellipsize = TextUtils.TruncateAt.END
+        pill.maxWidth = dp(220)
+        pill.isClickable = true
+        pill.isFocusable = false
+        pill.setPadding(dp(14), dp(6), dp(14), dp(6))
+        pill.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(18).toFloat()
+            setColor(color(if (active) R.color.ime_primary else R.color.ime_surface))
+            if (!active) {
+                setStroke(dp(1), color(R.color.ime_outline))
+            }
+        }
+        pill.contentDescription = choice.name
+        pill.setOnClickListener {
+            closeModels()
+            onModel(choice.key)
+        }
+        return pill
+    }
+
+    private fun toggleModels() {
+        if (choices.size <= 1) {
+            return
+        }
+        modelsOpen = !modelsOpen
+        modelScroller.visibility = if (modelsOpen) View.VISIBLE else View.GONE
+        if (modelsOpen) {
+            modelScroller.scrollTo(0, 0)
+        }
+    }
+
+    private fun closeModels() {
+        modelsOpen = false
+        modelScroller.visibility = View.GONE
     }
 
     // Custom snippets are the user's own punctuation and phrases. A horizontal strip holds

@@ -120,6 +120,31 @@ object ModelManager {
             ?: name.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf")
     }
 
+    data class ModelChoice(val key: String, val name: String, val current: Boolean)
+
+    // What a keyboard can switch between without opening the app: every model already on the
+    // phone, in the order the app lists them. Nothing is downloaded here — a model that is not
+    // installed is not a choice.
+    fun switchableModels(context: Context): List<ModelChoice> {
+        val active = activeFileName(context)
+        val choices = mutableListOf<ModelChoice>()
+        if (BuildConfig.LOCAL_MODELS) {
+            externalModel(context)?.let { (name, _) ->
+                val key = EXTERNAL_PREFIX + name
+                choices.add(ModelChoice(key, name, key == active))
+            }
+            installedFileNames(context).forEach { fileName ->
+                val name = ModelCatalog.byFileName(fileName)?.displayName
+                    ?: fileName.removePrefix("ggml-").removeSuffix(".bin").removeSuffix(".gguf")
+                choices.add(ModelChoice(fileName, name, fileName == active))
+            }
+        }
+        SherpaPlugins.plugin?.modelRows(context, active)?.forEach { row ->
+            choices.add(ModelChoice(row.id, row.name, row.state == RowState.Active))
+        }
+        return choices
+    }
+
     class ActiveModel internal constructor(val key: String, val path: String)
 
     data class SharedModelUse(val name: String, val inPlace: Boolean)

@@ -1,4 +1,5 @@
 # 0.31
+• Schnelles Wechseln des Modells über die Sprachtastatur hinzugefügt
 • Fehler beim Teilen von Audio mit bereits geöffnetem Scrib behoben
 • Lese-Timeout für Endpunkte skaliert mit der Aufnahmelänge, damit langsame Server lange Aufnahmen verarbeiten können
 • Einfache HTTP-Endpunkte und nutzerinstallierte Zertifikate für selbst gehostete Server erlaubt

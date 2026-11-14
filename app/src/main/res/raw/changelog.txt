@@ -1,4 +1,5 @@
 # 0.31
+• Added quick model switching from the voice keyboard
 • Fixed audio shared to Scrib while the app is already open
 • Scaled the endpoint read timeout with the recording length so slow servers can finish long recordings
 • Allowed plain-HTTP endpoints and user-installed certificates for self-hosted servers
