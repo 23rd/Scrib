@@ -52,6 +52,7 @@ data class ScribUiState(
     val vadSupported: Boolean,
     val liveStats: Boolean,
     val keyboardStats: Boolean,
+    val keyboardAutoListen: Boolean,
     val keyboardUsage: ModelManager.KeyboardUsage,
     val keyboardLayouts: KeyboardLayoutSettings,
     // Progress of the one-off VAD model download, or -1 when nothing is being fetched.
@@ -185,6 +186,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             vadSupported = BuildConfig.LOCAL_MODELS && ModelManager.activeModelUsesVad(ctx),
             liveStats = ModelManager.liveStats(ctx),
             keyboardStats = ModelManager.keyboardStats(ctx),
+            keyboardAutoListen = ModelManager.keyboardAutoListen(ctx),
             keyboardUsage = ModelManager.keyboardUsage(ctx),
             keyboardLayouts = keyboardLayouts ?: KeyboardLayouts.settings(ctx).also { keyboardLayouts = it },
             dictionaryEnabled = Dictionary.isEnabled(ctx),
@@ -364,6 +366,12 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
     fun setKeyboardStats(enabled: Boolean) {
         if (BenchmarkBatchGate.isActive) return
         ModelManager.setKeyboardStats(ctx, enabled)
+        push()
+    }
+
+    fun setKeyboardAutoListen(enabled: Boolean) {
+        if (BenchmarkBatchGate.isActive) return
+        ModelManager.setKeyboardAutoListen(ctx, enabled)
         push()
     }
 
