@@ -1,4 +1,5 @@
 # 0.31
+• Delen van audio met Scrib hersteld wanneer de app al open is
 • De lees-timeout voor endpoints schaalt mee met de opnamelengte zodat trage servers lange opnames kunnen afwerken
 • Gewone HTTP-endpoints en door de gebruiker geïnstalleerde certificaten toegestaan voor zelf gehoste servers
 # 0.30
