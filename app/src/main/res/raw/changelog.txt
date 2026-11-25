@@ -1,5 +1,6 @@
 # 0.31
 • Kept model downloads running after leaving the app
+• Resumed interrupted model downloads on retry when the server supports it
 • Kept transcription progress indeterminate when the model does not report a percentage
 • Added quick model switching from the voice keyboard
 • Fixed audio shared to Scrib while the app is already open

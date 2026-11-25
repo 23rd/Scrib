@@ -1,5 +1,6 @@
 # 0.31
 • Kontynuuje pobieranie modeli po opuszczeniu aplikacji
+• Wznawia przerwane pobieranie modeli przy ponownej próbie, jeśli serwer na to pozwala
 • Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
 • Dodano szybkie przełączanie modeli z klawiatury głosowej
 • Naprawiono udostępnianie dźwięku do już otwartej aplikacji Scrib

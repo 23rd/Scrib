@@ -1,4 +1,5 @@
 • Laat modeldownloads doorlopen na het verlaten van de app
+• Hervat onderbroken modeldownloads bij een nieuwe poging als de server dit ondersteunt
 • Toont onbepaalde voortgang wanneer het model geen percentage meldt
 • De lees-timeout voor endpoints schaalt mee met de opnamelengte zodat trage servers lange opnames kunnen afwerken
 • Gewone HTTP-endpoints en door de gebruiker geïnstalleerde certificaten toegestaan voor zelf gehoste servers

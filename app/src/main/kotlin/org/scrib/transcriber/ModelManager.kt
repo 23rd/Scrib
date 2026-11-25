@@ -5,8 +5,6 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import java.io.File
-import java.net.HttpURLConnection
-import java.net.URL
 
 object ModelManager {
 
@@ -464,50 +462,7 @@ object ModelManager {
         isCancelled: () -> Boolean,
         minSize: Long = MIN_VALID_SIZE
     ) {
-        dest.parentFile?.mkdirs()
-        val temp = File(dest.absolutePath + ".part")
-        temp.delete()
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000
-        connection.readTimeout = 60000
-        connection.instanceFollowRedirects = true
-        try {
-            val total = connection.contentLengthLong
-            connection.inputStream.use { input ->
-                temp.outputStream().use { output ->
-                    val buffer = ByteArray(64 * 1024)
-                    var downloaded = 0L
-                    while (true) {
-                        if (isCancelled()) {
-                            throw CancelledDownloadException()
-                        }
-                        val read = input.read(buffer)
-                        if (read < 0) {
-                            break
-                        }
-                        output.write(buffer, 0, read)
-                        downloaded += read
-                        onProgress(downloaded, total)
-                    }
-                }
-            }
-        } catch (e: Throwable) {
-            temp.delete()
-            throw e
-        } finally {
-            connection.disconnect()
-        }
-        if (temp.length() <= minSize) {
-            temp.delete()
-            throw RuntimeException("Downloaded file is too small")
-        }
-        if (dest.exists()) {
-            dest.delete()
-        }
-        if (!temp.renameTo(dest)) {
-            temp.copyTo(dest, overwrite = true)
-            temp.delete()
-        }
+        ResumableModelDownload.download(url, dest, minSize, onProgress, isCancelled)
     }
 
     fun customModelFromUrl(url: String): WhisperModel {

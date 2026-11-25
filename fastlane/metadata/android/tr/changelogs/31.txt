@@ -1,4 +1,5 @@
 • Uygulamadan ayrıldıktan sonra model indirmeye devam eder
+• Sunucu destekliyorsa yeniden denemede kesilen model indirmelerini sürdürür
 • Model yüzde bildirmediğinde belirsiz ilerleme göstergesi gösterir
 • Uç nokta okuma zaman aşımı kayıt uzunluğuna göre ölçeklenir, böylece yavaş sunucular uzun kayıtları tamamlayabilir
 • Kendi sunucularımız için düz HTTP uç noktalarına ve kullanıcı tarafından yüklenen sertifikalara izin verildi
