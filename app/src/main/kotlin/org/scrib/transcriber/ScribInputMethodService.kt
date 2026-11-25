@@ -53,6 +53,7 @@ class ScribInputMethodService : InputMethodService() {
     private var view: DictationView? = null
     private var stage = Stage.Idle
     private var inputViewStarted = false
+    private var automaticTake = false
     private var stream: AudioStream? = null
     private var microphone: MicrophoneStream? = null
 
@@ -86,6 +87,23 @@ class ScribInputMethodService : InputMethodService() {
         return fresh
     }
 
+    override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        // A restart can change InputType even while the keyboard window remains on screen.
+        // Cancel and invalidate the previous take before reports can reach the new editor.
+        if (automaticTake) abandon()
+        super.onStartInput(info, restarting)
+    }
+
+    override fun onFinishInput() {
+        if (automaticTake) abandon()
+        super.onFinishInput()
+    }
+
+    override fun onUnbindInput() {
+        if (automaticTake) abandon()
+        super.onUnbindInput()
+    }
+
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         notice = null
@@ -94,16 +112,22 @@ class ScribInputMethodService : InputMethodService() {
         render()
         if (inputViewStarted) return
         inputViewStarted = true
-        if (stage == Stage.Idle && ModelManager.keyboardAutoListen(this) &&
-            blocker() == Blocker.None) {
-            listen()
-        }
+        if (!restarting && stage == Stage.Idle && ModelManager.keyboardAutoListen(this) &&
+            KeyboardAutoListenPolicy.allowsEditor(info?.inputType, info?.imeOptions ?: 0, currentInputConnection != null) &&
+            blocker() == Blocker.None
+        ) listen(automatic = true)
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         abandon()
         inputViewStarted = false
+    }
+
+    override fun onWindowHidden() {
+        if (automaticTake) abandon()
+        inputViewStarted = false
+        super.onWindowHidden()
     }
 
     // Never take over the whole screen: the field being dictated into is the point.
@@ -175,7 +199,7 @@ class ScribInputMethodService : InputMethodService() {
         render()
     }
 
-    private fun listen() {
+    private fun listen(automatic: Boolean = false) {
         if (BenchmarkBatchGate.isActive) return
         val id = session
         notice = null
@@ -202,6 +226,7 @@ class ScribInputMethodService : InputMethodService() {
         microphone = capture
         takeStartMs = System.currentTimeMillis()
         ModelManager.addKeyboardSession(this)
+        automaticTake = automatic
         stage = Stage.Listening
         render()
     }
@@ -214,8 +239,9 @@ class ScribInputMethodService : InputMethodService() {
         stage = Stage.Finishing
         ModelManager.addKeyboardTime(this, System.currentTimeMillis() - takeStartMs)
         render()
+        val id = session
         main.postDelayed({
-            if (stage == Stage.Finishing) {
+            if (id == session && stage == Stage.Finishing) {
                 microphone?.stop()
                 stream?.endOfStream()
                 render()
@@ -240,7 +266,10 @@ class ScribInputMethodService : InputMethodService() {
     private fun reset() {
         session++
         stage = Stage.Idle
+        automaticTake = false
         stream = null
+        // A stream may fail or settle by itself while the recorder is still running.
+        microphone?.stop()
         microphone = null
         inserted = ""
         takeStartMs = 0
