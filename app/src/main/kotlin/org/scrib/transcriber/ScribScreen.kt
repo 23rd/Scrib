@@ -154,7 +154,7 @@ fun ScribScreen(
     onDeleteHistory: (String) -> Unit,
     onRenameHistory: (String, String) -> Unit,
     onClearHistory: () -> Unit,
-    onSaveHistoryFile: (String, Uri) -> Unit,
+    onSaveHistoryFile: (String, Uri, TranscriptFormat) -> Unit,
     onTogglePinned: (String) -> Unit,
     benchmarkRuns: List<BenchmarkRun>,
     onAbout: () -> Unit
@@ -370,7 +370,7 @@ fun ScribScreen(
             HistoryEntryDialog(
                 entry,
                 onClose = { openHistoryId = null },
-                onSaveFile = { uri -> onSaveHistoryFile(id, uri) }
+                onSaveFile = { uri, format -> onSaveHistoryFile(id, uri, format) }
             )
         }
     }
@@ -1976,7 +1976,13 @@ private fun TranscriptionDialog(
                 if (hasText) {
                     Spacer(Modifier.height(12.dp))
                     if (finished && t.segments.isNotEmpty()) {
-                        FormatPicker(t.format, onFormat, t.segments.any { it.words.isNotEmpty() })
+                        FormatPicker(
+                            t.format,
+                            onFormat,
+                            TranscriptFormat.entries.filter {
+                                it != TranscriptFormat.WORDS || t.segments.any { cue -> cue.words.isNotEmpty() }
+                            }
+                        )
                         Spacer(Modifier.height(10.dp))
                     }
                     Row(
@@ -2025,7 +2031,7 @@ private fun TranscriptionDialog(
 private fun HistoryEntryDialog(
     entry: TranscriptHistory.Entry,
     onClose: () -> Unit,
-    onSaveFile: (Uri) -> Unit
+    onSaveFile: (Uri, TranscriptFormat) -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val clipboard = LocalClipboardManager.current
@@ -2034,9 +2040,15 @@ private fun HistoryEntryDialog(
     // header and the names offered to Share/Save.
     val displayName = entry.title ?: entry.fileName
     val baseName = (entry.title ?: entry.fileName.substringBeforeLast('.')).ifBlank { "transcript" }
-    val saveContract = remember { CreateTranscriptDocument(null, transcriptMimeType(TranscriptFormat.TXT)) }
+    val formats = remember(entry) { entry.exportFormats() }
+    var selection by rememberSaveable(entry.id) { mutableStateOf(TranscriptFormat.TXT) }
+    var pendingFormat by rememberSaveable(entry.id) { mutableStateOf<TranscriptFormat?>(null) }
+    val format = selection.takeIf { it in formats } ?: TranscriptFormat.TXT
+    val saveContract = remember(format) { CreateTranscriptDocument(null, transcriptMimeType(format)) }
     val saveLauncher = rememberLauncherForActivityResult(saveContract) { uri ->
-        if (uri != null) onSaveFile(uri)
+        val chosen = pendingFormat
+        pendingFormat = null
+        if (uri != null && chosen != null) onSaveFile(uri, chosen)
     }
     AlertDialog(
         onDismissRequest = onClose,
@@ -2047,6 +2059,10 @@ private fun HistoryEntryDialog(
                     Text(entry.text, fontSize = 14.sp, lineHeight = 20.sp, color = cs.onSurface)
                 }
                 Spacer(Modifier.height(12.dp))
+                if (formats.size > 1) {
+                    FormatPicker(format, { selection = it }, formats)
+                    Spacer(Modifier.height(10.dp))
+                }
                 Row(
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
@@ -2063,10 +2079,13 @@ private fun HistoryEntryDialog(
                     }) {
                         Icon(painterResource(R.drawable.ic_action_share), stringResource(R.string.action_share))
                     }
-                    IconButton(onClick = { saveLauncher.launch("$baseName.txt") }) {
+                    IconButton(onClick = {
+                        pendingFormat = format
+                        saveLauncher.launch("$baseName.${format.extension}")
+                    }) {
                         Icon(
                             painterResource(R.drawable.ic_action_save),
-                            stringResource(R.string.action_save_ext, TranscriptFormat.TXT.extension)
+                            stringResource(R.string.action_save_ext, format.extension)
                         )
                     }
                 }
@@ -2189,7 +2208,11 @@ private fun RunProgress(t: TranscribeUi, showStats: Boolean) {
 // Plain text, or one of the timestamped formats. The pick drives the view as well as the export,
 // so what is copied or saved is what was on screen.
 @Composable
-private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat) -> Unit, hasWords: Boolean) {
+private fun FormatPicker(
+    selected: TranscriptFormat,
+    onSelect: (TranscriptFormat) -> Unit,
+    formats: List<TranscriptFormat>
+) {
     val cs = MaterialTheme.colorScheme
     @OptIn(ExperimentalLayoutApi::class)
     FlowRow(
@@ -2197,10 +2220,7 @@ private fun FormatPicker(selected: TranscriptFormat, onSelect: (TranscriptFormat
         verticalArrangement = Arrangement.spacedBy(6.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        TranscriptFormat.entries.forEach { format ->
-            if (format == TranscriptFormat.WORDS && !hasWords) {
-                return@forEach
-            }
+        formats.forEach { format ->
             val on = format == selected
             Surface(
                 color = if (on) cs.primary else cs.surfaceContainer,

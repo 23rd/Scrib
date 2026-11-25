@@ -98,8 +98,8 @@ object TranscriptHistory {
             val segment = array.getJSONObject(i)
             segments.add(
                 TranscriptSegment(
-                    segment.optLong(START),
-                    segment.optLong(END),
+                    segment.optLong(START, -1L),
+                    segment.optLong(END, -1L),
                     segment.optString(TEXT),
                     segment.optBoolean(PARAGRAPH)
                 )
