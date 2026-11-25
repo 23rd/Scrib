@@ -95,21 +95,26 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     throw DecodeException("No audio decoded")
                 }
                 val audioDurationMs = pcm.sampleCount.toLong() * 1000L / SAMPLE_RATE
-                onMetrics(TranscriptionMetrics(audioDurationMs = audioDurationMs, decodeMs = decodeMs))
+                onMetrics(TranscriptionMetrics(
+                    audioDurationMs = audioDurationMs, decodeMs = decodeMs, recognitionInProgress = false
+                ))
                 var modelLoadMs = 0L
                 var modelPssMb = 0
                 var modelMemoryDeltaMb = 0
-                val inferenceStartedAt = SystemClock.elapsedRealtime()
+                var recognitionStartedAt: Long? = null
+                fun recognitionMs(): Long =
+                    recognitionStartedAt?.let { SystemClock.elapsedRealtime() - it } ?: 0L
                 fun reportProgress(percent: Int) {
                     onProgress(percent)
                     onMetrics(
                         TranscriptionMetrics(
                             audioDurationMs = audioDurationMs,
                             decodeMs = decodeMs,
-                            inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                            inferenceMs = recognitionMs(),
                             modelLoadMs = modelLoadMs,
                             modelPssMb = modelPssMb,
-                            modelMemoryDeltaMb = modelMemoryDeltaMb
+                            modelMemoryDeltaMb = modelMemoryDeltaMb,
+                            recognitionInProgress = true
                         )
                     )
                 }
@@ -120,6 +125,10 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                         cancellation,
                         ::reportProgress,
                         onPartial,
+                        onRecognitionStart = {
+                            recognitionStartedAt = SystemClock.elapsedRealtime()
+                            onMetrics(TranscriptionMetrics(recognitionInProgress = true))
+                        },
                         onModelLoad = { metrics ->
                             modelLoadMs = metrics.modelLoadMs
                             modelPssMb = metrics.modelPssMb
@@ -135,10 +144,11 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                         TranscriptionMetrics(
                             audioDurationMs = audioDurationMs,
                             decodeMs = decodeMs,
-                            inferenceMs = SystemClock.elapsedRealtime() - inferenceStartedAt,
+                            inferenceMs = recognitionMs(),
                             modelLoadMs = modelLoadMs,
                             modelPssMb = modelPssMb,
-                            modelMemoryDeltaMb = modelMemoryDeltaMb
+                            modelMemoryDeltaMb = modelMemoryDeltaMb,
+                            recognitionInProgress = false
                         )
                     )
                 }
@@ -159,6 +169,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
+        onRecognitionStart: () -> Unit,
         onModelLoad: (TranscriptionMetrics) -> Unit,
         rangeStartMs: Long
     ): List<TranscriptSegment> {
@@ -174,17 +185,19 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             val loadStartedAt = SystemClock.elapsedRealtime()
             val live = session()
             val info = model()!!.info
+            val modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - loadStartedAt
             val hinted = languageHint?.takeIf { it.isNotEmpty() && it in info.languages }
             val afterLoad = processMemory(appContext)
             onModelLoad(
                 TranscriptionMetrics(
-                    modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - loadStartedAt,
+                    modelLoadMs = modelLoadMs,
                     modelPssMb = afterLoad.pssMb,
                     modelMemoryDeltaMb = if (alreadyLoaded) 0 else maxOf(0, afterLoad.pssMb - beforeLoad.pssMb)
                 )
             )
             val audio = runAudio(pcm, info, rangeStartMs)
             val window = windowSamples(info)
+            onRecognitionStart()
             if (window in 1 until audio.sampleCount) {
                 return transcribeWindows(
                     live, info, audio, window, hinted, abort, cancellation, onProgress, onPartial

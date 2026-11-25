@@ -158,11 +158,10 @@ object TranscriptionRun {
             val startedAt = SystemClock.elapsedRealtime()
             var audioDurationMs = 0L
             var decodeMs = 0L
-            var inferenceMs = 0L
             var modelLoadMs = 0L
             var modelPssMb = 0
             var modelMemoryDeltaMb = 0
-            var inferenceStartedAt = 0L
+            val recognition = RecognitionTiming()
             var peakPssMb = initialMemory.pssMb
             var currentPssMb = initialMemory.pssMb
             var freeRamMb = initialMemory.freeRamMb
@@ -174,15 +173,11 @@ object TranscriptionRun {
                 currentPssMb = memory.pssMb
                 freeRamMb = memory.freeRamMb
                 peakPssMb = maxOf(peakPssMb, currentPssMb)
-                val liveInferenceMs = if (inferenceStartedAt > 0L) {
-                    maxOf(inferenceMs, now - inferenceStartedAt)
-                } else {
-                    inferenceMs
-                }
+
                 TranscriptionMetrics(
                     audioDurationMs = audioDurationMs,
                     decodeMs = decodeMs,
-                    inferenceMs = liveInferenceMs,
+                    inferenceMs = recognition.durationAt(now),
                     modelLoadMs = modelLoadMs,
                     modelPssMb = modelPssMb,
                     modelMemoryDeltaMb = modelMemoryDeltaMb,
@@ -232,18 +227,13 @@ object TranscriptionRun {
                         var audioJustPrepared = false
                         synchronized(metricsLock) {
                             if (metrics.audioDurationMs > 0L) {
+                                audioJustPrepared = audioDurationMs == 0L
                                 audioDurationMs = metrics.audioDurationMs
-                                if (inferenceStartedAt == 0L) {
-                                    inferenceStartedAt = SystemClock.elapsedRealtime()
-                                    audioJustPrepared = true
-                                }
                             }
                             if (metrics.decodeMs > 0L) {
                                 decodeMs = metrics.decodeMs
                             }
-                            if (metrics.inferenceMs > 0L) {
-                                inferenceMs = metrics.inferenceMs
-                            }
+                            recognition.update(metrics, SystemClock.elapsedRealtime())
                             if (metrics.modelLoadMs > 0L) {
                                 modelLoadMs = metrics.modelLoadMs
                             }

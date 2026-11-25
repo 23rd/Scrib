@@ -18,7 +18,9 @@ data class TranscriptionMetrics(
     val totalMs: Long = 0L,
     val pssMb: Int = 0,
     val peakPssMb: Int = 0,
-    val freeRamMb: Int = 0
+    val freeRamMb: Int = 0,
+    // Null: engine has no separate phase signal. True/false: native recognition is active/paused or finished.
+    val recognitionInProgress: Boolean? = null
 ) {
     val hasData: Boolean get() = totalMs > 0L || audioDurationMs > 0L || inferenceMs > 0L || modelLoadMs > 0L
     val rtf: Double?
