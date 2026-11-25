@@ -190,7 +190,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     live, info, audio, window, hinted, abort, cancellation, onProgress, onPartial
                 )
             }
-            onProgress(0)
+            // A single native run has no progress callbacks. Keep the existing
+            // indeterminate indicator until it actually finishes.
             val result = runUtterance(live, info, audio, 0, audio.sampleCount, hinted, abort, onPartial)
             if (cancellation.isCancelled) {
                 throw CancelledException()

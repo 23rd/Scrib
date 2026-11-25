@@ -1,2 +1,3 @@
+• Zeigt einen unbestimmten Transkriptionsfortschritt, wenn das Modell keinen Prozentwert meldet
 • Lese-Timeout für Endpunkte skaliert mit der Aufnahmelänge, damit langsame Server lange Aufnahmen verarbeiten können
 • Einfache HTTP-Endpunkte und nutzerinstallierte Zertifikate für selbst gehostete Server erlaubt

@@ -1,4 +1,5 @@
 # 0.31
+• Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje
 • Añadido cambio rápido de modelo desde el teclado de voz
 • Corregido un fallo al compartir audio con Scrib cuando ya está abierto
 • El timeout de lectura de los endpoints escala con la duración de la grabación para que los servidores lentos terminen las grabaciones largas

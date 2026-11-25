@@ -1,4 +1,5 @@
 # 0.31
+• Model yüzde bildirmediğinde belirsiz ilerleme göstergesi gösterir
 • Sesli klavyeden hızlı model değiştirme eklendi
 • Scrib zaten açıkken ses paylaşımı düzeltildi
 • Uç nokta okuma zaman aşımı kayıt uzunluğuna göre ölçeklenir, böylece yavaş sunucular uzun kayıtları tamamlayabilir

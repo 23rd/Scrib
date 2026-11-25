@@ -1,4 +1,5 @@
 # 0.31
+• Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
 • Dodano szybkie przełączanie modeli z klawiatury głosowej
 • Naprawiono udostępnianie dźwięku do już otwartej aplikacji Scrib
 • Limit czasu odczytu endpointów skaluje się z długością nagrania, więc wolne serwery dokańczają długie nagrania
