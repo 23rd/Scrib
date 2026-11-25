@@ -248,4 +248,9 @@
     <string name="whats_new_entry_sub">Notes de versions antérieures</string>
     <string name="whats_new_title">Nouveautés de %1$s</string>
     <string name="model_download_channel">Téléchargement des modèles</string>
+    <string name="app_theme">Thème de l’application</string>
+    <string name="theme_system">Par défaut du système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="theme_black">Noir</string>
 </resources>

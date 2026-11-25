@@ -1,4 +1,5 @@
 # 0.31
+• Temas del sistema, claro, oscuro y negro añadidos a los ajustes
 • Mantiene las descargas de modelos al salir de la aplicación
 • Reanuda las descargas de modelos interrumpidas al reintentar si el servidor lo permite
 • Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje

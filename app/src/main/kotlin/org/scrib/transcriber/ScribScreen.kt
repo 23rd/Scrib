@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -999,6 +1001,7 @@ private fun SettingsTab(
         if (state.firstRun) {
             item { NudgeCard(state, actions) }
         }
+        item { AppThemeEntry() }
         if (BuildConfig.LOCAL_MODELS) {
             item {
                 Text(
@@ -1098,6 +1101,57 @@ private fun SettingsTab(
             item { BenchmarkEntry(state.benchmarkRuns, onOpenBenchmarks) }
         }
         item { ChangelogEntry(onOpenChangelog) }
+    }
+}
+
+@Composable
+private fun AppThemeEntry() {
+    val context = LocalContext.current
+    val selected = LocalAppThemeMode.current
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+            .testTag("scrib/settings/theme")
+            .clickableRow(RoundedCornerShape(14.dp)) { expanded = true }
+    ) {
+        Row(
+            Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.app_theme), modifier = Modifier.weight(1f))
+            Text(stringResource(selected.title), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+    if (expanded) {
+        AlertDialog(
+            onDismissRequest = { expanded = false },
+            title = { Text(stringResource(R.string.app_theme)) },
+            text = {
+                Column(Modifier.selectableGroup()) {
+                    AppThemeMode.entries.forEach { item ->
+                        Row(
+                            Modifier.fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .selectable(selected = item == selected, role = Role.RadioButton) {
+                                    AppThemePreferences.set(context, item)
+                                    expanded = false
+                                },
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = item == selected, onClick = null)
+                            Text(stringResource(item.title))
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { expanded = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
     }
 }
 

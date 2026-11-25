@@ -1,4 +1,5 @@
 # 0.31
+• Added system, light, dark and black app themes in Settings
 • Kept model downloads running after leaving the app
 • Resumed interrupted model downloads on retry when the server supports it
 • Kept transcription progress indeterminate when the model does not report a percentage

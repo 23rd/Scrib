@@ -248,4 +248,9 @@
     <string name="whats_new_entry_sub">Заметки о прошлых версиях</string>
     <string name="whats_new_title">Что нового в %1$s</string>
     <string name="model_download_channel">Загрузка моделей</string>
+    <string name="app_theme">Тема приложения</string>
+    <string name="theme_system">Как в системе</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_black">Чёрная</string>
 </resources>

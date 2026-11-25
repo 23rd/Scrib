@@ -1,4 +1,5 @@
 # 0.31
+• Systeemthema, licht, donker en zwart toegevoegd aan de instellingen
 • Laat modeldownloads doorlopen na het verlaten van de app
 • Hervat onderbroken modeldownloads bij een nieuwe poging als de server dit ondersteunt
 • Toont onbepaalde voortgang wanneer het model geen percentage meldt

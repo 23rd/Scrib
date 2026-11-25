@@ -1,4 +1,5 @@
 # 0.31
+• Ajout des thèmes système, clair, sombre et noir dans les paramètres
 • Poursuit les téléchargements de modèles après avoir quitté l’application
 • Reprend les téléchargements de modèles si le serveur le permet
 • Affiche une progression indéterminée quand le modèle ne fournit pas de pourcentage

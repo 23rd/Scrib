@@ -1,4 +1,5 @@
 # 0.31
+• Ayarlara sistem, açık, koyu ve siyah uygulama temaları eklendi
 • Uygulamadan ayrıldıktan sonra model indirmeye devam eder
 • Sunucu destekliyorsa yeniden denemede kesilen model indirmelerini sürdürür
 • Model yüzde bildirmediğinde belirsiz ilerleme göstergesi gösterir

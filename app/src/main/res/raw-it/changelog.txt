@@ -1,4 +1,5 @@
 # 0.31
+• Aggiunti i temi di sistema, chiaro, scuro e nero nelle impostazioni
 • Mantiene attivi i download dei modelli quando si lascia l’app
 • Riprende i download interrotti dei modelli al nuovo tentativo se il server lo consente
 • Mostra un avanzamento indeterminato quando il modello non fornisce una percentuale

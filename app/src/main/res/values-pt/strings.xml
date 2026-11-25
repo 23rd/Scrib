@@ -248,4 +248,9 @@
     <string name="whats_new_entry_sub">Notas de versões anteriores</string>
     <string name="whats_new_title">Novidades da versão %1$s</string>
     <string name="model_download_channel">A transferir modelos</string>
+    <string name="app_theme">Tema do aplicativo</string>
+    <string name="theme_system">Padrão do sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Escuro</string>
+    <string name="theme_black">Preto</string>
 </resources>

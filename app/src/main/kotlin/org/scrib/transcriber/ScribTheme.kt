@@ -1,5 +1,7 @@
 package org.scrib.transcriber
 
+import android.app.Activity
+import android.content.SharedPreferences
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -10,12 +12,25 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.core.view.WindowCompat
+
+internal val LocalAppThemeMode = staticCompositionLocalOf { AppThemeMode.SYSTEM }
 
 private val LightScheme = lightColorScheme(
     primary = Color(0xFF006A6A),
@@ -61,17 +76,49 @@ fun ScribTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val dark = isSystemInDarkTheme()
     val context = LocalContext.current
-    val scheme = when {
+    val view = LocalView.current
+    val prefs = remember(context) { AppThemePreferences.get(context) }
+    fun readMode() = AppThemeMode.fromStorage(prefs.getString(AppThemePreferences.KEY, null))
+    var mode by remember(prefs) { mutableStateOf(readMode()) }
+    DisposableEffect(prefs) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == null || key == AppThemePreferences.KEY) mode = readMode()
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        mode = readMode()
+        onDispose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
+    }
+    val dark = mode.usesDarkColors(isSystemInDarkTheme())
+    val palette = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ->
             if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         dark -> DarkScheme
         else -> LightScheme
     }
-    MaterialTheme(colorScheme = scheme) {
-        Box(Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
-            content()
+    val scheme = if (mode == AppThemeMode.BLACK) {
+        palette.copy(background = Color.Black, surface = Color.Black, surfaceContainerLowest = Color.Black)
+    } else palette
+    if (!view.isInEditMode && context is Activity) {
+        SideEffect {
+            val window = context.window
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                @Suppress("DEPRECATION")
+                window.statusBarColor = scheme.background.toArgb()
+                @Suppress("DEPRECATION")
+                window.navigationBarColor = scheme.background.toArgb()
+            }
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !dark
+                isAppearanceLightNavigationBars = !dark
+            }
+        }
+    }
+    CompositionLocalProvider(LocalAppThemeMode provides mode) {
+        MaterialTheme(colorScheme = scheme) {
+            Box(Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }) {
+                content()
+            }
         }
     }
 }
