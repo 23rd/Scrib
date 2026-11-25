@@ -253,4 +253,6 @@
     <string name="theme_light">Claro</string>
     <string name="theme_dark">Oscuro</string>
     <string name="theme_black">Negro</string>
+    <string name="keyboard_auto_listen_title">Escuchar al abrir el teclado</string>
+    <string name="keyboard_auto_listen_sub">Empieza automáticamente en campos de texto normales si hay un modelo local activo.</string>
 </resources>

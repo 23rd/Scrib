@@ -253,4 +253,6 @@
     <string name="theme_light">Jasny</string>
     <string name="theme_dark">Ciemny</string>
     <string name="theme_black">Czarny</string>
+    <string name="keyboard_auto_listen_title">Nasłuchuj po otwarciu klawiatury</string>
+    <string name="keyboard_auto_listen_sub">Uruchamia się automatycznie w zwykłych polach tekstowych, gdy aktywny jest model lokalny.</string>
 </resources>

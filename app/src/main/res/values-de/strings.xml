@@ -253,4 +253,6 @@
     <string name="theme_light">Hell</string>
     <string name="theme_dark">Dunkel</string>
     <string name="theme_black">Schwarz</string>
+    <string name="keyboard_auto_listen_title">Beim Öffnen der Tastatur zuhören</string>
+    <string name="keyboard_auto_listen_sub">Startet in normalen Textfeldern automatisch, wenn ein lokales Modell aktiv ist.</string>
 </resources>

@@ -54,6 +54,7 @@ class ScribInputMethodService : InputMethodService() {
     private var stage = Stage.Idle
     private var inputViewStarted = false
     private var automaticTake = false
+    private var takeEngine: TranscriptionEngine? = null
     private var stream: AudioStream? = null
     private var microphone: MicrophoneStream? = null
 
@@ -207,7 +208,19 @@ class ScribInputMethodService : InputMethodService() {
         val request = StreamRequest()
         request.sampleRate = MicrophoneStream.SAMPLE_RATE
         request.channels = 1
-        val audio = TranscriptionEngine.get(applicationContext).openStream(request, report(id))
+        val engine = if (automatic) {
+            TranscriptionEngine.forAutomaticKeyboard(this) ?: return
+        } else {
+            TranscriptionEngine.get(applicationContext)
+        }
+        val audio = engine.openStream(request, report(id))
+        // This stream is bound to a concrete local engine; never resolve the generic route
+        // again for an automatic take, even if model selection changes during construction.
+        if (automatic && EndpointPlugins.plugin?.isActive(this) == true) {
+            audio.cancel()
+            return
+        }
+        takeEngine = engine
         val capture = MicrophoneStream(
             audio,
             onLevel = { level -> main.post { if (id == session) view?.push(level) } },
@@ -274,7 +287,9 @@ class ScribInputMethodService : InputMethodService() {
         inserted = ""
         takeStartMs = 0
         view?.resetMeter()
-        releaseModel()
+        val engine = takeEngine
+        takeEngine = null
+        if (engine != null) releaseModel(engine)
     }
 
     private fun settled(message: String?) {
@@ -404,12 +419,11 @@ class ScribInputMethodService : InputMethodService() {
     // An input method is kept alive for as long as the user is typing, and a model resident there
     // is hundreds of megabytes the low-memory killer takes first. A run in the app is still using
     // it, though, and reloading under one would only cost that run its warm start.
-    private fun releaseModel() {
-        val app = applicationContext
+    private fun releaseModel(engine: TranscriptionEngine) {
         try {
             background.execute {
                 if (!TranscriptionRun.running) {
-                    TranscriptionEngine.get(app).releaseModel()
+                    engine.releaseModel()
                 }
             }
         } catch (ignore: Exception) {

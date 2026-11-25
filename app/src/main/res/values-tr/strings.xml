@@ -253,4 +253,6 @@
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
     <string name="theme_black">Siyah</string>
+    <string name="keyboard_auto_listen_title">Klavye açıldığında dinle</string>
+    <string name="keyboard_auto_listen_sub">Yerel model etkinse normal metin alanlarında otomatik başlar.</string>
 </resources>

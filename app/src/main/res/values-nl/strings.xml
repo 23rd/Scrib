@@ -253,4 +253,6 @@
     <string name="theme_light">Licht</string>
     <string name="theme_dark">Donker</string>
     <string name="theme_black">Zwart</string>
+    <string name="keyboard_auto_listen_title">Luisteren bij openen toetsenbord</string>
+    <string name="keyboard_auto_listen_sub">Start automatisch in gewone tekstvelden wanneer een lokaal model actief is.</string>
 </resources>

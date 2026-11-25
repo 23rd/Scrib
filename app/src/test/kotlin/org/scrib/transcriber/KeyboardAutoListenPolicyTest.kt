@@ -3,6 +3,8 @@ package org.scrib.transcriber
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -37,5 +39,24 @@ class KeyboardAutoListenPolicyTest {
         assertFalse(KeyboardAutoListenPolicy.allowsEditor(text or 0x00000ff0, 0, true))
         assertFalse(KeyboardAutoListenPolicy.allowsEditor(InputType.TYPE_CLASS_PHONE, 0, true))
         assertFalse(KeyboardAutoListenPolicy.allowsEditor(InputType.TYPE_CLASS_DATETIME, 0, true))
+    }
+
+    @Test fun activeEndpointAndEndpointOnlyBuildNeverResolveAnEngine() {
+        assertNull(KeyboardAutoListenPolicy.localEngine(true, { true }) { error("no route") })
+        assertNull(KeyboardAutoListenPolicy.localEngine(false, { false }) { error("no route") })
+    }
+
+    @Test fun endpointActivationDuringResolutionDiscardsTheLocalRoute() {
+        var active = false
+        assertNull(KeyboardAutoListenPolicy.localEngine(true, { active }) {
+            active = true
+            Any()
+        })
+    }
+
+    @Test fun onlyTheSelectedReadyLocalEngineCanBeReturned() {
+        val local = Any()
+        assertSame(local, KeyboardAutoListenPolicy.localEngine(true, { false }) { local })
+        assertNull(KeyboardAutoListenPolicy.localEngine(true, { false }) { null })
     }
 }

@@ -25,4 +25,15 @@ internal object KeyboardAutoListenPolicy {
             else -> false
         }
     }
+    // Callers can only supply a local factory. Recheck after resolving it in case the user
+    // switched to an endpoint while the selected local engine was being resolved.
+    fun <Engine> localEngine(
+        localModels: Boolean,
+        endpointActive: () -> Boolean,
+        selectedLocal: () -> Engine?
+    ): Engine? {
+        if (!localModels || endpointActive()) return null
+        val engine = selectedLocal() ?: return null
+        return engine.takeUnless { endpointActive() }
+    }
 }

@@ -253,4 +253,6 @@
     <string name="theme_light">Chiaro</string>
     <string name="theme_dark">Scuro</string>
     <string name="theme_black">Nero</string>
+    <string name="keyboard_auto_listen_title">Ascolta all’apertura della tastiera</string>
+    <string name="keyboard_auto_listen_sub">Si avvia automaticamente nei normali campi di testo quando è attivo un modello locale.</string>
 </resources>

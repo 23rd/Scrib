@@ -66,6 +66,22 @@ interface TranscriptionEngine {
             runCatching { EndpointPlugins.plugin?.engine(app)?.releaseModel() }
         }
 
+        internal fun forAutomaticKeyboard(context: Context): TranscriptionEngine? {
+            val app = context.applicationContext
+            return KeyboardAutoListenPolicy.localEngine(
+                localModels = BuildConfig.LOCAL_MODELS,
+                endpointActive = { EndpointPlugins.plugin?.isActive(app) == true },
+                selectedLocal = {
+                    val sherpa = SherpaPlugins.plugin
+                    if (sherpa != null && sherpa.selectedId(app) != null) {
+                        sherpa.takeIf { it.hasActiveModel(app) }?.engine(app)
+                    } else {
+                        LocalModelsPlugins.plugin?.takeIf { ModelManager.openActiveModel(app) != null }?.engine(app)
+                    }
+                }
+            )
+        }
+
         fun get(context: Context): TranscriptionEngine {
             val app = context.applicationContext
             val local = LocalModelsPlugins.plugin

@@ -253,4 +253,6 @@
     <string name="theme_light">Світла</string>
     <string name="theme_dark">Темна</string>
     <string name="theme_black">Чорна</string>
+    <string name="keyboard_auto_listen_title">Слухати під час відкриття клавіатури</string>
+    <string name="keyboard_auto_listen_sub">Запис починається автоматично у звичайних текстових полях, якщо вибрано локальну модель.</string>
 </resources>

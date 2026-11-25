@@ -1097,7 +1097,9 @@ private fun SettingsTab(
             }
             item { SkipSilenceEntry(state, onSkipSilence) }
         }
-        item { KeyboardAutoListenEntry(state.keyboardAutoListen, onKeyboardAutoListen) }
+        if (BuildConfig.LOCAL_MODELS) {
+            item { KeyboardAutoListenEntry(state.keyboardAutoListen, onKeyboardAutoListen) }
+        }
         item { LiveStatsEntry(state.liveStats, onLiveStats) }
         item { KeyboardStatsEntry(state, onKeyboardStats) }
         item { DictionaryEntry(state.dictionaryEnabled, onOpenDictionary) }
