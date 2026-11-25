@@ -1,5 +1,2 @@
-• Kontynuuje pobieranie modeli po opuszczeniu aplikacji
-• Wznawia przerwane pobieranie modeli przy ponownej próbie, jeśli serwer na to pozwala
-• Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
 • Limit czasu odczytu endpointów skaluje się z długością nagrania, więc wolne serwery dokańczają długie nagrania
 • Zezwolono na zwykłe połączenia HTTP i certyfikaty instalowane przez użytkownika dla serwerów własnych

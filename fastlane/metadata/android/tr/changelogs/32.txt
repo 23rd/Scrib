@@ -1,0 +1,6 @@
+• Scrib zaten açıkken ses paylaşımı düzeltildi
+• Sesli klavyeden hızlı model değiştirme eklendi
+• Model yüzde bildirmediğinde belirsiz ilerleme göstergesi gösterir
+• Uygulamadan ayrıldıktan sonra model indirmeye devam eder
+• Sunucu destekliyorsa yeniden denemede kesilen model indirmelerini sürdürür
+• Ayarlara sistem, açık, koyu ve siyah uygulama temaları eklendi

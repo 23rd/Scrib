@@ -1,10 +1,11 @@
-# 0.31
-• Dodano motywy systemowy, jasny, ciemny i czarny w ustawieniach
+# 0.32
+• Naprawiono udostępnianie dźwięku do już otwartej aplikacji Scrib
+• Dodano szybkie przełączanie modeli z klawiatury głosowej
+• Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
 • Kontynuuje pobieranie modeli po opuszczeniu aplikacji
 • Wznawia przerwane pobieranie modeli przy ponownej próbie, jeśli serwer na to pozwala
-• Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
-• Dodano szybkie przełączanie modeli z klawiatury głosowej
-• Naprawiono udostępnianie dźwięku do już otwartej aplikacji Scrib
+• Dodano motywy systemowy, jasny, ciemny i czarny w ustawieniach
+# 0.31
 • Limit czasu odczytu endpointów skaluje się z długością nagrania, więc wolne serwery dokańczają długie nagrania
 • Zezwolono na zwykłe połączenia HTTP i certyfikaty instalowane przez użytkownika dla serwerów własnych
 # 0.30

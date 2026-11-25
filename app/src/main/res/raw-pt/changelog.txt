@@ -1,10 +1,11 @@
-# 0.31
-• Adicionados os temas do sistema, claro, escuro e preto nas configurações
+# 0.32
+• Corrigida a partilha de áudio com o Scrib quando a aplicação já está aberta
+• Adicionada troca rápida de modelo pelo teclado de voz
+• Mostra progresso indeterminado quando o modelo não informa uma percentagem
 • Mantém a transferência dos modelos ao sair da aplicação
 • Retoma as transferências interrompidas de modelos ao tentar novamente, se o servidor o permitir
-• Mostra progresso indeterminado quando o modelo não informa uma percentagem
-• Adicionada troca rápida de modelo pelo teclado de voz
-• Corrigida a partilha de áudio com o Scrib quando a aplicação já está aberta
+• Adicionados os temas do sistema, claro, escuro e preto nas configurações
+# 0.31
 • O tempo limite de leitura dos endpoints escala com a duração da gravação para que servidores lentos concluam gravações longas
 • Permitidos endpoints HTTP simples e certificados instalados pelo usuário para servidores auto-hospedados
 # 0.30

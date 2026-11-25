@@ -1,10 +1,11 @@
-# 0.31
-• Added system, light, dark and black app themes in Settings
+# 0.32
+• Fixed audio shared to Scrib while the app is already open
+• Added quick model switching from the voice keyboard
+• Kept transcription progress indeterminate when the model does not report a percentage
 • Kept model downloads running after leaving the app
 • Resumed interrupted model downloads on retry when the server supports it
-• Kept transcription progress indeterminate when the model does not report a percentage
-• Added quick model switching from the voice keyboard
-• Fixed audio shared to Scrib while the app is already open
+• Added system, light, dark and black app themes in Settings
+# 0.31
 • Scaled the endpoint read timeout with the recording length so slow servers can finish long recordings
 • Allowed plain-HTTP endpoints and user-installed certificates for self-hosted servers
 # 0.30

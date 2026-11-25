@@ -1,0 +1,6 @@
+• Delen van audio met Scrib hersteld wanneer de app al open is
+• Snel wisselen van model vanaf het spraaktoetsenbord toegevoegd
+• Toont onbepaalde voortgang wanneer het model geen percentage meldt
+• Laat modeldownloads doorlopen na het verlaten van de app
+• Hervat onderbroken modeldownloads bij een nieuwe poging als de server dit ondersteunt
+• Systeemthema, licht, donker en zwart toegevoegd aan de instellingen

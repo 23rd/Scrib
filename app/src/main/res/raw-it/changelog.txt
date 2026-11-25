@@ -1,10 +1,11 @@
-# 0.31
-• Aggiunti i temi di sistema, chiaro, scuro e nero nelle impostazioni
+# 0.32
+• Corretto un problema nella condivisione di audio con Scrib già aperto
+• Aggiunto il cambio rapido di modello dalla tastiera vocale
+• Mostra un avanzamento indeterminato quando il modello non fornisce una percentuale
 • Mantiene attivi i download dei modelli quando si lascia l’app
 • Riprende i download interrotti dei modelli al nuovo tentativo se il server lo consente
-• Mostra un avanzamento indeterminato quando il modello non fornisce una percentuale
-• Aggiunto il cambio rapido di modello dalla tastiera vocale
-• Corretto un problema nella condivisione di audio con Scrib già aperto
+• Aggiunti i temi di sistema, chiaro, scuro e nero nelle impostazioni
+# 0.31
 • Il timeout di lettura degli endpoint scala con la durata della registrazione per consentire ai server lenti di completare le registrazioni lunghe
 • Consentiti endpoint HTTP in chiaro e certificati installati dall'utente per server self-hosted
 # 0.30

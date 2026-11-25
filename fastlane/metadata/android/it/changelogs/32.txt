@@ -1,0 +1,6 @@
+• Corretto un problema nella condivisione di audio con Scrib già aperto
+• Aggiunto il cambio rapido di modello dalla tastiera vocale
+• Mostra un avanzamento indeterminato quando il modello non fornisce una percentuale
+• Mantiene attivi i download dei modelli quando si lascia l’app
+• Riprende i download interrotti dei modelli al nuovo tentativo se il server lo consente
+• Aggiunti i temi di sistema, chiaro, scuro e nero nelle impostazioni

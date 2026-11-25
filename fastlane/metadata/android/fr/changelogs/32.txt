@@ -1,0 +1,6 @@
+• Correction du partage audio avec Scrib lorsque l’application est déjà ouverte
+• Ajout du changement rapide de modèle depuis le clavier vocal
+• Affiche une progression indéterminée quand le modèle ne fournit pas de pourcentage
+• Poursuit les téléchargements de modèles après avoir quitté l’application
+• Reprend les téléchargements de modèles si le serveur le permet
+• Ajout des thèmes système, clair, sombre et noir dans les paramètres

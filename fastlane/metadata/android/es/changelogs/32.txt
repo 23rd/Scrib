@@ -1,0 +1,6 @@
+• Corregido un fallo al compartir audio con Scrib cuando ya está abierto
+• Añadido cambio rápido de modelo desde el teclado de voz
+• Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje
+• Mantiene las descargas de modelos al salir de la aplicación
+• Reanuda las descargas de modelos interrumpidas al reintentar si el servidor lo permite
+• Temas del sistema, claro, oscuro y negro añadidos a los ajustes

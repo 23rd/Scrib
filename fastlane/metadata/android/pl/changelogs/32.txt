@@ -1,0 +1,6 @@
+• Naprawiono udostępnianie dźwięku do już otwartej aplikacji Scrib
+• Dodano szybkie przełączanie modeli z klawiatury głosowej
+• Pokazuje nieokreślony postęp, gdy model nie podaje wartości procentowej
+• Kontynuuje pobieranie modeli po opuszczeniu aplikacji
+• Wznawia przerwane pobieranie modeli przy ponownej próbie, jeśli serwer na to pozwala
+• Dodano motywy systemowy, jasny, ciemny i czarny w ustawieniach

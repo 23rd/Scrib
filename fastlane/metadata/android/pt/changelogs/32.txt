@@ -1,0 +1,6 @@
+• Corrigida a partilha de áudio com o Scrib quando a aplicação já está aberta
+• Adicionada troca rápida de modelo pelo teclado de voz
+• Mostra progresso indeterminado quando o modelo não informa uma percentagem
+• Mantém a transferência dos modelos ao sair da aplicação
+• Retoma as transferências interrompidas de modelos ao tentar novamente, se o servidor o permitir
+• Adicionados os temas do sistema, claro, escuro e preto nas configurações

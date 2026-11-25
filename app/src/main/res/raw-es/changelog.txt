@@ -1,10 +1,11 @@
-# 0.31
-• Temas del sistema, claro, oscuro y negro añadidos a los ajustes
+# 0.32
+• Corregido un fallo al compartir audio con Scrib cuando ya está abierto
+• Añadido cambio rápido de modelo desde el teclado de voz
+• Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje
 • Mantiene las descargas de modelos al salir de la aplicación
 • Reanuda las descargas de modelos interrumpidas al reintentar si el servidor lo permite
-• Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje
-• Añadido cambio rápido de modelo desde el teclado de voz
-• Corregido un fallo al compartir audio con Scrib cuando ya está abierto
+• Temas del sistema, claro, oscuro y negro añadidos a los ajustes
+# 0.31
 • El timeout de lectura de los endpoints escala con la duración de la grabación para que los servidores lentos terminen las grabaciones largas
 • Permitidos los endpoints HTTP sin cifrar y los certificados instalados por el usuario para servidores autohospedados
 # 0.30
