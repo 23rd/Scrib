@@ -53,7 +53,7 @@ can run and in how much they weigh — not in what they promise you.
 
 Separate application ids, so all three install side by side and none replaces
 another. Each is attached to every
-[GitHub release](https://github.com/23rd/Scrib/releases/tag/latest) as a
+[GitHub release](https://github.com/23rd/Scrib/releases/latest) as a
 universal apk and once per architecture — `arm64-v8a` for nearly every phone,
 `armeabi-v7a` for older 32-bit ones, `x86_64` and `x86` for emulators and
 Waydroid. Every one of them carries the same version code, so switching between
