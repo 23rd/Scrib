@@ -1,22 +1,57 @@
-name: Latest APK
+name: Versioned APK
 
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing version tag (empty uses the newest version tag)'
+        required: false
+        type: string
 
 permissions:
-  contents: write
-
-concurrency:
-  group: latest-apk
-  cancel-in-progress: true
+  contents: read
 
 env:
   ALL_ABIS: arm64-v8a,armeabi-v7a,x86_64,x86
 
 jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      commit: ${{ steps.version.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - id: version
+        name: Resolve the exact version tag
+        env:
+          REQUESTED_TAG: ${{ inputs.tag }}
+        run: |
+          stable_tag='^v[0-9]+\.[0-9]+(\.[0-9]+)?$'
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            tag="$GITHUB_REF_NAME"
+          elif [[ -n "$REQUESTED_TAG" ]]; then
+            tag="$REQUESTED_TAG"
+          else
+            tag="$(git tag --list 'v*' --sort=-version:refname | grep -E "$stable_tag" | sed -n '1p')"
+          fi
+          [[ "$tag" =~ $stable_tag ]]
+          commit="$(git rev-parse --verify "refs/tags/$tag^{commit}")"
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            [[ "$commit" == "$(git rev-parse "$GITHUB_SHA^{commit}")" ]]
+          fi
+          version="$(git show "$commit:app/build.gradle" | sed -n "s/^ *versionName '\([^']*\)'$/\1/p")"
+          [[ "$version" == "${tag#v}" ]]
+          printf 'tag=%s\ncommit=%s\n' "$tag" "$commit" >> "$GITHUB_OUTPUT"
+
   build:
+    needs: resolve
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -36,15 +71,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ needs.resolve.outputs.commit }}
+          persist-credentials: false
           submodules: recursive
-
-      # Manual runs rebuild the same tag a push would have built.
-      - name: Switch to the newest release tag
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git checkout "$(git tag --list 'v*' --sort=-version:refname | head -n1)"
-          git submodule update --init --recursive
 
       - uses: actions/setup-java@v4
         with:
@@ -99,32 +128,30 @@ jobs:
 
   release:
     name: Publish
-    needs: build
+    needs: [resolve, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: scrib-release-publication
+      queue: max
+    env:
+      TAG: ${{ needs.resolve.outputs.tag }}
+      RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Switch to the newest release tag
-        if: github.event_name == 'workflow_dispatch'
-        run: git checkout "$(git tag --list 'v*' --sort=-version:refname | head -n1)"
-
-      - name: Resolve the version
-        run: |
-          tag="$(git describe --tags --exact-match --match 'v*')"
-          grep -qF "versionName '${tag#v}'" app/build.gradle
-          echo "VERSION=${tag#v}" >> "$GITHUB_ENV"
+          persist-credentials: false
 
       - uses: actions/download-artifact@v4
         with:
           pattern: apk-*
           path: apks
-          merge-multiple: true
 
       - name: Write the release notes
         run: |
+          VERSION="${TAG#v}"
           cat > notes.md <<EOF
           Version $VERSION · $(date -u +%Y-%m-%d)
 
@@ -141,23 +168,7 @@ jobs:
           All of them are signed with our own key, so none of them can update an F-Droid install.
           EOF
 
-      - name: Update the latest release
+      - name: Publish the versioned release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          git push --force origin HEAD:refs/tags/latest
-          if gh release view latest >/dev/null 2>&1; then
-            gh release edit latest --title "Scrib $VERSION" --notes-file notes.md
-            # --clobber replaces what it is given and leaves the rest, so a renamed or dropped
-            # build would sit on the release page for ever.
-            fresh="$(cd apks && ls *.apk | tr '\n' ' ')"
-            for asset in $(gh release view latest --json assets --jq '.assets[].name'); do
-              case " $fresh " in
-                *" $asset "*) ;;
-                *) gh release delete-asset latest "$asset" -y ;;
-              esac
-            done
-            gh release upload latest apks/*.apk --clobber
-          else
-            gh release create latest apks/*.apk --title "Scrib $VERSION" --notes-file notes.md
-          fi
+        run: bash scripts/publish-versioned-release.sh "$TAG" "$RELEASE_COMMIT" apks notes.md
