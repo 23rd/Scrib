@@ -1,0 +1,4 @@
+• Dodano opcjonalne automatyczne nasłuchiwanie w klawiaturze głosowej, tylko z modelem lokalnym i poza polami haseł oraz innymi polami wrażliwymi.
+• Dodano eksport nagrań ze znacznikami czasu do SRT, VTT i LRC.
+• Rozwijane statystyki transkrypcji pokazują bieżący etap i czas od rozpoczęcia.
+• Czas ładowania modelu Whisper nie jest już wliczany do czasu rozpoznawania.

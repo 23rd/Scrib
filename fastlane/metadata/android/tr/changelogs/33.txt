@@ -1,0 +1,4 @@
+• Sesli klavyeye isteğe bağlı otomatik dinleme eklendi. Yalnızca yerel modelle çalışır; parola alanlarında ve diğer hassas alanlarda devreye girmez.
+• Zaman damgalı kayıtlar için SRT, VTT ve LRC dışa aktarma eklendi.
+• Genişletilebilir yazıya dökme istatistikleri mevcut aşamayı ve geçen süreyi gösteriyor.
+• Whisper modelinin yüklenme süresi artık tanıma süresine dahil edilmiyor.

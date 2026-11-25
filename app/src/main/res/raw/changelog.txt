@@ -1,3 +1,8 @@
+# 0.33
+• Added optional automatic listening to the voice keyboard with a local model. It stays off in passwords and other sensitive fields.
+• Added SRT, VTT and LRC exports for recordings saved with timestamps.
+• Added expandable transcription stats with the current stage and elapsed time.
+• Fixed Whisper stats counting model loading as recognition time.
 # 0.32
 • Fixed audio shared to Scrib while the app is already open
 • Added quick model switching from the voice keyboard

@@ -1,0 +1,4 @@
+• Ajout de l’écoute automatique facultative au clavier vocal, uniquement avec un modèle local et hors des champs de mot de passe ou autres champs sensibles.
+• Ajout de l’exportation des enregistrements horodatés en SRT, VTT et LRC.
+• Les statistiques de transcription sont dépliables et indiquent l’étape en cours et le temps écoulé.
+• Le temps de chargement du modèle Whisper n’est plus compté comme temps de reconnaissance.

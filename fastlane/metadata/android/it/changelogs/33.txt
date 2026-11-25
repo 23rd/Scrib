@@ -1,0 +1,4 @@
+• Aggiunto l’ascolto automatico facoltativo nella tastiera vocale, solo con un modello locale e non nei campi per password o in altri campi sensibili.
+• Aggiunta l’esportazione delle registrazioni con marcature temporali in SRT, VTT e LRC.
+• Le statistiche di trascrizione sono espandibili e mostrano la fase corrente e il tempo trascorso.
+• Il caricamento del modello Whisper non è più incluso nel tempo di riconoscimento.

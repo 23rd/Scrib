@@ -1,0 +1,4 @@
+• Optioneel automatisch luisteren toegevoegd aan het spraaktoetsenbord, alleen met een lokaal model en niet in wachtwoordvelden of andere gevoelige velden.
+• Opnamen met tijdcodes kunnen worden geëxporteerd als SRT, VTT en LRC.
+• De uitklapbare transcriptiestatistieken tonen de huidige fase en de verstreken tijd.
+• De laadtijd van het Whisper-model telt niet meer mee als herkenningstijd.

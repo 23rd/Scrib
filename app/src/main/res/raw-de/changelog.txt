@@ -1,3 +1,8 @@
+# 0.33
+• Automatisches Zuhören für die Sprachtastatur hinzugefügt: optional, nur mit lokalem Modell und nicht in Passwortfeldern oder anderen sensiblen Feldern.
+• Aufnahmen mit Zeitstempeln lassen sich als SRT, VTT und LRC exportieren.
+• Die aufklappbare Transkriptionsstatistik zeigt die aktuelle Phase und die verstrichene Zeit.
+• Die Whisper-Statistik zählt das Laden des Modells nicht mehr zur Erkennungszeit.
 # 0.32
 • Fehler beim Teilen von Audio mit bereits geöffnetem Scrib behoben
 • Schnelles Wechseln des Modells über die Sprachtastatur hinzugefügt

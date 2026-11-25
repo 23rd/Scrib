@@ -1,0 +1,4 @@
+• Adicionada a escuta automática opcional ao teclado de voz, apenas com um modelo local e nunca em campos de palavras-passe ou outros campos sensíveis.
+• Adicionada a exportação de gravações com marcas temporais em SRT, VTT e LRC.
+• As estatísticas de transcrição são expansíveis e mostram a fase atual e o tempo decorrido.
+• O carregamento do modelo Whisper deixou de contar como tempo de reconhecimento.

@@ -1,3 +1,8 @@
+# 0.33
+• Adicionada a escuta automática opcional ao teclado de voz, apenas com um modelo local e nunca em campos de palavras-passe ou outros campos sensíveis.
+• Adicionada a exportação de gravações com marcas temporais em SRT, VTT e LRC.
+• As estatísticas de transcrição são expansíveis e mostram a fase atual e o tempo decorrido.
+• O carregamento do modelo Whisper deixou de contar como tempo de reconhecimento.
 # 0.32
 • Corrigida a partilha de áudio com o Scrib quando a aplicação já está aberta
 • Adicionada troca rápida de modelo pelo teclado de voz
