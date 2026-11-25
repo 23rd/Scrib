@@ -21,7 +21,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
 
 enum class RowState { NotDownloaded, Downloading, Installed, Active, Failed }
 
@@ -94,17 +93,13 @@ data class TranscribeUi(
 
 class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
-    private data class Progress(val pct: Int, val model: WhisperModel?)
-
-    private val downloads = ConcurrentHashMap<String, Progress>()
-    private val jobs = ConcurrentHashMap<String, Job>()
-    private val failed = ConcurrentHashMap.newKeySet<String>()
+    private val downloads get() = ModelDownloads.state.value.active
+    private val failed get() = ModelDownloads.state.value.failed
+    private val vadPct get() = ModelDownloads.state.value.vadPercent
 
     @Volatile private var statusMsg = ""
     @Volatile private var statusError = false
-    @Volatile private var vadPct = -1
     @Volatile private var benchmarkBatch = BenchmarkBatchState()
-    private var vadJob: Job? = null
     private var keyboardLayouts: KeyboardLayoutSettings? = null
 
     @Volatile private var sherpaBusy = false
@@ -114,6 +109,22 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     private val _state = MutableStateFlow(build())
     val state: StateFlow<ScribUiState> = _state
+
+    init {
+        viewModelScope.launch {
+            var status: ModelDownloads.Status? = null
+            ModelDownloads.state.collect { snapshot ->
+                if (snapshot.status !== status) {
+                    status = snapshot.status
+                    snapshot.status?.let {
+                        statusMsg = it.message
+                        statusError = it.error
+                    }
+                }
+                push()
+            }
+        }
+    }
 
     private fun push() { _state.value = build() }
 
@@ -138,7 +149,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 multilingual = m.multilingual,
                 sizeMb = (m.approxBytes / 1_000_000).toInt(), tier = m.tier,
                 recommended = m.recommended, custom = false,
-                state = stateOf(m.fileName), progress = downloads[m.fileName]?.pct ?: 0,
+                state = stateOf(m.fileName), progress = downloads[m.fileName]?.percent ?: 0,
                 pinned = m.fileName in pinnedIds
             )
         }
@@ -154,7 +165,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
                 badge = str(if (multi) R.string.badge_multilingual else R.string.badge_english_only),
                 multilingual = multi, sizeMb = 0,
                 tier = downloads[f]?.model?.tier ?: 3, recommended = false, custom = true,
-                state = stateOf(f), progress = downloads[f]?.pct ?: 0,
+                state = stateOf(f), progress = downloads[f]?.percent ?: 0,
                 pinned = f in pinnedIds
             )
         }.toMutableList()
@@ -250,108 +261,28 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun startDownload(model: WhisperModel, activateOnComplete: Boolean = false, statusLabel: String? = null) {
         if (BenchmarkBatchGate.isActive) return
-        val f = model.fileName
-        if (downloads.containsKey(f)) return
-        failed.remove(f)
-        downloads[f] = Progress(0, model)
-        if (statusLabel != null) { statusMsg = str(R.string.status_ellipsis, statusLabel); statusError = false }
-        push()
-        val job = viewModelScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    ModelManager.download(ctx, model,
-                        onProgress = { done, total ->
-                            val pct = if (total > 0) ((done * 100) / total).toInt() else -1
-                            if (downloads[f]?.pct != pct) {
-                                downloads[f] = Progress(pct, model)
-                                if (statusLabel != null && pct >= 0) {
-                                    statusMsg = str(R.string.status_pct, statusLabel, pct)
-                                    statusError = false
-                                }
-                                push()
-                            }
-                        },
-                        isCancelled = { !isActive })
-                }
-                downloads.remove(f); jobs.remove(f)
-                if (activateOnComplete) ModelManager.setActive(ctx, f)
-                if (statusLabel != null) { statusMsg = str(R.string.status_ready_active, model.displayName); statusError = false }
-                push()
-            } catch (e: ModelManager.CancelledDownloadException) {
-                downloads.remove(f); jobs.remove(f)
-                if (statusLabel != null) statusMsg = ""
-                push()
-            } catch (e: Throwable) {
-                downloads.remove(f); jobs.remove(f); failed.add(f)
-                statusMsg = str(R.string.status_download_failed_named, model.displayName)
-                statusError = true
-                push()
-            }
-        }
-        jobs[f] = job
+        ModelDownloads.model(ctx, model, activateOnComplete, statusLabel)
     }
 
-    fun cancel(fileName: String) {
-        jobs.remove(fileName)?.cancel()
-        downloads.remove(fileName)
-        push()
-    }
+    fun cancel(fileName: String) = ModelDownloads.cancel(fileName)
 
-    // Skipping silence needs a model of its own, fetched the first time it is asked for. The
-    // setting only goes on once that has landed, so it can never point at a model that isn't there.
+    // The setting only goes on once its detector is present, and can cancel a pending download.
     fun setSkipSilence(enabled: Boolean) {
         if (BenchmarkBatchGate.isActive) return
         if (enabled && !ModelManager.activeModelUsesVad(ctx)) return
         if (!enabled) {
-            vadJob?.cancel(); vadJob = null; vadPct = -1
+            ModelDownloads.cancelVad()
             ModelManager.setSkipSilence(ctx, false)
-            push(); return
+            push()
+            return
         }
         val sherpaActive = SherpaPlugins.plugin?.selectedId(ctx) != null
-        val installed = if (sherpaActive) {
-            ModelManager.isSherpaVadInstalled(ctx)
-        } else {
-            ModelManager.isVadInstalled(ctx)
-        }
+        val installed = if (sherpaActive) ModelManager.isSherpaVadInstalled(ctx) else ModelManager.isVadInstalled(ctx)
         if (installed) {
             ModelManager.setSkipSilence(ctx, true)
-            push(); return
-        }
-        if (vadJob != null) return
-        vadPct = 0
-        push()
-        vadJob = viewModelScope.launch {
-            try {
-                withContext(Dispatchers.IO) {
-                    if (sherpaActive) {
-                        ModelManager.downloadSherpaVad(ctx,
-                            onProgress = { done, total ->
-                                val pct = if (total > 0) ((done * 100) / total).toInt() else -1
-                                if (vadPct != pct) {
-                                    vadPct = pct
-                                    push()
-                                }
-                            },
-                            isCancelled = { !isActive })
-                    } else {
-                        ModelManager.downloadVad(ctx,
-                            onProgress = { done, total ->
-                                val pct = if (total > 0) ((done * 100) / total).toInt() else -1
-                                if (vadPct != pct) {
-                                    vadPct = pct
-                                    push()
-                                }
-                            },
-                            isCancelled = { !isActive })
-                    }
-                }
-                ModelManager.setSkipSilence(ctx, true)
-            } catch (e: ModelManager.CancelledDownloadException) {
-            } catch (e: Throwable) {
-                statusMsg = str(R.string.status_vad_failed); statusError = true
-            }
-            vadPct = -1; vadJob = null
             push()
+        } else {
+            ModelDownloads.vad(ctx, sherpaActive)
         }
     }
 
@@ -426,7 +357,7 @@ class ScribViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
         ModelManager.delete(ctx, fileName)
-        failed.remove(fileName)
+        ModelDownloads.clearFailure(fileName)
         push()
     }
 

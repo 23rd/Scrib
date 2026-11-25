@@ -1,3 +1,4 @@
+• Mantém a transferência dos modelos ao sair da aplicação
 • Mostra progresso indeterminado quando o modelo não informa uma percentagem
 • O tempo limite de leitura dos endpoints escala com a duração da gravação para que servidores lentos concluam gravações longas
 • Permitidos endpoints HTTP simples e certificados instalados pelo usuário para servidores auto-hospedados

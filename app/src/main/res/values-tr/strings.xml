@@ -247,4 +247,5 @@
     <string name="whats_new_entry_title">Yenilikler ve değişiklik günlüğü</string>
     <string name="whats_new_entry_sub">Önceki sürümlerin sürüm notları</string>
     <string name="whats_new_title">%1$s sürümündeki yenilikler</string>
+    <string name="model_download_channel">Modeller indiriliyor</string>
 </resources>

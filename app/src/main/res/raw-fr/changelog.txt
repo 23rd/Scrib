@@ -1,4 +1,5 @@
 # 0.31
+• Poursuit les téléchargements de modèles après avoir quitté l’application
 • Affiche une progression indéterminée quand le modèle ne fournit pas de pourcentage
 • Ajout du changement rapide de modèle depuis le clavier vocal
 • Correction du partage audio avec Scrib lorsque l’application est déjà ouverte

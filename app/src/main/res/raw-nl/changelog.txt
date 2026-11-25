@@ -1,4 +1,5 @@
 # 0.31
+• Laat modeldownloads doorlopen na het verlaten van de app
 • Toont onbepaalde voortgang wanneer het model geen percentage meldt
 • Snel wisselen van model vanaf het spraaktoetsenbord toegevoegd
 • Delen van audio met Scrib hersteld wanneer de app al open is

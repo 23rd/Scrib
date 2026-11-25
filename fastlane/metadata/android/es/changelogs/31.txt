@@ -1,3 +1,4 @@
+• Mantiene las descargas de modelos al salir de la aplicación
 • Muestra un progreso indeterminado cuando el modelo no informa de un porcentaje
 • El timeout de lectura de los endpoints escala con la duración de la grabación para que los servidores lentos terminen las grabaciones largas
 • Permitidos los endpoints HTTP sin cifrar y los certificados instalados por el usuario para servidores autohospedados

@@ -58,6 +58,10 @@
             android:foregroundServiceType="dataSync"/>
 
         <service
+            android:name=".ModelDownloadService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync"/>
+        <service
             android:name=".SherpaValidationService"
             android:exported="false"
             android:process=":sherpa_validation"/>

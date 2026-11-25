@@ -1,4 +1,5 @@
 # 0.31
+• Mantiene attivi i download dei modelli quando si lascia l’app
 • Mostra un avanzamento indeterminato quando il modello non fornisce una percentuale
 • Aggiunto il cambio rapido di modello dalla tastiera vocale
 • Corretto un problema nella condivisione di audio con Scrib già aperto

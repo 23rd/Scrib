@@ -1,4 +1,5 @@
 # 0.31
+• Setzt Modelldownloads nach dem Verlassen der App fort
 • Zeigt einen unbestimmten Transkriptionsfortschritt, wenn das Modell keinen Prozentwert meldet
 • Schnelles Wechseln des Modells über die Sprachtastatur hinzugefügt
 • Fehler beim Teilen von Audio mit bereits geöffnetem Scrib behoben

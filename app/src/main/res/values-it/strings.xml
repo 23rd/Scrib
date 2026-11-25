@@ -247,4 +247,5 @@
     <string name="whats_new_entry_title">Novità e registro delle modifiche</string>
     <string name="whats_new_entry_sub">Note delle versioni precedenti</string>
     <string name="whats_new_title">Novità della versione %1$s</string>
+    <string name="model_download_channel">Download dei modelli</string>
 </resources>

@@ -1,3 +1,4 @@
+• Kept model downloads running after leaving the app
 • Kept transcription progress indeterminate when the model does not report a percentage
 • Scaled the endpoint read timeout with the recording length so slow servers can finish long recordings
 • Allowed plain-HTTP endpoints and user-installed certificates for self-hosted servers

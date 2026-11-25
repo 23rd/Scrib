@@ -1,4 +1,5 @@
 # 0.31
+• Uygulamadan ayrıldıktan sonra model indirmeye devam eder
 • Model yüzde bildirmediğinde belirsiz ilerleme göstergesi gösterir
 • Sesli klavyeden hızlı model değiştirme eklendi
 • Scrib zaten açıkken ses paylaşımı düzeltildi
