@@ -135,6 +135,7 @@ fun ScribScreen(
     onSkipSilence: (Boolean) -> Unit,
     onLiveStats: (Boolean) -> Unit,
     onKeyboardStats: (Boolean) -> Unit,
+    onKeyboardAutoListen: (Boolean) -> Unit,
     onConfigureKeyboardLayouts: (Boolean, List<String>, List<String>) -> Unit,
     onImportSherpa: (String, String, List<String>?, Map<String, Uri>, (Throwable?) -> Unit) -> Unit,
     sherpaPlugin: SherpaPlugin?,
@@ -294,6 +295,7 @@ fun ScribScreen(
                     onSkipSilence = onSkipSilence,
                     onLiveStats = onLiveStats,
                     onKeyboardStats = onKeyboardStats,
+                    onKeyboardAutoListen = onKeyboardAutoListen,
                     onOpenDictionary = { openDictionary(context) },
                     onOpenBenchmarks = {
                         if (BenchmarkStore.isFullscreen(context)) {
@@ -984,6 +986,7 @@ private fun SettingsTab(
     onSkipSilence: (Boolean) -> Unit,
     onLiveStats: (Boolean) -> Unit,
     onKeyboardStats: (Boolean) -> Unit,
+    onKeyboardAutoListen: (Boolean) -> Unit,
     onOpenDictionary: () -> Unit,
     onOpenBenchmarks: () -> Unit,
     onOpenChangelog: () -> Unit,
@@ -1094,6 +1097,7 @@ private fun SettingsTab(
             }
             item { SkipSilenceEntry(state, onSkipSilence) }
         }
+        item { KeyboardAutoListenEntry(state.keyboardAutoListen, onKeyboardAutoListen) }
         item { LiveStatsEntry(state.liveStats, onLiveStats) }
         item { KeyboardStatsEntry(state, onKeyboardStats) }
         item { DictionaryEntry(state.dictionaryEnabled, onOpenDictionary) }
@@ -2264,6 +2268,39 @@ private fun SkipSilenceEntry(state: ScribUiState, onToggle: (Boolean) -> Unit) {
             }
             Spacer(Modifier.width(8.dp))
             Switch(checked = state.skipSilence && usable, enabled = !busy && usable, onCheckedChange = { onToggle(it) })
+        }
+    }
+}
+
+@Composable
+private fun KeyboardAutoListenEntry(enabled: Boolean, onToggle: (Boolean) -> Unit) {
+    val cs = MaterialTheme.colorScheme
+    Surface(
+        color = cs.surfaceContainer, shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)
+            .clickableRow(RoundedCornerShape(16.dp)) { onToggle(!enabled) }
+    ) {
+        Row(
+            Modifier.padding(start = 16.dp, end = 12.dp, top = 14.dp, bottom = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(Modifier.width(24.dp), contentAlignment = Alignment.Center) {
+                Text("🎙️", fontSize = 18.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.keyboard_auto_listen_title),
+                    fontSize = 14.sp, fontWeight = FontWeight.Bold, color = cs.onSurface
+                )
+                Text(
+                    stringResource(R.string.keyboard_auto_listen_sub),
+                    fontSize = 12.sp, fontWeight = FontWeight.Medium,
+                    color = cs.onSurfaceVariant, lineHeight = 16.sp
+                )
+            }
+            Spacer(Modifier.width(8.dp))
+            Switch(checked = enabled, onCheckedChange = onToggle)
         }
     }
 }
