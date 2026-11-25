@@ -255,4 +255,22 @@
     <string name="theme_black">Zwart</string>
     <string name="keyboard_auto_listen_title">Luisteren bij openen toetsenbord</string>
     <string name="keyboard_auto_listen_sub">Start automatisch in gewone tekstvelden wanneer een lokaal model actief is.</string>
+    <string name="run_stats_title">Statistieken</string>
+    <string name="run_stats_preparing">Audio voorbereiden</string>
+    <string name="run_stats_transcribing">Spraak transcriberen</string>
+    <string name="run_stats_processing">Audio verwerken</string>
+    <string name="run_stats_complete">Gereed</string>
+    <string name="run_stats_expand">Statistieken uitklappen</string>
+    <string name="run_stats_collapse">Statistieken inklappen</string>
+    <string name="run_stats_model">Model</string>
+    <string name="run_stats_decode">Decodering</string>
+    <string name="run_stats_load">Model laden</string>
+    <string name="run_stats_inference">Herkenning</string>
+    <string name="run_stats_audio">Audioduur</string>
+    <string name="run_stats_memory">Geheugen</string>
+    <string name="run_stats_peak">Piekgeheugen</string>
+    <string name="run_stats_free">Vrij RAM</string>
+    <string name="run_stats_model_memory">Modelgeheugen</string>
+    <string name="run_stats_model_delta">Extra geheugen door model</string>
+    <string name="run_stats_ratio">Realtijdfactor</string>
 </resources>

@@ -255,4 +255,22 @@
     <string name="theme_black">Siyah</string>
     <string name="keyboard_auto_listen_title">Klavye açıldığında dinle</string>
     <string name="keyboard_auto_listen_sub">Yerel model etkinse normal metin alanlarında otomatik başlar.</string>
+    <string name="run_stats_title">İstatistikler</string>
+    <string name="run_stats_preparing">Ses hazırlanıyor</string>
+    <string name="run_stats_transcribing">Konuşma yazıya dökülüyor</string>
+    <string name="run_stats_processing">Ses işleniyor</string>
+    <string name="run_stats_complete">Tamamlandı</string>
+    <string name="run_stats_expand">İstatistikleri genişlet</string>
+    <string name="run_stats_collapse">İstatistikleri daralt</string>
+    <string name="run_stats_model">Model</string>
+    <string name="run_stats_decode">Kod çözme</string>
+    <string name="run_stats_load">Model yükleme</string>
+    <string name="run_stats_inference">Tanıma</string>
+    <string name="run_stats_audio">Ses süresi</string>
+    <string name="run_stats_memory">Bellek</string>
+    <string name="run_stats_peak">Tepe bellek kullanımı</string>
+    <string name="run_stats_free">Boş RAM</string>
+    <string name="run_stats_model_memory">Model belleği</string>
+    <string name="run_stats_model_delta">Modelin ek bellek kullanımı</string>
+    <string name="run_stats_ratio">Gerçek zaman katsayısı</string>
 </resources>

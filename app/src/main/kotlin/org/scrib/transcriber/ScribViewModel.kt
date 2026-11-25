@@ -85,7 +85,10 @@ data class TranscribeUi(
     val batchIndex: Int = 0,
     val batchTotal: Int = 0,
     // The stretch of the file this run covers, or null for the whole recording.
-    val range: AudioRange? = null
+    val range: AudioRange? = null,
+    val startedAtElapsedMs: Long? = null,
+    val usesEndpoint: Boolean = false,
+    val audioPrepared: Boolean = false
 ) {
     // What the screen shows and what Copy, Share and Save hand over. Falls back to the plain text
     // while the run is still going and when nothing was recognised.

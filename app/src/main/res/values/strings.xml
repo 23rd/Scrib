@@ -275,4 +275,25 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="theme_black">Black</string>
+    <string name="run_stats_title">Statistics</string>
+    <string name="run_stats_preparing">Preparing audio</string>
+    <string name="run_stats_transcribing">Transcribing speech</string>
+    <string name="run_stats_processing">Processing audio</string>
+    <string name="run_stats_complete">Complete</string>
+    <string name="run_stats_expand">Expand statistics</string>
+    <string name="run_stats_collapse">Collapse statistics</string>
+    <string name="run_stats_model">Model</string>
+    <string name="run_stats_decode">Decoding</string>
+    <string name="run_stats_load">Model loading</string>
+    <string name="run_stats_inference">Recognition</string>
+    <string name="run_stats_audio">Audio duration</string>
+    <string name="run_stats_memory">Memory</string>
+    <string name="run_stats_peak">Peak memory</string>
+    <string name="run_stats_free">Free RAM</string>
+    <string name="run_stats_model_memory">Model memory</string>
+    <string name="run_stats_model_delta">Memory added by model</string>
+    <string name="run_stats_ratio">Real-time factor</string>
+    <string name="run_stats_elapsed">%1$s · %2$s</string>
+    <string name="run_stats_multiplier">%1$.2f×</string>
+    <string name="run_stats_millis">%1$d ms</string>
 </resources>

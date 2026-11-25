@@ -1938,7 +1938,7 @@ private fun TranscriptionDialog(
             }
         },
         text = {
-            Column {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
                 if (t.running && t.batchTotal > 1) {
                     Text(
                         stringResource(R.string.transcribe_batch_position, t.batchIndex + 1, t.batchTotal),
@@ -1948,11 +1948,7 @@ private fun TranscriptionDialog(
                 }
                 when {
                     t.error != null -> Text(t.error, fontSize = 13.sp, color = cs.error, lineHeight = 18.sp)
-                    t.running && t.text.isEmpty() -> {
-                        Text(stringResource(R.string.decoding_transcribing), fontSize = 13.sp, color = cs.onSurfaceVariant)
-                        Spacer(Modifier.height(12.dp))
-                        RunProgress(t, showStats)
-                    }
+                    t.running && t.text.isEmpty() -> RunProgress(t)
                     else -> {
                         Column(Modifier.heightIn(max = 340.dp).verticalScroll(rememberScrollState())) {
                             Text(
@@ -1965,13 +1961,13 @@ private fun TranscriptionDialog(
                         }
                         if (t.running) {
                             Spacer(Modifier.height(12.dp))
-                            RunProgress(t, showStats)
+                            RunProgress(t)
                         }
                     }
                 }
-                if (!t.running && t.error == null && showStats && t.metrics.hasData) {
-                    Spacer(Modifier.height(8.dp))
-                    StatsLine(t)
+                if (t.error == null && (t.running || showStats && t.metrics.hasData)) {
+                    Spacer(Modifier.height(12.dp))
+                    TranscriptionStats(t, showStats)
                 }
                 if (hasText) {
                     Spacer(Modifier.height(12.dp))
@@ -2100,59 +2096,7 @@ private fun HistoryEntryDialog(
 }
 
 @Composable
-private fun StatsLine(t: TranscribeUi) {
-    if (!t.metrics.hasData) {
-        return
-    }
-    val metrics = t.metrics
-    val rtf = rtfText(metrics)
-    Column {
-        if (!t.modelName.isNullOrBlank()) {
-            Text(
-                text = stringResource(R.string.transcribe_stats_model, t.modelName),
-                fontSize = 11.5.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-        Text(
-            text = stringResource(
-                R.string.transcribe_stats_line,
-                elapsed(metrics.totalMs),
-                elapsedOrDash(metrics.decodeMs),
-                elapsed(metrics.modelLoadMs),
-                elapsedOrDash(metrics.inferenceMs),
-                elapsedOrDash(metrics.audioDurationMs),
-                rtf,
-                memoryText(metrics.pssMb),
-                memoryText(metrics.peakPssMb),
-                memoryText(metrics.freeRamMb)
-            ),
-            fontSize = 11.5.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 16.sp,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
-        if (metrics.modelPssMb > 0) {
-            Text(
-                text = stringResource(
-                    R.string.transcribe_stats_model_memory,
-                    memoryText(metrics.modelPssMb),
-                    memoryText(metrics.modelMemoryDeltaMb)
-                ),
-                fontSize = 11.5.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
-
-@Composable
-private fun memoryText(megabytes: Int): String =
+internal fun memoryText(megabytes: Int): String =
     if (megabytes >= 1024) {
         stringResource(R.string.transcribe_stats_gb, megabytes / 1024f)
     } else {
@@ -2162,8 +2106,6 @@ private fun memoryText(megabytes: Int): String =
 @Composable
 private fun memoryOrDash(megabytes: Int): String = if (megabytes > 0) memoryText(megabytes) else "—"
 
-private fun elapsedOrDash(ms: Long): String = if (ms > 0L) elapsed(ms) else "—"
-
 private fun rtfText(metrics: TranscriptionMetrics): String =
     metrics.rtf?.let { String.format(Locale.ROOT, "%.2f", it) } ?: "—"
 
@@ -2171,7 +2113,7 @@ private fun rtfText(metrics: TranscriptionMetrics): String =
 // until then rather than sitting at a misleading zero. The line underneath doubles as the promise
 // that walking away is safe — the run keeps going in the notification.
 @Composable
-private fun RunProgress(t: TranscribeUi, showStats: Boolean) {
+private fun RunProgress(t: TranscribeUi) {
     val cs = MaterialTheme.colorScheme
     val context = LocalContext.current
     Column(Modifier.fillMaxWidth()) {
@@ -2192,10 +2134,6 @@ private fun RunProgress(t: TranscribeUi, showStats: Boolean) {
                 },
                 fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = cs.primary
             )
-        }
-        if (showStats && t.metrics.hasData) {
-            Spacer(Modifier.height(6.dp))
-            StatsLine(t)
         }
         Spacer(Modifier.height(6.dp))
         Text(

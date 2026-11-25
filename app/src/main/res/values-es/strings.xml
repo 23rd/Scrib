@@ -255,4 +255,22 @@
     <string name="theme_black">Negro</string>
     <string name="keyboard_auto_listen_title">Escuchar al abrir el teclado</string>
     <string name="keyboard_auto_listen_sub">Empieza automáticamente en campos de texto normales si hay un modelo local activo.</string>
+    <string name="run_stats_title">Estadísticas</string>
+    <string name="run_stats_preparing">Preparando el audio</string>
+    <string name="run_stats_transcribing">Transcribiendo la voz</string>
+    <string name="run_stats_processing">Procesando el audio</string>
+    <string name="run_stats_complete">Listo</string>
+    <string name="run_stats_expand">Ampliar estadísticas</string>
+    <string name="run_stats_collapse">Contraer estadísticas</string>
+    <string name="run_stats_model">Modelo</string>
+    <string name="run_stats_decode">Decodificación</string>
+    <string name="run_stats_load">Carga del modelo</string>
+    <string name="run_stats_inference">Reconocimiento</string>
+    <string name="run_stats_audio">Duración del audio</string>
+    <string name="run_stats_memory">Memoria</string>
+    <string name="run_stats_peak">Pico de memoria</string>
+    <string name="run_stats_free">RAM libre</string>
+    <string name="run_stats_model_memory">Memoria del modelo</string>
+    <string name="run_stats_model_delta">Memoria adicional del modelo</string>
+    <string name="run_stats_ratio">Factor de tiempo real</string>
 </resources>

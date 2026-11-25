@@ -255,4 +255,23 @@
     <string name="theme_black">Чорна</string>
     <string name="keyboard_auto_listen_title">Слухати під час відкриття клавіатури</string>
     <string name="keyboard_auto_listen_sub">Запис починається автоматично у звичайних текстових полях, якщо вибрано локальну модель.</string>
+    <string name="run_stats_title">Статистика</string>
+    <string name="run_stats_preparing">Підготовка аудіо</string>
+    <string name="run_stats_transcribing">Розпізнавання мовлення</string>
+    <string name="run_stats_processing">Обробка аудіо</string>
+    <string name="run_stats_complete">Готово</string>
+    <string name="run_stats_expand">Розгорнути статистику</string>
+    <string name="run_stats_collapse">Згорнути статистику</string>
+    <string name="run_stats_model">Модель</string>
+    <string name="run_stats_decode">Декодування</string>
+    <string name="run_stats_load">Завантаження моделі</string>
+    <string name="run_stats_inference">Розпізнавання</string>
+    <string name="run_stats_audio">Тривалість аудіо</string>
+    <string name="run_stats_memory">Пам’ять</string>
+    <string name="run_stats_peak">Пік пам’яті</string>
+    <string name="run_stats_free">Вільна ОЗП</string>
+    <string name="run_stats_model_memory">Пам’ять моделі</string>
+    <string name="run_stats_model_delta">Приріст пам’яті від моделі</string>
+    <string name="run_stats_ratio">Коефіцієнт реального часу</string>
+    <string name="run_stats_millis">%1$d мс</string>
 </resources>

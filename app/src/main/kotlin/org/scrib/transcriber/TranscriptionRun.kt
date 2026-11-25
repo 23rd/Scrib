@@ -142,7 +142,9 @@ object TranscriptionRun {
             modelName = modelName,
             batchIndex = batchIndex,
             batchTotal = batchTotal,
-            range = range
+            range = range,
+            startedAtElapsedMs = SystemClock.elapsedRealtime(),
+            usesEndpoint = BuildConfig.ENDPOINTS_ONLY || EndpointPlugins.plugin?.isActive(app) == true
         )
         StateLog.log(
             "run started: file=$name model=$modelName${if (ephemeral) " (ephemeral)" else ""}" +
@@ -227,11 +229,13 @@ object TranscriptionRun {
                     },
                     onPartial = { partial -> _state.update { it?.copy(text = partial) } },
                     onMetrics = { metrics ->
+                        var audioJustPrepared = false
                         synchronized(metricsLock) {
                             if (metrics.audioDurationMs > 0L) {
                                 audioDurationMs = metrics.audioDurationMs
                                 if (inferenceStartedAt == 0L) {
                                     inferenceStartedAt = SystemClock.elapsedRealtime()
+                                    audioJustPrepared = true
                                 }
                             }
                             if (metrics.decodeMs > 0L) {
@@ -249,6 +253,10 @@ object TranscriptionRun {
                             if (metrics.modelMemoryDeltaMb > 0) {
                                 modelMemoryDeltaMb = metrics.modelMemoryDeltaMb
                             }
+                        }
+                        if (audioJustPrepared) {
+                            // The phase transition does not depend on the optional live sampler.
+                            _state.update { it?.copy(audioPrepared = true) }
                         }
                     },
                     range = range
