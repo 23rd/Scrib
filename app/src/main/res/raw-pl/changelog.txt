@@ -1,5 +1,6 @@
 # Nieopublikowane
 • Dodano ręczny wybór liczby wątków CPU dla żądań AIDL z innych aplikacji.
+• Naprawiono ucinanie końcówek słów przy strumieniowym rozpoznawaniu Sherpa.
 # 0.33
 • Dodano opcjonalne automatyczne nasłuchiwanie w klawiaturze głosowej, tylko z modelem lokalnym i poza polami haseł oraz innymi polami wrażliwymi.
 • Dodano eksport nagrań ze znacznikami czasu do SRT, VTT i LRC.

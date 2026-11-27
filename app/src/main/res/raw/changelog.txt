@@ -1,5 +1,6 @@
 # Unreleased
 • Added manual CPU thread selection for requests from other apps through AIDL.
+• Fixed dropped word endings in streaming Sherpa recognition.
 # 0.33
 • Added optional automatic listening to the voice keyboard with a local model. It stays off in passwords and other sensitive fields.
 • Added SRT, VTT and LRC exports for recordings saved with timestamps.

@@ -20,6 +20,7 @@ import java.nio.ByteOrder
 class SherpaTranscriptionEngine private constructor(private val appContext: Context) : TranscriptionEngine {
 
     private val nativeLock = Any()
+    private val onlineTailPadding = FloatArray(SAMPLE_RATE * 8 / 10)
 
     @Volatile
     private var recognizer: OfflineRecognizer? = null
@@ -341,6 +342,9 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 val stream = active.createStream()
                 try {
                     stream.acceptWaveform(samples, SAMPLE_RATE)
+                    // Online Zipformer needs right context to emit the last frames. The X-ASR
+                    // reference example supplies 800 ms of silence before the final decode.
+                    stream.acceptWaveform(onlineTailPadding, SAMPLE_RATE)
                     stream.inputFinished()
                     while (active.isReady(stream)) {
                         active.decode(stream)

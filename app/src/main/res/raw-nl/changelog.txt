@@ -1,5 +1,6 @@
 # Niet uitgebracht
 • Handmatige keuze van CPU-threads toegevoegd voor AIDL-verzoeken van andere apps.
+• Weggevallen woordeinden bij streamingherkenning met Sherpa hersteld.
 # 0.33
 • Optioneel automatisch luisteren toegevoegd aan het spraaktoetsenbord, alleen met een lokaal model en niet in wachtwoordvelden of andere gevoelige velden.
 • Opnamen met tijdcodes kunnen worden geëxporteerd als SRT, VTT en LRC.

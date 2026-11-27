@@ -1,5 +1,6 @@
 # Non publié
 • Ajout du choix manuel du nombre de threads CPU pour les requêtes AIDL des autres applications.
+• Correction des fins de mots tronquées par Sherpa en mode continu.
 # 0.33
 • Ajout de l’écoute automatique facultative au clavier vocal, uniquement avec un modèle local et hors des champs de mot de passe ou autres champs sensibles.
 • Ajout de l’exportation des enregistrements horodatés en SRT, VTT et LRC.
