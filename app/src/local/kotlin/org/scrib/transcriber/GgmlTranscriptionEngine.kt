@@ -380,7 +380,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
             releaseModel()
         }
         val active = ModelManager.openActiveModel(appContext) ?: throw ModelNotAvailableException()
-        val loaded = TranscribeModel.load(active.path)
+        val loaded = TranscribeModel.load(active.path, noMmap = active.key.startsWith(ModelManager.EXTERNAL_PREFIX))
         model = loaded
         loadedPath = active.key
         return loaded

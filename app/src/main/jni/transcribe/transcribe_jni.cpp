@@ -285,13 +285,16 @@ Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeModelUsesVad(JNIEn
 }
 
 JNIEXPORT jlong JNICALL
-Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeModelLoad(JNIEnv *env, jobject, jstring path) {
+Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeModelLoad(JNIEnv *env, jobject, jstring path,
+                                                         jboolean noMmap) {
     load_cpu_backend();
     const std::string file = to_std(env, path);
     transcribe_model *model = nullptr;
     transcribe_model_load_params params;
     transcribe_model_load_params_init(&params);
     params.backend = TRANSCRIBE_BACKEND_CPU;
+    // Files selected from shared storage may be rewritten by another app.
+    params.no_mmap = noMmap == JNI_TRUE;
     const transcribe_status status = transcribe_model_load_file(file.c_str(), &params, &model);
     if (status != TRANSCRIBE_OK) {
         throw_status(env, "load model", status);

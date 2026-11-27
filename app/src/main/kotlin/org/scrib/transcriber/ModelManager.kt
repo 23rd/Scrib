@@ -490,21 +490,18 @@ object ModelManager {
             if (isModelFile(it)) it else "$it.gguf"
         }
         val dest = fileFor(context, name)
-        val temp = File(dest.absolutePath + ".part")
-        temp.delete()
-        val input = context.contentResolver.openInputStream(uri) ?: throw RuntimeException("Cannot open file")
-        input.use { source ->
-            temp.outputStream().use { output -> source.copyTo(output) }
-        }
-        if (temp.length() <= MIN_VALID_SIZE) {
-            temp.delete()
-            throw RuntimeException("File is too small to be a model")
-        }
-        if (dest.exists()) {
-            dest.delete()
-        }
-        if (!temp.renameTo(dest)) {
-            temp.copyTo(dest, overwrite = true)
+        val temp = File.createTempFile("import-", ".part", dest.parentFile)
+        try {
+            val input = context.contentResolver.openInputStream(uri) ?: throw RuntimeException("Cannot open file")
+            input.use { source ->
+                temp.outputStream().use { output -> source.copyTo(output) }
+            }
+            if (temp.length() <= MIN_VALID_SIZE) {
+                throw RuntimeException("File is too small to be a model")
+            }
+            // Replace the directory entry, never the inode an active session may have mapped.
+            if (!temp.renameTo(dest)) throw java.io.IOException("Could not install imported model")
+        } finally {
             temp.delete()
         }
         if (activeFileName(context) == null) {

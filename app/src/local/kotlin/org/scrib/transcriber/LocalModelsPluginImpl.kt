@@ -17,7 +17,7 @@ class LocalModelsPluginImpl : LocalModelsPlugin {
         val active = ModelManager.openActiveModel(context)
             ?: return SelfTestResult(context.getString(R.string.status_selftest_needs_model), true)
         return try {
-            val model = TranscribeModel.load(active.path)
+            val model = TranscribeModel.load(active.path, noMmap = active.key.startsWith(ModelManager.EXTERNAL_PREFIX))
             try {
                 val session = model.openSession(CpuConfig.preferredThreadCount)
                 try {

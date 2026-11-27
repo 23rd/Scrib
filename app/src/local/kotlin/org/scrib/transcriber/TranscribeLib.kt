@@ -171,9 +171,9 @@ class TranscribeModel private constructor(private var ptr: Long) {
             return TranscribeLib.nativeModelUsesVad(path)
         }
 
-        fun load(path: String): TranscribeModel {
+        fun load(path: String, noMmap: Boolean): TranscribeModel {
             systemInfo
-            val model = TranscribeLib.nativeModelLoad(path)
+            val model = TranscribeLib.nativeModelLoad(path, noMmap)
             if (model == 0L) {
                 throw DecodeException("Couldn't load model $path")
             }
@@ -320,7 +320,7 @@ private class TranscribeLib {
             speechPadMs: Int
         ): LongArray
 
-        external fun nativeModelLoad(path: String): Long
+        external fun nativeModelLoad(path: String, noMmap: Boolean): Long
         external fun nativeModelFree(modelPtr: Long)
         external fun nativeModelArch(modelPtr: Long): String?
         external fun nativeModelVariant(modelPtr: Long): String?
