@@ -201,7 +201,7 @@ JNIEXPORT jstring JNICALL
 Java_org_scrib_transcriber_TranscribeLib_00024Companion_nativeInit(JNIEnv *env, jclass) {
     load_cpu_backend();
     char info[256];
-    snprintf(info, sizeof(info), "transcribe.cpp %s (%s), %d backend(s)",
+    snprintf(info, sizeof(info), "transcribe.cpp %s (%s), %zu backend(s)",
              transcribe_version(), transcribe_version_commit(), ggml_backend_reg_count());
     return env->NewStringUTF(info);
 }
