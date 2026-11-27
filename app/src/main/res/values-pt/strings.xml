@@ -273,4 +273,6 @@
     <string name="run_stats_model_memory">Memória do modelo</string>
     <string name="run_stats_model_delta">Memória adicional do modelo</string>
     <string name="run_stats_ratio">Fator de tempo real</string>
+    <string name="aidl_threads">Threads de reconhecimento AIDL</string>
+    <string name="aidl_threads_auto">Automático</string>
 </resources>

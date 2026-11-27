@@ -274,4 +274,6 @@
     <string name="run_stats_model_delta">Прирост памяти от модели</string>
     <string name="run_stats_ratio">Коэффициент реального времени</string>
     <string name="run_stats_millis">%1$d мс</string>
+    <string name="aidl_threads">Потоки распознавания через AIDL</string>
+    <string name="aidl_threads_auto">Авто</string>
 </resources>

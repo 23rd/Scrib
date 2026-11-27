@@ -1,3 +1,5 @@
+# Sin publicar
+• Se añadió la selección manual de hilos de CPU para solicitudes AIDL de otras aplicaciones.
 # 0.33
 • Añadida la escucha automática opcional al teclado de voz, solo con un modelo local y nunca en campos de contraseña u otros campos sensibles.
 • Añadida la exportación de grabaciones con marcas de tiempo en SRT, VTT y LRC.

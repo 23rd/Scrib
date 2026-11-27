@@ -1005,6 +1005,7 @@ private fun SettingsTab(
             item { NudgeCard(state, actions) }
         }
         item { AppThemeEntry() }
+        if (BuildConfig.LOCAL_MODELS) item { AidlThreadsEntry() }
         if (BuildConfig.LOCAL_MODELS) {
             item {
                 Text(
@@ -1150,6 +1151,58 @@ private fun AppThemeEntry() {
                         ) {
                             RadioButton(selected = item == selected, onClick = null)
                             Text(stringResource(item.title))
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { expanded = false }) { Text(stringResource(android.R.string.cancel)) }
+            }
+        )
+    }
+}
+
+@Composable
+private fun AidlThreadsEntry() {
+    val context = LocalContext.current
+    var selected by remember { mutableStateOf(AidlThreads.read(context)) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
+            .testTag("scrib/settings/aidl_threads")
+            .clickableRow(RoundedCornerShape(14.dp)) { expanded = true }
+    ) {
+        Row(
+            Modifier.padding(horizontal = 14.dp, vertical = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.aidl_threads), modifier = Modifier.weight(1f))
+            Text(selected.count?.toString() ?: stringResource(R.string.aidl_threads_auto), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+    if (expanded) {
+        AlertDialog(
+            onDismissRequest = { expanded = false },
+            title = { Text(stringResource(R.string.aidl_threads)) },
+            text = {
+                Column(Modifier.selectableGroup()) {
+                    AidlThreads.entries.forEach { item ->
+                        Row(
+                            Modifier.fillMaxWidth()
+                                .heightIn(min = 48.dp)
+                                .selectable(selected = item == selected, role = Role.RadioButton) {
+                                    AidlThreads.write(context, item)
+                                    selected = item
+                                    expanded = false
+                                },
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(selected = item == selected, onClick = null)
+                            Text(item.count?.toString() ?: stringResource(R.string.aidl_threads_auto))
                         }
                     }
                 }

@@ -47,8 +47,9 @@ class TranscriptionService : Service() {
                 return null
             }
             val cancellation = CancellationToken()
+            val threads = AidlThreads.read(applicationContext).count
             executor.execute {
-                TranscriptionEngine.get(applicationContext).transcribe(audio, request, callback, cancellation)
+                TranscriptionEngine.get(applicationContext).transcribe(audio, request, callback, cancellation, threads)
             }
             return object : ITranscriptionSession.Stub() {
                 override fun cancel() {
@@ -64,7 +65,8 @@ class TranscriptionService : Service() {
             if (callback == null || BenchmarkBatchGate.isActive) {
                 return null
             }
-            val stream = TranscriptionEngine.get(applicationContext).openStream(request, callback)
+            val threads = AidlThreads.read(applicationContext).count
+            val stream = TranscriptionEngine.get(applicationContext).openStream(request, callback, threads)
             streams.add(stream)
             stream.start { streams.remove(stream) }
             return object : ITranscriptionStream.Stub() {

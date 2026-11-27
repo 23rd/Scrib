@@ -20,6 +20,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
     @Volatile
     private var session: TranscribeSession? = null
 
+    private var sessionThreads: Int? = null
+
     @Volatile
     private var loadedPath: String? = null
 
@@ -27,7 +29,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
         callback: ITranscriptionCallback,
-        cancellation: CancellationToken
+        cancellation: CancellationToken,
+        threads: Int?
     ) {
         try {
             val range = request.rangeOrNull()
@@ -41,7 +44,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                     } catch (ignore: Exception) {
                     }
                 },
-                range = range
+                range = range,
+                threads = threads
             ).filterOverlapping(range)
             callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
@@ -56,16 +60,20 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         }
     }
 
-    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream =
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback, threads: Int?): AudioStream =
         AudioStream(request, callback) { samples, sampleCount, language, prompt, cancellation ->
             val abort = TranscribeAbort.create()
             try {
                 cancellation.onCancel { abort.cancel() }
-                val live = session()
-                val audio = RunAudio.whole(samples, sampleCount)
-                val text = runUtterance(live, model()!!.info, audio, 0, sampleCount, language, abort).text
-                val spoken = live.detectedLanguage ?: language
-                TranscribedSegment(Dictionary.applyReplacements(appContext, text), spoken)
+                synchronized(this) {
+                    if (cancellation.isCancelled) throw CancelledException()
+                    val loaded = model()
+                    val live = session(loaded, threads ?: CpuConfig.preferredThreadCount)
+                    val audio = RunAudio.whole(samples, sampleCount)
+                    val text = runUtterance(live, loaded.info, audio, 0, sampleCount, language, abort).text
+                    val spoken = live.detectedLanguage ?: language
+                    TranscribedSegment(Dictionary.applyReplacements(appContext, text), spoken)
+                }
             } finally {
                 abort.close()
             }
@@ -78,7 +86,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
         onMetrics: (TranscriptionMetrics) -> Unit,
-        range: AudioRange?
+        range: AudioRange?,
+        threads: Int?
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
@@ -137,7 +146,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                         },
                         // The decoded buffer starts at this moment of the original file; RunAudio
                         // adds it once, where buffer-relative times turn into original ones.
-                        rangeStartMs = range?.startMs?.coerceAtLeast(0L) ?: 0L
+                        rangeStartMs = range?.startMs?.coerceAtLeast(0L) ?: 0L,
+                        threads = threads ?: CpuConfig.preferredThreadCount
                     )
                 } finally {
                     onMetrics(
@@ -163,6 +173,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         }
     }
 
+    @Synchronized
     private fun transcribePcm(
         pcm: DecodedAudio,
         languageHint: String?,
@@ -171,7 +182,8 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         onPartial: (String) -> Unit,
         onRecognitionStart: () -> Unit,
         onModelLoad: (TranscriptionMetrics) -> Unit,
-        rangeStartMs: Long
+        rangeStartMs: Long,
+        threads: Int
     ): List<TranscriptSegment> {
         val abort = TranscribeAbort.create()
         cancellation.onCancel { abort.cancel() }
@@ -180,11 +192,12 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
                 throw CancelledException()
             }
             val activeKey = ModelManager.activeModelKey(appContext) ?: throw ModelNotAvailableException()
-            val alreadyLoaded = loadedPath == activeKey && session != null
+            val alreadyLoaded = loadedPath == activeKey && session != null && sessionThreads == threads
             val beforeLoad = processMemory(appContext)
             val loadStartedAt = SystemClock.elapsedRealtime()
-            val live = session()
-            val info = model()!!.info
+            val loaded = model()
+            val live = session(loaded, threads)
+            val info = loaded.info
             val modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - loadStartedAt
             val hinted = languageHint?.takeIf { it.isNotEmpty() && it in info.languages }
             val afterLoad = processMemory(appContext)
@@ -331,6 +344,7 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
         TranscribeVad.release()
         session?.release()
         session = null
+        sessionThreads = null
         model?.release()
         model = null
         loadedPath = null
@@ -364,10 +378,16 @@ class GgmlTranscriptionEngine(private val appContext: Context) : TranscriptionEn
     }
 
     @Synchronized
-    private fun session(): TranscribeSession {
-        session?.let { return it }
-        val loaded = model()
-        return loaded.openSession(CpuConfig.preferredThreadCount).also { session = it }
+    private fun session(loaded: TranscribeModel, threads: Int): TranscribeSession {
+        session?.takeIf { sessionThreads == threads }?.let { return it }
+        session?.release()
+        session = null
+        sessionThreads = null
+        return loaded.openSession(threads).also {
+            session = it
+            sessionThreads = threads
+            Log.i("ScribTranscribe", "Opened GGML session: threads=$threads")
+        }
     }
 
     @Synchronized

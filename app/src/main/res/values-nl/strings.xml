@@ -273,4 +273,6 @@
     <string name="run_stats_model_memory">Modelgeheugen</string>
     <string name="run_stats_model_delta">Extra geheugen door model</string>
     <string name="run_stats_ratio">Realtijdfactor</string>
+    <string name="aidl_threads">AIDL-threads voor herkenning</string>
+    <string name="aidl_threads_auto">Automatisch</string>
 </resources>

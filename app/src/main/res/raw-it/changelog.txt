@@ -1,3 +1,5 @@
+# Non pubblicato
+• Aggiunta la scelta manuale dei thread CPU per le richieste AIDL di altre app.
 # 0.33
 • Aggiunto l’ascolto automatico facoltativo nella tastiera vocale, solo con un modello locale e non nei campi per password o in altri campi sensibili.
 • Aggiunta l’esportazione delle registrazioni con marcature temporali in SRT, VTT e LRC.

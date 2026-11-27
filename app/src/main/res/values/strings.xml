@@ -296,4 +296,6 @@
     <string name="run_stats_elapsed">%1$s · %2$s</string>
     <string name="run_stats_multiplier">%1$.2f×</string>
     <string name="run_stats_millis">%1$d ms</string>
+    <string name="aidl_threads">AIDL inference threads</string>
+    <string name="aidl_threads_auto">Auto</string>
 </resources>

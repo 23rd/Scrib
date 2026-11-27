@@ -1,3 +1,5 @@
+# Unveröffentlicht
+• Manuelle Auswahl der CPU-Threads für AIDL-Anfragen anderer Apps hinzugefügt.
 # 0.33
 • Automatisches Zuhören für die Sprachtastatur hinzugefügt: optional, nur mit lokalem Modell und nicht in Passwortfeldern oder anderen sensiblen Feldern.
 • Aufnahmen mit Zeitstempeln lassen sich als SRT, VTT und LRC exportieren.

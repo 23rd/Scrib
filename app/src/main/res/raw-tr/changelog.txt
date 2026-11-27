@@ -1,3 +1,5 @@
+# Yayımlanmadı
+• Diğer uygulamalardan gelen AIDL istekleri için elle CPU iş parçacığı seçimi eklendi.
 # 0.33
 • Sesli klavyeye isteğe bağlı otomatik dinleme eklendi. Yalnızca yerel modelle çalışır; parola alanlarında ve diğer hassas alanlarda devreye girmez.
 • Zaman damgalı kayıtlar için SRT, VTT ve LRC dışa aktarma eklendi.

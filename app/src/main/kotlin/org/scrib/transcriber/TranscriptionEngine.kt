@@ -33,7 +33,8 @@ interface TranscriptionEngine {
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
         callback: ITranscriptionCallback,
-        cancellation: CancellationToken
+        cancellation: CancellationToken,
+        threads: Int? = null
     )
 
     // With a range, an engine that honors it decodes only [startMs, endMs) and returns segment
@@ -46,11 +47,12 @@ interface TranscriptionEngine {
         onProgress: (Int) -> Unit = {},
         onPartial: (String) -> Unit,
         onMetrics: (TranscriptionMetrics) -> Unit = {},
-        range: AudioRange? = null
+        range: AudioRange? = null,
+        threads: Int? = null
     ): List<TranscriptSegment>
 
     // The caller starts the returned stream and feeds it PCM as it is captured.
-    fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream
+    fun openStream(request: StreamRequest?, callback: ITranscriptionCallback, threads: Int? = null): AudioStream
 
     // Hands the model's native memory back until the next request needs it. Blocks while a
     // transcription is running, so it does not belong on the main thread.

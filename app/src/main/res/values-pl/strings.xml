@@ -273,4 +273,6 @@
     <string name="run_stats_model_memory">Pamięć modelu</string>
     <string name="run_stats_model_delta">Przyrost pamięci modelu</string>
     <string name="run_stats_ratio">Współczynnik czasu rzeczywistego</string>
+    <string name="aidl_threads">Wątki rozpoznawania AIDL</string>
+    <string name="aidl_threads_auto">Automatycznie</string>
 </resources>

@@ -273,4 +273,6 @@
     <string name="run_stats_model_memory">Model belleği</string>
     <string name="run_stats_model_delta">Modelin ek bellek kullanımı</string>
     <string name="run_stats_ratio">Gerçek zaman katsayısı</string>
+    <string name="aidl_threads">AIDL tanıma iş parçacıkları</string>
+    <string name="aidl_threads_auto">Otomatik</string>
 </resources>

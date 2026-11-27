@@ -33,11 +33,14 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
     @Volatile
     private var loadedLanguage: String? = null
 
+    private var loadedThreads: Int? = null
+
     override fun transcribe(
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
         callback: ITranscriptionCallback,
-        cancellation: CancellationToken
+        cancellation: CancellationToken,
+        threads: Int?
     ) {
         try {
             val range = request.rangeOrNull()
@@ -51,7 +54,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                     } catch (ignore: Exception) {
                     }
                 },
-                range = range
+                range = range,
+                threads = threads
             ).filterOverlapping(range)
             callback.emitSegments(segments)
             callback.onTranscriptionResult(segments.format(TranscriptFormat.TXT))
@@ -66,11 +70,11 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         }
     }
 
-    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream {
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback, threads: Int?): AudioStream {
         val language = request?.languageHint ?: activeLanguage()
         return AudioStream(request, callback) { samples, sampleCount, _, _, _ ->
             val text = Dictionary.applyReplacements(
-                appContext, decodeWindow(copyWindow(samples, 0, sampleCount), request?.languageHint)
+                appContext, decodeWindow(copyWindow(samples, 0, sampleCount), request?.languageHint, threads)
             )
             Log.d(TAG, "stream chunk: $sampleCount samples -> ${text.length} chars")
             TranscribedSegment(text, language)
@@ -87,7 +91,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
         onMetrics: (TranscriptionMetrics) -> Unit,
-        range: AudioRange?
+        range: AudioRange?,
+        threads: Int?
     ): List<TranscriptSegment> {
         try {
             if (cancellation.isCancelled) {
@@ -116,7 +121,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                     onPartial,
                     onMetrics,
                     audioDurationMs,
-                    decodeMs
+                    decodeMs,
+                    threads
                 ).rebasedToOriginal(range)
             } finally {
                 pcm.close()
@@ -138,7 +144,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         onPartial: (String) -> Unit,
         onMetrics: (TranscriptionMetrics) -> Unit,
         audioDurationMs: Long,
-        decodeMs: Long
+        decodeMs: Long,
+        threads: Int?
     ): List<TranscriptSegment> {
         if (cancellation.isCancelled) {
             throw CancelledException()
@@ -164,7 +171,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             val beforeLoad = processMemory(appContext)
             val modelLoadStartedAt = SystemClock.elapsedRealtime()
             val alreadyLoaded = synchronized(nativeLock) {
-                ensureRecognizerLocked(languageHint)
+                ensureRecognizerLocked(languageHint, threads)
             }
             val afterLoad = processMemory(appContext)
             modelLoadMs = if (alreadyLoaded) 0L else SystemClock.elapsedRealtime() - modelLoadStartedAt
@@ -179,9 +186,9 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             )
             val vadPath = ModelManager.sherpaVadModelPath(appContext)
             return if (vadPath != null && sampleCount > WINDOW_SAMPLES) {
-                transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, ::reportProgress, onPartial)
+                transcribeWithVad(samples, sampleCount, vadPath, languageHint, cancellation, ::reportProgress, onPartial, threads)
             } else {
-                transcribeWindows(samples, sampleCount, languageHint, cancellation, ::reportProgress, onPartial)
+                transcribeWindows(samples, sampleCount, languageHint, cancellation, ::reportProgress, onPartial, threads)
             }
         } finally {
             onMetrics(
@@ -203,7 +210,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        threads: Int?
     ): List<TranscriptSegment> {
         val windows = (sampleCount + WINDOW_SAMPLES - 1) / WINDOW_SAMPLES
         val segments = ArrayList<TranscriptSegment>(windows)
@@ -215,7 +223,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             val offset = i * WINDOW_SAMPLES
             val length = minOf(WINDOW_SAMPLES, sampleCount - offset)
             val text = Dictionary.applyReplacements(
-                appContext, decodeWindow(copyWindow(samples, offset, length), languageHint)
+                appContext, decodeWindow(copyWindow(samples, offset, length), languageHint, threads)
             )
             if (text.isNotEmpty()) {
                 val startMs = offset.toLong() * 1000 / SAMPLE_RATE
@@ -242,7 +250,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         languageHint: String?,
         cancellation: CancellationToken,
         onProgress: (Int) -> Unit,
-        onPartial: (String) -> Unit
+        onPartial: (String) -> Unit,
+        threads: Int?
     ): List<TranscriptSegment> {
         val vad = try {
             Vad(
@@ -256,7 +265,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             )
         } catch (e: Throwable) {
             Log.w(TAG, "Sherpa VAD could not load", e)
-            return transcribeWindows(samples, sampleCount, languageHint, cancellation, onProgress, onPartial)
+            return transcribeWindows(samples, sampleCount, languageHint, cancellation, onProgress, onPartial, threads)
         }
         val segments = ArrayList<TranscriptSegment>()
         val speech = ArrayList<SpeechSpan>()
@@ -266,7 +275,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             if (samples.isEmpty()) {
                 return
             }
-            val text = Dictionary.applyReplacements(appContext, decodeWindow(samples, languageHint))
+            val text = Dictionary.applyReplacements(appContext, decodeWindow(samples, languageHint, threads))
             if (text.isEmpty()) {
                 return
             }
@@ -323,10 +332,10 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         return finishSegments(segments, speech)
     }
 
-    private fun decodeWindow(samples: FloatArray, languageHint: String? = null): String {
+    private fun decodeWindow(samples: FloatArray, languageHint: String?, threads: Int?): String {
         synchronized(nativeLock) {
             val info = activeModelInfo() ?: throw ModelNotAvailableException()
-            ensureRecognizerLocked(languageHint)
+            ensureRecognizerLocked(languageHint, threads)
             if (SherpaModel.isStreaming(info.modelType)) {
                 val active = onlineRecognizer ?: throw ModelNotAvailableException()
                 val stream = active.createStream()
@@ -412,7 +421,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         null
     }
 
-    private fun ensureRecognizerLocked(languageHint: String? = null): Boolean {
+    private fun ensureRecognizerLocked(languageHint: String?, threads: Int?): Boolean {
         val info = activeModelInfo()
             ?: throw ModelNotAvailableException()
         val dir = SherpaModel.dirFor(appContext, info.id)
@@ -430,7 +439,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             else -> null
         }
         val streaming = SherpaModel.isStreaming(info.modelType)
-        if (loadedId == info.id && loadedLanguage == language) {
+        val effectiveThreads = threads ?: 4
+        if (loadedId == info.id && loadedLanguage == language && loadedThreads == effectiveThreads) {
             if (streaming && onlineRecognizer != null) {
                 return true
             }
@@ -456,17 +466,18 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
                 if (streaming) {
                     onlineRecognizer = OnlineRecognizer(
                         null,
-                        SherpaModel.buildOnlineConfig(dir, info, provider)
+                        SherpaModel.buildOnlineConfig(dir, info, provider, effectiveThreads)
                     )
                 } else {
                     recognizer = OfflineRecognizer(
                         null,
-                        SherpaModel.buildConfig(dir, info, provider, languageHint)
+                        SherpaModel.buildConfig(dir, info, provider, languageHint, effectiveThreads)
                     )
                 }
                 loadedId = info.id
                 loadedLanguage = language
-                Log.i(TAG, "Sherpa provider=$provider — OK")
+                loadedThreads = effectiveThreads
+                Log.i(TAG, "Sherpa provider=$provider, threads=$effectiveThreads — OK")
                 return false
             } catch (e: Exception) {
                 Log.w(TAG, "Sherpa provider '$provider' failed: ${e.message}")

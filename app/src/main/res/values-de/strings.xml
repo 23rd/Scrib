@@ -273,4 +273,6 @@
     <string name="run_stats_model_memory">Modellspeicher</string>
     <string name="run_stats_model_delta">Zusatzspeicher durch Modell</string>
     <string name="run_stats_ratio">Echtzeitfaktor</string>
+    <string name="aidl_threads">AIDL-Threads für die Erkennung</string>
+    <string name="aidl_threads_auto">Automatisch</string>
 </resources>

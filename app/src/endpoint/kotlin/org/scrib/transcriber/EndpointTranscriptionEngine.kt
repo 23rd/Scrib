@@ -29,7 +29,8 @@ class EndpointTranscriptionEngine(
         audio: ParcelFileDescriptor,
         request: TranscriptionRequest?,
         callback: ITranscriptionCallback,
-        cancellation: CancellationToken
+        cancellation: CancellationToken,
+        threads: Int?
     ) {
         try {
             val range = request.rangeOrNull()
@@ -58,7 +59,7 @@ class EndpointTranscriptionEngine(
         }
     }
 
-    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback): AudioStream {
+    override fun openStream(request: StreamRequest?, callback: ITranscriptionCallback, threads: Int?): AudioStream {
         val language = request?.languageHint?.takeIf { it.isNotEmpty() }
         return AudioStream(request, callback) { samples, sampleCount, _, prompt, _ ->
             val wav = WavWriter.encode(samples, sampleCount, SAMPLE_RATE)
@@ -79,7 +80,8 @@ class EndpointTranscriptionEngine(
         onProgress: (Int) -> Unit,
         onPartial: (String) -> Unit,
         onMetrics: (TranscriptionMetrics) -> Unit,
-        range: AudioRange?
+        range: AudioRange?,
+        threads: Int?
     ): List<TranscriptSegment> {
         val startedAt = SystemClock.elapsedRealtime()
         try {

@@ -1,3 +1,5 @@
+# Não lançado
+• Adicionada seleção manual dos threads da CPU para solicitações AIDL de outros aplicativos.
 # 0.33
 • Adicionada a escuta automática opcional ao teclado de voz, apenas com um modelo local e nunca em campos de palavras-passe ou outros campos sensíveis.
 • Adicionada a exportação de gravações com marcas temporais em SRT, VTT e LRC.

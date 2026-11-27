@@ -314,7 +314,8 @@ object SherpaModel {
         dir: File,
         info: SherpaModelInfo,
         provider: String = "cpu",
-        languageHint: String? = null
+        languageHint: String? = null,
+        threads: Int = 4
     ): OfflineRecognizerConfig {
         val tokens = File(dir, info.files.getValue(ROLE_TOKENS)).absolutePath
         val modelConfig = when (info.modelType) {
@@ -325,7 +326,7 @@ object SherpaModel {
                     useInverseTextNormalization = true
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_MOONSHINE -> OfflineModelConfig(
@@ -334,7 +335,7 @@ object SherpaModel {
                     mergedDecoder = File(dir, info.files.getValue(ROLE_MERGED_DECODER)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_CANARY -> OfflineModelConfig(
@@ -346,7 +347,7 @@ object SherpaModel {
                     usePnc = true
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_DOLPHIN -> OfflineModelConfig(
@@ -354,7 +355,7 @@ object SherpaModel {
                     model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_OMNILINGUAL -> OfflineModelConfig(
@@ -362,7 +363,7 @@ object SherpaModel {
                     model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_NEMO_CTC -> OfflineModelConfig(
@@ -370,7 +371,7 @@ object SherpaModel {
                     model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_ZIPFORMER_CTC -> OfflineModelConfig(
@@ -378,7 +379,7 @@ object SherpaModel {
                     model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_FIRE_RED_AED -> OfflineModelConfig(
@@ -387,7 +388,7 @@ object SherpaModel {
                     decoder = File(dir, info.files.getValue(ROLE_DECODER)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             TYPE_FIRE_RED_CTC -> OfflineModelConfig(
@@ -395,7 +396,7 @@ object SherpaModel {
                     model = File(dir, info.files.getValue(ROLE_MODEL)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider
             )
             else -> OfflineModelConfig(
@@ -405,7 +406,7 @@ object SherpaModel {
                     joiner = File(dir, info.files.getValue(ROLE_JOINER)).absolutePath
                 ),
                 tokens = tokens,
-                numThreads = 4,
+                numThreads = threads,
                 provider = provider,
                 modelType = info.modelType
             )
@@ -422,7 +423,8 @@ object SherpaModel {
     fun buildOnlineConfig(
         dir: File,
         info: SherpaModelInfo,
-        provider: String = "cpu"
+        provider: String = "cpu",
+        threads: Int = 4
     ): OnlineRecognizerConfig {
         val modelConfig = OnlineModelConfig(
             transducer = OnlineTransducerModelConfig(
@@ -431,7 +433,7 @@ object SherpaModel {
                 joiner = File(dir, info.files.getValue(ROLE_JOINER)).absolutePath
             ),
             tokens = File(dir, info.files.getValue(ROLE_TOKENS)).absolutePath,
-            numThreads = 4,
+            numThreads = threads,
             provider = provider,
             modelType = if (info.modelType == TYPE_STREAMING_ZIPFORMER2) "zipformer2" else ""
         )
