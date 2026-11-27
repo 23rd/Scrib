@@ -262,7 +262,7 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
         val speech = ArrayList<SpeechSpan>()
         val cumulative = StringBuilder()
         val input = samples.duplicate().order(ByteOrder.nativeOrder()).asFloatBuffer()
-        fun appendSegment(start: Int, samples: FloatArray) {
+        fun appendSegment(start: Long, samples: FloatArray) {
             if (samples.isEmpty()) {
                 return
             }
@@ -270,8 +270,8 @@ class SherpaTranscriptionEngine private constructor(private val appContext: Cont
             if (text.isEmpty()) {
                 return
             }
-            val startMs = start.toLong() * 1000 / SAMPLE_RATE
-            val endMs = (start + samples.size).toLong() * 1000 / SAMPLE_RATE
+            val startMs = start * 1000 / SAMPLE_RATE
+            val endMs = (start + samples.size) * 1000 / SAMPLE_RATE
             segments.add(TranscriptSegment(startMs, endMs, if (segments.isEmpty()) text else " $text"))
             speech.add(SpeechSpan(startMs, endMs))
             if (cumulative.isNotEmpty()) {
