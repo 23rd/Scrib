@@ -1,0 +1,40 @@
+name: Nightly APKs
+
+on:
+  push:
+    branches: [nightly]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Scrib-Nightly
+            flags: ''
+          - name: Scrib-Max-Nightly
+            flags: '-PwithSherpa'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Fetch Sherpa runtime
+        if: matrix.flags == '-PwithSherpa'
+        run: scripts/download-sherpa-onnx.sh
+      - name: Build Android nightly
+        run: ./gradlew :app:assembleRelease -Pnightly -Pabis=arm64-v8a,armeabi-v7a ${{ matrix.flags }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error

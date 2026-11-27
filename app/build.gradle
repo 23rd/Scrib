@@ -13,7 +13,9 @@ if (max && remote) {
 }
 def local = !remote
 def suffix = max ? '.max' : remote ? '.remote' : ''
-def appName = max ? 'Scrib Max' : remote ? 'Scrib Remote' : 'Scrib'
+def nightly = project.hasProperty('nightly')
+def baseAppName = max ? 'Scrib Max' : remote ? 'Scrib Remote' : 'Scrib'
+def appName = nightly ? "${baseAppName} Nightly" : baseAppName
 def launcher = max ? 'ic_launcher_max' : remote ? 'ic_launcher_remote' : 'ic_launcher'
 def launcherRound = max ? 'ic_launcher_round_max' : remote ? 'ic_launcher_round_remote' : 'ic_launcher_round'
 
@@ -24,11 +26,11 @@ android {
     ndkVersion '27.2.12479018'
 
     defaultConfig {
-        applicationId "org.scrib.transcriber${suffix}"
+        applicationId "org.scrib.transcriber${suffix}${nightly ? '.nightly' : ''}"
         minSdk 26
         targetSdk 35
         versionCode 33
-        versionName '0.33'
+        versionName(nightly ? '0.33-nightly' : '0.33')
 
         resValue 'string', 'app_name', appName
 
@@ -97,6 +99,10 @@ android {
     buildTypes {
         release {
             minifyEnabled false
+            // Nightly APKs install alongside stable without enabling debug-only receivers.
+            if (nightly) {
+                signingConfig signingConfigs.debug
+            }
         }
         debug {
             applicationIdSuffix '.debug'
