@@ -99,6 +99,18 @@ Omit both flags and you get the lean Scrib that F-Droid builds. `-Pabis=` picks
 the architectures to compile and `-PabiSplits` adds one apk per architecture next
 to the universal one; the release workflow passes both.
 
+## Importing X-ASR in Scrib Max
+
+Download and extract an English/Chinese [X-ASR punct-int8 model](https://k2-fsa.github.io/sherpa/onnx/x-asr/index.html).
+In **Settings → Sherpa models → Add sherpa model**, choose **Standard
+transducer** for the offline export or **Streaming transducer (Zipformer…)**
+for the streaming export. Assign the encoder, decoder, joiner and
+tokens.txt; for languages enter zh, en. Then activate the imported model.
+
+On nightly builds, **Settings → AIDL inference threads** changes the local
+engine's thread count for requests from other apps only. **Auto** leaves the
+engine's usual defaults in place.
+
 ## Testing on a phone
 
 [scripts/onphone/README.md](scripts/onphone/README.md) documents the test
